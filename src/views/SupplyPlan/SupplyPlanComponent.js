@@ -535,7 +535,6 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     exportPDF = () => {
-        //console.log(this.state.bars)
         const addFooters = doc => {
 
             const pageCount = doc.internal.getNumberOfPages()
@@ -848,7 +847,6 @@ export default class SupplyPlanComponent extends React.Component {
             var canv=  document.getElementById("cool-canvas"+count)
                  
            var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        //   console.log(canvasImg1)
           console.log('count',count, doc.addImage(canvasImg1, 'png', 50, 160, 750, 290,"a"+count ,'CANVAS'));
           count++
   
@@ -2174,7 +2172,6 @@ export default class SupplyPlanComponent extends React.Component {
             ledgerForBatch:ledgerForBatch,
             loading:false
         })
-        console.log("ledgerForBatch+++",ledgerForBatch)
     }
 
     showShipmentWithBatch(batchNo,expiryDate){
@@ -2192,7 +2189,6 @@ export default class SupplyPlanComponent extends React.Component {
                 }else{
                     date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
-                console.log("Date+++",date);
                 // Open toggleLarge
                 var supplyPlanType="";
                 if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
@@ -2382,7 +2378,6 @@ export default class SupplyPlanComponent extends React.Component {
                         var myResult = [];
                         var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                         myResult = planningunitRequest.result.filter(c => c.program.id == programId);
-                        console.log("MyResult1++++",myResult);
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -2394,8 +2389,6 @@ export default class SupplyPlanComponent extends React.Component {
                                 planningList.push(myResult[i]);
                             }
                         }
-console.log("ProList+++",proList);
-console.log("PlanningList+++",planningList)
                         var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
                         var puOs = puTransaction.objectStore('planningUnit');
                         var puRequest = puOs.getAll();
@@ -2412,7 +2405,6 @@ console.log("PlanningList+++",planningList)
                             var puResult = [];
                             puResult = puRequest.result;
                             planningUnitListForConsumption = puResult;
-                            console.log("PlanningUnitListfor consumotion+++",puResult);
 
                             var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
                             var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
@@ -2436,12 +2428,6 @@ console.log("PlanningList+++",planningList)
                                         }
                                     }
                                 }
-                                console.log("After Sorting+++",proList.sort(function (a, b) {
-                                    a = a.label.toLowerCase();
-                                    b = b.label.toLowerCase();
-                                    return a < b ? -1 : a > b ? 1 : 0;
-                                }));
-                                console.log("MyResult2+++",myResult);
                                 this.setState({
                                     planningUnitList: proList.sort(function (a, b) {
                                         a = a.label.toLowerCase();
@@ -2462,7 +2448,6 @@ console.log("PlanningList+++",planningList)
                                 })
                                 // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                                 var planningUnitIdProp = '';
-                                console.log("this.props.match.params.planningUnitId+++",this.props.match.params.planningUnitId);
                                 if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                     planningUnitIdProp = this.props.match.params.planningUnitId;
                                 } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
@@ -3340,9 +3325,6 @@ console.log("PlanningList+++",planningList)
                                 closingBalanceArray: closingBalanceArray,
                                 loading: false
                             })
-                            console.log("MonthsOfStockArray+++", monthsOfStockArray);
-                            console.log("this.props.match.params.batchNo+++",this.props.match.params.batchNo);
-                            console.log("this.props.match.params.batchNo+++",this.props.match.params.expiryDate);
                             if (localStorage.getItem("batchNo") != '' && localStorage.getItem("expiryDate") != ''){
                                 this.showShipmentWithBatch(localStorage.getItem("batchNo"),localStorage.getItem("expiryDate"));
                             }
