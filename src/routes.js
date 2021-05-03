@@ -329,7 +329,7 @@ const routes = [
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   
-  { path: '/shipmentLinkingNotification', exact: true, name: "Shipment Linking Notification", component: ShipmentLinkingNotifications },
+  { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
