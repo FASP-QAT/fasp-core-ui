@@ -217,7 +217,7 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(12, y);
-            console.log("value------------------->>>",this.el.getValueFromCoords(0, y))
+            console.log("value------------------->>>", this.el.getValueFromCoords(0, y))
             if (parseInt(value) == 1 && this.el.getValueFromCoords(0, y) == true) {
 
 
@@ -822,6 +822,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 var elInstance = el.jexcel;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
+                    console.log("test----", rowData);
                     if (rowData[0] && rowData[12] != 1) {
                         var cell;
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
@@ -834,7 +835,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    else if (rowData[17] == 1) {
+                    if ((!rowData[0] && rowData[17] == 2) || (rowData[17] == 1)) {
                         var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
@@ -1296,7 +1297,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
                             {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
                             <div>
-                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan hideCross">
+                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>ERP Order History</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>

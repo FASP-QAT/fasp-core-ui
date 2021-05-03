@@ -131,18 +131,45 @@ export default class ManualTagging extends Component {
     filterProgramByCountry() {
         let programList = this.state.programs;
         let countryId = this.state.countryId;
+        let countryWisePrograms;
         if (countryId != -1) {
             console.log("programList---", programList);
             console.log("countryId---", countryId);
-            const countryWisePrograms = programList.filter(c => c.realmCountry.realmCountryId == countryId)
+            countryWisePrograms = programList.filter(c => c.realmCountry.realmCountryId == countryId)
             console.log("countryWisePrograms---", countryWisePrograms);
+
+        } else {
+            countryWisePrograms = programList;
+        }
+        if (countryWisePrograms.length == 1) {
             this.setState({
+                loading: false,
+                loading1: false,
+                programId1: countryWisePrograms[0].programId,
                 countryWisePrograms
+            }, () => {
+                this.getNotLinkedShipments();
+                this.getPlanningUnitList();
+                this.getBudgetListByProgramId();
             });
         } else {
-            this.setState({
-                countryWisePrograms: programList
-            });
+            if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+                console.log("ses programId report-------", localStorage.getItem("sesProgramIdReport"));
+                this.setState({
+                    loading: false,
+                    loading1: false,
+                    countryWisePrograms,
+                    programId1: localStorage.getItem("sesProgramIdReport")
+                }, () => {
+                    this.getNotLinkedShipments();
+                    this.getPlanningUnitList();
+                    this.getBudgetListByProgramId();
+                });
+            } else {
+                this.setState({
+                    countryWisePrograms
+                });
+            }
         }
     }
     getPlanningUnitListByRealmCountryId() {
@@ -458,13 +485,14 @@ export default class ManualTagging extends Component {
 
         if (event.target.id == 'active4') {
             this.setState({
+                // active3:true,
                 active4: true,
                 active5: false,
                 checkboxValue: false
             });
         } else if (event.target.id == 'active5') {
             this.setState({
-                // finalShipmentId:'',
+                selectedShipment: [],
                 active4: false,
                 active5: true,
                 checkboxValue: true
@@ -853,6 +881,7 @@ export default class ManualTagging extends Component {
         let valid = false;
         var programId = (this.state.active3 ? this.state.programId1 : this.state.programId);
         if (this.state.active3) {
+            localStorage.setItem("sesProgramIdReport", programId)
             if (this.state.active5) {
                 if (this.state.finalShipmentId != "" && this.state.finalShipmentId != null) {
                     valid = true;
@@ -1271,7 +1300,7 @@ export default class ManualTagging extends Component {
     }
 
     filterErpData() {
-        document.getElementById('div2').style.display = 'block';
+
         var countryId = this.state.countryId;
 
         // if (countryId != -1) {
@@ -1301,6 +1330,7 @@ export default class ManualTagging extends Component {
                     });
                 }).catch(
                     error => {
+                        document.getElementById('div2').style.display = 'block';
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
@@ -1353,7 +1383,6 @@ export default class ManualTagging extends Component {
     filterData = (planningUnitIds) => {
 
         console.log("planningUnitIds---", planningUnitIds);
-        document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
 
         planningUnitIds = planningUnitIds;
@@ -1396,6 +1425,8 @@ export default class ManualTagging extends Component {
                         });
                     }).catch(
                         error => {
+
+                            document.getElementById('div2').style.display = 'block';
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -1481,8 +1512,16 @@ export default class ManualTagging extends Component {
                     var label = response.data[i].planningUnit.label.label_en + '(' + response.data[i].skuCode + ')';
                     tracercategoryPlanningUnit[i] = { value: response.data[i].planningUnit.id, label: label }
                 }
+
+                var listArray = tracercategoryPlanningUnit;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
                 this.setState({
-                    tracercategoryPlanningUnit
+                    tracercategoryPlanningUnit: listArray
                 });
                 // this.setState({
                 //     tracercategoryPlanningUnit: response.data
@@ -1823,6 +1862,19 @@ export default class ManualTagging extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (y != null) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[0]) {
+                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                }
+            }.bind(this),
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -2755,8 +2807,11 @@ export default class ManualTagging extends Component {
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
                     <CardBody className="pb-lg-5">
                         {/* <Col md="10 ml-0"> */}
+                        <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
+
                         <div className="col-md-12 pl-0">
                             <Row>
+
                                 <FormGroup className="pl-3">
                                     {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
                                     <FormGroup check inline style={{ 'marginLeft': '-52px' }}>
@@ -2782,7 +2837,7 @@ export default class ManualTagging extends Component {
                                             id="active2"
                                             name="active"
                                             value={false}
-                                            //checked={this.state.user.active === false}
+                                            checked={this.state.active2 === true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
@@ -2798,7 +2853,7 @@ export default class ManualTagging extends Component {
                                             id="active3"
                                             name="active"
                                             value={false}
-                                            //checked={this.state.user.active === false}
+                                            checked={this.state.active3 === true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
@@ -2812,7 +2867,21 @@ export default class ManualTagging extends Component {
                         </div>
                         {/* </Col> */}
 
-
+                        {this.state.active1 &&
+                            <>
+                                <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab1Purpose')}</span></div></b><br />
+                            </>
+                        }
+                        {this.state.active2 &&
+                            <>
+                                <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab2Purpose')}</span></div></b><br />
+                            </>
+                        }
+                        {this.state.active3 &&
+                            <>
+                                <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab3Purpose')}</span></div></b><br />
+                            </>
+                        }
                         <div className="col-md-12 pl-0">
                             <Row>
                                 {this.state.active3 &&
@@ -2933,7 +3002,7 @@ export default class ManualTagging extends Component {
                         <Modal isOpen={this.state.manualTag}
                             className={'modal-lg ' + this.props.className, "modalWidth"}>
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
-                                <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan hideCross">
+                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
@@ -2980,7 +3049,7 @@ export default class ManualTagging extends Component {
                                                                     id="active4"
                                                                     name="active"
                                                                     value={true}
-                                                                    //checked={this.state.user.active === true}
+                                                                    checked={this.state.active4 === true}
                                                                     onChange={(e) => { this.dataChange1(e) }}
                                                                 />
                                                                 <Label
@@ -2996,7 +3065,7 @@ export default class ManualTagging extends Component {
                                                                     id="active5"
                                                                     name="active"
                                                                     value={false}
-                                                                    //checked={this.state.user.active === false}
+                                                                    checked={this.state.active5 === true}
                                                                     onChange={(e) => { this.dataChange1(e) }}
                                                                 />
                                                                 <Label
@@ -3162,7 +3231,7 @@ export default class ManualTagging extends Component {
                                         <p><h5><b>{i18n.t('static.manualTagging.erpShipment')}</b></h5></p>
                                         <Col md="12 pl-0">
                                             <div className="d-md-flex">
-                                                <FormGroup className="col-md-4">
+                                                <FormGroup className="col-md-6">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.erpPlanningUnit')}</Label>
                                                     <div className="controls ">
                                                         <Autocomplete
@@ -3171,7 +3240,7 @@ export default class ManualTagging extends Component {
                                                             // defaultValue={{ id: this.state.planningUnitIdUpdated, label: this.state.planningUnitName }}
                                                             options={this.state.tracercategoryPlanningUnit}
                                                             getOptionLabel={(option) => option.label}
-                                                            style={{ width: 300 }}
+                                                            style={{ width: 450 }}
                                                             onChange={(event, value) => {
                                                                 // this.getOrderDetails()
                                                                 console.log("demo2 value---", value);
@@ -3202,7 +3271,7 @@ export default class ManualTagging extends Component {
                                                     </div>
                                                 </FormGroup>
 
-                                                <FormGroup className="col-md-3 pl-0">
+                                                <FormGroup className="col-md-6 pl-0">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
                                                     <div className="controls "
                                                     >
@@ -3212,7 +3281,7 @@ export default class ManualTagging extends Component {
                                                             defaultValue={this.state.roNoOrderNo}
                                                             options={this.state.autocompleteData}
                                                             getOptionLabel={(option) => option.label}
-                                                            style={{ width: 300 }}
+                                                            style={{ width: 450 }}
                                                             onChange={(event, value) => {
                                                                 console.log("combo 2 ro combo box---", value)
                                                                 if (value != null) {
