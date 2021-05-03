@@ -171,7 +171,11 @@ class StockStatus extends Component {
     }
   }
   formatAmc = value => {
+    if(value!=null){
     return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+    }else{
+      return null;
+    }
   }
 
   formatter = value => {
@@ -255,7 +259,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment,ele.expiredStock!=0?ele.expiredStock:'', ele.closingBalance, this.formatAmc(ele.amc), ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand!=0?ele.unmetDemand:''])));
+      , ele.adjustment == null ? '' : ele.adjustment,ele.expiredStock!=0?ele.expiredStock:'', ele.closingBalance, ele.amc!=null?this.formatAmc(ele.amc):"", ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand!=0?ele.unmetDemand:''])));
 
     
     for (var i = 0; i < A.length; i++) {
@@ -297,7 +301,7 @@ class StockStatus extends Component {
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock!=0?ele.expiredStock:'',ele.closingBalance, this.formatAmc(ele.amc), this.roundN(ele.mos), ele.unmetDemand!=0?ele.unmetDemand:''])));
+          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock!=0?ele.expiredStock:'',ele.closingBalance, ele.amc!=null?this.formatAmc(ele.amc):"", this.roundN(ele.mos), ele.unmetDemand!=0?ele.unmetDemand:''])));
 
        console.log('A===>',A)
         for (var i = 0; i < A.length; i++) {

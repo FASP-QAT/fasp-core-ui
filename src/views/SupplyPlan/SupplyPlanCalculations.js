@@ -852,7 +852,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-                                    var amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                    var amc="";
+                                    if(totalMonths==0){
+                                        amc=null;
+                                    }else{
+                                        amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                    }
 
 
                                     // Calculations for Min stock
@@ -918,9 +923,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                     var mos = "";
-                                    if (closingBalance != 0 && amc != 0) {
+                                    if (closingBalance != 0 && amc != 0 && amc!=null) {
                                         mos = Number(closingBalance / amc).toFixed(4);
-                                    } else if (amc == 0) {
+                                    } else if (amc == 0 || amc == null) {
                                         mos = null;
                                     } else {
                                         mos = 0;
