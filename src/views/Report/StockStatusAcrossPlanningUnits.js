@@ -271,7 +271,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos == null ? i18n.t('static.supplyPlanFormula.na') : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))).replaceAll(' ', '%20'), ele.mos != null ? isNaN(ele.mos) ? '' : this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : ele.minMos, isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : ele.maxMos, ele.stock, isNaN(ele.amc) ? '' : this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? (new moment(ele.lastStockCount).format('MMM-yy')).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos == null ? i18n.t('static.supplyPlanFormula.na') : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))).replaceAll(' ', '%20'), ele.mos != null ? isNaN(ele.mos) ? '' : this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : ele.minMos, isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : ele.maxMos, ele.stock, isNaN(ele.amc) || ele.amc==null ? '' : this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? (new moment(ele.lastStockCount).format('MMM-yy')).replaceAll(' ', '%20') : ''])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -353,7 +353,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.mos == null ? i18n.t("static.supplyPlanFormula.na") : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))), ele.mos != null ? isNaN(ele.mos) ? '' : this.formatterDouble(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : this.formatterDouble(ele.minMos), isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : this.formatterDouble(ele.maxMos), this.formatter(ele.stock), isNaN(ele.amc) ? '' : this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? new moment(ele.lastStockCount).format('MMM-yy') : '']);
+        const data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.mos == null ? i18n.t("static.supplyPlanFormula.na") : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))), ele.mos != null ? isNaN(ele.mos) ? '' : this.formatterDouble(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : this.formatterDouble(ele.minMos), isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : this.formatterDouble(ele.maxMos), this.formatter(ele.stock), isNaN(ele.amc) || ele.amc==null ? '' : this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? new moment(ele.lastStockCount).format('MMM-yy') : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -655,7 +655,11 @@ class StockStatusAcrossPlanningUnits extends Component {
         return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     round = num => {
+        if(num!=null){
         return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
+        }else{
+            return null;
+        }
     }
 
     formatLabel = (cell, row) => {

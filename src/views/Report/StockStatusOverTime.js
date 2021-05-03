@@ -174,7 +174,11 @@ class StockStatusOverTime extends Component {
         return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
+        if(value!=null){
         return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+        }else{
+            return null;
+        }
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
@@ -993,6 +997,8 @@ class StockStatusOverTime extends Component {
                                             amcCalcualted = (sumOfConsumptions) / countAMC;
                                             console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
                                             mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                        }else if(countAMC==0){
+                                            amcCalcualted=null;
                                         }
 
 
@@ -1023,7 +1029,7 @@ class StockStatusOverTime extends Component {
                                             "planningUnit": pu.planningUnit,
                                             "stock": 0,
                                             "consumptionQty": 0,
-                                            "amc": 0,
+                                            "amc": null,
                                             "amcMonthCount": 0,
                                             "mos": null
                                         }
@@ -1229,7 +1235,7 @@ class StockStatusOverTime extends Component {
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc!=null?this.formatAmc(elt.amc):"", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
 
 
         for (var i = 0; i < A.length; i++) {
