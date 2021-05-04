@@ -93,7 +93,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                   {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
