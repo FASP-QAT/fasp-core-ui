@@ -2251,13 +2251,22 @@ class ShipmentGlobalDemandView extends Component {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
-                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
-                    '#042e6a',
-                    '#59cacc', '#118b70',
-                    '#EDB944',
-                    '#F48521',
-                    '#ED5626',
-                    '#3fe488'],
+                // backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
+                //     '#042e6a',
+                //     '#59cacc', '#118b70',
+                //     '#EDB944',
+                //     '#F48521',
+                //     '#ED5626',
+                //     '#3fe488'],
+                backgroundColor: [
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
+                ],
                 legend: {
                     position: 'bottom'
                 }

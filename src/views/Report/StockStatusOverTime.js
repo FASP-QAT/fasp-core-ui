@@ -1426,22 +1426,28 @@ class StockStatusOverTime extends Component {
             return color;
         }
         console.log(this.state.matricsList)
+        // const backgroundColor = [
+        //     '#4dbd74',
+        //     '#c8ced3',
+        //     '#000',
+        //     '#ffc107',
+        //     '#f86c6b',
+        //     '#205493',
+        //     '#20a8d8',
+        //     '#a6c4ec',
+        //     '#ca3828',
+        //     '#388b70',
+        //     '#f4862a',
+        //     '#ed5626',
+        //     '#4dbd74',
+        //     '#ffc107',
+        //     '#f86c6b'
+        // ]
         const backgroundColor = [
-            '#4dbd74',
-            '#c8ced3',
-            '#000',
-            '#ffc107',
-            '#f86c6b',
-            '#205493',
-            '#20a8d8',
-            '#a6c4ec',
-            '#ca3828',
-            '#388b70',
-            '#f4862a',
-            '#ed5626',
-            '#4dbd74',
-            '#ffc107',
-            '#f86c6b'
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
+            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
         ]
         console.log(this.state.matricsList)
 
