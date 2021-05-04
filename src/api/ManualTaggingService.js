@@ -32,13 +32,13 @@ class ManualTaggingSerice {
         return axios.get(`${API_URL}/api/getNotificationCount`, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType,parentShipmentId) {
-        console.log("parentShipmentId----",parentShipmentId);
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
+        console.log("parentShipmentId----", parentShipmentId);
         return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
         });
     }
     linkShipmentWithARTMIS(json) {
-        console.log("my json------",json);
+        console.log("my json------", json);
         return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, json, {}
         );
     }
@@ -54,6 +54,10 @@ class ManualTaggingSerice {
     searchErpOrderData(term, programId, erpPlanningUnitId, linkingType) {
         return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
+    }
+    getShipmentDetailsByParentShipmentId(parentShipmentId) {
+        return axios.post(`${API_URL}/api/getShipmentDetailsByParentShipmentId/`, { parentShipmentId }, {}
+        );
     }
 
 }

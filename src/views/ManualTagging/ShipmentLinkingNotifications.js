@@ -789,8 +789,9 @@ export default class ShipmentLinkingNotifications extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: "parentShipmentId",
-                    type: 'hidden',
+                    title: i18n.t('static.mt.parentShipmentId'),
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: "notificationId",
