@@ -420,7 +420,7 @@ export default class ShipmentDetails extends React.Component {
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
-                        console.log("ShowBatchInfoList+++",programJson.batchInfoList);
+                        console.log("ShowBatchInfoList+++", programJson.batchInfoList);
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
                         if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
@@ -435,7 +435,7 @@ export default class ShipmentDetails extends React.Component {
                             shipmentListUnFiltered: shipmentListUnFiltered,
                             shipmentList: shipmentList,
                             showShipments: 1,
-                            programPlanningUnitForPrice:programPlanningUnit
+                            programPlanningUnitForPrice: programPlanningUnit
                         })
                         this.refs.shipmentChild.showShipmentData();
                     }.bind(this)

@@ -612,7 +612,7 @@ export default class ExpiredInventory extends Component {
                     programRequest.onsuccess = function (e) {
                         console.log("2----", programRequest)
                         this.setState({
-                            localProgramId:programRequest.result.id
+                            localProgramId: programRequest.result.id
                         })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1043,14 +1043,14 @@ export default class ExpiredInventory extends Component {
             console.log("+++in y==1")
             this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
         }
-        if(y==2){
+        if (y == 2) {
             let versionId = document.getElementById("versionId").value;
-        if (versionId.includes('Local')) {
-            localStorage.setItem("batchNo",rowData[2]);
-            localStorage.setItem("expiryDate",rowData[6]);
-            window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+            if (versionId.includes('Local')) {
+                localStorage.setItem("batchNo", rowData[2]);
+                localStorage.setItem("expiryDate", rowData[6]);
+                window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+            }
         }
-    }
     }.bind(this);
 
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
@@ -1374,7 +1374,7 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
-                        {this.state.outPutList.length>0 && <span style={{float:"left"}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="">
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
                             </div>
