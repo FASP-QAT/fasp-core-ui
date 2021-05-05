@@ -9,7 +9,7 @@ import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION,DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -50,7 +50,7 @@ export default class SupplyPlanComponent extends React.Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
-            planningUnitData:[],
+            planningUnitData: [],
             loading: true,
             monthsArray: [],
             programList: [],
@@ -124,7 +124,7 @@ export default class SupplyPlanComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch:[]
+            ledgerForBatch: []
             // startDateFormat:curDate
         }
 
@@ -584,9 +584,9 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.setFont('helvetica', 'normal')
                     var splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
                     doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
-                    splittext = doc.splitTextToSize(i18n.t('static.user.user')+' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
-                    doc.text( doc.internal.pageSize.width / 8, 60, splittext)
-          
+                    splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
+                    doc.text(doc.internal.pageSize.width / 8, 60, splittext)
+
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
@@ -668,7 +668,7 @@ export default class SupplyPlanComponent extends React.Component {
         // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c=>this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
         let content = {
             margin: { top: 80, bottom: 70 },
@@ -716,7 +716,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -744,7 +744,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
             }
@@ -772,7 +772,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                     align: 'left'
                 })
 
@@ -785,7 +785,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
         var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
-        var count=0;
+        var count = 0;
         list.map(ele => {
             doc.addPage();
             y = 80
@@ -839,20 +839,20 @@ export default class SupplyPlanComponent extends React.Component {
             // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...ele.data.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
 
-            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)),expiredStockArr.map(c=>this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
-          //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
-               
-            
-          
-            var canv=  document.getElementById("cool-canvas"+count)
-                 
-           var canvasImg1 = canv.toDataURL("image/png", 1.0);
-          console.log('count',count, doc.addImage(canvasImg1, 'png', 50, 160, 750, 290,"a"+count ,'CANVAS'));
-          count++
-  
+            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+            //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
 
 
-          
+
+            var canv = document.getElementById("cool-canvas" + count)
+
+            var canvasImg1 = canv.toDataURL("image/png", 1.0);
+            console.log('count', count, doc.addImage(canvasImg1, 'png', 50, 160, 750, 290, "a" + count, 'CANVAS'));
+            count++
+
+
+
+
             let content = {
                 margin: { top: 80, bottom: 70 },
                 startY: height,
@@ -899,7 +899,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -927,7 +927,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
                 }
@@ -955,7 +955,7 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace( /[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
+                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
                         align: 'left'
                     })
 
@@ -1042,14 +1042,14 @@ export default class SupplyPlanComponent extends React.Component {
             tooltips: {
                 callbacks: {
                     label: function (tooltipItems, data) {
-                        if(tooltipItems.datasetIndex==0){
-                            var details=this.state.expiredStockArr[tooltipItems.index].details;
-                            var infoToShow=[];
-                            details.map(c=>{
-                                infoToShow.push(c.batchNo+" - "+c.expiredQty.toLocaleString());
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
                             });
-                            return (infoToShow.join(' | '));    
-                        }else{
+                            return (infoToShow.join(' | '));
+                        } else {
                             return (tooltipItems.yLabel.toLocaleString());
                         }
                     }.bind(this)
@@ -1152,7 +1152,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -1169,7 +1169,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -1187,7 +1187,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -1207,7 +1207,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -1228,7 +1228,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -1599,10 +1599,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                 {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
-                                            <div id="bars_div"  style={{display:"none"}}>
-                                            {this.state.planningUnitData.filter(c=>c.planningUnit.id!=this.state.planningUnitId).map((ele,index)=> {
-                                               return( <div  className="chart-wrapper chart-graph-report"><Bar  id={"cool-canvas"+index} data={ele.bar} options={ele.chartOptions}  /></div>)})}
-                            </div>
+                                            <div id="bars_div" style={{ display: "none" }}>
+                                                {this.state.planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId).map((ele, index) => {
+                                                    return (<div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>)
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
@@ -1900,7 +1901,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={item.balance!=0?"hoverTd":""} onClick={() => item.balance!=0?this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }):""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -1908,9 +1909,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table>
-                                {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).length > 0 &&
+                                {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                     <>
-                                        <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th>{i18n.t("static.supplyPlan.batchId")}</th>
@@ -1921,7 +1922,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).map(item => (
+                                                {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                     <tr>
                                                         <td>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
@@ -1931,8 +1932,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                     </tr>
                                                 ))}
                                             </tbody>
-                                        </Table><br/>
-                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br/>
+                                        </Table><br />
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
                                     </>
                                 }
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
@@ -2056,7 +2057,7 @@ export default class SupplyPlanComponent extends React.Component {
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>
-                                <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
+                                <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                                 <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                     <thead>
                                         <tr>
@@ -2071,11 +2072,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         {
                                             this.state.expiredStockDetails.map(item => (
                                                 <tr>
-                                                    <td className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
+                                                    <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                     <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                     <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                     <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                    <td className="hoverTd" onClick={()=>this.showBatchLedgerClicked(item.batchNo,item.createdDate,item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                    <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                 </tr>
                                             )
                                             )
@@ -2088,51 +2089,51 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tfoot>
                                 </Table>
-                                {this.state.ledgerForBatch.length>0 && 
-                                    <> 
-                                    <br></br>
-                                    {i18n.t("static.inventory.batchNumber")+" : "+this.state.ledgerForBatch[0].batchNo}   
-                                    <br></br>
-                                    {i18n.t("static.batchLedger.note")}
-                                    <Table  className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                        <thead>
-                                            <tr>
-                                            <th  style={{width:"60px"}}  rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
-                                            <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated")+" (+/-)"}</th>
-                                            <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
-                                            </tr>
-                                            <tr>
-                                                <th  align="center">{i18n.t("static.supplyPlan.consumption")+" (-)"}</th>
-                                                <th align="center">{i18n.t("static.inventoryType.adjustment")+" (+/-)"}</th>
-                                                <th align="center">{i18n.t("static.shipment.shipment")+" (+)"}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
-                                                 <tr>
-                                                        <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
-                                                        <td>{item.shipmentQty==0?null:<NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0-Number(item.unallocatedQty)} /></td>
-                                                        {item.stockQty!=null && Number(item.stockQty)>0?<td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td>:<td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                                <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
-                                            </tr>
-                                        </tfoot>
-                                    </Table>
+                                {this.state.ledgerForBatch.length > 0 &&
+                                    <>
+                                        <br></br>
+                                        {i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo}
+                                        <br></br>
+                                        {i18n.t("static.batchLedger.note")}
+                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: "60px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
+                                                    <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
+                                                    <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
+                                                    <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
+                                                        <tr>
+                                                            <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
+                                                            <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
+                                                            {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
+                                                    <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
+                                                </tr>
+                                            </tfoot>
+                                        </Table>
                                     </>
-                                    }
+                                }
                             </ModalBody>
                             <ModalFooter>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -2157,58 +2158,58 @@ export default class SupplyPlanComponent extends React.Component {
                 </TabPane></>)
     }
 
-    showBatchLedgerClicked(batchNo,createdDate,expiryDate){
-        this.setState({loading:true})
-        var supplyPlanForAllDate=this.state.supplyPlanDataForAllTransDate.filter(c=>moment(c.transDate).format("YYYY-MM")>=moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM")<=moment(expiryDate).format("YYYY-MM"));
-        var allBatchLedger=[];
-        supplyPlanForAllDate.map(c=>
-            c.batchDetails.map(bd=> {
-                var batchInfo=bd;
-                batchInfo.transDate=c.transDate;
+    showBatchLedgerClicked(batchNo, createdDate, expiryDate) {
+        this.setState({ loading: true })
+        var supplyPlanForAllDate = this.state.supplyPlanDataForAllTransDate.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(createdDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(expiryDate).format("YYYY-MM"));
+        var allBatchLedger = [];
+        supplyPlanForAllDate.map(c =>
+            c.batchDetails.map(bd => {
+                var batchInfo = bd;
+                batchInfo.transDate = c.transDate;
                 allBatchLedger.push(batchInfo);
             }));
-        var ledgerForBatch=allBatchLedger.filter(c=>c.batchNo==batchNo && moment(c.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
+        var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
         this.setState({
-            ledgerForBatch:ledgerForBatch,
-            loading:false
+            ledgerForBatch: ledgerForBatch,
+            loading: false
         })
     }
 
-    showShipmentWithBatch(batchNo,expiryDate){
-        localStorage.setItem("batchNo","");
-        localStorage.setItem("expiryDate","");
-        var shipmentList=this.state.allShipmentsList;
-        shipmentList.map(sl=>{
-            var batchInfoList=sl.batchInfoList;
-            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
-            if(bi.length>0) {
-                var shipmentStatus=sl.shipmentStatus.id;
-                var date="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
-                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
-                }else{
-                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+    showShipmentWithBatch(batchNo, expiryDate) {
+        localStorage.setItem("batchNo", "");
+        localStorage.setItem("expiryDate", "");
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map(sl => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
                 // Open toggleLarge
-                var supplyPlanType="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
                     supplyPlanType = 'deliveredShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'shippedShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
-                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'shippedErpShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
-                if(supplyPlanType!=""){
+                if (supplyPlanType != "") {
                     this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
@@ -2586,7 +2587,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
                 var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                 this.setState({
-                    allShipmentsList:programJson.shipmentList
+                    allShipmentsList: programJson.shipmentList
                 })
                 var realmTransaction = db1.transaction(['realm'], 'readwrite');
                 var realmOs = realmTransaction.objectStore('realm');
@@ -2670,7 +2671,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                             }
                             this.setState({
-                                supplyPlanDataForAllTransDate:supplyPlanData
+                                supplyPlanDataForAllTransDate: supplyPlanData
                             })
                             console.log("SupplyPlanData--------------->", supplyPlanData);
                             // if (supplyPlanData.length > 0) {
@@ -3325,8 +3326,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 closingBalanceArray: closingBalanceArray,
                                 loading: false
                             })
-                            if (localStorage.getItem("batchNo") != '' && localStorage.getItem("expiryDate") != ''){
-                                this.showShipmentWithBatch(localStorage.getItem("batchNo"),localStorage.getItem("expiryDate"));
+                            if (localStorage.getItem("batchNo") != '' && localStorage.getItem("expiryDate") != '') {
+                                this.showShipmentWithBatch(localStorage.getItem("batchNo"), localStorage.getItem("expiryDate"));
                             }
                             // this.compareChild.formSubmit(this.state.monthCount);
                             // } else {
@@ -3431,13 +3432,13 @@ export default class SupplyPlanComponent extends React.Component {
                         expiredStockDetails: details[0].details,
                         expiredStockDetailsTotal: details[0].qty,
                         loading: false,
-                        ledgerForBatch:[]
+                        ledgerForBatch: []
                     })
                 } else {
                     this.setState({
                         expiredStockModal: !this.state.expiredStockModal,
                         loading: false,
-                        ledgerForBatch:[]
+                        ledgerForBatch: []
                     })
                 }
             }
@@ -3658,12 +3659,12 @@ export default class SupplyPlanComponent extends React.Component {
                         consumptionChangedFlag: 0,
                         consumptionBatchInfoChangedFlag: 0,
                         consumptionRegion: region
-                    },()=>{
-                        if(this.refs.consumptionChild!=undefined){
+                    }, () => {
+                        if (this.refs.consumptionChild != undefined) {
                             this.refs.consumptionChild.showConsumptionData();
-                        }else{
+                        } else {
                             this.setState({
-                                loading:false
+                                loading: false
                             })
                         }
                     })
@@ -3763,12 +3764,12 @@ export default class SupplyPlanComponent extends React.Component {
                         inventoryRegion: region,
                         inventoryChangedFlag: 0,
                         inventoryBatchInfoChangedFlag: 0
-                    },()=>{
-                        if(this.refs.inventoryChild!=undefined){
+                    }, () => {
+                        if (this.refs.inventoryChild != undefined) {
                             this.refs.inventoryChild.showInventoryData();
-                        }else{
+                        } else {
                             this.setState({
-                                loading:false
+                                loading: false
                             })
                         }
                     })
@@ -3876,13 +3877,13 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentList: shipmentList,
                     showShipments: 1,
                     isSuggested: 1,
-                    programPlanningUnitForPrice:programPlanningUnit
-                },()=>{
-                    if(this.refs.shipmentChild!=undefined){
+                    programPlanningUnitForPrice: programPlanningUnit
+                }, () => {
+                    if (this.refs.shipmentChild != undefined) {
                         this.refs.shipmentChild.showShipmentData();
-                    }else{
+                    } else {
                         this.setState({
-                            loading:false
+                            loading: false
                         })
                     }
                 })
@@ -4172,16 +4173,16 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
                     isSuggested: 0,
-                    programJson:programJson,
+                    programJson: programJson,
                     shelfLife: programPlanningUnit.shelfLife,
                     catalogPrice: programPlanningUnit.catalogPrice,
-                    programPlanningUnitForPrice:programPlanningUnit
-                },()=>{
-                    if(this.refs.shipmentChild!=undefined){
-                    this.refs.shipmentChild.showShipmentData();
-                    }else{
+                    programPlanningUnitForPrice: programPlanningUnit
+                }, () => {
+                    if (this.refs.shipmentChild != undefined) {
+                        this.refs.shipmentChild.showShipmentData();
+                    } else {
                         this.setState({
-                            loading:false
+                            loading: false
                         })
                     }
                 })
@@ -4315,7 +4316,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
     getDataforExport = (report) => {
 
-        document.getElementById("bars_div").style.display='block';
+        document.getElementById("bars_div").style.display = 'block';
         this.setState({ loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
@@ -4349,10 +4350,10 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var planningUnitData = [];
-                    var selectedPlanningUnitdata={};
-                    var selectedplanningunit=this.state.planningUnitList.filter(c=>c.value==this.state.planningUnitId)
+                    var selectedPlanningUnitdata = {};
+                    var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
 
-                    var planningunitList=this.state.planningUnitList.filter(c=>c.value!=this.state.planningUnitId)
+                    var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
                     planningunitList.push(selectedplanningunit[0])
                     var pcnt = 0
                     planningunitList.map(planningUnit => {
@@ -5057,7 +5058,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         loading: false
                                     }
 
-                                    var bar=  {
+                                    var bar = {
 
                                         labels: [...new Set(jsonArrForGraph.map(ele1 => (ele1.month)))],
                                         datasets: [
@@ -5075,7 +5076,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 pointBackgroundColor: '#ED8944',
                                                 pointBorderColor: '#212721',
                                                 pointRadius: 10
-                        
+
                                             },
                                             {
                                                 label: i18n.t('static.supplyPlan.planned'),
@@ -5137,7 +5138,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 },
                                                 lineTension: 0,
                                                 pointStyle: 'line',
-                                                pointRadius:0,
+                                                pointRadius: 0,
                                                 showInLegend: true,
                                                 data: jsonArrForGraph.map((item, index) => (item.stock))
                                             }, {
@@ -5154,7 +5155,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 },
                                                 lineTension: 0,
                                                 pointStyle: 'line',
-                                                pointRadius:0,
+                                                pointRadius: 0,
                                                 showInLegend: true,
                                                 data: jsonArrForGraph.map((item, index) => (item.consumption))
                                             },
@@ -5172,9 +5173,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 },
                                                 lineTension: 0,
                                                 pointStyle: 'line',
-                                                pointRadius:0,
+                                                pointRadius: 0,
                                                 showInLegend: true,
-                                                data:jsonArrForGraph.map((item, index) => (item.mos))
+                                                data: jsonArrForGraph.map((item, index) => (item.mos))
                                             },
                                             {
                                                 label: i18n.t('static.supplyPlan.minStockMos'),
@@ -5192,10 +5193,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                 },
                                                 showInLegend: true,
                                                 pointStyle: 'line',
-                                                pointRadius:0,
+                                                pointRadius: 0,
                                                 yValueFormatString: "$#,##0",
                                                 lineTension: 0,
-                                                data:jsonArrForGraph.map((item, index) => (item.minMos))
+                                                data: jsonArrForGraph.map((item, index) => (item.minMos))
                                             },
                                             {
                                                 label: i18n.t('static.supplyPlan.maxStockMos'),
@@ -5213,120 +5214,121 @@ export default class SupplyPlanComponent extends React.Component {
                                                 },
                                                 lineTension: 0,
                                                 pointStyle: 'line',
-                                                pointRadius:0,
+                                                pointRadius: 0,
                                                 showInLegend: true,
                                                 yValueFormatString: "$#,##0",
                                                 data: jsonArrForGraph.map((item, index) => (item.maxMos))
                                             }
-                                        ]}
-                                        var chartOptions = {
-                                            title: {
-                                                display: true,
-                                                text: entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label,this.state.lang)
-                                            },
-                                            scales: {
-                                                yAxes: [{
-                                                    id: 'A',
-                                                    scaleLabel: {
-                                                        display: true,
-                                                        labelString: i18n.t('static.shipment.qty'),
-                                                        fontColor: 'black'
-                                                    },
-                                                    stacked: false,
-                                                    ticks: {
-                                                        beginAtZero: true,
-                                                        fontColor: 'black',
-                                                        callback: function (value) {
-                                                            return value.toLocaleString();
-                                                        }
-                                                    },
-                                                    gridLines: {
-                                                        drawBorder: true, lineWidth: 0
-                                                    },
-                                                    position: 'left',
-                                                },
-                                                {
-                                                    id: 'B',
-                                                    scaleLabel: {
-                                                        display: true,
-                                                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                                                        fontColor: 'black'
-                                                    },
-                                                    stacked: false,
-                                                    ticks: {
-                                                        beginAtZero: true,
-                                                        fontColor: 'black'
-                                                    },
-                                                    gridLines: {
-                                                        drawBorder: true, lineWidth: 0
-                                                    },
-                                                    position: 'right',
-                                                }
-                                                ],
-                                                xAxes: [{
-                                                    ticks: {
-                                                        fontColor: 'black'
-                                                    },
-                                                    gridLines: {
-                                                        drawBorder: true, lineWidth: 0
-                                                    }
-                                                }]
-                                            },
-                                            tooltips: {
-                                                callbacks: {
-                                                    label: function (tooltipItems, data) {
-                                                        return (tooltipItems.yLabel.toLocaleString());
-                                                    }
-                                                },
-                                                enabled: false,
-                                                custom: CustomTooltips
-                                            },
-                                            maintainAspectRatio: false
-                                            ,
-                                            legend: {
-                                                display: true,
-                                                position: 'bottom',
-                                                labels: {
-                                                    usePointStyle: true,
+                                        ]
+                                    }
+                                    var chartOptions = {
+                                        title: {
+                                            display: true,
+                                            text: entityname + " - " + getLabelText(programPlanningUnit.planningUnit.label, this.state.lang)
+                                        },
+                                        scales: {
+                                            yAxes: [{
+                                                id: 'A',
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: i18n.t('static.shipment.qty'),
                                                     fontColor: 'black'
+                                                },
+                                                stacked: false,
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    fontColor: 'black',
+                                                    callback: function (value) {
+                                                        return value.toLocaleString();
+                                                    }
+                                                },
+                                                gridLines: {
+                                                    drawBorder: true, lineWidth: 0
+                                                },
+                                                position: 'left',
+                                            },
+                                            {
+                                                id: 'B',
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                                                    fontColor: 'black'
+                                                },
+                                                stacked: false,
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    fontColor: 'black'
+                                                },
+                                                gridLines: {
+                                                    drawBorder: true, lineWidth: 0
+                                                },
+                                                position: 'right',
+                                            }
+                                            ],
+                                            xAxes: [{
+                                                ticks: {
+                                                    fontColor: 'black'
+                                                },
+                                                gridLines: {
+                                                    drawBorder: true, lineWidth: 0
                                                 }
+                                            }]
+                                        },
+                                        tooltips: {
+                                            callbacks: {
+                                                label: function (tooltipItems, data) {
+                                                    return (tooltipItems.yLabel.toLocaleString());
+                                                }
+                                            },
+                                            enabled: false,
+                                            custom: CustomTooltips
+                                        },
+                                        maintainAspectRatio: false
+                                        ,
+                                        legend: {
+                                            display: true,
+                                            position: 'bottom',
+                                            labels: {
+                                                usePointStyle: true,
+                                                fontColor: 'black'
                                             }
                                         }
+                                    }
                                     var planningUnitDataforExport = {
                                         planningUnit: programPlanningUnit.planningUnit,
                                         info: planningUnitInfo,
                                         data: exportData,
-                                        bar:bar,
-                                        chartOptions:chartOptions
-                                        
+                                        bar: bar,
+                                        chartOptions: chartOptions
+
                                     }
 
-                                        if(this.state.planningUnitId!=programPlanningUnit.planningUnit.id){
-                                            planningUnitData.push(planningUnitDataforExport) 
-                                            // this.setState({
-                                            //     planningUnitData: planningUnitData,
-                                            //         loading: false
-                                            // })
-                                           }
-                                   else{
-                                    selectedPlanningUnitdata=planningUnitDataforExport
-                                   }
+                                    if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
+                                        planningUnitData.push(planningUnitDataforExport)
+                                        // this.setState({
+                                        //     planningUnitData: planningUnitData,
+                                        //         loading: false
+                                        // })
+                                    }
+                                    else {
+                                        selectedPlanningUnitdata = planningUnitDataforExport
+                                    }
                                     pcnt = pcnt + 1
                                     if (pcnt == this.state.planningUnitList.length) {
                                         planningUnitData.push(selectedPlanningUnitdata)
                                         this.setState({
                                             planningUnitData: planningUnitData,
                                             loading: false
-                                        },()=>{
+                                        }, () => {
                                             setTimeout(() => {
-                                            report == 1 ? this.exportPDF() : this.exportCSV()
-                                            document.getElementById("bars_div").style.display='none';
-                                        },2000)
+                                                report == 1 ? this.exportPDF() : this.exportCSV()
+                                                document.getElementById("bars_div").style.display = 'none';
+                                            }, 2000)
                                         })
 
-                                     
-                                     
-                                    }   
+
+
+                                    }
                                     // } else {
                                     //     this.setState({ loading: false })
                                     //     // calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'programData', 'supplyPlan', this);

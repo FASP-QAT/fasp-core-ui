@@ -305,7 +305,7 @@ export default class ConsumptionDetails extends React.Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                            myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -501,7 +501,7 @@ export default class ConsumptionDetails extends React.Component {
         if (cont == true) {
             this.setState({
                 consumptionChangedFlag: 0,
-                consumptionBatchInfoChangedFlag:0
+                consumptionBatchInfoChangedFlag: 0
             }, () => {
                 let id = AuthenticationService.displayDashboardBasedOnRole();
                 this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
@@ -564,7 +564,7 @@ export default class ConsumptionDetails extends React.Component {
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 id="div2" className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h5>
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                    {checkOnline === 'Online' && 
+                    {checkOnline === 'Online' &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
@@ -717,7 +717,7 @@ export default class ConsumptionDetails extends React.Component {
                         <div className="table-responsive">
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
-                        <br/><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                        <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
