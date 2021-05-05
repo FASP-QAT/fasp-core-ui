@@ -64,7 +64,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
     getPlanningUnitArray() {
         let planningUnits = this.state.planningUnits;
-        console.log("planningUnitArray1---", planningUnits);
         let planningUnitArray = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
@@ -76,15 +75,12 @@ export default class ShipmentLinkingNotifications extends Component {
         }, () => {
             this.filterData(planningUnitArray);
         })
-
-        console.log("planningUnitArray2---", planningUnitArray);
     }
 
     displayButton() {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
             let count = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -115,12 +111,9 @@ export default class ShipmentLinkingNotifications extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
             let changedmtList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                // console.log("7 map---" + map1.get("10"))
-                // console.log("is changed-- ", map1.get("12"));
                 if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
                     let json = {
                         parentShipmentId: (map1.get("2") === '' ? null : map1.get("2")),
@@ -141,7 +134,6 @@ export default class ShipmentLinkingNotifications extends Component {
             console.log("FINAL SUBMIT changedmtList---", changedmtList);
             ManualTaggingService.updateNotification(changedmtList)
                 .then(response => {
-                    console.log("response m tagging---", response)
                     document.getElementById('div2').style.display = 'block';
                     this.setState({
                         message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -151,10 +143,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         displaySubmitButton: false
                     },
                         () => {
-                            console.log("message ------------------" + this.state.message);
                             this.hideSecondComponent();
-                            console.log("Going to call toggle large 1");
-
                             this.filterData(this.state.planningUnitIds);
 
                         })
@@ -214,10 +203,8 @@ export default class ShipmentLinkingNotifications extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(13, y);
-            console.log("value------------------->>>", this.el.getValueFromCoords(0, y))
             if (parseInt(value) == 1 && this.el.getValueFromCoords(0, y) == true) {
 
 
@@ -250,15 +237,11 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
-        console.log("changed 1---")
-
         //conversion factor
         if (x == 10) {
 
             var col = ("K").concat(parseInt(y) + 1);
-            // console.log("-------------inside conversion factor change-------------------------",col)
             value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -274,7 +257,6 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    console.log("qty-------" + qty);
                     this.el.setValueFromCoords(11, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
                 }
 
@@ -303,8 +285,6 @@ export default class ShipmentLinkingNotifications extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
-        console.log("changed 2---")
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
 
@@ -354,9 +334,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
     filterData = (planningUnitIds) => {
-
-        console.log("planningUnitIds---", planningUnitIds);
-        // document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
         var addressed = document.getElementById("addressed").value;
 
@@ -382,8 +359,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 ManualTaggingService.getShipmentLinkingNotification(json)
                     .then(response => {
-                        console.log("notification response===", response);
-
                         let list = (addressed != -1 ? response.data.filter(c => (c.addressed == (addressed == 1 ? true : false))) : response.data);
                         this.setState({
                             outputList: list
@@ -559,10 +534,8 @@ export default class ShipmentLinkingNotifications extends Component {
 
     buildARTMISHistory() {
         let artmisHistoryList = this.state.artmisHistory;
-        console.log("artmisHistoryList---->", artmisHistoryList);
         let artmisHistoryArray = [];
         let count = 0;
-        console.log("jexcel this------", this);
         this.el = jexcel(document.getElementById("tableDiv1"), '');
         this.el.destroy();
         var json = [];
@@ -660,7 +633,6 @@ export default class ShipmentLinkingNotifications extends Component {
 
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
-        console.log("manualTaggingList---->", manualTaggingList);
         let manualTaggingArray = [];
         let count = 0;
 
@@ -723,7 +695,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.commit.qatshipmentId'),
+                    title: i18n.t('static.mt.childShipmentId'),
                     type: 'text',
                     readOnly: true
                 },
@@ -815,8 +787,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 var elInstance = el.jexcel;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
-                    console.log("test----", rowData);
-                    if (rowData[0] && rowData[13] != 1) {
+                    if (rowData[0] && parseInt(rowData[13]) != 1) {
                         var cell;
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
@@ -828,7 +799,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[17] == 1) {
+                    else if (rowData[17] == 1) {
                         var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
@@ -871,13 +842,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                 var outputListAfterSearch = [];
                                 let orderNo = this.el.getValueFromCoords(14, y);
                                 let primeLineNo = this.el.getValueFromCoords(15, y);
-                                console.log("history order no---" + orderNo);
-                                console.log("history prime line no---" + primeLineNo);
                                 // this.buildARTMISHistory();
                                 // this.toggleLarge();
                                 ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                     .then(response => {
-                                        console.log("history response===", response.data);
                                         this.setState({
                                             artmisHistory: response.data
                                         }, () => {
@@ -953,7 +921,6 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     toggleLarge() {
-        console.log("show artmis history---")
         this.setState({
             manualTag: !this.state.manualTag,
         })
@@ -1044,9 +1011,7 @@ export default class ShipmentLinkingNotifications extends Component {
         if (cell != null && cell != "") {
             // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
-            console.log("date-----", date);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            console.log("dateMonthAsWord-----", dateMonthAsWord);
             return dateMonthAsWord;
         } else {
             return "";
@@ -1054,7 +1019,6 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     addCommas(cell, row) {
-        console.log("row---------->", row);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -1066,8 +1030,6 @@ export default class ShipmentLinkingNotifications extends Component {
         return x1 + x2;
     }
     formatLabel(cell, row) {
-        console.log("cell---", cell);
-        console.log("row---", row);
         if (cell != null && cell != "") {
             return getLabelText(cell.label, 'en');
         } else {
@@ -1150,14 +1112,14 @@ export default class ShipmentLinkingNotifications extends Component {
                 headerAlign: 'center',
                 formatter: this.addCommas
             },
-            // {
-            //     dataField: 'receivedOn',
-            //     text: i18n.t('static.mt.dataReceivedOn'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.formatDate
-            // }
+            {
+                dataField: 'receivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            }
 
         ];
         const options = {

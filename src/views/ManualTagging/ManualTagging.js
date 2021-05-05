@@ -2005,7 +2005,7 @@ export default class ManualTagging extends Component {
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.commit.qatshipmentId'),
+                        title: i18n.t('static.mt.childShipmentId'),
                         type: 'text',
                     },
                     {
