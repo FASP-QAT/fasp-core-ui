@@ -822,10 +822,10 @@ export default class ShipmentLinkingNotifications extends Component {
                         cell.classList.add('readonly');
 
 
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
 
-                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
                     if (rowData[17] == 1) {
