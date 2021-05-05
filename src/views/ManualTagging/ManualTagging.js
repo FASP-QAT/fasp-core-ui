@@ -1223,7 +1223,6 @@ export default class ManualTagging extends Component {
     }
 
     handleProductCategoryChange = (productCategoryIds) => {
-        console.log("product categry---", productCategoryIds.length)
         this.setState({
             productCategoryValues: productCategoryIds.map(ele => ele),
             productCategoryLabels: productCategoryIds.map(ele => ele.label),
@@ -2337,7 +2336,11 @@ export default class ManualTagging extends Component {
 
     formatPlanningUnitLabel(cell, row) {
         if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+            if (row.skuCode != null && row.skuCode != "") {
+                return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+            } else {
+                return getLabelText(cell, this.state.lang);
+            }
         } else {
             return "";
         }

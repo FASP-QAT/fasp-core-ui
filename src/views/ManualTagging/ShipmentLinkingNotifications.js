@@ -88,7 +88,7 @@ export default class ShipmentLinkingNotifications extends Component {
             let count = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("12")) === 1 && map1.get("0")) {
+                if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
                     count++;
                 }
             }
@@ -119,20 +119,20 @@ export default class ShipmentLinkingNotifications extends Component {
             let changedmtList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("10"))
-                console.log("is changed-- ", map1.get("12"));
-                if (parseInt(map1.get("12")) === 1 && map1.get("0")) {
+                // console.log("7 map---" + map1.get("10"))
+                // console.log("is changed-- ", map1.get("12"));
+                if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
                     let json = {
-                        parentShipmentId: (map1.get("15") === '' ? null : map1.get("15")),
-                        conversionFactor: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        notes: (map1.get("11") === '' ? null : map1.get("11")),
-                        orderNo: map1.get("13"),
-                        primeLineNo: parseInt(map1.get("14")),
+                        parentShipmentId: (map1.get("2") === '' ? null : map1.get("2")),
+                        conversionFactor: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        notes: (map1.get("12") === '' ? null : map1.get("12")),
+                        orderNo: map1.get("14"),
+                        primeLineNo: parseInt(map1.get("15")),
                         notificationId: parseInt(map1.get("16")),
                         notificationType: {
                             id: parseInt(map1.get("17"))
                         },
-                        shipmentQty: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        shipmentQty: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         programId: programId
                     }
                     changedmtList.push(json);
@@ -216,14 +216,14 @@ export default class ShipmentLinkingNotifications extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(12, y);
+            var value = this.el.getValueFromCoords(13, y);
             console.log("value------------------->>>", this.el.getValueFromCoords(0, y))
             if (parseInt(value) == 1 && this.el.getValueFromCoords(0, y) == true) {
 
 
-                var col = ("J").concat(parseInt(y) + 1);
+                var col = ("K").concat(parseInt(y) + 1);
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 value = value.replace(/,/g, "");
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -253,11 +253,11 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("changed 1---")
 
         //conversion factor
-        if (x == 9) {
+        if (x == 10) {
 
-            var col = ("J").concat(parseInt(y) + 1);
+            var col = ("K").concat(parseInt(y) + 1);
             // console.log("-------------inside conversion factor change-------------------------",col)
-            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
@@ -273,9 +273,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var qty = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     console.log("qty-------" + qty);
-                    this.el.setValueFromCoords(10, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
+                    this.el.setValueFromCoords(11, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
                 }
 
             }
@@ -286,18 +286,13 @@ export default class ShipmentLinkingNotifications extends Component {
         // }
 
         // //Active
-        if (x != 12) {
-            this.el.setValueFromCoords(12, y, 1, true);
+        if (x != 13) {
+            this.el.setValueFromCoords(13, y, 1, true);
             if (x == 0) {
                 value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                console.log("addressed value---", this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-                // var col = ("J").concat(parseInt(y) + 1);
-                // this.el.setStyle(col, "background-color", "transparent");
-                // this.el.setComments(col, "");
                 if (value === "false") {
-                    console.log("inside if---", ("J").concat(parseInt(y) + 1))
-                    this.el.setStyle(("J").concat(parseInt(y) + 1), "background-color", "transparent");
-                    this.el.setComments(("J").concat(parseInt(y) + 1), "");
+                    this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
+                    this.el.setComments(("K").concat(parseInt(y) + 1), "");
                 }
             }
         }
@@ -310,7 +305,7 @@ export default class ShipmentLinkingNotifications extends Component {
     onedit = function (instance, cell, x, y, value) {
         console.log("------------onedit called")
         console.log("changed 2---")
-        this.el.setValueFromCoords(12, y, 1, true);
+        this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
 
     onPaste(instance, data) {
@@ -380,11 +375,6 @@ export default class ShipmentLinkingNotifications extends Component {
                     loading: true,
                     planningUnitIds
                 })
-                // if (this.state.haslinked) {
-                //     this.setState({ haslinked: false })
-                // } else {
-                //     this.setState({ message: '' })
-                // }
                 var json = {
                     programId: parseInt(this.state.programId),
                     planningUnitIdList: this.state.planningUnitValues.map(ele => (ele.value).toString())
@@ -679,25 +669,26 @@ export default class ShipmentLinkingNotifications extends Component {
 
             data[0] = manualTaggingList[j].addressed;
             data[1] = getLabelText(manualTaggingList[j].notificationType.label);
-            data[2] = manualTaggingList[j].shipmentId;
-            data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
-            data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-            data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-            data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+            data[2] = manualTaggingList[j].parentShipmentId
+            data[3] = manualTaggingList[j].shipmentId;
+            data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+            data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
+            data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
+            data[7] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-            data[7] = manualTaggingList[j].erpStatus
-            data[8] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
+            data[8] = manualTaggingList[j].erpStatus
+            data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2) || manualTaggingList[j].notificationType.id == 1) {
-                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
+                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
             } else {
-                data[9] = ""
+                data[10] = ""
             }
-            data[10] = this.addCommas(Math.round(manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
-            data[11] = manualTaggingList[j].notes
-            data[12] = 0
-            data[13] = manualTaggingList[j].orderNo
-            data[14] = manualTaggingList[j].primeLineNo
-            data[15] = manualTaggingList[j].parentShipmentId
+            data[11] = this.addCommas(Math.round(manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
+            data[12] = manualTaggingList[j].notes
+            data[13] = 0
+            data[14] = manualTaggingList[j].orderNo
+            data[15] = manualTaggingList[j].primeLineNo
+            
             data[16] = manualTaggingList[j].notificationId
             data[17] = manualTaggingList[j].notificationType.id;
 
@@ -722,6 +713,12 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
                 {
                     title: i18n.t('static.mt.notificationType'),
+                    type: 'text',
+                    readOnly: true
+                },
+
+                {
+                    title: i18n.t('static.mt.parentShipmentId'),
                     type: 'text',
                     readOnly: true
                 },
@@ -789,11 +786,6 @@ export default class ShipmentLinkingNotifications extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: i18n.t('static.mt.parentShipmentId'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
                     title: "notificationId",
                     type: 'hidden',
                 },
@@ -824,7 +816,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     console.log("test----", rowData);
-                    if (rowData[0] && rowData[12] != 1) {
+                    if (rowData[0] && rowData[13] != 1) {
                         var cell;
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
@@ -836,8 +828,8 @@ export default class ShipmentLinkingNotifications extends Component {
                         cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if ((!rowData[0] && rowData[17] == 2) || (rowData[17] == 1)) {
-                        var cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                    if (rowData[17] == 1) {
+                        var cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
                     else {
@@ -846,10 +838,10 @@ export default class ShipmentLinkingNotifications extends Component {
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
 
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
 
-                        cell = elInstance.getCell(("L").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                     }
 
@@ -877,8 +869,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
                                 var outputListAfterSearch = [];
-                                let orderNo = this.el.getValueFromCoords(13, y);
-                                let primeLineNo = this.el.getValueFromCoords(14, y);
+                                let orderNo = this.el.getValueFromCoords(14, y);
+                                let primeLineNo = this.el.getValueFromCoords(15, y);
                                 console.log("history order no---" + orderNo);
                                 console.log("history prime line no---" + primeLineNo);
                                 // this.buildARTMISHistory();
@@ -951,81 +943,9 @@ export default class ShipmentLinkingNotifications extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
         var asterisk = document.getElementsByClassName("resizable")[0];
-        console.log("asterisk123---", asterisk);
         var tr = asterisk.firstChild;
-        console.log("tr-------------", tr)
         tr.children[10].classList.add('AsteriskTheadtrTd');
     }
-
-    // loadedERP = function (instance, cell, x, y, value) {
-    //     jExcelLoadedFunction(instance, 1);
-    // }
-
-    // selected = function (instance, cell, x, y, value) {
-
-    //     if ((x == 0 && value != 0) || (y == 0)) {
-    //         // console.log("HEADER SELECTION--------------------------");
-    //     } else {
-    //         var outputListAfterSearch = [];
-    //         let row;
-    //         if (this.state.active1) {
-    //             row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
-    //             outputListAfterSearch.push(row);
-    //             let json = { id: '', label: '' };
-    //             this.setState({
-    //                 roNoOrderNo: json,
-    //                 searchedValue: '',
-    //                 planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
-    //             });
-    //         } else if (this.state.active2) {
-    //             console.log("my out put list---", this.state.outputList)
-    //             console.log("my coordinates---", this.el.getValueFromCoords(1, x))
-    //             row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(1, x)))[0];
-    //             console.log()
-    //             outputListAfterSearch.push(row);
-    //             // console.log("my output---", document.getElementById("combo-box-demo1"));
-    //             let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
-    //             this.setState({
-    //                 parentShipmentId: outputListAfterSearch[0].parentShipmentId,
-    //                 roNoOrderNo: json,
-    //                 searchedValue: outputListAfterSearch[0].roNo,
-    //                 planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
-    //             }, () => {
-
-    //                 this.getOrderDetails();
-    //             });
-    //         } else {
-    //             console.log("my out put list---", this.state.outputList)
-    //             console.log("my coordinates---", this.el.getValueFromCoords(0, x))
-    //             row = this.state.outputList.filter(c => (c.erpOrderId == this.el.getValueFromCoords(0, x)))[0];
-    //             console.log()
-    //             outputListAfterSearch.push(row);
-    //             let json = { id: outputListAfterSearch[0].roNo, label: outputListAfterSearch[0].roNo };
-    //             this.setState({
-    //                 // parentShipmentId: outputListAfterSearch[0].parentShipmentId,
-    //                 roNoOrderNo: json,
-    //                 searchedValue: outputListAfterSearch[0].roNo,
-    //                 planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
-    //             }, () => {
-
-    //                 this.getOrderDetails();
-    //                 // this.getNotLinkedShipments();
-    //             });
-    //         }
-    //         // outputListAfterSearch.push(row);
-
-    //         this.setState({
-    //             planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-    //             shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
-    //             outputListAfterSearch,
-    //             procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
-    //             planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "()" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
-    //         })
-    //         console.log("Going to call toggle large 3");
-    //         this.toggleLarge();
-    //     }
-    // }.bind(this);
-
 
     componentDidMount() {
         this.hideFirstComponent();
