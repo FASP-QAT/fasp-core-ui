@@ -2500,7 +2500,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'shipmentId',
-                text: i18n.t('static.mt.parentShipmentId'),
+                text: i18n.t('static.commit.qatshipmentId'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
