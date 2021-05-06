@@ -1161,6 +1161,9 @@ export default class syncPage extends Component {
         })
           .catch(
             error => {
+              console.log("@@@Error1",error);
+              console.log("@@@Error1",error.message);
+              console.log("@@@Error1",error.response ? error.response.status : "")
               if (error.message === "Network Error") {
                 console.log("+++in catch 1")
                 this.setState({
@@ -2110,6 +2113,9 @@ export default class syncPage extends Component {
               })
               .catch(
                 error => {
+                  console.log("@@@Error2",error);
+                  console.log("@@@Error2",error.message);
+                  console.log("@@@Error2",error.response ? error.response.status : "")
                   if (error.message === "Network Error") {
                     console.log("+++in catch 3")
                     this.setState({
@@ -2163,6 +2169,9 @@ export default class syncPage extends Component {
         })
         .catch(
           error => {
+            console.log("@@@Error3",error);
+            console.log("@@@Error3",error.message);
+            console.log("@@@Error3",error.response ? error.response.status : "")
             if (error.message === "Network Error") {
               console.log("+++in catch 5")
               this.setState({
@@ -3245,6 +3254,9 @@ export default class syncPage extends Component {
                   })
                     .catch(
                       error => {
+                        console.log("@@@Error4",error);
+                        console.log("@@@Error4",error.message);
+                        console.log("@@@Error4",error.response ? error.response.status : "")
                         if (error.message === "Network Error") {
                           console.log("+++in catch 7")
                           this.setState({
@@ -3320,6 +3332,9 @@ export default class syncPage extends Component {
             })
               .catch(
                 error => {
+                  console.log("@@@Error5",error);
+                  console.log("@@@Error5",error.message);
+                  console.log("@@@Error5",error.response ? error.response.status : "")
                   if (error.message === "Network Error") {
                     console.log("+++in catch 9")
                     this.setState({
