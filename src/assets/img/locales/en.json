@@ -924,7 +924,7 @@
     "static.message.user.couldNotBeUnlocked": "User could not be unlocked",
     "static.supplyPlan.roundingOption": "Rounding Option",
     "static.realm.minQplTolerance": "Min Qpl Tolerance",
-    "static.mt.totalQty": "ERP Quantity",
+    "static.mt.totalQty": "/ ERP Quantity",
     "static.subfundingsource.subfundingsourcelisttext": "Sub-funding source List",
     "static.procurementAgentProcurementUnit.vendorPriceText": "Enter Procurement Agent Price (in USD)",
     "static.common.delete": "Delete",

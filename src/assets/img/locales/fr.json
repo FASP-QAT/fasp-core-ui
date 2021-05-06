@@ -924,7 +924,7 @@
     "static.message.user.couldNotBeUnlocked": "L`utilisateur n`a pas pu être déverrouillé",
     "static.supplyPlan.roundingOption": "Option d`arrondi",
     "static.realm.minQplTolerance": "Tolérance QPL minimale",
-    "static.mt.totalQty": "Quantité ERP",
+    "static.mt.totalQty": "/ Quantité ERP",
     "static.subfundingsource.subfundingsourcelisttext": "Liste des sous-catégories de financement",
     "static.procurementAgentProcurementUnit.vendorPriceText": "Entrez le prix de l`agent d`approvisionnement (en USD)",
     "static.common.delete": "Supprimer",
