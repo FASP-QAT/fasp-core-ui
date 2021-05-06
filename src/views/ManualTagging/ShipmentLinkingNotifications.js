@@ -650,7 +650,7 @@ export default class ShipmentLinkingNotifications extends Component {
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
             data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
-            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2) || manualTaggingList[j].notificationType.id == 1) {
+            if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
             } else {
                 data[10] = ""
@@ -676,7 +676,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [45, 45, 40, 50, 60, 60, 45, 45, 40, 30, 45, 50],
+            colWidths: [45, 45, 40, 50, 60, 65, 65, 45, 40, 30, 45, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {

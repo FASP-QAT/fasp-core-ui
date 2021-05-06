@@ -825,10 +825,12 @@ export default class ManualTagging extends Component {
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
+            planningUnitValues:[],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
             this.getPlanningUnitListByRealmCountryId();
+            this.filterErpData();
         })
     }
 
