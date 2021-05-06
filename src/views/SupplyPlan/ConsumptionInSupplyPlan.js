@@ -165,6 +165,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     realmCountryPlanningUnitList: realmCountryPlanningUnitList
+                }, () => {
+                    this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                 })
 
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -197,6 +199,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
                     })
                     if (this.state.consumptionEl != "" && this.state.consumptionEl != undefined) {
                         this.state.consumptionEl.destroy();
@@ -314,7 +318,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100,readOnly:!consumptionEditable },
+                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
