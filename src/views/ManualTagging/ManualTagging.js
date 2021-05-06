@@ -826,6 +826,7 @@ export default class ManualTagging extends Component {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
             planningUnitValues:[],
+            productCategoryValues:[],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
