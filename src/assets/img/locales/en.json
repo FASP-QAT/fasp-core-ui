@@ -1725,5 +1725,6 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.mt.originalQty": "Original Quantity"
+    "static.mt.originalQty": "Original Quantity",
+    "static.mt.childShipmentId":"Child Shipment Id"
 }

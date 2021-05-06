@@ -825,10 +825,12 @@ export default class ManualTagging extends Component {
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
+            planningUnitValues:[],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
             this.getPlanningUnitListByRealmCountryId();
+            this.filterErpData();
         })
     }
 
@@ -1223,7 +1225,6 @@ export default class ManualTagging extends Component {
     }
 
     handleProductCategoryChange = (productCategoryIds) => {
-        console.log("product categry---", productCategoryIds.length)
         this.setState({
             productCategoryValues: productCategoryIds.map(ele => ele),
             productCategoryLabels: productCategoryIds.map(ele => ele.label),
@@ -2006,7 +2007,7 @@ export default class ManualTagging extends Component {
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.commit.qatshipmentId'),
+                        title: i18n.t('static.mt.childShipmentId'),
                         type: 'text',
                     },
                     {
@@ -2337,7 +2338,11 @@ export default class ManualTagging extends Component {
 
     formatPlanningUnitLabel(cell, row) {
         if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+            if (row.skuCode != null && row.skuCode != "") {
+                return getLabelText(cell, this.state.lang) + " (" + row.skuCode + ")";
+            } else {
+                return getLabelText(cell, this.state.lang);
+            }
         } else {
             return "";
         }
