@@ -130,6 +130,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (data[i].x == 17 && data[i].value != "") {
                 (instance.jexcel).setValueFromCoords(17, data[i].y, data[i].value, true);
             }
+            if (data[i].x == 11 && data[i].value != "") {
+                (instance.jexcel).setValueFromCoords(11, data[i].y, data[i].value, true);
+            }
         }
     }
 
@@ -184,6 +187,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var db1;
         var shipmentStatusList = [];
         var procurementAgentList = [];
+        var procurementAgentListAll=[];
         var fundingSourceList = [];
         var budgetList = [];
         var dataSourceList = [];
@@ -237,6 +241,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             label: paResult[k].label
                         }
                         procurementAgentList.push(paJson);
+                        procurementAgentListAll.push(paResult[k]);
                     }
                     var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                     var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
@@ -388,6 +393,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             dataSourceList: dataSourceList,
                                             fundingSourceList: fundingSourceList,
                                             procurementAgentList: procurementAgentList,
+                                            procurementAgentListAll:procurementAgentListAll,
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
                                         })
@@ -421,7 +427,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
                                         var erpType = "hidden";
                                         shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
-                                        console.log("ShipmentList++++", shipmentList);
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
@@ -577,7 +582,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
-                                                { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                                { type: 'notes', title: i18n.t('static.program.notes'), width: 200 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
                                                 { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0 },
@@ -792,7 +797,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                                    if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS)) {
+                                                    if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS) && rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                             onclick: function () {
@@ -1536,7 +1541,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.toggleLarge();
         }
         var rowData = obj.getRowData(y)
-        var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
+        var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
         var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         var batchInfoListAll = this.props.items.programJson.batchInfoList;
         this.setState({
@@ -1562,7 +1567,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         // var elInstance=this.state.plannedPsmShipmentsEl;
 
         var batchInfo = rowData[25];
-        console.log("Batch Info+++", batchInfo);
         var tableEditable = shipmentEditable;
         if (rowData[22].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
             tableEditable = false;
@@ -1726,28 +1730,28 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var programJson = this.props.items.programJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
-                    this.props.hideFirstComponent();
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                    var papuOs = papuTransaction.objectStore('procurementAgent');
-                    var papuRequest = papuOs.get(parseInt(procurementAgent));
-                    papuRequest.onerror = function (event) {
-                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
-                        this.props.hideFirstComponent();
-                    }.bind(this);
-                    papuRequest.onsuccess = function (event) {
+                // var db1;
+                // var storeOS;
+                // getDatabase();
+                // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                // openRequest.onerror = function (event) {
+                //     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                //     this.props.updateState("color", "red");
+                //     this.props.hideFirstComponent();
+                // }.bind(this);
+                // openRequest.onsuccess = function (e) {
+                //     db1 = e.target.result;
+                //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                //     var papuOs = papuTransaction.objectStore('procurementAgent');
+                    // var papuRequest = papuOs.get(parseInt(procurementAgent));
+                    // papuRequest.onerror = function (event) {
+                    //     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    //     this.props.updateState("color", "red");
+                    //     this.props.hideFirstComponent();
+                    // }.bind(this);
+                    // papuRequest.onsuccess = function (event) {
                         var papuResult = [];
-                        papuResult = papuRequest.result;
+                        papuResult = this.state.procurementAgentListAll.filter(c=>c.procurementAgentId==parseInt(procurementAgent))[0];
                         var addLeadTimes = 0;
                         if (rowData[7].toString() == "true") {
                             addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
@@ -1798,18 +1802,28 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         } else {
                             shipmentInstance.setValueFromCoords(11, y, false, true);
                         }
-                    }.bind(this)
-                }.bind(this)
+                    // }.bind(this)
+                // }.bind(this)
             } else {
-                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                if (shipmentMode == 2) {
-                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
+                if (rowData[7].toString() == "true") {
+                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
+                    var leadTimesPerStatus = addLeadTimes / 5;
+                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                 } else {
-                    expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    if (shipmentMode == 2) {
+                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    } else {
+                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    }
+                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 }
-                expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 var expectedDate = expectedPlannedDate;
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
                     expectedDate = expectedSubmittedDate;
@@ -1880,14 +1894,35 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var batchDetails = rowData[25];
                 for (var b = 0; b < batchDetails.length; b++) {
                     var bd = batchDetails[b];
+                    var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
+                    var minCreatedDate = moment(rowData[4]).format("YYYY-MM-DD");
+                    shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[24] : c.index != rowData[24]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                        .map(c => {
+                            var batchInfoList = c.batchInfoList;
+                            batchInfoList.map(bi => {
+                                if (bi.batch.batchNo == bd.batch.batchNo && moment(bi.batch.expiryDate).format("YYYY-MM") == moment(bd.batch.expiryDate).format("YYYY-MM")) {
+                                    if (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") {
+                                        if (moment(minCreatedDate).format("YYYY-MM-DD") > moment(c.receivedDate).format("YYYY-MM-DD")) {
+                                            minCreatedDate = moment(c.receivedDate).format("YYYY-MM-DD");
+                                        }
+                                    } else {
+                                        if (moment(minCreatedDate).format("YYYY-MM-DD") > moment(c.expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                            minCreatedDate = moment(c.expectedDeliveryDate).format("YYYY-MM-DD");
+                                        }
+                                    }
+                                }
+                            })
+                        })
                     if (bd.batch.autoGenerated.toString() == "true") {
-                        batchDetails[b].batch.expiryDate = moment(rowData[4]).add(this.props.items.shelfLife, 'months').format("YYYY-MM-DD");
+                        batchDetails[b].batch.expiryDate = moment(minCreatedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
                     }
-                    batchDetails[b].batch.createdDate = moment(rowData[4]).startOf('month').format("YYYY-MM-DD");
+                    batchDetails[b].batch.createdDate = moment(minCreatedDate).format("YYYY-MM-DD");
                 }
                 elInstance.setValueFromCoords(25, y, batchDetails, true);
                 elInstance.setValueFromCoords(34, y, 0, true);
-                if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
+            }
+            if (validation) {
+                if (rowData[3] == DELIVERED_SHIPMENT_STATUS && rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                     this.batchDetailsClicked(elInstance, x, y, true, true);
                 }
             }
@@ -1934,7 +1969,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (valid == true) {
                 var shipmentDates = rowData[27];
                 if (value == DELIVERED_SHIPMENT_STATUS) {
-                    this.batchDetailsClicked(elInstance, x, y, true, true);
+                    if (rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
+                        this.batchDetailsClicked(elInstance, x, y, true, true);
+                    }
                 } else {
                     if (shipmentDates.expectedDeliveryDate != "" && shipmentDates.expectedDeliveryDate != null && shipmentDates.expectedDeliveryDate != "Invalid date") {
                         elInstance.setValueFromCoords(4, y, shipmentDates.expectedDeliveryDate, true);
@@ -2184,10 +2221,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(25, y, batchDetails, true);
                         elInstance.setValueFromCoords(26, y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), true);
                         elInstance.setValueFromCoords(34, y, 0, true);
-                        if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
-                            this.batchDetailsClicked(elInstance, x, y, true, true);
-                        }
                     }
+                }
+                if (rowData[3] == DELIVERED_SHIPMENT_STATUS && rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
+                    this.batchDetailsClicked(elInstance, x, y, true, true);
                 }
             }
         }
@@ -2229,7 +2266,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     cell.classList.add('readonly');
                 }
                 if (rowData[30].toString() == "false") {
-                    console.log("In if+++");
                     elInstance.setStyle(col, "color", "#000");
                     // elInstance.setStyle(col, "color", "red");
                     var cell = elInstance.getCell(col);
@@ -2240,7 +2276,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     // var cell = elInstance.getCell(`B${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
                 } else {
-                    console.log("In else+++");
                     if (rowData[0].toString() == "false" || rowData[3] == CANCELLED_SHIPMENT_STATUS) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         // elInstance.setStyle(col, "background-color", "#D3D3D3");
@@ -2570,6 +2605,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (batchInfoList.length > 0) {
                     batchId = batchInfoList[0].batchId;
                 }
+                var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
+                var minCreatedDate = moment(rowData[4]).format("YYYY-MM-DD");
+                shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[24] : c.index != rowData[24]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                    .map(c => {
+                        var batchInfoList = c.batchInfoList;
+                        batchInfoList.map(bi => {
+                            if (bi.batch.batchNo == batchNo && moment(bi.batch.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")) {
+                                if (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") {
+                                    if (moment(minCreatedDate).format("YYYY-MM-DD") > moment(c.receivedDate).format("YYYY-MM-DD")) {
+                                        minCreatedDate = moment(c.receivedDate).format("YYYY-MM-DD");
+                                    }
+                                } else {
+                                    if (moment(minCreatedDate).format("YYYY-MM-DD") > moment(c.expectedDeliveryDate).format("YYYY-MM-DD")) {
+                                        minCreatedDate = moment(c.expectedDeliveryDate).format("YYYY-MM-DD");
+                                    }
+                                }
+                            }
+                        })
+                    })
                 var batchInfoJson = {
                     shipmentTransBatchInfoId: map.get("3"),
                     batch: {
@@ -2577,7 +2631,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         expiryDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
                         batchId: batchId,
                         autoGenerated: autoGenerated,
-                        createdDate: moment(rowData[4]).format("YYYY-MM-DD")
+                        createdDate: moment(minCreatedDate).format("YYYY-MM-DD")
                     },
                     shipmentQty: map.get("2").toString().replaceAll("\,", ""),
                 }
@@ -3015,9 +3069,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var valid = true;
         var elInstance = this.state.shipmentsEl;
         var json = elInstance.getJson(null, false);
-        console.log("Json+++",json);
         var checkIfShipmentBatchIsConfirmed = json.filter(c => c[3] == DELIVERED_SHIPMENT_STATUS && c[34] == 0);
-        console.log("Check if shipment batch info is confirmed+++",checkIfShipmentBatchIsConfirmed);
         var checkOtherValidation = true;
         if (checkIfShipmentBatchIsConfirmed.length > 0) {
             checkOtherValidation = false;
@@ -3232,8 +3284,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }
                     }
                 }
-            }else{
-                valid=false;
+            } else {
+                valid = false;
             }
         }
         if (negativeBudget > 0 && valid == true) {
@@ -3500,13 +3552,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: shipmentBatchInfoList[bi].batch.batchNo,
                                         planningUnitId: parseInt(map.get("2")),
                                         expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
-                                        createdDate: createdDate,
+                                        createdDate: shipmentBatchInfoList[bi].batch.createdDate,
                                         autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
                                     }
                                     batchInfoList.push(batchDetails);
                                 } else {
                                     batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
-                                    batchInfoList[index].createdDate = createdDate;
+                                    batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
                                     batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
                                 }
                             }
@@ -3668,13 +3720,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         batchNo: shipmentBatchInfoList[bi].batch.batchNo,
                                         planningUnitId: map.get("2"),
                                         expiryDate: shipmentBatchInfoList[bi].batch.expiryDate,
-                                        createdDate: createdDate,
+                                        createdDate: shipmentBatchInfoList[bi].batch.createdDate,
                                         autoGenerated: shipmentBatchInfoList[bi].batch.autoGenerated
                                     }
                                     batchInfoList.push(batchDetails);
                                 } else {
                                     batchInfoList[index].expiryDate = shipmentBatchInfoList[bi].batch.expiryDate;
-                                    batchInfoList[index].createdDate = createdDate;
+                                    batchInfoList[index].createdDate = shipmentBatchInfoList[bi].batch.createdDate;
                                     batchInfoList[index].autoGenerated = shipmentBatchInfoList[bi].batch.autoGenerated;
                                 }
                             }

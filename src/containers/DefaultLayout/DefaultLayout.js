@@ -363,7 +363,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
-  { path: '/shipmentLinkingNotification', exact: true, name: 'Shipment Linking Notification', component: ShipmentLinkingNotifications },
+  { path: '/shipmentLinkingNotification', exact: true, name: 'static.mt.shipmentLinkingNotification', component: ShipmentLinkingNotifications },
 
   { path: '/RealmDashboard', name: 'static.dashboard.realmdashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'static.dashboard.programdashboard', component: ProgramDashboard },
@@ -1553,6 +1553,13 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.manualTagging'),
                             url: '/shipment/manualTagging',
+                            icon: 'fa fa-truck',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.mt.shipmentLinkingNotification'),
+                            url: '/shipmentLinkingNotification',
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
                           },

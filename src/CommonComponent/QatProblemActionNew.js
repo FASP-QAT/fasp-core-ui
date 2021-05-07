@@ -407,7 +407,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     problemActionList[index].dt = curDate;
                                                                                     problemActionList[index].data5 = JSON.stringify(causeJson);
                                                                                     if (problemActionList[index].problemStatus.id == 4) {
-                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj,openProblemStatusObj);
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj, openProblemStatusObj);
                                                                                     }
                                                                                 }
 
@@ -475,18 +475,18 @@ export default class QatProblemActionNew extends Component {
                                                                                     causeJson.push(item);
                                                                                 }
                                                                                 if (index == -1) {
-                                                                                    createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList,openProblemStatusObj);
+                                                                                    createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     problemActionList[index].dt = curDate;
                                                                                     problemActionList[index].data5 = JSON.stringify(causeJson);
                                                                                     if (problemActionList[index].problemStatus.id == 4) {
-                                                                                        openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                     }
                                                                                 }
                                                                             } else {
                                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
-                                                                                    incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
                                                                         }
@@ -524,12 +524,13 @@ export default class QatProblemActionNew extends Component {
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson ,openProblemStatusObj);
+                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
+                                                                                    problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
                                                                                     if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
-                                                                                        problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
-                                                                                        openProblem(indexShipment, username, userId, problemActionList,openProblemStatusObj);
+                                                                                        // problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
+                                                                                        openProblem(indexShipment, username, userId, problemActionList, openProblemStatusObj);
                                                                                     }
                                                                                 }
                                                                             }
@@ -547,7 +548,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         && c.shipmentId != 0 &&
                                                                                         c.shipmentId == fslShipmentId);
                                                                                     // console.log("the index+++", notIncludedShipmentIndex);
-                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
                                                                             //new for loop logic=======================================
@@ -563,7 +564,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.shipmentId != 0 &&
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
-                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                             //new for loop logic=======================================
                                                                         }
@@ -648,13 +649,14 @@ export default class QatProblemActionNew extends Component {
                                                                                     );
                                                                                     if (indexShipment == -1) {
                                                                                         var index = 0;
-                                                                                        createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson,openProblemStatusObj);
+                                                                                        createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                         problemActionIndex++;
                                                                                     } else {
                                                                                         // make shipmet problem status eual to open========
+                                                                                        problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
                                                                                         if (indexShipment != -1 && problemActionList[indexShipment].problemStatus.id == 4) {
-                                                                                            problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
-                                                                                            openProblem(indexShipment, username, userId, problemActionList,openProblemStatusObj);
+                                                                                            // problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
+                                                                                            openProblem(indexShipment, username, userId, problemActionList, openProblemStatusObj);
                                                                                         }
                                                                                     }
                                                                                 }
@@ -674,7 +676,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         && c.shipmentId != 0 &&
                                                                                         c.shipmentId == fslShipmentId);
                                                                                     // console.log("the index+++", notIncludedShipmentIndex);
-                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
                                                                             //new for loop logic=======================================
@@ -690,7 +692,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.shipmentId != 0 &&
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
-                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
 
                                                                         }
@@ -747,7 +749,7 @@ export default class QatProblemActionNew extends Component {
                                                                             if (filteredConsumptionListTwo.length < 18) {
                                                                                 if (index == -1) {
                                                                                     // console.log("in create logic+++");
-                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList ,openProblemStatusObj);
+                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // problemActionList[index].isFound = 1===== auto open logic;
@@ -755,7 +757,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     problemActionList[index].dt = curDate;
                                                                                     problemActionList[index].data5 = JSON.stringify(monthWithNoForecastedConsumption);
                                                                                     if (problemActionList[index].problemStatus.id == 4) {
-                                                                                        openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                     }
 
                                                                                 }
@@ -764,7 +766,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                     // problemActionList[index].isFound = 0;
                                                                                     // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                    incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
                                                                         }
@@ -851,14 +853,14 @@ export default class QatProblemActionNew extends Component {
                                                                                     if (cause.length > 0) {
                                                                                         // console.log("flag problem=====>", index);
                                                                                         if (index == -1) {
-                                                                                            createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList,openProblemStatusObj);
+                                                                                            createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                             problemActionIndex++;
                                                                                         } else {
                                                                                             // auto open problem logic for index
                                                                                             problemActionList[index].dt = curDate;
                                                                                             problemActionList[index].data5 = JSON.stringify(cause);
                                                                                             if (problemActionList[index].problemStatus.id == 4) {
-                                                                                                openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                                openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                             }
                                                                                         }
                                                                                     }
@@ -866,7 +868,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         //console.log("dont flag problem=====>");
                                                                                         if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                             // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                            incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                            incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                         }
                                                                                     }
                                                                                     // ================================
@@ -1131,7 +1133,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("cId+++", getProblemCriticality(problemCriticality));
 
                                                                             if (index == -1) {
-                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList ,openProblemStatusObj);
+                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 //auto open for index=======>
@@ -1140,13 +1142,13 @@ export default class QatProblemActionNew extends Component {
                                                                                 problemActionList[index].data5 = JSON.stringify(cause);
                                                                                 // problemActionList[index].realmProblem.criticality = getProblemCriticality(problemCriticality);
                                                                                 if (problemActionList[index].problemStatus.id == 4) {
-                                                                                    openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                    openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                 }
                                                                             }
 
                                                                         } else {
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
-                                                                                incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
                                                                         break;
@@ -1212,7 +1214,7 @@ export default class QatProblemActionNew extends Component {
 
                                                                         if (stockoutsWithing6months.length > 0 || stockoutsWithing7to18months.length > 0) {
                                                                             if (index == -1) {
-                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList,openProblemStatusObj);
+                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 //auto open for index=======>
@@ -1220,12 +1222,12 @@ export default class QatProblemActionNew extends Component {
                                                                                 problemActionList[index].dt = curDate;
                                                                                 problemActionList[index].data5 = JSON.stringify(cause);
                                                                                 if (problemActionList[index].problemStatus.id == 4) {
-                                                                                    openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                    openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                 }
                                                                             }
                                                                         } else {
                                                                             if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
-                                                                                incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
                                                                         break;
@@ -1287,7 +1289,7 @@ export default class QatProblemActionNew extends Component {
                                                                             if (actualCauseMonths.length > 0) {
                                                                                 if (index == -1) {
                                                                                     // console.log("in create logic+++");
-                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList ,openProblemStatusObj);
+                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // problemActionList[index].isFound = 1===== auto open logic;
@@ -1295,7 +1297,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     problemActionList[index].dt = curDate;
                                                                                     problemActionList[index].data5 = JSON.stringify(actualCauseMonths);
                                                                                     if (problemActionList[index].problemStatus.id == 4) {
-                                                                                        openProblem(index, username, userId, problemActionList,openProblemStatusObj);
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
                                                                                     }
                                                                                 }
 
@@ -1303,7 +1305,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3)) {
                                                                                     // problemActionList[index].isFound = 0;
                                                                                     // //console.log("****** in logic to make isfound 0 future 18 consumption**********", problemActionList[index]);
-                                                                                    incomplianceProblem(index, username, userId, problemActionList,incomplianceProblemStatusObj);
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
                                                                         }
