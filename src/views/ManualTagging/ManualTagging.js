@@ -528,7 +528,7 @@ export default class ManualTagging extends Component {
                 selectedShipment: [],
                 active4: false,
                 active5: true,
-                checkboxValue: true
+                checkboxValue: false
             });
         }
     }
@@ -2765,51 +2765,60 @@ export default class ManualTagging extends Component {
 
                                 <FormGroup className="pl-3">
                                     {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }}>
+                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }} 
+                                    >
                                         <Input
                                             className="form-check-input"
                                             type="radio"
                                             id="active1"
                                             name="active"
                                             value={true}
+                                            title={i18n.t('static.mt.tab1Purpose')}
                                             checked={this.state.active1 == true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
                                             className="form-check-label"
-                                            check htmlFor="inline-radio1">
+                                            check htmlFor="inline-radio1"
+                                            title={i18n.t('static.mt.tab1Purpose')}>
                                             {i18n.t('static.mt.notLinkedQAT')}
                                         </Label>
                                     </FormGroup>
-                                    <FormGroup check inline>
+                                    <FormGroup check inline 
+                                    >
                                         <Input
                                             className="form-check-input"
                                             type="radio"
                                             id="active2"
                                             name="active"
                                             value={false}
+                                            title={i18n.t('static.mt.tab2Purpose')}
                                             checked={this.state.active2 === true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
                                             className="form-check-label"
-                                            check htmlFor="inline-radio2">
+                                            check htmlFor="inline-radio2"
+                                            title={i18n.t('static.mt.tab2Purpose')}>
                                             {i18n.t('static.mt.linked')}
                                         </Label>
                                     </FormGroup>
-                                    <FormGroup check inline>
+                                    <FormGroup check inline
+                                    >
                                         <Input
                                             className="form-check-input"
                                             type="radio"
                                             id="active3"
                                             name="active"
                                             value={false}
+                                            title={i18n.t('static.mt.tab3Purpose')}
                                             checked={this.state.active3 === true}
                                             onChange={(e) => { this.dataChange(e) }}
                                         />
                                         <Label
                                             className="form-check-label"
-                                            check htmlFor="inline-radio2">
+                                            check htmlFor="inline-radio2"
+                                            title={i18n.t('static.mt.tab3Purpose')}>
                                             {i18n.t('static.mt.notLinkedERP')}
                                         </Label>
                                     </FormGroup>
@@ -2818,7 +2827,7 @@ export default class ManualTagging extends Component {
                         </div>
                         {/* </Col> */}
 
-                        {this.state.active1 &&
+                        {/* {this.state.active1 &&
                             <>
                                 <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab1Purpose')}</span></div></b><br />
                             </>
@@ -2832,7 +2841,7 @@ export default class ManualTagging extends Component {
                             <>
                                 <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.tab3Purpose')}</span></div></b><br />
                             </>
-                        }
+                        } */}
                         <div className="col-md-12 pl-0">
                             <Row>
                                 {this.state.active3 &&
