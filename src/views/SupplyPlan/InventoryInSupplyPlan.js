@@ -206,6 +206,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.setState({
                         realmCountryPlanningUnitList: realmCountryPlanningUnitList,
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
+                        this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                     })
                     var data = [];
                     var inventoryDataArr = [];

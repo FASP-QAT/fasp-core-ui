@@ -21,6 +21,8 @@ import moment from "moment"
 import { Online } from "react-detect-offline";
 import { Prompt } from 'react-router'
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -52,6 +54,14 @@ export default class ShipmentDetails extends React.Component {
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            programId: "",
+            planningUnitId: "",
+            currencyList: [],
+            dataSourceList: [],
+            fundingSourceList: [],
+            procurementAgentList: [],
+            budgetList: [],
+            shipmentStatusList: [],
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -68,7 +78,326 @@ export default class ShipmentDetails extends React.Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.exportCSV = this.exportCSV.bind(this);
     }
+
+
+    exportCSV() {
+
+        //Create workbook and worksheet
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(i18n.t('static.supplyplan.shipmentDataEntry'));
+
+        //Add Header Row
+
+        worksheet.columns = [
+            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+            { header: i18n.t('static.report.id'), key: 'name', width: 25 },
+            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
+            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
+            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
+            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },
+            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.adjustesOrderQty'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },
+            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },
+
+            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },
+            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },
+            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },
+
+            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },
+            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
+
+
+        ];
+
+        //Header Color
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
+            // console.log('ROW--------->' + colNumber + ' = ' + cell.value);
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFFF00' },
+                bgColor: { argb: 'FF0000FF' },
+                // font: { bold: true }
+            }
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+
+
+        let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        worksheet.dataValidations.add('A2:A100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${activeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
+        worksheet.dataValidations.add('F2:F100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${shipmentModeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        worksheet.dataValidations.add('H2:H100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${isLocalProcurementAgentDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        worksheet.dataValidations.add('L2:L100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${emergencyShipmentDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let dataSourceVar = [];
+        let datasourceList = this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+
+        for (let i = 0; i < datasourceList.length; i++) {
+            dataSourceVar.push(datasourceList[i].name);
+        }
+
+        worksheet.dataValidations.add('T2:T100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${dataSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //currency
+
+        let currencyVar = [];
+        let currencyList = this.state.currencyList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < currencyList.length; i++) {
+            currencyVar.push(currencyList[i].name);
+        }
+
+        worksheet.dataValidations.add('O2:O100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${currencyVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let fundingSourceVar = [];
+        let fundingSourceList = this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < fundingSourceList.length; i++) {
+            fundingSourceVar.push(fundingSourceList[i].name);
+        }
+
+        worksheet.dataValidations.add('M2:M100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${fundingSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let procurementAgentVar = [];
+        let procurementAgentList = this.state.procurementAgentList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < procurementAgentList.length; i++) {
+            procurementAgentVar.push(procurementAgentList[i].name);
+        }
+
+        worksheet.dataValidations.add('G2:G100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${procurementAgentVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let budgetVar = [];
+        let budgetList = this.state.budgetList.slice(1).filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < budgetList.length; i++) {
+            budgetVar.push(budgetList[i].name);
+        }
+
+        worksheet.dataValidations.add('N2:N100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${budgetVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let shipmentStatusVar = [];
+        let shipmentStatusList = this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
+        for (let i = 0; i < shipmentStatusList.length; i++) {
+            shipmentStatusVar.push(shipmentStatusList[i].name);
+        }
+
+        worksheet.dataValidations.add('D2:D100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${shipmentStatusVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+
+        //Validations
+
+        worksheet.dataValidations.add('K2:K100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        worksheet.dataValidations.add('P2:P100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        worksheet.dataValidations.add('R2:R100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        //Locked gray color fill
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('B' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('C' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('J' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('Q' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('S' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+        }
+
+        //Protection
+
+        // worksheet.protect();
+        // worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+        // worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        //     cell.protection = { locked: false };
+        // });
+
+        // Generate Excel File with given name
+
+        workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, i18n.t('static.supplyplan.shipmentDataEntry') + '.xlsx');
+        })
+
+    }
+
 
     show() {
     }
@@ -562,7 +891,10 @@ export default class ShipmentDetails extends React.Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                            <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        }
+                                        {/* <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
                                         {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>
