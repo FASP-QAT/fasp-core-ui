@@ -560,7 +560,7 @@
     "static.common.result": "Affichage de {{from}} pages sur {{size}}",
     "static.message.notExist": "N`existe pas",
     "static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText": "Entrez le délai «Approuvé à expédié» pour cet agent d`approvisionnement (en mois)",
-    "static.manualTagging.currentEstimetedDeliveryDate": "Date de réception estimée",
+    "static.manualTagging.currentEstimetedDeliveryDate": "Fecha estimada de recepción",
     "static.dashboard.applicationmaster": "Maîtres d`application",
     "static.program.validstatus": "Sélectionnez l`état",
     "static.message.fundingSource.listNotFound": "Aucune source de financement trouvée",
