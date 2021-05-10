@@ -3,16 +3,43 @@ import { API_URL } from '../Constants.js';
 
 class ManualTaggingSerice {
 
-    getShipmentListForManualTagging(programId, planningUnitId) {
-        return axios.get(`${API_URL}/api/manualTagging/${programId}/${planningUnitId}`, {
+    getShipmentListForManualTagging(json) {
+        return axios.post(`${API_URL}/api/manualTagging/`, json, {
         });
     }
-    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, searchId, programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${searchId}/${programId}/${erpPlanningUnitId}`, {
+
+    getShipmentLinkingNotification(json) {
+        return axios.post(`${API_URL}/api/shipmentLinkingNotification/`, json, {
         });
     }
-    linkShipmentWithARTMIS(orderNo, primeLineNo, shipmentId, conversionFactor, programId) {
-        return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, { orderNo, primeLineNo, shipmentId, conversionFactor, programId }, {}
+
+    updateNotification(json) {
+        return axios.post(`${API_URL}/api/updateNotification/`, json, {
+        });
+    }
+
+    getNotLinkedShipmentListForManualTagging(programId, linkingType) {
+        return axios.get(`${API_URL}/api/manualTagging/notLinkedShipments/${programId}/${linkingType}`, {
+        });
+    }
+
+    getARTMISHistory(orderNo, primeLineNo) {
+        return axios.get(`${API_URL}/api/artmisHistory/${orderNo}/${primeLineNo}`, {
+        });
+    }
+
+    getNotificationCount() {
+        return axios.get(`${API_URL}/api/getNotificationCount`, {
+        });
+    }
+    getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
+        console.log("parentShipmentId----", parentShipmentId);
+        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
+        });
+    }
+    linkShipmentWithARTMIS(json) {
+        console.log("my json------", json);
+        return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, json, {}
         );
     }
     delinkShipment(shipmentId, notes, programId) {
@@ -24,9 +51,13 @@ class ManualTaggingSerice {
         });
     }
 
-    searchErpOrderData(term, searchId, programId, erpPlanningUnitId) {
-        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${searchId}/${programId}/${erpPlanningUnitId}`, {
+    searchErpOrderData(term, programId, erpPlanningUnitId, linkingType) {
+        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
+    }
+    getShipmentDetailsByParentShipmentId(parentShipmentId) {
+        return axios.post(`${API_URL}/api/getShipmentDetailsByParentShipmentId/`, { parentShipmentId }, {}
+        );
     }
 
 }
