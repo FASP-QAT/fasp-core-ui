@@ -1430,8 +1430,8 @@ class Consumption extends Component {
             lineTension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
-            // borderColor: '#000',
-            borderColor: '#ED5626',
+            borderColor: '#000',
+            // borderColor: '#ED5626',
             borderDash: [10, 10],
             ticks: {
               fontSize: 2,
@@ -1471,8 +1471,8 @@ class Consumption extends Component {
             lineTension: 0,
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
-            // borderColor: '#000',
-            borderColor: '#ED5626',
+            borderColor: '#000',
+            // borderColor: '#ED5626',
             borderDash: [10, 10],
             ticks: {
               fontSize: 2,
