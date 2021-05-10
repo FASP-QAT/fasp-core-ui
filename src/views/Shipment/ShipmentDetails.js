@@ -914,7 +914,7 @@ export default class ShipmentDetails extends React.Component {
                                                         <div className="controls edit">
 
                                                             <Picker
-                                                                //  years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                 ref={this.pickRange}
                                                                 value={rangeValue}
                                                                 lang={pickerLang}
