@@ -47,12 +47,22 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
         );
     }
-    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId,term) {
+    getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId, term) {
         return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
     getActivePlanningUnitByProductCategoryId(json) {
         return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/active`, {}
+        );
+    }
+
+    getActivePlanningUnitByProductCategoryIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/productCategoryList/active`, json, {}
+        );
+    }
+
+    getActivePlanningUnitByRealmCountryId(realmCountryId) {
+        return axios.get(`${API_URL}/api/planningUnit/realmCountry/${realmCountryId}`, {}
         );
     }
 }
