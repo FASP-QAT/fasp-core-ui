@@ -71,7 +71,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         regionListFiltered = regionList;
 
                         // Filtering program planning unit based on program Id and active is true
-                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active == true);
+                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active.toString() == "true");
                         // Filter planning unit list for single planning unit
                         if (planningUnitId != 0) {
                             programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
@@ -93,9 +93,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             // Loop across filtered planning unit
                             for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
                                 // Getting max data entry date
-                                var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
-                                var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
-                                var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
+                                var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                 let invmax = moment.max(inventoryListForMax.map(d => moment(d.inventoryDate)))
                                 let shipmax = moment.max(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                 let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
@@ -228,7 +228,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     // Shipments part
                                     // Getting shipments list for planning unit
-                                    var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                    var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                                     // Getting shipment list for a month
                                     var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
                                     var shipmentTotalQty = 0;
@@ -355,7 +355,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     // Inventory part
                                     // Filtering inventory for planning unit and that particular month
-                                    var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                    var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                     var actualStockCount = 0;
                                     var adjustmentQty = 0;
                                     var regionsReportingActualInventory = 0;
@@ -456,7 +456,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     // Consumption part
                                     // Filtering consumption list for that month, that planning unit
-                                    var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                    var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                     var actualConsumptionQty = 0;
                                     var forecastedConsumptionQty = 0;
                                     var regionsReportingActualConsumption = [];
@@ -825,7 +825,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var regionsReportingActualConsumptionAmc = []
                                         var noOfRegionsReportingActualConsumptionAmc = []
 
-                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                         for (var c = 0; c < amcFilter.length; c++) {
                                             if (amcFilter[c].actualFlag.toString() == "true") {
                                                 actualConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
