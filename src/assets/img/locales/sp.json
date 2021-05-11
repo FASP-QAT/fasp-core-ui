@@ -525,6 +525,7 @@
     "static.message.2digitDecimal": "Ingresar 2 decimales (p. ej.: 0.95, 10.11)",
     "static.report.shippedToArrivedAirLeadTime": "Tiempo de espera desde embarcado hasta llegado por vía aérea",
     "static.supplyPlan.shelfLife": "Vida útil",
+    "static.jexcel.consumptionQuantity": "con cantidad de consumo",
     "static.planningUnit.planningUnitName": "Nombre del producto",
     "static.dashboard.forecastingunit": "Producto (estimación)",
     "static.realm.maxMosMaxGaurdraillabel": "Límite superior para el nivel MAX de meses de existencias",
