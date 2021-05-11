@@ -434,7 +434,26 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
                                         var erpType = "hidden";
                                         shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
+                                        var yForBatch = -1;
+                                        if (shipmentList.length == 0) {
+                                            this.setState({
+                                                yForBatch: yForBatch,
+                                                shipmentEditable: false
+                                            })
+                                        }
                                         for (var i = 0; i < shipmentList.length; i++) {
+                                            var index;
+                                            if (shipmentList[i].shipmentId != 0) {
+                                                index = shipmentListUnFiltered.findIndex(c => c.shipmentId == shipmentList[i].shipmentId);
+                                            } else {
+                                                index = shipmentList[i].index;
+                                            }
+                                            if (this.props.items.indexOfShipmentContainingBatch != undefined && this.props.items.indexOfShipmentContainingBatch >= 0 && index == this.props.items.indexOfShipmentContainingBatch && (shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)) {
+                                                yForBatch = i;
+                                            }
+                                            this.setState({
+                                                yForBatch: yForBatch
+                                            })
                                             var shipmentMode = 1;
                                             if (shipmentList[i].shipmentMode == "Air") {
                                                 shipmentMode = 2;
@@ -449,6 +468,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
                                                 shipmentEditable = false;
                                             }
+                                            this.setState({
+                                                shipmentEditable: shipmentEditable
+                                            })
 
                                             var totalShipmentQty = 0;
                                             var shipmentBatchInfoList = shipmentList[i].batchInfoList;
@@ -505,12 +527,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[21] = shipmentList[i].createdDate;//V
                                             data[22] = shipmentList[i].erpFlag;//W
                                             data[23] = shipmentList[i].shipmentStatus.id;//X
-                                            var index;
-                                            if (shipmentList[i].shipmentId != 0) {
-                                                index = shipmentListUnFiltered.findIndex(c => c.shipmentId == shipmentList[i].shipmentId);
-                                            } else {
-                                                index = shipmentList[i].index;
-                                            }
                                             data[24] = index; // Y
                                             data[25] = shipmentList[i].batchInfoList; //Z
                                             data[26] = totalShipmentQty; //AA
@@ -1433,6 +1449,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
 
             }
+        }
+        if (this.state.yForBatch != -1) {
+            this.batchDetailsClicked((shipmentInstance), 0, this.state.yForBatch, this.state.shipmentEditable, false);
+            this.props.updateState("indexOfShipmentContainingBatch", -1);
         }
     }
 

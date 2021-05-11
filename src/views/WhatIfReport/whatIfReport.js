@@ -5039,11 +5039,15 @@ export default class WhatIfReportComponent extends React.Component {
 
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map(sl => {
+        shipmentList.map((sl,count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
+                var index=count;
+                this.setState({
+                    indexOfShipmentContainingBatch:index
+                })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
                     date = moment(sl.receivedDate).format("YYYY-MM-DD");

@@ -525,6 +525,7 @@
     "static.message.2digitDecimal": "Entrez des nombres décimaux à 2 chiffres (par exemple: 0,95,10,11)",
     "static.report.shippedToArrivedAirLeadTime": "Délai de livraison «expédié à arrivé» par voie aérienne (en mois)",
     "static.supplyPlan.shelfLife": "Durée de vie",
+    "static.jexcel.consumptionQuantity": "avec quantité de consommation",
     "static.planningUnit.planningUnitName": "Nom de l`unité de planification",
     "static.dashboard.forecastingunit": "Unité de prévision",
     "static.realm.maxMosMaxGaurdraillabel": "Max Guardrail pour Max MdS",
