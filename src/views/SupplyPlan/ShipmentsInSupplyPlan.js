@@ -2703,77 +2703,77 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var lastShipmentStatus = rowData[23];
         var addLeadTimes = 0;
         if (shipmentMode != "" && procurementAgent != "" && shipmentStatus != "") {
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
-                this.props.hideFirstComponent();
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programJson = this.props.items.programJson;
-                var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                var papuOs = papuTransaction.objectStore('procurementAgent');
-                var papuRequest = papuOs.get(parseInt(procurementAgent));
-                papuRequest.onerror = function (event) {
-                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
-                    this.props.hideFirstComponent();
-                }.bind(this);
-                papuRequest.onsuccess = function (event) {
-                    var papuResult = [];
-                    papuResult = papuRequest.result;
+            // var db1;
+            // var storeOS;
+            // getDatabase();
+            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            // openRequest.onerror = function (event) {
+            //     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            //     this.props.updateState("color", "red");
+            //     this.props.hideFirstComponent();
+            // }.bind(this);
+            // openRequest.onsuccess = function (e) {
+            //     db1 = e.target.result;
+            var programJson = this.props.items.programJson;
+            //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            //     var papuOs = papuTransaction.objectStore('procurementAgent');
+            //     var papuRequest = papuOs.get(parseInt(procurementAgent));
+            //     papuRequest.onerror = function (event) {
+            //         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            //         this.props.updateState("color", "red");
+            //         this.props.hideFirstComponent();
+            //     }.bind(this);
+            //     papuRequest.onsuccess = function (event) {
+            var papuResult = [];
+            papuResult = this.state.procurementAgentListAll.filter(c => c.procurementAgentId == parseInt(procurementAgent))[0];
 
-                    var plannedDate = shipmentDatesJson.plannedDate;
-                    var submittedDate = shipmentDatesJson.submittedDate;
-                    var approvedDate = shipmentDatesJson.approvedDate;
-                    var shippedDate = shipmentDatesJson.shippedDate;
-                    var arrivedDate = shipmentDatesJson.arrivedDate;
-                    var receivedDate = shipmentDatesJson.receivedDate;
-                    var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
-                    if (rowData[7].toString() == "true") {
-                        addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
-                        expectedDeliveryDate = moment(Date.now()).add((addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                    } else {
-                        var ppUnit = papuResult;
-                        var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                        if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                            submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
-                        }
-                        var approvedToShippedLeadTime = "";
-                        approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                        if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                            approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
-                        }
+            var plannedDate = shipmentDatesJson.plannedDate;
+            var submittedDate = shipmentDatesJson.submittedDate;
+            var approvedDate = shipmentDatesJson.approvedDate;
+            var shippedDate = shipmentDatesJson.shippedDate;
+            var arrivedDate = shipmentDatesJson.arrivedDate;
+            var receivedDate = shipmentDatesJson.receivedDate;
+            var expectedDeliveryDate = shipmentDatesJson.expectedDeliveryDate;
+            if (rowData[7].toString() == "true") {
+                addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == rowData[2])[0].localProcurementLeadTime;
+                expectedDeliveryDate = moment(Date.now()).add((addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+            } else {
+                var ppUnit = papuResult;
+                var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                    submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                }
+                var approvedToShippedLeadTime = "";
+                approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                    approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                }
 
-                        var shippedToArrivedLeadTime = ""
-                        if (shipmentMode == 2) {
-                            shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
-                        } else {
-                            shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
-                        }
+                var shippedToArrivedLeadTime = ""
+                if (shipmentMode == 2) {
+                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
+                } else {
+                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
+                }
 
-                        plannedDate = moment(Date.now()).format("YYYY-MM-DD");
-                        submittedDate = moment(plannedDate).add(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        approvedDate = moment(submittedDate).add(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        shippedDate = moment(approvedDate).add(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        arrivedDate = moment(shippedDate).add(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        expectedDeliveryDate = moment(arrivedDate).add(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                    }
-                    if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                        elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
-                    } else {
-                        shipmentDatesJson.expectedDeliveryDate = expectedDeliveryDate;
-                        elInstance.setValueFromCoords(27, y, shipmentDatesJson, true);
-                        if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                            elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
-                        }
-                    }
-                }.bind(this)
-            }.bind(this)
+                plannedDate = moment(Date.now()).format("YYYY-MM-DD");
+                submittedDate = moment(plannedDate).add(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                approvedDate = moment(submittedDate).add(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                shippedDate = moment(approvedDate).add(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                arrivedDate = moment(shippedDate).add(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedDeliveryDate = moment(arrivedDate).add(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+            }
+            if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
+            } else {
+                shipmentDatesJson.expectedDeliveryDate = expectedDeliveryDate;
+                elInstance.setValueFromCoords(27, y, shipmentDatesJson, true);
+                if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                    elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
+                }
+            }
+            // }.bind(this)
+            // }.bind(this)
         }
     }
 
