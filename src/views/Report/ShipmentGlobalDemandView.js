@@ -2234,14 +2234,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#6a82a8',
+                backgroundColor: '#205493',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#dee7f8',
+                backgroundColor: '#a7c6ed',
                 borderWidth: 0,
             }
             ]
@@ -2259,13 +2259,13 @@ class ShipmentGlobalDemandView extends Component {
                 //     '#ED5626',
                 //     '#3fe488'],
                 backgroundColor: [
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
                 ],
                 legend: {
                     position: 'bottom'
