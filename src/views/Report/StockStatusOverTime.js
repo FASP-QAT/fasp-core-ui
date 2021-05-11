@@ -1715,7 +1715,7 @@ class StockStatusOverTime extends Component {
 
                                     </div>
                                 </div>
-                                <div className="col-md-12 pt-1" align="center"> <span>{i18n.t('static.stockStatusOverTime.noteBelowGraph')}</span></div>
+                                <div className="col-md-12 pt-1"> <span><b>{i18n.t('static.stockStatusOverTime.noteBelowGraph')}</b></span></div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
