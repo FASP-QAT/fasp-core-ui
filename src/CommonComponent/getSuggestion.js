@@ -373,7 +373,7 @@ export default function getSuggestion(row, lang) {
         var causeString = ""
         if (res.length > 0) {
             for (var i = 0; i < res.length; i++) {
-                causeString = causeString.concat(res[i].monthRange[0] + " to " + res[i].monthRange[3] + " with consumption quantity " + res[i].consumptionValue + ",");
+                causeString = causeString.concat(res[i].monthRange[0] + i18n.t('static.jexcel.to') + res[i].monthRange[3] + i18n.t('static.jexcel.consumptionQuantity') + res[i].consumptionValue + ",");
             }
         }
 

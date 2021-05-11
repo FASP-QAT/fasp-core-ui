@@ -525,6 +525,7 @@
     "static.message.2digitDecimal": "Enter 2 digit decimal numbers (e.g.- 0.95, 10.11)",
     "static.report.shippedToArrivedAirLeadTime": "Shipped to Arrived (Air)",
     "static.supplyPlan.shelfLife": "Shelf Life (months)",
+    "static.jexcel.consumptionQuantity": "with consumption quantity",
     "static.planningUnit.planningUnitName": "Planning Unit Name",
     "static.dashboard.forecastingunit": "Forecasting Unit",
     "static.realm.maxMosMaxGaurdraillabel": "Max guardrail for MAX MOS",
