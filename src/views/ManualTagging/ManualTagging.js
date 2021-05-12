@@ -214,7 +214,8 @@ export default class ManualTagging extends Component {
                 });
             } else {
                 this.setState({
-                    countryWisePrograms
+                    countryWisePrograms,
+                    planningUnits:[]
                 });
             }
         }
@@ -583,6 +584,7 @@ export default class ManualTagging extends Component {
                 planningUnitValues: [],
                 productCategoryValues: [],
                 planningUnits1: [],
+                planningUnits: [],
                 countryId: -1,
                 active3: true,
                 active1: false,
@@ -825,8 +827,8 @@ export default class ManualTagging extends Component {
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
-            planningUnitValues:[],
-            productCategoryValues:[],
+            planningUnitValues: [],
+            productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
@@ -838,7 +840,8 @@ export default class ManualTagging extends Component {
 
     programChangeModal(event) {
         this.setState({
-            programId1: event.target.value
+            programId1: event.target.value,
+            planningUnits: []
         }, () => {
             this.getNotLinkedShipments();
             this.getPlanningUnitList();
@@ -2220,7 +2223,7 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     selectedShipment: [],
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo,
+                    searchedValue: outputListAfterSearch[0].roNo
                     // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
                     this.filterProgramByCountry();
@@ -2765,7 +2768,7 @@ export default class ManualTagging extends Component {
 
                                 <FormGroup className="pl-3">
                                     {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }} 
+                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }}
                                     >
                                         <Input
                                             className="form-check-input"
@@ -2784,7 +2787,7 @@ export default class ManualTagging extends Component {
                                             {i18n.t('static.mt.notLinkedQAT')}
                                         </Label>
                                     </FormGroup>
-                                    <FormGroup check inline 
+                                    <FormGroup check inline
                                     >
                                         <Input
                                             className="form-check-input"
