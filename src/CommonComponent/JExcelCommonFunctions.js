@@ -1,5 +1,6 @@
 import i18n from '../../src/i18n';
 import { func } from 'prop-types';
+import moment from 'moment';
 
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
@@ -75,9 +76,7 @@ export function jExcelLoadedFunction(instance, number) {
 }
 
 export function paginationChange(number) {
-    console.log("number---" + number)
     var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
-    console.log("recordCount---", recordCount);
     localStorage.setItem("sesRecordCount", recordCount)
 }
 
@@ -231,7 +230,6 @@ export function jExcelLoadedFunctionQuantimed(instance) {
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0) {
     if (type == "text") {
         var col = (colName).concat(parseInt(rowNo) + 1);
-        console.log("D--------------------->", value,"value == undefined",value == undefined,"value == undefined",value == "undefined");
         if (value == "" || value == undefined || value == "undefined") {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -244,7 +242,6 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
         }
     } else if (type == "number") {
         var col = (colName).concat(parseInt(rowNo) + 1);
-        console.log("col", col);
         value = value.toString().replaceAll("\,", "").trim();
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -253,7 +250,6 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             return false;
         } else {
             if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? value != 0 : value == 0))) {
-                console.log("!(reg.test(value)) in if")
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -272,15 +268,16 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            // if (isNaN(Date.parse(value))) {
-            //     elInstance.setStyle(col, "background-color", "transparent");
-            //     elInstance.setStyle(col, "background-color", "yellow");
-            //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-            // } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-            return true;
-            // }
+            if (moment(value).format("YYYY-MM")=="Invalid date") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                return false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                return true;
+            }
         }
     } else if (type == "numberNotRequired") {
         var col = (colName).concat(parseInt(rowNo) + 1);
