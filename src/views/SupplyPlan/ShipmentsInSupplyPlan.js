@@ -1565,7 +1565,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.props.updateState("loading", true);
         if (this.props.shipmentPage == "shipmentDataEntry") {
             this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
-            this.props.toggleLarge();
+            this.props.openBatchPopUp();
         }
         var rowData = obj.getRowData(y)
         var expectedDeliveryDate = moment(rowData[4]).format("YYYY-MM-DD");
@@ -2504,7 +2504,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            var valid = checkValidtion("text", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("date", "B", y, rowData[1], elInstance);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
                 if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
@@ -2577,7 +2577,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
                     valid = false;
                 }
-                var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
                 if (validation.toString() == "false") {
                     valid = false;
                 } else {
@@ -3070,7 +3070,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
             var shipmentInstance = this.state.shipmentsEl;
             shipmentInstance.setValueFromCoords(27, parseInt(rowNumber), json, true);
-            shipmentInstance.setValueFromCoords(4, parseInt(rowNumber), map.get("6") != "" && map.get("6") != null && map.get("6") != undefined ? moment(map.get("6")).format("YYYY-MM-DD") : moment(map1.get("6")).format("YYYY-MM-DD"), true);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("shipmentDatesChangedFlag", 0);
             this.setState({
@@ -3090,6 +3089,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("loading", false);
             this.props.hideFourthComponent()
         }
+        shipmentInstance.setValueFromCoords(4, parseInt(rowNumber), map.get("6") != "" && map.get("6") != null && map.get("6") != undefined ? moment(map.get("6")).format("YYYY-MM-DD") : moment(map1.get("6")).format("YYYY-MM-DD"), true);
     }
 
     checkValidationForShipments() {
