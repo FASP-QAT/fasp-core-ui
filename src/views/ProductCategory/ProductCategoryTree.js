@@ -20,6 +20,7 @@ import * as Yup from 'yup';
 import { Formik } from "formik";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
+
 let initialValues = {
     productCategory: ''
 }
@@ -864,7 +865,9 @@ export default class ProductCategoryTree extends Component {
                                     </ FormGroup>
                                 }
                             </CardFooter>
+                            
                         </Card>
+                        
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
