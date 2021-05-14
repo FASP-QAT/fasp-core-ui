@@ -2493,7 +2493,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            var valid = checkValidtion("date", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
                 if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
@@ -2566,7 +2566,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
                     valid = false;
                 }
-                var validation = checkValidtion("date", "B", y, rowData[1], elInstance);
+                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
                 if (validation.toString() == "false") {
                     valid = false;
                 } else {
@@ -2766,6 +2766,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                 elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
             } else {
+                if (shipmentDatesJson != "") {
+                } else {
+                    shipmentDatesJson = {
+                        receivedDate: "",
+                        expectedDeliveryDate: ""
+                    }
+                }
                 shipmentDatesJson.expectedDeliveryDate = expectedDeliveryDate;
                 elInstance.setValueFromCoords(27, y, shipmentDatesJson, true);
                 if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
@@ -3097,16 +3104,43 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered;
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            shipmentListAfterUpdate[parseInt(map.get("24"))].budget.id = map.get("13");
-            var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0])
-            shipmentListAfterUpdate[parseInt(map.get("24"))].currency = c;
-            shipmentListAfterUpdate[parseInt(map.get("24"))].shipmentStatus.id = map.get("3");
-            shipmentListAfterUpdate[parseInt(map.get("24"))].accountFlag = map.get("0");
-            shipmentListAfterUpdate[parseInt(map.get("24"))].active = map.get("30");
-            var productCost = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-            var freightCost = elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-            shipmentListAfterUpdate[parseInt(map.get("24"))].productCost = productCost.toString().replaceAll("\,", "");
-            shipmentListAfterUpdate[parseInt(map.get("24"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+            if (map.get("24") != -1) {
+                shipmentListAfterUpdate[parseInt(map.get("24"))].budget.id = map.get("13");
+                var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0])
+                shipmentListAfterUpdate[parseInt(map.get("24"))].currency = c;
+                shipmentListAfterUpdate[parseInt(map.get("24"))].shipmentStatus.id = map.get("3");
+                shipmentListAfterUpdate[parseInt(map.get("24"))].accountFlag = map.get("0");
+                shipmentListAfterUpdate[parseInt(map.get("24"))].active = map.get("30");
+                var productCost = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                var freightCost = elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                shipmentListAfterUpdate[parseInt(map.get("24"))].productCost = productCost.toString().replaceAll("\,", "");
+                shipmentListAfterUpdate[parseInt(map.get("24"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+            } else {
+                var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("14"))[0]);
+                var productCost = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                var freightCost = elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                var shipmentJson = {
+                    budget: {
+                        id: map.get("13") == "undefined" || map.get("13") == undefined || map.get("13") == "" ? '' : map.get("13"),
+                    },
+                    currency: c,
+                    shipmentStatus: {
+                        id: map.get("3"),
+                        label: (this.state.shipmentStatusList).filter(c => c.id == map.get("3"))[0].label
+                    },
+                    accountFlag: map.get("0"),
+                    active: map.get("30"),
+                    erpFlag: false,
+                    freightCost: Number(freightCost.toString().replaceAll("\,", "")).toFixed(2),
+                    planningUnit: {
+                        id: map.get("2"),
+                        label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("2"))[0]).planningUnit.label
+                    },
+                    productCost: productCost.toString().replaceAll("\,", ""),
+                    shipmentId: 0
+                }
+                shipmentListAfterUpdate.push(shipmentJson);
+            }
         }
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));

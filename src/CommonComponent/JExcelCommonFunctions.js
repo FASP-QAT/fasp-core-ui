@@ -268,10 +268,30 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            if (moment(value).format("YYYY-MM")=="Invalid date") {
+            // if (moment(value).format("YYYY-MM")=="Invalid date") {
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+            //     return false;
+            // } else {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+            return true;
+            // }
+        }
+    } else if (type == "dateWithInvalid") {
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        if (value == "") {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            return false;
+        } else {
+            if (moment(value).format("YYYY-MM") == "Invalid date") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                elInstance.setValueFromCoords(1, rowNo, "", true);
                 return false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
