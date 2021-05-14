@@ -2626,8 +2626,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[24] : c.index != rowData[24]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                     .map(c => {
                         var batchInfoList = c.batchInfoList;
-                        console.log("+++BatchInfo List",batchInfoList);
-                        console.log("c+++",c);
                         batchInfoList.map(bi => {
                             if (bi.batch.batchNo == batchNo && moment(bi.batch.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")) {
                                 if (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") {
@@ -3138,7 +3136,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == map.get("2"))[0]).planningUnit.label
                     },
                     productCost: productCost.toString().replaceAll("\,", ""),
-                    shipmentId: 0
+                    shipmentId: 0,
+                    batchInfoList:[]
                 }
                 shipmentListAfterUpdate.push(shipmentJson);
             }
