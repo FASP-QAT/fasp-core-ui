@@ -94,161 +94,167 @@ export default class StockStatusMatrix extends React.Component {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
 
-    if (programId > 0 && versionId != 0) {
-      localStorage.setItem("sesVersionIdReport", versionId);
-      if (versionId.includes('Local')) {
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-          var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-          var planningunitRequest = planningunitOs.getAll();
-          var planningList = []
-          planningunitRequest.onerror = function (event) {
-            // Handle errors!
-          };
-          planningunitRequest.onsuccess = function (e) {
-            var myResult = [];
-            myResult = planningunitRequest.result;
-            var programId = (document.getElementById("programId").value).split("_")[0];
-            var proList = []
-
-            for (var i = 0; i < myResult.length; i++) {
-              if (myResult[i].program.id == programId) {
-
-                proList.push(myResult[i].planningUnit)
-              }
-            }
-            console.log('proList', proList)
-            this.setState({ programPlanningUnitList: myResult })
-            var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
-            var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
-            var planningunitRequest1 = planningunitOs1.getAll();
-            //  var pllist = []
-            planningunitRequest1.onerror = function (event) {
+    this.setState({
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+    }, () => {
+      if (programId > 0 && versionId != 0) {
+        localStorage.setItem("sesVersionIdReport", versionId);
+        if (versionId.includes('Local')) {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
               // Handle errors!
             };
-            planningunitRequest1.onsuccess = function (e) {
+            planningunitRequest.onsuccess = function (e) {
               var myResult = [];
-              myResult = planningunitRequest1.result;
-              var flList = []
-              console.log(myResult)
-              for (var i = 0; i < myResult.length; i++) {
-                for (var j = 0; j < proList.length; j++) {
-                  if (myResult[i].planningUnitId == proList[j].id) {
-                    console.log(myResult[i].planningUnitId, proList[j].id)
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
 
-                    flList.push(myResult[i].forecastingUnit)
-                    planningList.push(myResult[i])
-                  }
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList.push(myResult[i].planningUnit)
                 }
               }
-              console.log('flList', flList)
+              console.log('proList', proList)
+              this.setState({ programPlanningUnitList: myResult })
+              var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
+              var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
+              var planningunitRequest1 = planningunitOs1.getAll();
+              //  var pllist = []
+              planningunitRequest1.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest1.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest1.result;
+                var flList = []
+                console.log(myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                  for (var j = 0; j < proList.length; j++) {
+                    if (myResult[i].planningUnitId == proList[j].id) {
+                      console.log(myResult[i].planningUnitId, proList[j].id)
 
-              var tcList = [];
-              flList.filter(function (item) {
-                var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
-                if (i <= -1 && item.tracerCategory.id != 0) {
-                  tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                      flList.push(myResult[i].forecastingUnit)
+                      planningList.push(myResult[i])
+                    }
+                  }
                 }
-                return null;
-              });
+                console.log('flList', flList)
 
-              console.log('tcList', tcList)
-              var lang = this.state.lang;
+                var tcList = [];
+                flList.filter(function (item) {
+                  var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                  if (i <= -1 && item.tracerCategory.id != 0) {
+                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                  }
+                  return null;
+                });
+
+                console.log('tcList', tcList)
+                var lang = this.state.lang;
+                this.setState({
+                  tracerCategories: tcList.sort(function (a, b) {
+                    a = getLabelText(a.label, lang).toLowerCase();
+                    b = getLabelText(b.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitList: planningList
+                }, () => {
+                  // this.fetchData()
+                })
+
+
+
+              }.bind(this);
+
+            }.bind(this);
+          }.bind(this)
+
+
+        }
+        else {
+
+
+          let realmId = AuthenticationService.getRealmId();
+          TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+
+            if (response.status == 200) {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
               this.setState({
-                tracerCategories: tcList.sort(function (a, b) {
-                  a = getLabelText(a.label, lang).toLowerCase();
-                  b = getLabelText(b.label, lang).toLowerCase();
-                  return a < b ? -1 : a > b ? 1 : 0;
-                }),
-                planningUnitList: planningList
+                tracerCategories: listArray
               }, () => {
                 // this.fetchData()
               })
+            }
 
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-
-            }.bind(this);
-
-          }.bind(this);
-        }.bind(this)
-
-
-      }
-      else {
-
-
-        let realmId = AuthenticationService.getRealmId();
-        TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
-
-          if (response.status == 200) {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-              tracerCategories: listArray
-            }, () => {
-              // this.fetchData()
-            })
-          }
-
-        }).catch(
-          error => {
-            if (error.message === "Network Error") {
-              this.setState({
-                message: 'static.unkownError',
-                loading: false
-              });
-            } else {
-              switch (error.response ? error.response.status : "") {
-
-                case 401:
-                  this.props.history.push(`/login/static.message.sessionExpired`)
-                  break;
-                case 403:
-                  this.props.history.push(`/accessDenied`)
-                  break;
-                case 500:
-                case 404:
-                case 406:
-                  this.setState({
-                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                    loading: false
-                  });
-                  break;
-                case 412:
-                  this.setState({
-                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                    loading: false
-                  });
-                  break;
-                default:
-                  this.setState({
-                    message: 'static.unkownError',
-                    loading: false
-                  });
-                  break;
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
               }
             }
-          }
-        );
-      }
+          );
+        }
 
-    } else {
-      this.setState({
-        message: i18n.t('static.common.selectProgram'),
-        productCategories: [],
-        tracerCategories: []
-      })
-    }
+      } else {
+        this.setState({
+          message: i18n.t('static.common.selectProgram'),
+          productCategories: [],
+          tracerCategories: []
+        })
+      }
+    })
   }
 
   makeText = m => {
