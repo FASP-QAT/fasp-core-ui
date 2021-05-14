@@ -361,34 +361,62 @@ export default class ShipmentDetails extends React.Component {
 
         //Protection
 
-        // worksheet.protect();
-        // worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
+        worksheet.protect();
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
 
         // Generate Excel File with given name
 

@@ -149,23 +149,23 @@ export default class ConsumptionDetails extends React.Component {
         });
 
         //alternateReportingUnit
-        let alternateReportingUnitVar = [];
-        let alternateReportingUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
-            a = a.name.toLowerCase();
-            b = b.name.toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        });
-        for (let i = 0; i < alternateReportingUnitList.length; i++) {
-            alternateReportingUnitVar.push(alternateReportingUnitList[i].name);
-        }
-        worksheet.dataValidations.add('E2:E100', {
-            type: 'list',
-            allowBlank: false,
-            formulae: [`"${alternateReportingUnitVar.join(",")}"`],
-            showErrorMessage: true,
-            // errorStyle: 'error',
-            // error: 'Invalid value',
-        });
+        // let alternateReportingUnitVar = [];
+        // let alternateReportingUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        //     a = a.name.toLowerCase();
+        //     b = b.name.toLowerCase();
+        //     return a < b ? -1 : a > b ? 1 : 0;
+        // });
+        // for (let i = 0; i < alternateReportingUnitList.length; i++) {
+        //     alternateReportingUnitVar.push(alternateReportingUnitList[i].name);
+        // }
+        // worksheet.dataValidations.add('E2:E100', {
+        //     type: 'list',
+        //     allowBlank: false,
+        //     formulae: [`"${alternateReportingUnitVar.join(",")}"`],
+        //     showErrorMessage: true,
+        //     // errorStyle: 'error',
+        //     // error: 'Invalid value',
+        // });
 
 
         let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
@@ -227,34 +227,34 @@ export default class ConsumptionDetails extends React.Component {
         //     hidden: true,
         // };
 
-        // worksheet.protect();
-        // worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
-        // worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-        //     cell.protection = { locked: false };
-        // });
+        worksheet.protect();
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
 
         // Generate Excel File with given name
 
