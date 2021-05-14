@@ -529,85 +529,92 @@ class ForecastMetrics extends Component {
 
   filterTracerCategory(programIds) {
 
-    var programIdsValue = [];
-    for (var i = 0; i < programIds.length; i++) {
-      programIdsValue.push(programIds[i].value);
-    }
-    // console.log("programids=====>", programIdsValue);
-    let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-    TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
-      .then(response => {
-        console.log("tc respons==>", response.data);
-        var listArray = response.data;
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        this.setState({
-          tracerCategories: listArray
-        }, () => {
-          this.filterData()
-        });
-      }).catch(
-        error => {
+    this.setState({
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+    }, () => {
+
+      var programIdsValue = [];
+      for (var i = 0; i < programIds.length; i++) {
+        programIdsValue.push(programIds[i].value);
+      }
+      // console.log("programids=====>", programIdsValue);
+      let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
+      TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
+        .then(response => {
+          console.log("tc respons==>", response.data);
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
           this.setState({
-            tracerCategories: []
+            tracerCategories: listArray
           }, () => {
             this.filterData()
           });
-          if (error.message === "Network Error") {
+        }).catch(
+          error => {
             this.setState({
-              message: 'static.unkownError',
-              loading: false
+              tracerCategories: []
+            }, () => {
+              this.filterData()
             });
-          } else {
-            switch (error.response ? error.response.status : "") {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
 
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  tracerCategories: [],
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                  loading: false
-                }, () => {
-                  this.filterData()
-                });
-                break;
-              case 412:
-                this.setState({
-                  tracerCategories: [],
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                  loading: false
-                }, () => {
-                  this.filterData()
-                });
-                break;
-              default:
-                this.setState({
-                  tracerCategories: [],
-                  message: 'static.unkownError',
-                  loading: false
-                }, () => {
-                  this.filterData()
-                });
-                break;
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    tracerCategories: [],
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  }, () => {
+                    this.filterData()
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    tracerCategories: [],
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  }, () => {
+                    this.filterData()
+                  });
+                  break;
+                default:
+                  this.setState({
+                    tracerCategories: [],
+                    message: 'static.unkownError',
+                    loading: false
+                  }, () => {
+                    this.filterData()
+                  });
+                  break;
+              }
             }
           }
-        }
-      );
-    if (programIdsValue.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] });
-    } else {
-      this.setState({ message: '' });
-    }
+        );
+      if (programIdsValue.length == 0) {
+        this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] });
+      } else {
+        this.setState({ message: '' });
+      }
+    })
   }
 
   handlePlanningUnitChange(planningUnitIds) {
