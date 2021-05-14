@@ -84,47 +84,71 @@
 
 // export default BasicPrimitiveTreeDemo;
 import React, { Component } from 'react';
-import { OrgDiagram } from 'basicprimitivesreact';
-import { Enabled, PageFitMode } from 'basicprimitives';
+import SamplesList from '../../SamplesList';
+import {
+    DragNDrop
+} from '../../Samples';
+// import '../../../src/global.css';
 
 class BasicPrimitiveTreeDemo extends Component {
     constructor(props) {
         super(props);
+
+        this.onChange = this.onChange.bind(this);
+
+        let key = 1;
+        this.hash = SamplesList.reduce((agg, group) => {
+            group.key = key;
+            key += 1;
+            group.items.reduce((agg, item) => {
+                item.key = key;
+                key += 1;
+                agg[item.key] = item;
+                return agg;
+            }, agg)
+            return agg;
+        }, {});
+
+        this.state = {
+            activeItem: (SamplesList[0].items[0])
+        };
     }
     componentDidMount() {
-        console.log("component did mount called");
+        console.log("activeItem---", this.state.activeItem);
     }
-    render() {
-        const config = {
-            pageFitMode: PageFitMode.FitToPage,
-            cursorItem: 0,
-            highlightItem: 0,
-            hasSelectorCheckbox: Enabled.True,
-            items: [
-                {
-                    id: 0,
-                    parent: null,
-                    title: 'James Smith',
-                    description: 'VP, Public Sector'
-                },
-                {
-                    id: 1,
-                    parent: 0,
-                    title: 'Ted Lucas',
-                    description: 'VP, Human Resources'
-                },
-                {
-                    id: 2,
-                    parent: 0,
-                    title: 'Fritz Stuger',
-                    description: 'Business Solutions, US'
-                }
-            ]
-        };
+    onChange({ target }) {
+        const { activeItem } = this.state;
+        const newItem = this.hash[target.value];
+        if (activeItem.key !== newItem.key) {
+            this.setState({
+                activeItem: newItem
+            });
+        }
+    }
 
-        return <div className="">
-            <OrgDiagram centerOnCursor={true} config={config} />
-        </div>
+    render() {
+        const { activeItem } = this.state;
+        return (
+            <div className="container">
+                <h1>Basic Primitives Diagrams for React</h1>
+                <p>
+                    {/* <select onChange={this.onChange}>
+                        {SamplesList.map(({ key, label, items }) => (
+                            <optgroup key={key} label={label}>
+                                {items.map(({ key: itemKey, label }) => (
+                                    <option key={itemKey} value={itemKey} >{label}</option>
+                                ))}
+                            </optgroup>
+                        )
+                        )}
+                    </select> */}
+                </p>
+                <div class="sample">
+                    {/* <DragNDrop /> */}
+                    {activeItem.component}
+                </div>
+            </div>
+        );
     }
 }
 

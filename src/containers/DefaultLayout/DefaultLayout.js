@@ -269,7 +269,7 @@ const EditIntegration = React.lazy(() => import('../../views/Integration/EditInt
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/myTree', name: i18n.t('static.dashboard.consumptiondetails'), component: BasicPrimitiveTreeDemo },
+  { path: '/myTree', name: "Tree", component: BasicPrimitiveTreeDemo },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -1011,6 +1011,11 @@ class DefaultLayout extends Component {
                       //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PROGRAM_DASHBOARD') ? false : true) }
                       // },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: "Tree",
+                        icon: 'fa fa-tree',
+                        url: '/myTree',
+                      },
                       {
                         name: i18n.t('static.dashboard.datasync'),
                         icon: 'fa fa-refresh',
