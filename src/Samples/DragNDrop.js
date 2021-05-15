@@ -5,6 +5,10 @@ import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import i18n from '../i18n'
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 class Container extends Component {
   render() {
@@ -82,12 +86,15 @@ class Container extends Component {
 
         this.onAddButtonClick = this.onAddButtonClick.bind(this);
         this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
+        this.onHighlightChanged = this.onHighlightChanged.bind(this);
 
         this.state = {
+          modalOpen: false,
+          title: '',
           cursorItem: 0,
           highlightItem: 0,
           items: [
-            { id: 0, parent: null, description: "Chief Executive Officer (CEO)", email: "akil.m@altius.cc", itemTitleColor: "#4169e1", phone: "352-206-7599", title: "Akil Mahimwala", label: "Akil Mahimwala" },
+            { id: 0, parent: null, description: "Chief Executive Officer (CEO)", email: "akil.m@altius.cc", phone: "352-206-7599", title: "Akil Mahimwala", label: "Akil Mahimwala" },
             { id: 1, parent: 0, description: "Co-Presidents, Platform Products & Services Division", email: "ravi.s@altius.cc", phone: "505-791-1689", title: "Ravi Sharma", label: "Jeanna White" },
             { id: 2, parent: 0, description: "Sr. VP, Server & Tools Division", email: "sameer.g@altiusbpo.com", phone: "262-215-7998", title: "Sameer Gharpurey", label: "James Holt" },
             { id: 3, parent: 2, description: "VP, Server & Tools Marketing and Solutions", email: "thomwill@name.com", phone: "904-547-5342", title: "Anchal", label: "Thomas Williams" },
@@ -104,7 +111,7 @@ class Container extends Component {
         const { items } = this.state;
 
         var newItem = {
-          id: this.index++,
+          id: parseInt(items.length + 1),
           parent: itemConfig.id,
           title: "New Title",
           description: "New Description"
@@ -122,6 +129,29 @@ class Container extends Component {
 
         this.setState(this.getDeletedItems(items, [itemConfig.id]));
       }
+
+      onHighlightChanged(event, data) {
+        const { context: item } = data;
+        const { config } = this.state;
+        // console.log("data1---", item.title);
+        // console.log("data2---", item.id);
+        // item.id
+        if (item != null) {
+
+          this.setState({
+            title: item.title,
+            config: {
+              ...config,
+              // highlightItem: item.id,
+              // cursorItem: item.id
+            },
+            highlightItem: item.id,
+            cursorItem: item.id
+          }, () => {
+            console.log("highlighted item---", this.state)
+          })
+        }
+      };
 
       onMoveItem(parentid, itemid) {
         const { items } = this.state;
@@ -214,6 +244,7 @@ class Container extends Component {
           ...this.state,
           pageFitMode: PageFitMode.Enabled,
           // pageFitMode: PageFitMode.None,
+          highlightItem: 0,
           hasSelectorCheckbox: Enabled.True,
           hasButtons: Enabled.True,
           buttonsPanelSize: 40,
@@ -223,7 +254,10 @@ class Container extends Component {
               <button key="2" className="StyledButton"
                 onClick={(event) => {
                   event.stopPropagation();
-                  alert(`User clicked on edit button for node ${itemConfig.title}`)
+                  this.setState({
+                    modalOpen: true
+                  })
+                  // alert(`User clicked on edit button for node ${itemConfig.title}`)
                 }}>
                 <FontAwesomeIcon icon={faEdit} />
               </button>
@@ -236,12 +270,27 @@ class Container extends Component {
                 <FontAwesomeIcon icon={faPlus} />
               </button>
               {itemConfig.parent != null &&
-                <button key="2" className="StyledButton"
+                <button key="3" className="StyledButton"
                   onClick={(event) => {
                     event.stopPropagation();
                     // var result = confirm("Are you sure you want to delete this node?");
                     // if (result) {
-                      this.onRemoveButtonClick(itemConfig);
+                    confirmAlert({
+                      message: "Are you sure you want to delete this node.",
+                      buttons: [
+                        {
+                          label: i18n.t('static.program.yes'),
+                          onClick: () => {
+                            this.onRemoveButtonClick(itemConfig);
+                          }
+                        },
+                        {
+                          label: i18n.t('static.program.no')
+                        }
+                      ]
+                    });
+
+
                     // }
                     // alert(`User clicked on delete button for node ${itemConfig.title}`)
                   }}>
@@ -268,7 +317,29 @@ class Container extends Component {
         }
         return <>
           <div className="placeholder" style={{ clear: 'both' }} >
-            <OrgDiagram centerOnCursor={true} config={config} />
+            <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} />
+            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => {
+              console.log("tree json ---", this.state.items)
+            }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+            {/* Modal start */}
+            <Modal isOpen={this.state.modalOpen}
+              className={'modal-sm '} style={{ maxWidth: '49% !important' }}>
+              <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+              </ModalHeader>
+              <ModalBody>
+                <div></div>
+              </ModalBody>
+              <ModalFooter>
+
+
+                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+
+                <Button size="md" color="danger" className="submitBtn float-right mr-1"> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+              </ModalFooter>
+            </Modal>
+            {/* Modal end */}
           </div>
         </>;
       }

@@ -130,7 +130,7 @@ class BasicPrimitiveTreeDemo extends Component {
         const { activeItem } = this.state;
         return (
             <div className="container">
-                <h1>Basic Primitives Diagrams for React</h1>
+                <h1>Altius Tree</h1>
                 <p>
                     {/* <select onChange={this.onChange}>
                         {SamplesList.map(({ key, label, items }) => (
