@@ -998,6 +998,12 @@ class EditSupplyPlanStatus extends Component {
                 shipmentValidationBatchError: "",
                 shipmentBatchInfoDuplicateError: ""
             })
+        }else if(type == "shipmentNotes"){
+            var cont = true;
+            if (cont == true) {
+                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
+                document.getElementById("shipmentNotesDiv").style.display = 'none';
+            }
         }
     }
 
@@ -4156,6 +4162,19 @@ class EditSupplyPlanStatus extends Component {
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
+                                    <div id="shipmentNotesDiv" style={{"display":'none'}}>
+                                <FormGroup style={{"marginTop":"-30px"}}>
+                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                    <Input
+                                        bsSize="sm"
+                                        type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                        <input type="hidden" name="yForNotes" id="yForNotes"/>
+                                    </FormGroup>
+                                </div>
+                                <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
+                        </div>
                                     <div className="pt-4"></div>
                                 </ModalBody>
                                 <ModalFooter>

@@ -573,7 +573,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
-                                                { type: 'notes', title: i18n.t('static.program.notes'), width: 200 },
+                                                { type: 'text', title: i18n.t('static.program.notes'), width: 300, wordWrap: shipmentEditable?false:true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
                                                 { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0 },
@@ -614,6 +614,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
+                                                }
+                                                if (c == 20) {
+                                                    this.shipmentNotesClicked(a, b, c, d, e)
                                                 }
                                                 // if (e.value) {
                                                 //     e.selectionStart = e.value.length;
@@ -3750,6 +3753,45 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     render() { return (<div></div>) }
+
+    shipmentNotesClicked = function (instance, cell, x, y, value) {
+        if (x == 20) {
+            this.props.updateState("loading", true);
+            if (this.props.shipmentPage == "shipmentDataEntry") {
+                this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentNotes"));
+                this.props.toggleLarge();
+            }
+            if (document.getElementById("showSaveShipmentsNotesButtonsDiv") != null) {
+                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'block';
+            }
+            if (document.getElementById("shipmentNotesDiv") != null) {
+                document.getElementById("shipmentNotesDiv").style.display = 'block';
+            }
+            var elInstance = this.state.shipmentsEl;
+            var rowData = elInstance.getRowData(y);
+            var notes = rowData[20];
+            document.getElementById("shipmentNotes").value = notes;
+            document.getElementById("yForNotes").value = y;
+            this.props.updateState("loading", false);
+        }
+    }
+
+    saveShipmentsNotes() {
+        this.props.updateState("loading", true);
+        var elInstance = this.state.shipmentsEl;
+        elInstance.setValueFromCoords(20, document.getElementById("yForNotes").value, document.getElementById("shipmentNotes").value, true);
+        this.props.updateState("shipmentChangedFlag", 1);
+        if (document.getElementById("showSaveShipmentsNotesButtonsDiv") != null) {
+            document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
+        }
+        if (document.getElementById("shipmentNotesDiv") != null) {
+            document.getElementById("shipmentNotesDiv").style.display = 'none';
+        }
+        if (this.props.shipmentPage == "shipmentDataEntry") {
+            this.props.toggleLarge("submit");
+        }
+        this.props.updateState("loading", false);
+    }
 
     shipmentEditStart = function (instance, cell, x, y, value) {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;
