@@ -9,6 +9,7 @@ import i18n from '../i18n'
 import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import TreeData from './TreeData';
 
 class Container extends Component {
   render() {
@@ -88,25 +89,42 @@ class Container extends Component {
         this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
         this.onHighlightChanged = this.onHighlightChanged.bind(this);
 
+        this.dataChange = this.dataChange.bind(this);
+        this.updateNodeInfoInJson=this.updateNodeInfoInJson.bind(this);
         this.state = {
           modalOpen: false,
           title: '',
           cursorItem: 0,
           highlightItem: 0,
-          items: [
-            { id: 0, parent: null, description: "Chief Executive Officer (CEO)", email: "akil.m@altius.cc", phone: "352-206-7599", title: "Akil Mahimwala", label: "Akil Mahimwala" },
-            { id: 1, parent: 0, description: "Co-Presidents, Platform Products & Services Division", email: "ravi.s@altius.cc", phone: "505-791-1689", title: "Ravi Sharma", label: "Jeanna White" },
-            { id: 2, parent: 0, description: "Sr. VP, Server & Tools Division", email: "sameer.g@altiusbpo.com", phone: "262-215-7998", title: "Sameer Gharpurey", label: "James Holt" },
-            { id: 3, parent: 2, description: "VP, Server & Tools Marketing and Solutions", email: "thomwill@name.com", phone: "904-547-5342", title: "Anchal", label: "Thomas Williams" },
-            { id: 4, parent: 2, description: "VP, Software & Enterprise Management Division", email: "sarakemp@name.com", phone: "918-257-4218", title: "Dolly", label: "Sara Kemp" },
-            { id: 5, parent: 2, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Palash", label: "George Duong" },
-            { id: 6, parent: 2, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Shubham D", label: "George Duong" },
-            { id: 7, parent: 1, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Harshana", label: "George Duong" },
-            { id: 8, parent: 1, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Shubham Y", label: "George Duong" }
-          ]
+          items: TreeData.node_data,
+          currentItemConfig: {}
+          // items: [
+          //   { id: 0, parent: null, description: "Chief Executive Officer (CEO)", email: "akil.m@altius.cc", phone: "352-206-7599", title: "Akil Mahimwala", label: "Akil Mahimwala" },
+          //   { id: 1, parent: 0, description: "Co-Presidents, Platform Products & Services Division", email: "ravi.s@altius.cc", phone: "505-791-1689", title: "Ravi Sharma", label: "Jeanna White" },
+          //   { id: 2, parent: 0, description: "Sr. VP, Server & Tools Division", email: "sameer.g@altiusbpo.com", phone: "262-215-7998", title: "Sameer Gharpurey", label: "James Holt" },
+          //   { id: 3, parent: 2, description: "VP, Server & Tools Marketing and Solutions", email: "thomwill@name.com", phone: "904-547-5342", title: "Anchal", label: "Thomas Williams" },
+          //   { id: 4, parent: 2, description: "VP, Software & Enterprise Management Division", email: "sarakemp@name.com", phone: "918-257-4218", title: "Dolly", label: "Sara Kemp" },
+          //   { id: 5, parent: 2, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Palash", label: "George Duong" },
+          //   { id: 6, parent: 2, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Shubham D", label: "George Duong" },
+          //   { id: 7, parent: 1, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Harshana", label: "George Duong" },
+          //   { id: 8, parent: 1, description: "Sr. VP, Software Server System", email: "georduon@name.com", phone: "434-406-2189", title: "Shubham Y", label: "George Duong" }
+          // ]
         }
       }
 
+      dataChange(event) {
+        // alert("hi");
+        let {currentItemConfig}=this.state;
+        if (event.target.name === "nodeTitle") {
+          currentItemConfig.title = event.target.value;
+        }
+        if (event.target.name === "nodeValueType") {
+          currentItemConfig.valueType = event.target.value;
+        }
+        this.setState({ currentItemConfig: currentItemConfig });
+      }
+
+     
       onAddButtonClick(itemConfig) {
         const { items } = this.state;
 
@@ -130,28 +148,7 @@ class Container extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]));
       }
 
-      onHighlightChanged(event, data) {
-        const { context: item } = data;
-        const { config } = this.state;
-        // console.log("data1---", item.title);
-        // console.log("data2---", item.id);
-        // item.id
-        if (item != null) {
-
-          this.setState({
-            title: item.title,
-            config: {
-              ...config,
-              // highlightItem: item.id,
-              // cursorItem: item.id
-            },
-            highlightItem: item.id,
-            cursorItem: item.id
-          }, () => {
-            console.log("highlighted item---", this.state)
-          })
-        }
-      };
+      
 
       onMoveItem(parentid, itemid) {
         const { items } = this.state;
@@ -239,7 +236,45 @@ class Container extends Component {
         return tree;
       }
 
+      onHighlightChanged(event, data) {
+        const { context: item } = data;
+        const { config } = this.state;
+        // console.log("data1---", item.title);
+        // console.log("data2---", item.id);
+        // item.id
+        if (item != null) {
+
+          this.setState({
+            title: item.title,
+            config: {
+              ...config,
+              // highlightItem: item.id,
+              // cursorItem: item.id
+            },
+            highlightItem: item.id,
+            cursorItem: item.id
+          }, () => {
+            console.log("highlighted item---", this.state)
+          })
+        }
+      };
+
+      updateNodeInfoInJson(currentItemConfig){
+        var nodes=this.state.items;
+        var findNodeIndex=nodes.findIndex(n=>n.id==currentItemConfig.id);
+        nodes[findNodeIndex].title=currentItemConfig.title;
+        nodes[findNodeIndex].valueType=currentItemConfig.valueType;
+        this.setState({
+          items:nodes,
+          modalOpen:false,
+        },()=>{
+          console.log("updated tree data+++",this.state);
+        });
+      }
+
+
       render() {
+        console.log("this.state+++",this.state);
         const config = {
           ...this.state,
           pageFitMode: PageFitMode.Enabled,
@@ -255,7 +290,8 @@ class Container extends Component {
                 onClick={(event) => {
                   event.stopPropagation();
                   this.setState({
-                    modalOpen: true
+                    modalOpen: true,
+                    currentItemConfig: itemConfig,
                   })
                   // alert(`User clicked on edit button for node ${itemConfig.title}`)
                 }}>
@@ -317,29 +353,51 @@ class Container extends Component {
         }
         return <>
           <div className="placeholder" style={{ clear: 'both' }} >
-            <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} />
+            <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged}/>
             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => {
               console.log("tree json ---", this.state.items)
             }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-            {/* Modal start */}
+
+            {/* Modal start------------------- */}
             <Modal isOpen={this.state.modalOpen}
-              className={'modal-sm '} style={{ maxWidth: '49% !important' }}>
+              className={'modal-md '} >
               <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
-                <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                <strong>Edit Node</strong>
+                <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
               </ModalHeader>
               <ModalBody>
-                <div></div>
+                <FormGroup>
+                  <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                  <Input type="text"
+                    name="nodeTitle"
+                    onChange={(e) => { this.dataChange(e) }}
+                    value={this.state.currentItemConfig.title}></Input>
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
+                  <Input
+                    type="select"
+                    name="nodeValueType"
+                    bsSize="sm"
+                    onChange={(e) => { this.dataChange(e) }}
+                    required
+                    value={this.state.currentItemConfig.valueType}
+                  >
+                    <option value="-1">Nothing Selected</option>
+                    <option value="1">Percentage</option>
+                    <option value="2">Derived value</option>
+                    <option value="3">Use Expression (y=mx+c)</option>
+                    <option value="4">Forecasting Unit</option>
+                  </Input>
+                </FormGroup>
               </ModalBody>
               <ModalFooter>
-
-
-                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-
-                <Button size="md" color="danger" className="submitBtn float-right mr-1"> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                <Button type="submit" size="md" onClick={(e)=>{this.updateNodeInfoInJson(this.state.currentItemConfig)}} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
               </ModalFooter>
             </Modal>
-            {/* Modal end */}
+            {/* Modal end------------------------ */}
+
           </div>
         </>;
       }
