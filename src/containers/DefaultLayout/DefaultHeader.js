@@ -11,6 +11,7 @@ import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import imageNotificationCount from '../../assets/img/icons-truck.png';
 import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
 import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
 import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
@@ -92,6 +93,13 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                  {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
+                  <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px',marginTop: '-1px' }} />
+              </NavLink>
+            </NavItem>}
           <DefaultHeaderDropdown mssgs />
 
           {/* <NavItem className="">
@@ -140,16 +148,18 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem>
+
+
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
-                <span className="icon-wrapper-bg "></span>
+                <span className="icon-wrapper-bg"></span>
                 <i className="cui-home icons HomeIcon   icon-anim-pulse text-primary " onClick={this.props.onChangeDashboard} title={i18n.t('static.common.viewDashBoard')}></i>
               </span>
             </NavLink>
           </NavItem>
           {/* <DefaultHeaderDropdown /> */}
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} />
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} shipmentLinkingAlerts={this.props.shipmentLinkingAlerts} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">

@@ -317,13 +317,13 @@ const backgroundColor = [
     // '#ED5626',
     // '#cfcdc9',
     // '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
 ]
 // var bar_chart = new Chart(bar_ctx, {
 //     type: 'bar',
@@ -1823,13 +1823,15 @@ class ShipmentGlobalView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
-                backgroundColor: '#6a82a8',
+                // backgroundColor: '#6a82a8',
+                backgroundColor: '#205493',
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
-                backgroundColor: '#dee7f8',
+                // backgroundColor: '#dee7f8',
+                backgroundColor: '#a7c6ed',
                 borderWidth: 0,
             }
             ]

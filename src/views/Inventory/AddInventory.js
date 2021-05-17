@@ -299,7 +299,7 @@ export default class AddInventory extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
-                            myResult = planningunitRequest.result.filter(c=>c.program.id==programId);
+                            myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                             var proList = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
@@ -638,7 +638,7 @@ export default class AddInventory extends Component {
                         <div className="table-responsive">
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
-                        <br/><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                        <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">

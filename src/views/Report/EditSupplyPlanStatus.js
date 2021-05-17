@@ -533,9 +533,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.consumptionChild != undefined) {
                                 this.refs.consumptionChild.showConsumptionData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -653,9 +653,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.inventoryChild != undefined) {
                                 this.refs.inventoryChild.showInventoryData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -825,9 +825,9 @@ class EditSupplyPlanStatus extends Component {
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
-                                            }else{
+                                            } else {
                                                 this.setState({
-                                                    loading:false
+                                                    loading: false
                                                 })
                                             }
                                         })
@@ -1198,7 +1198,7 @@ class EditSupplyPlanStatus extends Component {
                         }
                         this.setState({
                             supplyPlanDataForAllTransDate: supplyPlanData,
-                            allShipmentsList:programJson.shipmentList
+                            allShipmentsList: programJson.shipmentList
                         })
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
@@ -1618,7 +1618,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -2451,7 +2451,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -2468,7 +2468,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -2486,7 +2486,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -2506,7 +2506,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -2527,7 +2527,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -4042,7 +4042,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={item.balance!=0?"hoverTd":""} onClick={() => item.balance!=0?this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }):""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -4050,7 +4050,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).length > 0 &&
+                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                         <>
                                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                                 <thead>
@@ -4063,7 +4063,7 @@ class EditSupplyPlanStatus extends Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).map(item => (
+                                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                         <tr>
                                                             <td>{item.batchNo}</td>
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
@@ -4202,7 +4202,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
-                                    <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
+                                    <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
@@ -4217,7 +4217,7 @@ class EditSupplyPlanStatus extends Component {
                                             {
                                                 this.state.expiredStockDetails.map(item => (
                                                     <tr>
-                                                        <td  className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
+                                                        <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
@@ -4257,7 +4257,7 @@ class EditSupplyPlanStatus extends Component {
                                                 </thead>
                                                 <tbody>
                                                     {
-                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
+                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
@@ -4566,39 +4566,39 @@ class EditSupplyPlanStatus extends Component {
         console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
-    showShipmentWithBatch(batchNo,expiryDate){
-        var shipmentList=this.state.allShipmentsList;
-        shipmentList.map(sl=>{
-            var batchInfoList=sl.batchInfoList;
-            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
-            if(bi.length>0) {
-                var shipmentStatus=sl.shipmentStatus.id;
-                var date="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
-                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
-                }else{
-                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+    showShipmentWithBatch(batchNo, expiryDate) {
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map(sl => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
                 // Open toggleLarge
-                var supplyPlanType="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
                     supplyPlanType = 'deliveredShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'shippedShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
-                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'shippedErpShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
-                if(supplyPlanType!=""){
+                if (supplyPlanType != "") {
                     this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
