@@ -998,7 +998,7 @@ class EditSupplyPlanStatus extends Component {
                 shipmentValidationBatchError: "",
                 shipmentBatchInfoDuplicateError: ""
             })
-        }else if(type == "shipmentNotes"){
+        } else if (type == "shipmentNotes") {
             var cont = true;
             if (cont == true) {
                 document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
@@ -1618,7 +1618,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3749,27 +3749,27 @@ class EditSupplyPlanStatus extends Component {
                                 render={
                                     ({
                                     }) => (
-                                            <Form name='simpleForm'>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input type="text"
-                                                                        name="programId"
-                                                                        id="programId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
-                                                                        disabled />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
+                                        <Form name='simpleForm'>
+                                            <Col md="12 pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input type="text"
+                                                                    name="programId"
+                                                                    id="programId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.program.label.label_en}
+                                                                    disabled />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                             {/* </CardBody> */}
                             <Row>
@@ -4162,19 +4162,19 @@ class EditSupplyPlanStatus extends Component {
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
-                                    <div id="shipmentNotesDiv" style={{"display":'none'}}>
-                                <FormGroup style={{"marginTop":"-30px"}}>
-                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                    <Input
-                                        bsSize="sm"
-                                        type="textarea" name="shipmentNotes" id="shipmentNotes" />
-                                        <input type="hidden" name="yForNotes" id="yForNotes"/>
-                                    </FormGroup>
-                                </div>
-                                <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
-                        </div>
+                                    <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
+                                        <FormGroup style={{ "marginTop": "-30px" }}>
+                                            <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                            <Input
+                                                bsSize="sm"
+                                                type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                            <input type="hidden" name="yForNotes" id="yForNotes" />
+                                        </FormGroup>
+                                    </div>
+                                    <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
+                                    </div>
                                     <div className="pt-4"></div>
                                 </ModalBody>
                                 <ModalFooter>
@@ -4457,12 +4457,12 @@ class EditSupplyPlanStatus extends Component {
                                     isValid,
                                     setTouched
                                 }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody className="pt-lg-0">
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
+                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                        <CardBody className="pt-lg-0">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
 
-                                                        {/*  <FormGroup className="tab-ml-1">
+                                                    {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -4477,68 +4477,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                        <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
 
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
-                                                            <Input
-                                                                type="textarea"
-                                                                maxLength={65535}
-                                                                name="versionNotes"
-                                                                id="versionNotes"
-                                                                value={this.state.program.currentVersion.notes}
-                                                                bsSize="sm"
-                                                                valid={!errors.versionNotes}
-                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={!this.state.editable}
-                                                                required
-                                                            />
-                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-
-                                                        </FormGroup>
-
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="versionStatusId"
-                                                                id="versionStatusId"
-                                                                bsSize="sm"
-                                                                valid={!errors.versionStatusId}
-                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.currentVersion.versionStatus.id}
-                                                                disabled={!this.state.editable}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {statusList}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                        </FormGroup>
                                                         <Input
-                                                            type="hidden"
-                                                            name="needNotesValidation"
-                                                            id="needNotesValidation"
-                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                            type="textarea"
+                                                            maxLength={65535}
+                                                            name="versionNotes"
+                                                            id="versionNotes"
+                                                            value={this.state.program.currentVersion.notes}
+                                                            bsSize="sm"
+                                                            valid={!errors.versionNotes}
+                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={!this.state.editable}
+                                                            required
                                                         />
-                                                    </div>
-                                                </Col>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
+
+                                                    </FormGroup>
+
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionStatusId"
+                                                            id="versionStatusId"
+                                                            bsSize="sm"
+                                                            valid={!errors.versionStatusId}
+                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.currentVersion.versionStatus.id}
+                                                            disabled={!this.state.editable}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {statusList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needNotesValidation"
+                                                        id="needNotesValidation"
+                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                     &nbsp;
                                              </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
+                                        </CardFooter>
+                                    </Form>
+                                )} />
                     </Card>
 
                 </Col>

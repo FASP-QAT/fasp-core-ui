@@ -694,13 +694,13 @@ export default class ShipmentDetails extends React.Component {
                         <div className="table-responsive">
                             <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
-                        <div id="shipmentNotesDiv"  style={{"display":'none'}}>
-                            <FormGroup style={{"marginTop":"-30px"}}>
+                        <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
+                            <FormGroup style={{ "marginTop": "-30px" }}>
                                 <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                 <Input
                                     bsSize="sm"
                                     type="textarea" name="shipmentNotes" id="shipmentNotes" />
-                                    <input type="hidden" name="yForNotes" id="yForNotes"/>
+                                <input type="hidden" name="yForNotes" id="yForNotes" />
                             </FormGroup>
                         </div>
                     </ModalBody>
