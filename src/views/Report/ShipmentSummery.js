@@ -1,5 +1,6 @@
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Pie, HorizontalBar } from 'react-chartjs-2';
+import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import {
@@ -229,7 +230,10 @@ class ShipmentSummery extends Component {
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             loading: true,
             programId: '',
-            versionId: ''
+            versionId: '',
+            fundingSources: [],
+            fundingSourceValues: [],
+            fundingSourceLabels: []
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -237,6 +241,7 @@ class ShipmentSummery extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
+        this.getFundingSourceList = this.getFundingSourceList.bind(this);
 
     }
 
@@ -479,6 +484,91 @@ class ShipmentSummery extends Component {
         doc.save('canvas.pdf');*/
     }
 
+    getFundingSourceList() {
+        const { fundingSources } = this.state
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            FundingSourceService.getFundingSourceListAll()
+                .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSources: response.data
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            countrys: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            var db3;
+            var fSourceResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var fSourceTransaction = db3.transaction(['fundingSource'], 'readwrite');
+                var fSourceOs = fSourceTransaction.objectStore('fundingSource');
+                var fSourceRequest = fSourceOs.getAll();
+                fSourceRequest.onerror = function (event) {
+                    //handel error
+                }.bind(this);
+                fSourceRequest.onsuccess = function (event) {
+
+                    fSourceResult = fSourceRequest.result;
+                    console.log("funding source list offline--->", fSourceResult);
+                    this.setState({
+                        fundingSources: fSourceResult.sort(function (a, b) {
+                            a = a.fundingSourceCode.toLowerCase();
+                            b = b.fundingSourceCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+
+                }.bind(this)
+
+            }.bind(this)
+
+
+        }
+
+    }
+
+    handleFundingSourceChange = (fundingSourceIds) => {
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
+        }, () => {
+
+            this.fetchData()
+        })
+    }
+    
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
@@ -921,6 +1011,7 @@ class ShipmentSummery extends Component {
 
     componentDidMount() {
         this.getPrograms();
+        this.getFundingSourceList();
     }
 
     setProgramId(event) {
@@ -1372,6 +1463,16 @@ class ShipmentSummery extends Component {
 
             }, this);
 
+        const { fundingSources } = this.state;
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
+            return (
+                <option key={i} value={item.fundingSourceId}>
+                    {getLabelText(item.label, this.state.lang)}
+                </option>
+
+            )
+        }, this);
+
         const { rangeValue } = this.state;
 
         var viewById = this.state.viewById;
@@ -1800,6 +1901,29 @@ class ShipmentSummery extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+
+                                            <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="fundingSourceId"
+                                                        id="fundingSourceId"
+                                                        bsSize="md"
+                                                        value={this.state.fundingSourceValues}
+                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                        options={fundingSources.length > 0
+                                                            && fundingSources.map((item, i) => {
+                                                                return (
+                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                )
+                                                            }, this)}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>
+
+
                                         </div>
                                         {/* </Col> */}
                                     </div>
