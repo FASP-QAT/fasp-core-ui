@@ -206,6 +206,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.setState({
                         realmCountryPlanningUnitList: realmCountryPlanningUnitList,
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
+                        this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                     })
                     var data = [];
                     var inventoryDataArr = [];
@@ -861,9 +864,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         } else {
                             positiveValidation("F", y, elInstance)
                         }
-                        if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                            this.batchDetailsClicked(elInstance, x, y, "", true)
-                        }
+                        // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                        //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                        // }
                     }
                 }
             }
@@ -887,9 +890,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("G", y, elInstance)
                     }
-                    if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                        this.batchDetailsClicked(elInstance, x, y, "", true)
-                    }
+                    // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                    //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                    // }
                 }
             } else {
                 var batchDetails = rowData[13];
