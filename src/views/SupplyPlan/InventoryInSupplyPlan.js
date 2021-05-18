@@ -185,7 +185,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
-                                    active: dataSourceResult[k].active
+                                    active: dataSourceResult[k].active,
+                                    label:dataSourceResult[k].label
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
