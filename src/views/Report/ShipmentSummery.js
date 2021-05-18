@@ -1,6 +1,7 @@
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Pie, HorizontalBar } from 'react-chartjs-2';
 import FundingSourceService from '../../api/FundingSourceService';
+import BudgetService  from '../../api/BudgetService';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import {
@@ -233,7 +234,11 @@ class ShipmentSummery extends Component {
             versionId: '',
             fundingSources: [],
             fundingSourceValues: [],
-            fundingSourceLabels: []
+            fundingSourceLabels: [],
+
+            budgets: [],
+            budgetValues: [],
+            budgetLabels: []
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -242,6 +247,7 @@ class ShipmentSummery extends Component {
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
+        this.getBudgetList = this.getBudgetList.bind(this);
 
     }
 
@@ -502,7 +508,7 @@ class ShipmentSummery extends Component {
                 }).catch(
                     error => {
                         this.setState({
-                            countrys: []
+                            fundingSources: []
                         })
                         if (error.message === "Network Error") {
                             this.setState({ message: error.message });
@@ -556,16 +562,112 @@ class ShipmentSummery extends Component {
 
     }
 
+    getBudgetList() {
+        const { budgets } = this.state
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            BudgetService.getBudgetList()
+                .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.budgetCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.budgetCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        budgets: response.data
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            budgets: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            var db3;
+            var fSourceResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var fSourceTransaction = db3.transaction(['budget'], 'readwrite');
+                var fSourceOs = fSourceTransaction.objectStore('budget');
+                var fSourceRequest = fSourceOs.getAll();
+                fSourceRequest.onerror = function (event) {
+                    //handel error
+                }.bind(this);
+                fSourceRequest.onsuccess = function (event) {
+
+                    fSourceResult = fSourceRequest.result;
+                    console.log("budget list offline--->", fSourceResult);
+                    this.setState({
+                        budgets: fSourceResult.sort(function (a, b) {
+                            a = a.budgetCode.toLowerCase();
+                            b = b.budgetCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+
+                }.bind(this)
+
+            }.bind(this)
+
+
+        }
+
+    }
+
     handleFundingSourceChange = (fundingSourceIds) => {
+        console.log("fundingSourceIds+++",fundingSourceIds);
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+
+        var fundingSourceIdsArray=[];
+        fundingSourceIds.map(fm=>{
+            fundingSourceIdsArray.push(parseInt(fm.value));
+        });
+        
+        var budgetList=this.state.budgets.filter(b =>fundingSourceIdsArray.includes(parseInt(b.fundingSource.fundingSourceId)));
+        console.log("budgetListFiltered+++",budgetList);
+
         this.setState({
             fundingSourceValues: fundingSourceIds.map(ele => ele),
-            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label),
+            budgets:budgetList
         }, () => {
 
-            this.fetchData()
+            // this.fetchData()
+        })
+    }
+
+    handleBudgetChange = (budgetIds) => {
+        budgetIds = budgetIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            budgetValues: budgetIds.map(ele => ele),
+            budgetLabels: budgetIds.map(ele => ele.label)
+        }, () => {
+
+            // this.fetchData()
         })
     }
     
@@ -1012,6 +1114,7 @@ class ShipmentSummery extends Component {
     componentDidMount() {
         this.getPrograms();
         this.getFundingSourceList();
+        this.getBudgetList();
     }
 
     setProgramId(event) {
@@ -1464,14 +1567,24 @@ class ShipmentSummery extends Component {
             }, this);
 
         const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
-            return (
-                <option key={i} value={item.fundingSourceId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
+        // let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
+        //     return (
+        //         <option key={i} value={item.fundingSourceId}>
+        //             {getLabelText(item.label, this.state.lang)}
+        //         </option>
 
-            )
-        }, this);
+        //     )
+        // }, this);
+
+        const { budgets } = this.state;
+        // let budgetList = budgets.length > 0 && budgets.map((item, i) => {
+        //     return (
+        //         <option key={i} value={item.budgetId}>
+        //             {getLabelText(item.label, this.state.lang)}
+        //         </option>
+
+        //     )
+        // }, this);
 
         const { rangeValue } = this.state;
 
@@ -1916,6 +2029,27 @@ class ShipmentSummery extends Component {
                                                             && fundingSources.map((item, i) => {
                                                                 return (
                                                                     { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                )
+                                                            }, this)}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.budgetheader')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="budgetId"
+                                                        id="budgetId"
+                                                        bsSize="md"
+                                                        value={this.state.budgetValues}
+                                                        onChange={(e) => { this.handleBudgetChange(e) }}
+                                                        options={budgets.length > 0
+                                                            && budgets.map((item, i) => {
+                                                                return (
+                                                                    { label: item.budgetCode, value: item.budgetId }
                                                                 )
                                                             }, this)}
                                                     />
