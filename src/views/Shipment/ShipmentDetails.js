@@ -78,8 +78,8 @@ export default class ShipmentDetails extends React.Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
-        this.exportCSV = this.exportCSV.bind(this);
         this.openBatchPopUp = this.openBatchPopUp.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
     }
 
 
