@@ -165,6 +165,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     realmCountryPlanningUnitList: realmCountryPlanningUnitList
+                }, () => {
+                    this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                 })
 
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -197,6 +199,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
                     })
                     if (this.state.consumptionEl != "" && this.state.consumptionEl != undefined) {
                         this.state.consumptionEl.destroy();

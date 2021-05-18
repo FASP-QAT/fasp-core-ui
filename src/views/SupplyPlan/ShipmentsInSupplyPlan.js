@@ -393,6 +393,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             procurementAgentListAll: procurementAgentListAll,
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
+                                        }, () => {
+                                            this.props.updateState("currencyList", currencyList);                                            
+                                            this.props.updateState("dataSourceList", dataSourceList);
+                                            this.props.updateState("fundingSourceList", fundingSourceList);
+                                            this.props.updateState("procurementAgentList", procurementAgentList);
+                                            this.props.updateState("budgetList", budgetList);
+                                            this.props.updateState("shipmentStatusList", shipmentStatusList);
                                         })
                                         if (this.state.shipmentsEl != "" && this.state.shipmentsEl != undefined) {
                                             // this.el = jexcel(document.getElementById("shipmentsDetailsTable"), '');
