@@ -33,7 +33,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.onPaste = this.onPaste.bind(this);
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
-        this.batchDetailsClicked=this.batchDetailsClicked.bind(this);
+        this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
         this.state = {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
@@ -206,6 +206,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.setState({
                         realmCountryPlanningUnitList: realmCountryPlanningUnitList,
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
+                        this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                     })
                     var data = [];
                     var inventoryDataArr = [];
@@ -331,7 +334,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100,readOnly:!inventoryEditable },
+                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
                             { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 50 },
@@ -861,9 +864,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         } else {
                             positiveValidation("F", y, elInstance)
                         }
-                        if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                            this.batchDetailsClicked(elInstance, x, y, "", true)
-                        }
+                        // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                        //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                        // }
                     }
                 }
             }
@@ -887,9 +890,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("G", y, elInstance)
                     }
-                    if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                        this.batchDetailsClicked(elInstance, x, y, "", true)
-                    }
+                    // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                    //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                    // }
                 }
             } else {
                 var batchDetails = rowData[13];

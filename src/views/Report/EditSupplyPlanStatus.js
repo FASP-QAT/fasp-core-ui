@@ -533,9 +533,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.consumptionChild != undefined) {
                                 this.refs.consumptionChild.showConsumptionData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -653,9 +653,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.inventoryChild != undefined) {
                                 this.refs.inventoryChild.showInventoryData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -825,9 +825,9 @@ class EditSupplyPlanStatus extends Component {
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
-                                            }else{
+                                            } else {
                                                 this.setState({
-                                                    loading:false
+                                                    loading: false
                                                 })
                                             }
                                         })
@@ -998,6 +998,12 @@ class EditSupplyPlanStatus extends Component {
                 shipmentValidationBatchError: "",
                 shipmentBatchInfoDuplicateError: ""
             })
+        } else if (type == "shipmentNotes") {
+            var cont = true;
+            if (cont == true) {
+                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
+                document.getElementById("shipmentNotesDiv").style.display = 'none';
+            }
         }
     }
 
@@ -1192,7 +1198,7 @@ class EditSupplyPlanStatus extends Component {
                         }
                         this.setState({
                             supplyPlanDataForAllTransDate: supplyPlanData,
-                            allShipmentsList:programJson.shipmentList
+                            allShipmentsList: programJson.shipmentList
                         })
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
@@ -1606,7 +1612,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -2444,7 +2450,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -2461,7 +2467,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -2479,7 +2485,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -2499,7 +2505,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -2520,7 +2526,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -3742,27 +3748,27 @@ class EditSupplyPlanStatus extends Component {
                                 render={
                                     ({
                                     }) => (
-                                            <Form name='simpleForm'>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input type="text"
-                                                                        name="programId"
-                                                                        id="programId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
-                                                                        disabled />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
+                                        <Form name='simpleForm'>
+                                            <Col md="12 pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input type="text"
+                                                                    name="programId"
+                                                                    id="programId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.program.label.label_en}
+                                                                    disabled />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                             {/* </CardBody> */}
                             <Row>
@@ -4035,7 +4041,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={item.balance!=0?"hoverTd":""} onClick={() => item.balance!=0?this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }):""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -4043,7 +4049,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).length > 0 &&
+                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                         <>
                                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                                 <thead>
@@ -4056,7 +4062,7 @@ class EditSupplyPlanStatus extends Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).map(item => (
+                                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                         <tr>
                                                             <td>{item.batchNo}</td>
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
@@ -4155,6 +4161,19 @@ class EditSupplyPlanStatus extends Component {
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
+                                    <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
+                                        <FormGroup style={{ "marginTop": "-30px" }}>
+                                            <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                            <Input
+                                                bsSize="sm"
+                                                type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                            <input type="hidden" name="yForNotes" id="yForNotes" />
+                                        </FormGroup>
+                                    </div>
+                                    <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
+                                    </div>
                                     <div className="pt-4"></div>
                                 </ModalBody>
                                 <ModalFooter>
@@ -4182,7 +4201,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
-                                    <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
+                                    <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
@@ -4197,7 +4216,7 @@ class EditSupplyPlanStatus extends Component {
                                             {
                                                 this.state.expiredStockDetails.map(item => (
                                                     <tr>
-                                                        <td  className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
+                                                        <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
@@ -4237,7 +4256,7 @@ class EditSupplyPlanStatus extends Component {
                                                 </thead>
                                                 <tbody>
                                                     {
-                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
+                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
@@ -4437,12 +4456,12 @@ class EditSupplyPlanStatus extends Component {
                                     isValid,
                                     setTouched
                                 }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody className="pt-lg-0">
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
+                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                        <CardBody className="pt-lg-0">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
 
-                                                        {/*  <FormGroup className="tab-ml-1">
+                                                    {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -4457,68 +4476,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                        <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
 
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
-                                                            <Input
-                                                                type="textarea"
-                                                                maxLength={65535}
-                                                                name="versionNotes"
-                                                                id="versionNotes"
-                                                                value={this.state.program.currentVersion.notes}
-                                                                bsSize="sm"
-                                                                valid={!errors.versionNotes}
-                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={!this.state.editable}
-                                                                required
-                                                            />
-                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-
-                                                        </FormGroup>
-
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="versionStatusId"
-                                                                id="versionStatusId"
-                                                                bsSize="sm"
-                                                                valid={!errors.versionStatusId}
-                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.currentVersion.versionStatus.id}
-                                                                disabled={!this.state.editable}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {statusList}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                        </FormGroup>
                                                         <Input
-                                                            type="hidden"
-                                                            name="needNotesValidation"
-                                                            id="needNotesValidation"
-                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                            type="textarea"
+                                                            maxLength={65535}
+                                                            name="versionNotes"
+                                                            id="versionNotes"
+                                                            value={this.state.program.currentVersion.notes}
+                                                            bsSize="sm"
+                                                            valid={!errors.versionNotes}
+                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={!this.state.editable}
+                                                            required
                                                         />
-                                                    </div>
-                                                </Col>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
+
+                                                    </FormGroup>
+
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionStatusId"
+                                                            id="versionStatusId"
+                                                            bsSize="sm"
+                                                            valid={!errors.versionStatusId}
+                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.currentVersion.versionStatus.id}
+                                                            disabled={!this.state.editable}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {statusList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needNotesValidation"
+                                                        id="needNotesValidation"
+                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                     &nbsp;
                                              </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
+                                        </CardFooter>
+                                    </Form>
+                                )} />
                     </Card>
 
                 </Col>
@@ -4546,39 +4565,43 @@ class EditSupplyPlanStatus extends Component {
         console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
-    showShipmentWithBatch(batchNo,expiryDate){
-        var shipmentList=this.state.allShipmentsList;
-        shipmentList.map(sl=>{
-            var batchInfoList=sl.batchInfoList;
-            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
-            if(bi.length>0) {
-                var shipmentStatus=sl.shipmentStatus.id;
-                var date="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
-                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
-                }else{
-                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+    showShipmentWithBatch(batchNo, expiryDate) {
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map((sl,count) => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var index=count;
+                this.setState({
+                    indexOfShipmentContainingBatch:index
+                })
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
                 // Open toggleLarge
-                var supplyPlanType="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
                     supplyPlanType = 'deliveredShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'shippedShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
-                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'shippedErpShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
-                if(supplyPlanType!=""){
+                if (supplyPlanType != "") {
                     this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }

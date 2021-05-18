@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Modal, ModalBody, ModalFooter, ModalHeader, Button, Row, } from 'reactstrap';
+import { Table, Modal, ModalBody, ModalFooter, ModalHeader, Button, Row, Input, Label, FormGroup } from 'reactstrap';
 import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
 import CryptoJS from 'crypto-js'
@@ -291,7 +291,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formatter = value => {
-        if (value != null && value != '' && !isNaN(Number(value))) {
+        if (value != null && value !== '' && !isNaN(Number(value))) {
             var cell1 = value
             cell1 += '';
             var x = cell1.split('.');
@@ -839,7 +839,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
                 var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
                 this.setState({
-                    allShipmentsList:programJson.shipmentList
+                    allShipmentsList: programJson.shipmentList
                 })
                 var realmTransaction = db1.transaction(['realm'], 'readwrite');
                 var realmOs = realmTransaction.objectStore('realm');
@@ -1334,7 +1334,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                    amcTotalData.push(Math.round(Number(jsonList[0].amc)))
+                                    amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -1837,9 +1837,9 @@ export default class SupplyPlanComponent extends React.Component {
                 }, () => {
                     if (this.refs.consumptionChild != undefined) {
                         this.refs.consumptionChild.showConsumptionData();
-                    }else{
+                    } else {
                         this.setState({
-                            loading:false
+                            loading: false
                         })
                     }
                 })
@@ -1925,9 +1925,9 @@ export default class SupplyPlanComponent extends React.Component {
                 }, () => {
                     if (this.refs.inventoryChild != undefined) {
                         this.refs.inventoryChild.showInventoryData();
-                    }else{
+                    } else {
                         this.setState({
-                            loading:false
+                            loading: false
                         })
                     }
                 })
@@ -2108,7 +2108,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -2125,7 +2125,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -2143,7 +2143,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -2163,7 +2163,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -2184,7 +2184,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -2661,7 +2661,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
 
                             <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
                             <div className="pt-4"></div>
@@ -2821,7 +2821,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             this.state.closingBalanceArray.map((item, count) => {
                                                 if (count < 7) {
                                                     return (
-                                                        <td colSpan="2" className={item.balance!=0?"hoverTd":""} onClick={() => item.balance!=0?this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }):""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                        <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                     )
                                                 }
                                             })
@@ -2829,7 +2829,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
-                            {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).length > 0 &&
+                            {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                 <>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
@@ -2842,7 +2842,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).map(item => (
+                                            {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                 <tr>
                                                     <td>{item.batchNo}</td>
                                                     <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
@@ -2866,7 +2866,7 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
 
                             <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                 <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
                             <div className="pt-4"></div>
@@ -2942,6 +2942,19 @@ export default class SupplyPlanComponent extends React.Component {
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             </div>
+                            <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
+                                <FormGroup style={{ "marginTop": "-30px" }}>
+                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                    <Input
+                                        bsSize="sm"
+                                        type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                    <input type="hidden" name="yForNotes" id="yForNotes" />
+                                </FormGroup>
+                            </div>
+                            <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
+                            </div>
                             <div className="pt-4"></div>
                         </ModalBody>
                         <ModalFooter>
@@ -2969,7 +2982,7 @@ export default class SupplyPlanComponent extends React.Component {
                     </ModalHeader>
                     <div style={{ display: this.state.loading ? "none" : "block" }}>
                         <ModalBody>
-                            <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
+                            <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                 <thead>
                                     <tr>
@@ -2984,7 +2997,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     {
                                         this.state.expiredStockDetails.map(item => (
                                             <tr>
-                                                <td  className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
+                                                <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                 <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                 <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
@@ -3024,7 +3037,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </thead>
                                         <tbody>
                                             {
-                                                ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
+                                                ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                     <tr>
                                                         <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
@@ -3088,39 +3101,43 @@ export default class SupplyPlanComponent extends React.Component {
         console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
-    showShipmentWithBatch(batchNo,expiryDate){
-        var shipmentList=this.state.allShipmentsList;
-        shipmentList.map(sl=>{
-            var batchInfoList=sl.batchInfoList;
-            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
-            if(bi.length>0) {
-                var shipmentStatus=sl.shipmentStatus.id;
-                var date="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
-                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
-                }else{
-                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+    showShipmentWithBatch(batchNo, expiryDate) {
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map((sl,count) => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var index=count;
+                this.setState({
+                    indexOfShipmentContainingBatch:index
+                })
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
                 // Open toggleLarge
-                var supplyPlanType="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
                     supplyPlanType = 'deliveredShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'shippedShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
-                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'shippedErpShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
-                if(supplyPlanType!=""){
+                if (supplyPlanType != "") {
                     this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }
@@ -3184,13 +3201,13 @@ export default class SupplyPlanComponent extends React.Component {
                     showShipments: 1,
                     shipmentList: shipmentList,
                     shipmentListUnFiltered: shipmentListUnFiltered,
-                    programJson:programJson
+                    programJson: programJson
                 }, () => {
                     if (this.refs.shipmentChild != undefined) {
                         this.refs.shipmentChild.showShipmentData();
-                    }else{
+                    } else {
                         this.setState({
-                            loading:false
+                            loading: false
                         })
                     }
                 })
@@ -3232,6 +3249,12 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentValidationBatchError: "",
                 shipmentBatchInfoDuplicateError: ""
             })
+        } else if (type == "shipmentNotes") {
+            var cont = true;
+            if (cont == true) {
+                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
+                document.getElementById("shipmentNotesDiv").style.display = 'none';
+            }
         }
     }
 
