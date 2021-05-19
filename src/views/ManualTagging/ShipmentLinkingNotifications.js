@@ -30,6 +30,7 @@ export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            notificationSummary: [],
             color: '',
             message: '',
             loading: true,
@@ -58,8 +59,10 @@ export default class ShipmentLinkingNotifications extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.filterData1 = this.filterData1.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
+        // this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
+        this.getNotificationSummary = this.getNotificationSummary.bind(this);
+        this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
     }
 
     getPlanningUnitArray() {
@@ -331,7 +334,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
     }
 
-
+    componentDidMount() {
+        this.hideFirstComponent();
+        this.getProgramList();
+        this.getNotificationSummary();
+    }
 
     filterData = (planningUnitIds) => {
         var programId = this.state.programId;
@@ -532,104 +539,104 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
 
-    buildARTMISHistory() {
-        let artmisHistoryList = this.state.artmisHistory;
-        let artmisHistoryArray = [];
-        let count = 0;
-        this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
-        var json = [];
-        var data = artmisHistoryArray;
+    // buildARTMISHistory() {
+    //     let artmisHistoryList = this.state.artmisHistory;
+    //     let artmisHistoryArray = [];
+    //     let count = 0;
+    //     this.el = jexcel(document.getElementById("tableDiv2"), '');
+    //     this.el.destroy();
+    //     var json = [];
+    //     var data = artmisHistoryArray;
 
-        var options = {
-            data: data,
-            columnDrag: true,
-            colWidths: [40, 30, 40, 45, 30, 30, 35, 25, 35],
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
+    //     var options = {
+    //         data: data,
+    //         columnDrag: true,
+    //         colWidths: [40, 30, 40, 45, 30, 30, 35, 25, 35],
+    //         colHeaderClasses: ["Reqasterisk"],
+    //         columns: [
 
-                {
-                    title: i18n.t('static.mt.roNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.roPrimeLineNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.orderNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.primeLineNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
+    //             {
+    //                 title: i18n.t('static.mt.roNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.roPrimeLineNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.orderNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.primeLineNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
 
-                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpStatus'),
-                    type: 'text',
-                    readOnly: true
-                },
+    //                 title: i18n.t('static.manualTagging.erpPlanningUnit'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.manualTagging.erpStatus'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
 
-                {
-                    title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: "Received On",
-                    type: 'text',
-                    readOnly: true
-                },
-            ],
-            editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loadedERP,
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
-        };
+    //             {
+    //                 title: i18n.t('static.supplyPlan.shipmentQty'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: "Received On",
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //         ],
+    //         editable: true,
+    //         text: {
+    //             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+    //             show: '',
+    //             entries: '',
+    //         },
+    //         onload: this.loadedERP,
+    //         pagination: localStorage.getItem("sesRecordCount"),
+    //         search: true,
+    //         columnSorting: true,
+    //         tableOverflow: true,
+    //         wordWrap: true,
+    //         allowInsertColumn: false,
+    //         allowManualInsertColumn: false,
+    //         allowDeleteRow: false,
+    //         // onselection: this.selected,
+    //         copyCompatibility: true,
+    //         allowExport: false,
+    //         paginationOptions: JEXCEL_PAGINATION_OPTION,
+    //         position: 'top',
+    //         filters: true,
+    //         license: JEXCEL_PRO_KEY,
+    //         contextMenu: function (obj, x, y, e) {
+    //             return [];
+    //         }.bind(this),
+    //     };
 
 
-        var instance = jexcel(document.getElementById("tableDiv1"), options);
-        this.el = instance;
-        this.setState({
-            instance, loading: false
-        })
-    }
+    //     var instance = jexcel(document.getElementById("tableDiv2"), options);
+    //     this.el = instance;
+    //     this.setState({
+    //         instance, loading: false
+    //     })
+    // }
 
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
@@ -660,7 +667,7 @@ export default class ShipmentLinkingNotifications extends Component {
             data[13] = 0
             data[14] = manualTaggingList[j].orderNo
             data[15] = manualTaggingList[j].primeLineNo
-            
+
             data[16] = manualTaggingList[j].notificationId
             data[17] = manualTaggingList[j].notificationType.id;
 
@@ -781,7 +788,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -908,16 +915,194 @@ export default class ShipmentLinkingNotifications extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+    buildNotificationSummaryJExcel() {
+        let notificationSummaryList = this.state.notificationSummary;
+        let notificationSummaryArray = [];
+        let count = 0;
+
+        for (var j = 0; j < notificationSummaryList.length; j++) {
+            data = [];
+
+            data[0] = getLabelText(notificationSummaryList[j].label);
+            data[1] = this.addCommas(notificationSummaryList[j].notificationCount);
+            data[2] = notificationSummaryList[j].programId;
+
+            notificationSummaryArray[count] = data;
+            count++;
+        }
+
+        this.el = jexcel(document.getElementById("tableDiv1"), '');
+        this.el.destroy();
+        var json = [];
+        var data = notificationSummaryArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [10, 10],
+            columns: [
+
+                {
+                    title: i18n.t('static.program.programName'),
+                    type: 'text',
+                    readOnly: true
+                },
+
+                {
+                    title: i18n.t('static.mt.notificationCount'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
+                }
+            ],
+            editable: false,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded1,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            // onchange: this.changed,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        };
+
+
+        var instance = jexcel(document.getElementById("tableDiv1"), options);
+        this.el = instance;
+        this.setState({
+            instance, loading: false
+        })
+    }
+    selected = function (instance, cell, x, y, value) {
+
+        // if ((x == 0 && value != 0) || (y == 0)) {
+        //     // console.log("HEADER SELECTION--------------------------");
+        // } else {
+        var instance = (instance).jexcel;
+        console.log("selected instance---", instance)
+        console.log("selected cell---", cell)
+        console.log("selected x---", x)
+        console.log("selected y---", y)
+        console.log("selected value---", value)
+        // console.log("selected program---", this.el);
+        console.log("selected program id---", instance.getValueFromCoords(2, x))
+        if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
+            this.setState({
+                programId: instance.getValueFromCoords(2, x)
+            }, () => {
+                this.getPlanningUnitList();
+            })
+        }
+        // }
+
+    }.bind(this)
+
+    loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+        console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        var asterisk = document.getElementsByClassName("resizable")[2];
+
         var tr = asterisk.firstChild;
         tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
-    componentDidMount() {
-        this.hideFirstComponent();
-        this.getProgramList();
+
+
+
+    getNotificationSummary() {
+        ManualTaggingService.getNotificationSummary()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("notification summary---", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        notificationSummary: listArray,
+                        loading: false
+                    }, () => {
+                        this.buildNotificationSummaryJExcel();
+                    })
+
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode,
+                        color: 'red',
+                        loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     toggleLarge() {
@@ -1232,6 +1417,10 @@ export default class ShipmentLinkingNotifications extends Component {
                             </div> */}
                         </Modal>
                         {/* Consumption modal */}
+                        <div className="col-md-12 pl-0">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground">
+                            </div>
+                        </div>
                         <div className="col-md-12 pl-0">
                             <Row>
 
