@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Table, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -26,6 +26,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import MultiSelect from 'react-multi-select-component';
+import conversionFormula from '../../assets/img/conversionFormula.png';
+import conversionFormulaExample from '../../assets/img/conversionFormulaExample.png';
 
 
 
@@ -35,6 +37,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            tempNotes: '',
             originalQty: 0,
             filteredBudgetListByProgram: [],
             checkboxValue: true,
@@ -128,8 +131,21 @@ export default class ManualTagging extends Component {
         this.filterProgramByCountry = this.filterProgramByCountry.bind(this);
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
         this.getShipmentDetailsByParentShipmentId = this.getShipmentDetailsByParentShipmentId.bind(this);
+        this.toggleDetailsModal = this.toggleDetailsModal.bind(this);
+        this.toggle = this.toggle.bind(this);
 
     }
+    toggleDetailsModal() {
+        this.setState({
+            modal: !this.state.modal
+        })
+    }
+
+    toggle() {
+        this.setState({
+          modal: !this.state.modal,
+        });
+      }
     getShipmentDetailsByParentShipmentId(parentShipmentId) {
         ManualTaggingService.getShipmentDetailsByParentShipmentId(parentShipmentId)
             .then(response => {
@@ -137,7 +153,8 @@ export default class ManualTagging extends Component {
                 outputListAfterSearch.push(response.data)
                 this.setState({
                     outputListAfterSearch,
-                    originalQty: outputListAfterSearch[0].shipmentQty
+                    originalQty: outputListAfterSearch[0].shipmentQty,
+                    tempNotes: outputListAfterSearch[0].notes
                 })
             }).catch(
                 error => {
@@ -215,7 +232,7 @@ export default class ManualTagging extends Component {
             } else {
                 this.setState({
                     countryWisePrograms,
-                    planningUnits:[]
+                    planningUnits: []
                 });
             }
         }
@@ -477,9 +494,22 @@ export default class ManualTagging extends Component {
         // if (x == 9) {
 
         // }
-
+        if (x == 0) {
+            var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            console.log("checkboxValue---", checkboxValue);
+            if (checkboxValue == "true") {
+                this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true);
+            } else {
+                console.log("inside else---", checkboxValue);
+                this.state.instance.setValueFromCoords(7, y, "", true);
+                this.state.instance.setValueFromCoords(9, y, "", true);
+                var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty)), true);
+            }
+        }
         // //Active
         if (x != 10) {
+
             this.el.setValueFromCoords(10, y, 1, true);
         }
         this.displayButton();
@@ -521,7 +551,8 @@ export default class ManualTagging extends Component {
                 originalQty: 0,
                 active4: true,
                 active5: false,
-                checkboxValue: false
+                checkboxValue: false,
+                tempNotes: ''
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -529,7 +560,8 @@ export default class ManualTagging extends Component {
                 selectedShipment: [],
                 active4: false,
                 active5: true,
-                checkboxValue: false
+                checkboxValue: false,
+                tempNotes: ''
             });
         }
     }
@@ -544,7 +576,8 @@ export default class ManualTagging extends Component {
                 outputList: [],
                 active1: true,
                 active2: false,
-                active3: false
+                active3: false,
+                tempNotes: ''
             }, () => {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
@@ -565,7 +598,8 @@ export default class ManualTagging extends Component {
                 outputList: [],
                 active2: true,
                 active1: false,
-                active3: false
+                active3: false,
+                tempNotes: ''
             }, () => {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
@@ -588,7 +622,8 @@ export default class ManualTagging extends Component {
                 countryId: -1,
                 active3: true,
                 active1: false,
-                active2: false
+                active2: false,
+                tempNotes: ''
             }, () => {
                 // this.buildJExcel();
                 let realmId = AuthenticationService.getRealmId();
@@ -2188,6 +2223,7 @@ export default class ManualTagging extends Component {
                     buildJexcelRequired = false;
                 }
                 this.setState({
+                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
                     originalQty: outputListAfterSearch[0].shipmentQty,
                     outputListAfterSearch,
                     buildJexcelRequired,
@@ -2404,10 +2440,11 @@ export default class ManualTagging extends Component {
                 //     return "center" }
             },
             onSelect: (row, isSelect, rowIndex, e) => {
-                // console.log("my row---", row);
+                console.log("my row---", row);
                 this.setState({
                     originalQty: row.shipmentQty,
-                    finalShipmentId: row.shipmentId
+                    finalShipmentId: row.shipmentId,
+                    tempNotes: row.notes
                 });
             }
         };
@@ -2759,6 +2796,16 @@ export default class ManualTagging extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                    <div className="Card-header-reporticon">
+                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleDetailsModal() }}><small className="supplyplanformulas">{i18n.t('static.mt.showDetails')}</small></span>
+                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                            </a>
+                        </div>
+                    </div>
                     <CardBody className="pb-lg-5">
                         {/* <Col md="10 ml-0"> */}
                         <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
@@ -3297,6 +3344,135 @@ export default class ManualTagging extends Component {
                             </div>
                         </Modal>
                         {/* Consumption modal */}
+                        {/* Details modal start */}
+                        <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
+                            <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">
+                                <strong className="TextWhite" >{i18n.t('static.mt.showDetails')}</strong>
+                                </ModalHeader>
+                            <ModalBody >
+                                <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
+                                    <ListGroupItem >
+                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.purposeOfEachScreen')}</ListGroupItemHeading>
+                                        <ListGroupItemText className="formulastext">
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedQAT") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab1DetailPurpose")}<br></br>
+                                            </p>
+
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.linked") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab2DetailPurpose")}<br></br>
+                                            </p>
+
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedERP") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab3DetailPurpose")}<br></br>
+                                            </p>
+                                        </ListGroupItemText>
+                                    </ListGroupItem>
+                                    <ListGroupItem >
+                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.reminders')}</ListGroupItemHeading>
+                                        <ListGroupItemText className="formulastext">
+                                            <ul className="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders1")}
+
+                                                </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o  list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A")}
+                                                            <br />    <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A1")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A2")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A3")}</p></li>
+                                                            </ol>
+                                                        </p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B")}
+                                                            <br />    <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B1")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B2")}</p></li>
+                                                            </ol>
+                                                        </p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2C")}</p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D")}
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "><img src={conversionFormula} className="formula-img-mr img-fluid" /></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D1a")}<b>{i18n.t("static.mt.reminders2D1b")}</b>{i18n.t("static.mt.reminders2D1c")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D2a")}<b>{i18n.t("static.mt.reminders2D2b")}</b>{i18n.t("static.mt.reminders2D2c")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  ">
+                                                                    <p><b><u><span className="">{i18n.t("static.common.example") + ": "}</span></u></b>{i18n.t("static.mt.reminders2D3")}<br></br>
+
+                                                                    </p>
+
+                                                                </li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "><img src={conversionFormulaExample} className="formula-img-mr img-fluid" /></li>
+                                                            </ol>
+
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  ">
+                                                                    <Table id="mytable1" responsive className="table-fixed table-hover table-bordered text-center mt-2">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.erpShipmentQty")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.conversionFactor")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.convertedQATShipmentQty")}</th>
+                                                                                <th>{i18n.t("static.supplyPlan.qatProduct")}</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>{i18n.t("static.mt.reminders2D4a")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4b")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4c")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4d")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4e")}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </Table>
+                                                                </li>
+                                                            </ol>
+
+                                                        </p></li>
+                                                    </ol>
+                                                </p>
+                                                </li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3A")}</p></li>
+                                                    </ol>
+                                                </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4A")}</p></li>
+                                                    </ol>
+                                                </p></li>
+                                            </ul>
+                                        </ListGroupItemText>
+                                    </ListGroupItem>
+                                </ListGroup>
+                            </ModalBody>
+                        </Modal>
+                        {/* Details modal end */}
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
