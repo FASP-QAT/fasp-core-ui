@@ -932,6 +932,10 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
+.RowheightForjexcel .jexcel_overflow>tbody>tr>td:nth-child(22){ 
+  height: 100px;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }

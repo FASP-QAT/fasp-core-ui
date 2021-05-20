@@ -1994,7 +1994,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" useLocalData={1} />
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
+                                    <div id="shipmentsDetailsTable"  className="RowheightForjexcel" />
                                 </div>
 
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
@@ -2029,11 +2029,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
-                                    <FormGroup style={{ "marginTop": "-30px" }}>
+                                    <FormGroup style={{ "marginTop": "-25px" }}>
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                         <Input
                                             bsSize="sm"
-                                            type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                            type="textarea" name="shipmentNotes" id="shipmentNotes"  style={{height:"400px"}}/>
                                         <input type="hidden" name="yForNotes" id="yForNotes" />
                                     </FormGroup>
                                 </div>
