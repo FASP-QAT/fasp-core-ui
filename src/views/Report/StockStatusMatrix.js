@@ -173,7 +173,7 @@ export default class StockStatusMatrix extends React.Component {
                   }),
                   planningUnitList: planningList
                 }, () => {
-                  // this.fetchData()
+                  this.filterData();
                 })
 
 
@@ -199,9 +199,9 @@ export default class StockStatusMatrix extends React.Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
               this.setState({
-                tracerCategories: listArray
+                tracerCategories: listArray,
               }, () => {
-                // this.fetchData()
+                this.filterData();
               })
             }
 
@@ -248,11 +248,12 @@ export default class StockStatusMatrix extends React.Component {
         }
 
       } else {
-        this.setState({
-          message: i18n.t('static.common.selectProgram'),
-          productCategories: [],
-          tracerCategories: []
-        })
+        // this.setState({
+        //   message: i18n.t('static.common.selectProgram'),
+        //   productCategories: [],
+        //   tracerCategories: []
+        // })
+        this.filterData();
       }
     })
   }
@@ -374,11 +375,13 @@ export default class StockStatusMatrix extends React.Component {
     let programId = document.getElementById("programId").value;
     // let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    console.log("planningUnitIds------>", planningUnitIds);
     let versionId = document.getElementById("versionId").value;
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
     // let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
     if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
+      // if (programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
 
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
@@ -634,16 +637,17 @@ export default class StockStatusMatrix extends React.Component {
 
       }
     } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
-    } else if (this.state.planningUnitValues.length == 0) {
+    }
+    else if (this.state.tracerCategoryValues.length == 0) {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
+    }
+    else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), selData: [], data: [] });
-    } else {
-      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [] });
-
     }
   }
 
@@ -1035,7 +1039,7 @@ export default class StockStatusMatrix extends React.Component {
               versions: versionList,
               versionId: localStorage.getItem("sesVersionIdReport")
             }, () => {
-              this.getPlanningUnit();
+              // this.getPlanningUnit();
               this.getTracerCategoryList();
             })
           } else {
@@ -1043,7 +1047,7 @@ export default class StockStatusMatrix extends React.Component {
               versions: versionList,
               versionId: versionList[0].versionId
             }, () => {
-              this.getPlanningUnit();
+              // this.getPlanningUnit();
               this.getTracerCategoryList();
             })
           }
@@ -1052,7 +1056,7 @@ export default class StockStatusMatrix extends React.Component {
             versions: versionList,
             versionId: versionList[0].versionId
           }, () => {
-            this.getPlanningUnit();
+            // this.getPlanningUnit();
             this.getTracerCategoryList();
           })
         }
@@ -1075,6 +1079,7 @@ export default class StockStatusMatrix extends React.Component {
       tracerCategoryValues: tracerCategoryIds.map(ele => ele),
       tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
     }, () => {
+      this.getPlanningUnit();
       this.filterData();
     })
   }
@@ -1082,140 +1087,159 @@ export default class StockStatusMatrix extends React.Component {
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
 
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
+    if (this.state.tracerCategoryValues.length > 0) {
 
-      if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
-      } else {
-        localStorage.setItem("sesVersionIdReport", versionId);
-        if (versionId.includes('Local')) {
-          const lan = 'en';
-          var db1;
-          var storeOS;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
-              // Handle errors!
-            };
-            planningunitRequest.onsuccess = function (e) {
-              var myResult = [];
-              myResult = planningunitRequest.result;
-              var programId = (document.getElementById("programId").value).split("_")[0];
-              var proList = []
-              console.log(myResult)
-              for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active == true) {
+      this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+      }, () => {
 
-                  proList[i] = myResult[i]
+        if (versionId == 0) {
+          this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+        } else {
+          localStorage.setItem("sesVersionIdReport", versionId);
+          if (versionId.includes('Local')) {
+            const lan = 'en';
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+              db1 = e.target.result;
+              var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+              var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+              var planningunitRequest = planningunitOs.getAll();
+              var planningList = []
+              planningunitRequest.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                var proList = []
+                console.log(myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                  if (myResult[i].program.id == programId && myResult[i].active == true) {
+
+                    let tempTCId = this.state.planningUnitList.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0].forecastingUnit.tracerCategory.id;
+
+                    let tempPUObj = myResult[i];
+                    tempPUObj["tracerCategoryId"] = tempTCId;
+                    // proList[i] = myResult[i];
+                    proList[i] = tempPUObj;
+                  }
                 }
-              }
-              var lang = this.state.lang;
+
+                let tracerCategoryValues = this.state.tracerCategoryValues.map((item, i) => {
+                  return ({ tracerCategoryId: item.value })
+                }, this);
+
+
+                let data1 = [];
+                for (let i = 0; i < proList.length; i++) {
+                  for (let j = 0; j < tracerCategoryValues.length; j++) {
+                    if (tracerCategoryValues[j].tracerCategoryId == proList[i].tracerCategoryId) {
+                      data1.push(proList[i]);
+                    }
+                  }
+                }
+
+
+                var lang = this.state.lang;
+                this.setState({
+                  planningUnits: data1.sort(function (a, b) {
+                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitValues: data1.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                  }, this),
+                  planningUnitLabels: data1.map((item, i) => {
+                    return (getLabelText(item.planningUnit.label, this.state.lang))
+                  }, this),
+                  message: ''
+                }, () => {
+                  this.filterData();
+                })
+              }.bind(this);
+            }.bind(this)
+
+
+          }
+          else {
+            // AuthenticationService.setupAxiosInterceptors();
+
+            //let productCategoryId = document.getElementById("productCategoryId").value;
+            ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
+              console.log('**' + JSON.stringify(response.data))
               this.setState({
-                planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                  return a < b ? -1 : a > b ? 1 : 0;
-                }), message: ''
+                planningUnits: response.data,
+                planningUnitValues: response.data.map((item, i) => {
+                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                }, this),
+                planningUnitLabels: response.data.map((item, i) => {
+                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                }, this),
+                message: ''
               }, () => {
                 this.filterData();
               })
-            }.bind(this);
-          }.bind(this)
-
-
-        }
-        else {
-          // AuthenticationService.setupAxiosInterceptors();
-
-          //let productCategoryId = document.getElementById("productCategoryId").value;
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
-            this.setState({
-              planningUnits: response.data, message: ''
-            }, () => {
-              this.filterData();
-            })
-          }).catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
+            }).catch(
+              error => {
                 this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
                 }
               }
-            }
-          );
-          // .catch(
-          //   error => {
-          //     this.setState({
-          //       planningUnits: [],
-          //     })
-          //     if (error.message === "Network Error") {
-          //       this.setState({ message: error.message });
-          //     } else {
-          //       switch (error.response ? error.response.status : "") {
-          //         case 500:
-          //         case 401:
-          //         case 404:
-          //         case 406:
-          //         case 412:
-          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-          //           break;
-          //         default:
-          //           this.setState({ message: 'static.unkownError' });
-          //           break;
-          //       }
-          //     }
-          //   }
-          // );
+            );
+          }
         }
-      }
-    });
-
+      });
+    } else {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [] });
+    }
   }
 
   componentDidMount() {
@@ -1252,13 +1276,14 @@ export default class StockStatusMatrix extends React.Component {
         versionId: event.target.value
       }, () => {
         localStorage.setItem("sesVersionIdReport", this.state.versionId);
-        this.filterData();
+        this.getTracerCategoryList();
+        // this.filterData();
       })
     } else {
       this.setState({
         versionId: event.target.value
       }, () => {
-        this.getPlanningUnit();
+        // this.getPlanningUnit();
         this.getTracerCategoryList();
       })
     }
@@ -1797,20 +1822,6 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                  <div className="controls">
-
-                    <MultiSelect
-                      name="planningUnitId"
-                      id="planningUnitId"
-                      bsSize="md"
-                      value={this.state.planningUnitValues}
-                      onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                      options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                    />     </div></FormGroup>
-
-                <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
@@ -1829,6 +1840,20 @@ export default class StockStatusMatrix extends React.Component {
                         }, this) : []} />
                   </div>
                 </FormGroup>
+
+                <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <div className="controls">
+
+                    <MultiSelect
+                      name="planningUnitId"
+                      id="planningUnitId"
+                      bsSize="md"
+                      value={this.state.planningUnitValues}
+                      onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                      options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                    />     </div></FormGroup>
 
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
