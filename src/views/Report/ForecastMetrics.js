@@ -456,7 +456,8 @@ class ForecastMetrics extends Component {
       tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData()
+      // this.filterData()
+      this.getPlanningUnit();
     })
   }
 
@@ -868,25 +869,52 @@ class ForecastMetrics extends Component {
       //   }
       // );
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] }, () => {
+      this.setState({
+        message: i18n.t('static.program.validcountrytext'),
+        consumptions: [],
+        programValues: [],
+        programLabels: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+        tracerCategories: [],
+        tracerCategoryValues: [],
+        tracerCategoryLabels: [],
+      }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
       });
 
     } else if (this.state.programValues.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] }, () => {
+      this.setState({
+        message: i18n.t('static.common.selectProgram'),
+        consumptions: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+        tracerCategories: [],
+        tracerCategoryValues: [],
+        tracerCategoryLabels: [],
+
+      }, () => {
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+      });
+
+    } else if (this.state.tracerCategoryValues.length == 0) {
+      this.setState({
+        message: i18n.t('static.tracercategory.tracercategoryText'),
+        consumptions: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+      }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
       });
 
     } else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] }, () => {
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
-      });
-
-    } else if (this.state.tracerCategoryValues.length == 0) {
-      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), consumptions: [] }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
       });
@@ -1026,67 +1054,83 @@ class ForecastMetrics extends Component {
 
   }
   getPlanningUnit() {
-    let programValues = this.state.programValues;
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
-      if (programValues.length > 0) {
-        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
-          .then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-              planningUnits: listArray,
-            })
-          }).catch(
-            error => {
-              if (error.message === "Network Error") {
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
+    if (this.state.tracerCategoryValues.length > 0) {
+
+      let programValues = this.state.programValues;
+      this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+      }, () => {
+        if (programValues.length > 0) {
+          PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
+            .then(response => {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              console.log("resp---->", listArray);
+              this.setState({
+                planningUnits: listArray,
+                planningUnitValues: listArray.map((item, i) => {
+                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                }, this),
+                planningUnitLabels: listArray.map((item, i) => {
+                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                }, this),
+                message: ''
+              }, () => {
+                this.filterData();
+              })
+            }).catch(
+              error => {
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
                 }
               }
-            }
-          );
-      }
-    })
-
+            );
+        }
+      })
+    }
   }
 
   getPrograms() {
@@ -1557,25 +1601,6 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
-
-                    <FormGroup className="col-sm-3" id="hideDiv">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <div className="controls">
-
-                        <MultiSelect
-                          // isLoading={true}
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                          value={this.state.planningUnitValues}
-                          onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                          options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                        />
-
-                      </div>
-                    </FormGroup>
-
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1593,6 +1618,25 @@ class ForecastMetrics extends Component {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
 
                             }, this) : []} />
+
+                      </div>
+                    </FormGroup>
+
+
+                    <FormGroup className="col-sm-3" id="hideDiv">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <div className="controls">
+
+                        <MultiSelect
+                          // isLoading={true}
+                          name="planningUnitId"
+                          id="planningUnitId"
+                          bsSize="sm"
+                          value={this.state.planningUnitValues}
+                          onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                          options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                        />
 
                       </div>
                     </FormGroup>
