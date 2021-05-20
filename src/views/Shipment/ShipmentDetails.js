@@ -132,7 +132,8 @@ export default class ShipmentDetails extends React.Component {
         });
 
 
-        let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
         worksheet.dataValidations.add('A2:A100', {
             type: 'list',
             allowBlank: false,
@@ -152,7 +153,8 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
-        let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        // let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let isLocalProcurementAgentDropdown = ["True", "False"];
         worksheet.dataValidations.add('H2:H100', {
             type: 'list',
             allowBlank: false,
@@ -162,7 +164,8 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
-        let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        // let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let emergencyShipmentDropdown = ["True", "False"];
         worksheet.dataValidations.add('L2:L100', {
             type: 'list',
             allowBlank: false,
