@@ -112,7 +112,7 @@ export default class ConsumptionDetails extends React.Component {
         for (let i = 0; i < datasourceList.length; i++) {
             dataSourceVar.push(datasourceList[i].name);
         }
-        
+
         worksheet.dataValidations.add('D2:D100', {
             type: 'list',
             allowBlank: false,
@@ -168,7 +168,8 @@ export default class ConsumptionDetails extends React.Component {
         // });
 
 
-        let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
         worksheet.dataValidations.add('K2:K100', {
             type: 'list',
             allowBlank: false,
