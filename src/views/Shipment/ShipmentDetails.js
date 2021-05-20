@@ -657,7 +657,7 @@ export default class ShipmentDetails extends React.Component {
                         <div className="shipmentconsumptionSearchMarginTop">
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} />
                             <div className="table-responsive" id="shipmentsDetailsTableDiv">
-                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground RowheightForjexcel" />
                             </div>
                         </div>
 
@@ -699,7 +699,7 @@ export default class ShipmentDetails extends React.Component {
                                 <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                 <Input
                                     bsSize="sm"
-                                    type="textarea" name="shipmentNotes" id="shipmentNotes" />
+                                    type="textarea" name="shipmentNotes" id="shipmentNotes" style={{height:"400px"}}/>
                                 <input type="hidden" name="yForNotes" id="yForNotes" />
                             </FormGroup>
                         </div>
