@@ -1458,7 +1458,7 @@
     "static.budget.allocatedShipmentOrdered": "Allocated to Shipments (Submitted or later)",
     "static.common.jun": "Jun",
     "static.user.validphonemaxdigit": "Phone number can be 15 digits max",
-    "static.mt.masterDataSyncNote": "Reminder: If you make any changes in this screen, you will need to click “master data sync” for those changes to be seen throughout the tool. Also, please note that only ERP orders after \"approved\" status are available to be linked to QAT shipments.",
+    "static.mt.masterDataSyncNote": "Reminder: If you make any changes in this screen, you will need to click “master data sync” for those changes to be seen throughout the tool. Also, please note that only ERP orders after `approved` status are available to be linked to QAT shipments.",
     "static.common.viewDashBoard": "View Dashboard",
     "static.manualTagging.OrderType": "Order Type",
     "static.common.prevPage": "Previous page",
