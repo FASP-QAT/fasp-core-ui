@@ -30,6 +30,7 @@ export default class ShipmentLinkingNotifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            batchDetails: [],
             notificationSummary: [],
             color: '',
             message: '',
@@ -63,6 +64,23 @@ export default class ShipmentLinkingNotifications extends Component {
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
         this.getNotificationSummary = this.getNotificationSummary.bind(this);
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
+        this.viewBatchData = this.viewBatchData.bind(this);
+    }
+
+    viewBatchData(event, row) {
+        console.log("event---", event);
+        console.log("row---", row);
+        console.log("row length---", row.shipmentList.length);
+        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            this.setState({
+                batchDetails: row.shipmentList
+            });
+        } else {
+            this.setState({
+                batchDetails: []
+            });
+        }
+        // batchDetails
     }
 
     getPlanningUnitArray() {
@@ -994,26 +1012,44 @@ export default class ShipmentLinkingNotifications extends Component {
             instance, loading: false
         })
     }
-    selected = function (instance, cell, x, y, value) {
-
-        // if ((x == 0 && value != 0) || (y == 0)) {
-        //     // console.log("HEADER SELECTION--------------------------");
-        // } else {
+    selected = function (instance, x1, y1, x2, y2, origin) {
         var instance = (instance).jexcel;
-        console.log("selected instance---", instance)
-        console.log("selected cell---", cell)
-        console.log("selected x---", x)
-        console.log("selected y---", y)
-        console.log("selected value---", value)
-        // console.log("selected program---", this.el);
-        console.log("selected program id---", instance.getValueFromCoords(2, x))
-        if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
+        console.log("RESP------>x1", x1);
+        console.log("RESP------>y1", y1);
+        console.log("RESP------>x2", x2);
+        console.log("RESP------>y2", y2);
+        console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
+
+        if (y1 == 0 && y2 != 0) {
+            console.log("RESP------>Header");
+        } else {
+            console.log("RESP------>Not");
             this.setState({
-                programId: instance.getValueFromCoords(2, x)
+                programId: instance.getValueFromCoords(2, y1)
             }, () => {
+                document.getElementById("addressed").value = 0;
                 this.getPlanningUnitList();
             })
         }
+
+        // if ((x == 0 && value != 0) || (y == 0)) {
+        // // console.log("HEADER SELECTION--------------------------");
+        // } else {
+        // var instance = (instance).jexcel;
+        // console.log("selected instance---", instance)
+        // console.log("selected cell---", cell)
+        // console.log("selected x---", x)
+        // console.log("selected y---", y)
+        // console.log("selected value---", value)
+        // // console.log("selected program---", this.el);
+        // console.log("selected program id---", instance.getValueFromCoords(2, x))
+        // if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
+        // this.setState({
+        // programId: instance.getValueFromCoords(2, x)
+        // }, () => {
+        // this.getPlanningUnitList();
+        // })
+        // }
         // }
 
     }.bind(this)
@@ -1108,6 +1144,7 @@ export default class ShipmentLinkingNotifications extends Component {
     toggleLarge() {
         this.setState({
             manualTag: !this.state.manualTag,
+            batchDetails: []
         })
     }
 
@@ -1232,38 +1269,24 @@ export default class ShipmentLinkingNotifications extends Component {
             </span>
         );
         const columns1 = [
+            {
+                dataField: 'erpOrderId',
+                text: i18n.t('static.mt.viewBatchDetails'),
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    )
+                }
+            },
 
             {
-                dataField: 'roNo',
-                text: i18n.t('static.manualTagging.RONO'),
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.manualTagging.procOrderNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
-            {
-                dataField: 'roPrimeLineNo',
-                text: i18n.t('static.manualTagging.ROPrimeline'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            {
-                dataField: 'orderNo',
-                text: i18n.t('static.manualTagging.erpShipmentNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'primeLineNo',
-                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-
             {
                 dataField: 'erpPlanningUnit',
                 text: "ERP Planning Unit",
@@ -1292,6 +1315,15 @@ export default class ShipmentLinkingNotifications extends Component {
                 dataField: 'shipmentQty',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'totalCost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1334,6 +1366,26 @@ export default class ShipmentLinkingNotifications extends Component {
             }]
         }
 
+        const columns2 = [
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            }
+
+        ];
+
+
 
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
@@ -1366,7 +1418,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
                             <div>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                    <strong>ERP Order History</strong>
+                                    <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
@@ -1382,7 +1434,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 ">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -1397,6 +1449,33 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 )
                                             }
                                         </ToolkitProvider>
+                                        <br />
+                                        {this.state.batchDetails.length > 0 &&
+                                            <ToolkitProvider
+                                                keyField="optList"
+                                                data={this.state.batchDetails}
+                                                columns={columns2}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                // pagination={paginationFactory(options)}
+                                                                rowEvents={{
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider>}
 
                                     </div><br />
                                 </ModalBody>

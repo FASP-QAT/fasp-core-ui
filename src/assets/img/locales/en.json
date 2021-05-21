@@ -1766,5 +1766,7 @@
     "static.mt.reminders2D4c": "= 10/100 = 0.1 ",
     "static.mt.reminders2D4d": "2",
     "static.mt.reminders2D4e": "Pack of 100 chocolate bars",
-    "static.mt.notificationCount": "Notification Count"
+    "static.mt.notificationCount": "Notification Count",
+    "static.mt.viewBatchDetails":"View Batch Details",
+    "static.mt.erpHistoryTitle":"ERP Order History"
 }
