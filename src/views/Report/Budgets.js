@@ -1505,6 +1505,8 @@ class Budgets extends Component {
                                                     // pagination={paginationFactory(options)}
                                                     rowEvents={{
                                                         onClick: (e, row, rowIndex) => {
+                                                            console.log("***row",row);
+                                                            window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
                                                         }
                                                     }}
                                                     {...props.baseProps}
