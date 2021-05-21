@@ -37,6 +37,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            artmisHistory: [],
             tempNotes: '',
             originalQty: 0,
             filteredBudgetListByProgram: [],
@@ -94,7 +95,10 @@ export default class ManualTagging extends Component {
             fundingSourceList: [],
             displaySubmitButton: false,
             countryId: '',
-            hasSelectAll: true
+            hasSelectAll: true,
+            artmisHistoryModal: false,
+            batchDetails: []
+
         }
 
         this.filterData = this.filterData.bind(this);
@@ -133,7 +137,33 @@ export default class ManualTagging extends Component {
         this.getShipmentDetailsByParentShipmentId = this.getShipmentDetailsByParentShipmentId.bind(this);
         this.toggleDetailsModal = this.toggleDetailsModal.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
+        this.viewBatchData = this.viewBatchData.bind(this);
 
+    }
+
+    viewBatchData(event, row) {
+        console.log("event---", event);
+        console.log("row---", row);
+        console.log("row length---", row.shipmentList.length);
+        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            this.setState({
+                batchDetails: row.shipmentList
+            });
+        } else {
+            this.setState({
+                batchDetails: []
+            });
+        }
+        // batchDetails
+    }
+
+
+    toggleArtmisHistoryModal() {
+        this.setState({
+            artmisHistoryModal: !this.state.artmisHistoryModal,
+            batchDetails: []
+        })
     }
     toggleDetailsModal() {
         this.setState({
@@ -143,9 +173,9 @@ export default class ManualTagging extends Component {
 
     toggle() {
         this.setState({
-          modal: !this.state.modal,
+            modal: !this.state.modal,
         });
-      }
+    }
     getShipmentDetailsByParentShipmentId(parentShipmentId) {
         ManualTaggingService.getShipmentDetailsByParentShipmentId(parentShipmentId)
             .then(response => {
@@ -1938,7 +1968,9 @@ export default class ManualTagging extends Component {
                 data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
                 data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
-                data[11] = manualTaggingList[j].notes
+                data[11] = manualTaggingList[j].notes;
+                data[12] = manualTaggingList[j].orderNo;
+                data[13] = manualTaggingList[j].primeLineNo
             }
             else {
                 data[0] = manualTaggingList[j].erpOrderId;
@@ -2092,6 +2124,14 @@ export default class ManualTagging extends Component {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
                     },
+                    {
+                        title: "orderNo",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "primeLineNo",
+                        type: 'hidden',
+                    },
                 ],
                 editable: false,
                 text: {
@@ -2119,7 +2159,69 @@ export default class ManualTagging extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    return [];
+                    var items = [];
+                    if (y != null) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                // title: i18n.t('static.dashboard.linkShipment'),
+                                title: i18n.t('static.mt.viewArtmisHistory'),
+                                onclick: function () {
+                                    let orderNo = this.el.getValueFromCoords(12, y);
+                                    let primeLineNo = this.el.getValueFromCoords(13, y);
+                                    ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                        .then(response => {
+                                            this.setState({
+                                                artmisHistory: response.data
+                                            }, () => {
+                                                // this.buildARTMISHistory();
+                                                this.toggleArtmisHistoryModal();
+                                            });
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
+                                }.bind(this)
+                            });
+                        }
+                    }
+
+                    return items;
                 }.bind(this),
             };
         }
@@ -2628,51 +2730,33 @@ export default class ManualTagging extends Component {
         const columns1 = [
             {
                 dataField: 'erpOrderId',
-                text: i18n.t('static.manualTagging.linkColumn'),
+                text: i18n.t('static.mt.viewBatchDetails'),
                 align: 'center',
-                hidden: true,
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    )
+                }
             },
+
             {
-                dataField: 'roNo',
-                text: i18n.t('static.manualTagging.RONO'),
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.manualTagging.procOrderNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
-                dataField: 'roPrimeLineNo',
-                text: i18n.t('static.manualTagging.ROPrimeline'),
+                dataField: 'erpPlanningUnit',
+                text: "ERP Planning Unit",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                // formatter: this.formatLabel
+                formatter: this.formatLabel
             },
+
             {
-                dataField: 'orderNo',
-                text: i18n.t('static.manualTagging.erpShipmentNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'primeLineNo',
-                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            //  {
-            //     dataField: 'orderType',
-            //     text: i18n.t('static.manualTagging.OrderType'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     // formatter: this.formatLabel
-            // },
-            {
-                dataField: 'currentEstimatedDeliveryDate',
+                dataField: 'expectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
@@ -2680,78 +2764,57 @@ export default class ManualTagging extends Component {
                 formatter: this.formatDate
             },
             {
-                dataField: 'status',
+                dataField: 'erpStatus',
                 text: i18n.t('static.manualTagging.erpStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
-
-            // {
-            //     dataField: 'planningUnitSkuCode',
-            //     text: i18n.t('static.manualTagging.planningUnitSKUCode'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     // formatter: this.formatLabel
-            // },
-            // {
-            //     dataField: 'planningUnitLabel',
-            //     text: i18n.t('static.planningUnit.planningUnitName'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.formatLabel
-            // },
-
-            // {
-            //     dataField: 'procurementUnitSkuCode',
-            //     text: i18n.t('static.manualTagging.procurementUnitSKUCode'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
-
-
-            // {
-            //     dataField: 'supplierName',
-            //     text: i18n.t('static.supplier.supplierName'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
-            // {
-            //     dataField: 'recipentCountry',
-            //     text: i18n.t('static.manualTagging.receipentCountry'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
             {
-                dataField: 'quantity',
+                dataField: 'shipmentQty',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.manualTagging.erpShipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
+            },
+            {
+                dataField: 'totalCost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'receivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
             }
-            // {
-            //     dataField: 'price',
-            //     text: i18n.t('static.manualTagging.price'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.addCommas
-            // },
-            // {
-            //     dataField: 'shippingCost',
-            //     text: i18n.t('static.manualTagging.shippingCost'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.addCommas
-            // }
+
+        ];
+        const columns2 = [
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
+            }
+
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -3345,7 +3408,7 @@ export default class ManualTagging extends Component {
                         <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
                             <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">
                                 <strong className="TextWhite" >{i18n.t('static.mt.showDetails')}</strong>
-                                </ModalHeader>
+                            </ModalHeader>
                             <ModalBody >
                                 <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
                                     <ListGroupItem >
@@ -3470,6 +3533,81 @@ export default class ManualTagging extends Component {
                             </ModalBody>
                         </Modal>
                         {/* Details modal end */}
+
+                        {/* ARTMIS history modal start */}
+                        <Modal isOpen={this.state.artmisHistoryModal}
+                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
+                            <div>
+                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                    <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
+                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i></Button>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div>
+
+                                        <ToolkitProvider
+                                            keyField="optList"
+                                            data={this.state.artmisHistory}
+                                            columns={columns1}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 ">
+                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
+                                        <br />
+                                        {this.state.batchDetails.length > 0 &&
+                                            <ToolkitProvider
+                                                keyField="optList"
+                                                data={this.state.batchDetails}
+                                                columns={columns2}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                // pagination={paginationFactory(options)}
+                                                                rowEvents={{
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider>}
+
+                                    </div><br />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </div>
+
+                        </Modal>
+                        {/* ARTMIS history modal end */}
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

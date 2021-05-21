@@ -2653,6 +2653,13 @@ input::placeholder {
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
 
+
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(1){ width: 10px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(2){ width: 170px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(4){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
+
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(7){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(1){ width: 10px !important; }
@@ -2662,7 +2669,8 @@ input::placeholder {
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(8){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(9){ width: 50px !important; }
-  
+  .ShipmentNotificationtable .react-bootstrap-table .table thead tr th:nth-child(0){ width: 50% !important; }
+  .ShipmentNotificationtable .react-bootstrap-table .table thead tr th:nth-child(1){ width: 50% !important; }
   .expand-button {
     position: relative;
   }
@@ -3899,6 +3907,7 @@ background-color: yellow;
   height: auto !important;
 }
 .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
+.FortablewidthMannualtaggingtable3 .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
 
 .highCriticality{
 background-color: #f48282!important;
@@ -3969,4 +3978,8 @@ color: #000000!important;
   font-size: 8px !important;
     color: #000 !important;
     margin-top: 3px !important;
+}
+
+.eyeIconFontSize{
+  font-size: 19px;
 }
