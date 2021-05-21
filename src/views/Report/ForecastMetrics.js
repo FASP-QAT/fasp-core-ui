@@ -1064,13 +1064,15 @@ class ForecastMetrics extends Component {
         planningUnitLabels: []
       }, () => {
         if (programValues.length > 0) {
-          PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
+          let inputjson = {
+            tracerCategoryIds: this.state.tracerCategoryValues.map(ele => (ele.value).toString()),
+            programIds: programValues.map(ele => (ele.value))
+          }
+          PlanningUnitService.getPlanningUnitByProgramIdsAndTracerCategorieIds(inputjson)
             .then(response => {
               var listArray = response.data;
               listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
@@ -1078,11 +1080,11 @@ class ForecastMetrics extends Component {
               this.setState({
                 planningUnits: listArray,
                 planningUnitValues: listArray.map((item, i) => {
-                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                  return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
                 }, this),
                 planningUnitLabels: listArray.map((item, i) => {
-                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                  return (getLabelText(item.label, this.state.lang))
                 }, this),
                 message: ''
               }, () => {
@@ -1130,6 +1132,8 @@ class ForecastMetrics extends Component {
             );
         }
       })
+    } else {
+      this.filterData();
     }
   }
 
