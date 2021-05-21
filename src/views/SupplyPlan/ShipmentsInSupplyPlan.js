@@ -50,6 +50,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.shipmentNotesClicked = this.shipmentNotesClicked.bind(this);
+        this.oneditionstart = this.oneditionstart.bind(this);
     }
 
     formatter = value => {
@@ -174,6 +176,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(18, y, parseFloat(rowData[18]), true);
         }
 
+    }
+
+    oneditionstart = function (instance, cell, x, y, value) {
+        if (x == 20) {
+            this.shipmentNotesClicked(instance, cell, x, y, value)
+        }
     }
 
     showShipmentData() {
@@ -638,18 +646,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             onchange: this.shipmentChanged,
                                             // oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
-                                            rowResize:true,
+                                            rowResize: true,
                                             parseFormulas: true,
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
                                             onchangepage: this.onchangepage,
                                             oneditionend: this.oneditionend,
+                                            oneditionstart: this.oneditionstart,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
                                                 }
                                                 if (c == 20) {
-                                                    this.shipmentNotesClicked(a, b, c, d, e)
                                                 }
                                                 // if (e.value) {
                                                 //     e.selectionStart = e.value.length;
