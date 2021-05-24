@@ -28,6 +28,7 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const BasicPrimitiveTreeDemo = React.lazy(() => import('../../views/BasicPrimitiveTree/BasicPrimitiveTreeDemo'));
+const DragNDrop= React.lazy(() => import('../../Samples/DragNDropTwo'));
 const AddInventory = React.lazy(() => import('../../views/Inventory/AddInventory'));
 const AddDimension = React.lazy(() => import('../../views/Dimension/AddDimensionComponent'));
 const DimensionList = React.lazy(() => import('../../views/Dimension/DimensionListComponent'));
@@ -270,6 +271,7 @@ const EditIntegration = React.lazy(() => import('../../views/Integration/EditInt
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/myTree', name: "Tree", component: BasicPrimitiveTreeDemo },
+  { path: '/myTree2', name: "Tree", component: DragNDrop },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -1015,6 +1017,11 @@ class DefaultLayout extends Component {
                         name: "Tree",
                         icon: 'fa fa-tree',
                         url: '/myTree',
+                      },
+                      {
+                        name: "DragNDrop Tree.",
+                        icon: 'fa fa-tree',
+                        url: '/myTree2',
                       },
                       {
                         name: i18n.t('static.dashboard.datasync'),
