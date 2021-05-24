@@ -541,7 +541,7 @@ const routes = [
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:message',exact:true,name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
-  { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
+  { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
