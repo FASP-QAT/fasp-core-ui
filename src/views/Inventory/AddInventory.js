@@ -43,6 +43,7 @@ export default class AddInventory extends Component {
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            inventoryModalTitle:""
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -612,7 +613,7 @@ export default class AddInventory extends Component {
                         <div>
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
                             <div className="table-responsive" id="adjustmentsTableDiv">
-                                <div id="adjustmentsTable" />
+                                <div id="adjustmentsTable"  className="InventoryRowheightForjexcel"/>
                             </div>
                         </div>
                     </CardBody>
@@ -631,7 +632,7 @@ export default class AddInventory extends Component {
                 <Modal isOpen={this.state.inventoryBatchInfo}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                        <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
+                        <strong>{this.state.inventoryModalTitle}</strong>
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
@@ -639,11 +640,23 @@ export default class AddInventory extends Component {
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                        <div id="inventoryNotesDiv" style={{ "display": 'none' }}>
+                            <FormGroup style={{ "marginTop": "-50px" }}>
+                                <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                <Input
+                                    bsSize="sm"
+                                    type="textarea" name="inventoryNotes" id="inventoryNotes" style={{height:"400px"}}/>
+                                <input type="hidden" name="yForNotes" id="yForNotes" />
+                            </FormGroup>
+                        </div>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" id="inventoryBatchAddRow" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                        </div>
+                        <div id="showSaveInventoryNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveInventoryNotes')}</Button>
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>

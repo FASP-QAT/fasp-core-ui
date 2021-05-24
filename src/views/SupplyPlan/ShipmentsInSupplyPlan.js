@@ -631,12 +631,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
                                                 }
-                                                if (c == 20) {
-                                                }
-                                                // if (e.value) {
-                                                //     e.selectionStart = e.value.length;
-                                                //     e.selectionEnd = e.value.length;
-                                                // }
                                             }.bind(this),
                                             onpaste: this.onPaste,
                                             text: {
