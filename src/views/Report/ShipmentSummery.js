@@ -534,7 +534,7 @@ class ShipmentSummery extends Component {
         data = this.state.shipmentDetailsList.map(
             ele => [
                 getLabelText(ele.planningUnit.label, this.state.lang),
-                ele.shipmentId,
+                this.formatter(ele.shipmentId),
                 ele.emergencyOrder,
                 ele.erpOrder == true ? true : false,
                 ele.localProcurement,
@@ -543,11 +543,11 @@ class ShipmentSummery extends Component {
                 ele.fundingSource.code,
                 ele.budget.code,
                 getLabelText(ele.shipmentStatus.label, this.state.lang),
-                this.state.viewById == 1 ? (ele.shipmentQty) : (Number(ele.shipmentQty) * ele.multiplier),
+                this.state.viewById == 1 ? (this.formatter(ele.shipmentQty)) : (this.formatter(Number(ele.shipmentQty) * ele.multiplier)),
                 moment(ele.expectedDeliveryDate).format('YYYY-MM-DD'),
-                ele.productCost.toFixed(2),
-                ele.freightCost.toFixed(2),
-                ele.totalCost.toFixed(2),
+                ele.productCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                ele.freightCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                ele.totalCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                 ele.notes
             ]);
 
