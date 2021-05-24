@@ -936,6 +936,17 @@ label.arrow_label:after {
   height: 100px;
   overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
 }
+
+.ConsumptionRowheightForjexcel .jexcel_overflow>tbody>tr>td:nth-child(11):not(.readonly){ 
+  height: 100px;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+
+.InventoryRowheightForjexcel .jexcel_overflow>tbody>tr>td:nth-child(12):not(.readonly){ 
+  height: 100px;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }

@@ -34,6 +34,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
+        this.consumptionNotesClicked = this.consumptionNotesClicked.bind(this);
+        this.oneditionstart = this.oneditionstart.bind(this);
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -117,6 +119,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
         }
 
+    }
+
+    oneditionstart = function (instance, cell, x, y, value) {
+        if (x == 9) {
+            this.consumptionNotesClicked(instance, cell, x, y, value)
+        }
     }
 
     showConsumptionData() {
@@ -317,7 +325,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
-                            { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
+                            { title: i18n.t('static.program.notes'), type: 'text', width: 300 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
@@ -342,6 +350,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
+                        oneditionstart: this.oneditionstart,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -478,6 +487,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("loading", true);
         var rowData = obj.getRowData(y);
         if (this.props.consumptionPage == "consumptionDataEntry") {
+            this.props.updateState("consumptionModalTitle", i18n.t("static.dataEntry.batchDetails"));
             this.props.toggleLarge();
         }
         var batchList = [];
@@ -1490,6 +1500,47 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             this.props.hideSecondComponent();
         }
     }
+
+    consumptionNotesClicked = function (instance, cell, x, y, value) {
+        if (x == 9) {
+            this.props.updateState("loading", true);
+            if (this.props.consumptionPage == "consumptionDataEntry") {
+                this.props.updateState("consumptionModalTitle", i18n.t("static.consumption.consumptionNotes"));
+                this.props.toggleLarge();
+            }
+            if (document.getElementById("showSaveConsumptionNotesButtonsDiv") != null) {
+                document.getElementById("showSaveConsumptionNotesButtonsDiv").style.display = 'block';
+            }
+            if (document.getElementById("consumptionNotesDiv") != null) {
+                document.getElementById("consumptionNotesDiv").style.display = 'block';
+            }
+            var elInstance = this.state.consumptionEl;
+            var rowData = elInstance.getRowData(y);
+            var notes = rowData[9];
+            document.getElementById("consumptionNotes").value = notes;
+            document.getElementById("yForNotes").value = y;
+            this.props.updateState("loading", false);
+        }
+    }
+
+    saveConsumptionNotes() {
+        this.props.updateState("loading", true);
+        var elInstance = this.state.consumptionEl;
+        elInstance.setValueFromCoords(9, document.getElementById("yForNotes").value, document.getElementById("consumptionNotes").value, true);
+        this.props.updateState("consumptionChangedFlag", 1);
+        if (document.getElementById("showSaveConsumptionNotesButtonsDiv") != null) {
+            document.getElementById("showSaveConsumptionNotesButtonsDiv").style.display = 'none';
+        }
+        if (document.getElementById("consumptionNotesDiv") != null) {
+            document.getElementById("consumptionNotesDiv").style.display = 'none';
+        }
+        if (this.props.consumptionPage == "consumptionDataEntry") {
+            this.props.toggleLarge("submit");
+        }
+        this.props.updateState("loading", false);
+    }
+
+
 
     render() { return (<div></div>) }
 }
