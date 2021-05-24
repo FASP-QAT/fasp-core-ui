@@ -184,7 +184,7 @@ export default class ManualTagging extends Component {
                 this.setState({
                     outputListAfterSearch,
                     originalQty: outputListAfterSearch[0].shipmentQty,
-                    tempNotes: outputListAfterSearch[0].notes
+                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : "")
                 })
             }).catch(
                 error => {
@@ -528,7 +528,8 @@ export default class ManualTagging extends Component {
             var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             console.log("checkboxValue---", checkboxValue);
             if (checkboxValue == "true") {
-                this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true);
+                console.log("jexcel instance---", this.state.instance);
+                (this.state.tempNotes != null && this.state.tempNotes != "" ? this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true) : '')
             } else {
                 console.log("inside else---", checkboxValue);
                 this.state.instance.setValueFromCoords(7, y, "", true);
@@ -1964,7 +1965,8 @@ export default class ManualTagging extends Component {
                 data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
-                data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
+                // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
+                data[7] = manualTaggingList[j].erpStatus;
                 data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
                 data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
@@ -2546,7 +2548,7 @@ export default class ManualTagging extends Component {
                 this.setState({
                     originalQty: row.shipmentQty,
                     finalShipmentId: row.shipmentId,
-                    tempNotes: row.notes
+                    tempNotes: (row.notes != null && row.notes != "" ? row.notes : "")
                 });
             }
         };
