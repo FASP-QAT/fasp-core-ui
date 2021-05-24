@@ -332,8 +332,8 @@ class ShipmentSummery extends Component {
         i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'),
         i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo').replaceAll(' ', '%20').replaceAll('#', '%23'),
         (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
-        (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), 
-        (i18n.t('static.budgetHead.budget')).replaceAll(' ', '%20'), 
+        (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'),
+        (i18n.t('static.budgetHead.budget')).replaceAll(' ', '%20'),
         (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
         (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')])]
@@ -351,9 +351,9 @@ class ShipmentSummery extends Component {
             re[item].erpOrder == true ? true : false,
             // re[item].localProcurement == true ? i18n.t('static.report.localprocurement').replaceAll(' ', '%20') : '',
             re[item].localProcurement,
-            re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), 
-            (re[item].fundingSource.code).replaceAll(' ', '%20'), 
-            (re[item].budget.code).replaceAll(' ', '%20'), 
+            re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'),
+            (re[item].fundingSource.code).replaceAll(' ', '%20'),
+            (re[item].budget.code).replaceAll(' ', '%20'),
             (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             Number(re[item].productCost).toFixed(2),
@@ -560,7 +560,8 @@ class ShipmentSummery extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 104.89 },
+                0: { cellWidth: 100 },
+                15: { cellWidth: 110 },
             },
         };
         doc.autoTable(contentTable2);
@@ -2476,16 +2477,19 @@ class ShipmentSummery extends Component {
                                         </div>
                                     </div>
 
-                                    <FormGroup className="col-md-10 mt-3 ">
-                                        <ul className="legendcommitversion list-group">
-                                            {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
-                                        </ul>
-                                    </FormGroup>
-                                    <div className="ShipmentSummeryReportMarginTop" id="mytable2">
-                                        <div id="shipmentDetailsListTableDiv" className="jexcelremoveReadonlybackground">
+                                </Col>
+                                <Col md="12 pl-0">
+                                    <div className="row">
+                                        <FormGroup className="col-md-10 mt-3 ">
+                                            <ul className="legendcommitversion list-group">
+                                                {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
+                                            </ul>
+                                        </FormGroup>
+                                        <div className="ShipmentSummeryReportMarginTop" id="mytable2">
+                                            <div id="shipmentDetailsListTableDiv" className="jexcelremoveReadonlybackground">
+                                            </div>
                                         </div>
                                     </div>
-
                                 </Col>
                             </div>
                         </div>
