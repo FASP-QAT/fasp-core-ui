@@ -271,7 +271,7 @@ const EditIntegration = React.lazy(() => import('../../views/Integration/EditInt
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/myTree', name: "Tree", component: BasicPrimitiveTreeDemo },
-  { path: '/myTree2', name: "Tree", component: DragNDrop },
+  { path: '/myTree2', name: "DragNDrop Tree", component: DragNDrop },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },

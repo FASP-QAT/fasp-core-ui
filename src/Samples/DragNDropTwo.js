@@ -6,10 +6,13 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../i18n'
-import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
+import CardBody from 'reactstrap/lib/CardBody';
+import CardFooter from 'reactstrap/lib/CardFooter';
+
 
 export default class ContainerTwo extends Component {
     constructor() {
@@ -320,57 +323,66 @@ export default class ContainerTwo extends Component {
                 }
             }]
         }
-        return <>
-            <div className="container">
-                <div class="sample">
-                    <h3>DragNDrop Tree.</h3>
-                    <DndProvider backend={HTML5Backend}>
-                        <div className="placeholder" style={{ clear: 'both' }} >
-                            <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} />
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            {/* modal start---------------- */}
-                            <Modal isOpen={this.state.modalOpen}
-                                className={'modal-md '} >
-                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                    <strong>Edit Node</strong>
-                                    <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                                </ModalHeader>
-                                <ModalBody>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            name="nodeTitle"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            value={this.state.currentItemConfig.title}></Input>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="select"
-                                            name="nodeValueType"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            required
-                                            value={this.state.currentItemConfig.valueType}
-                                        >
-                                            <option value="-1">Nothing Selected</option>
-                                            <option value="1">Percentage</option>
-                                            <option value="2">Derived value</option>
-                                            <option value="3">Use Expression (y=mx+c)</option>
-                                            <option value="4">Forecasting Unit</option>
-                                        </Input>
-                                    </FormGroup>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                </ModalFooter>
-                            </Modal>
-                            {/* ------------------modal end */}
-                        </div>
-                    </DndProvider>
-                </div>
-            </div>
-        </>;
+        return <div className="animated fadeIn">
+            <Row>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                    <Card className="mb-lg-0">
+                        <CardBody>
+                            <div className="container">
+                                <div class="sample">
+                                    {/* <h3>DragNDrop Tree.</h3> */}
+                                    <DndProvider backend={HTML5Backend}>
+                                        <div className="placeholder" style={{ clear: 'both' }} >
+                                            <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} />
+                                            
+                                            {/* modal start---------------- */}
+                                            <Modal isOpen={this.state.modalOpen}
+                                                className={'modal-md '} >
+                                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                                    <strong>Edit Node</strong>
+                                                    <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                                                </ModalHeader>
+                                                <ModalBody>
+                                                    <FormGroup>
+                                                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="nodeTitle"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            value={this.state.currentItemConfig.title}></Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="nodeValueType"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            required
+                                                            value={this.state.currentItemConfig.valueType}
+                                                        >
+                                                            <option value="-1">Nothing Selected</option>
+                                                            <option value="1">Percentage</option>
+                                                            <option value="2">Derived value</option>
+                                                            <option value="3">Use Expression (y=mx+c)</option>
+                                                            <option value="4">Forecasting Unit</option>
+                                                        </Input>
+                                                    </FormGroup>
+                                                </ModalBody>
+                                                <ModalFooter>
+                                                    <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                </ModalFooter>
+                                            </Modal>
+                                            {/* ------------------modal end */}
+                                        </div>
+                                    </DndProvider>
+                                </div>
+                            </div>
+                        </CardBody>
+                        <CardFooter>
+                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        </CardFooter>
+                    </Card></Col></Row>
+        </div>
     }
 }
