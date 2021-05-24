@@ -863,13 +863,34 @@ export default class ShipmentLinkingNotifications extends Component {
                         items.push({
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                console.log("my order no.---",this.el.getValueFromCoords(14, y));
+                                console.log("my order no.---", this.el.getValueFromCoords(14, y));
                                 let orderNo = this.el.getValueFromCoords(14, y);
                                 let primeLineNo = this.el.getValueFromCoords(15, y);
                                 ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                     .then(response => {
+                                        console.log("DATA---->1", response.data);
+
+                                        let responseData = response.data.sort(function (a, b) {
+                                            var dateA = new Date(a.date).getTime();
+                                            var dateB = new Date(b.date).getTime();
+                                            return dateA > dateB ? 1 : -1;
+                                        })
+                                        responseData = responseData.filter((responseData, index, self) =>
+                                            index === self.findIndex((t) => (
+                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.expectedDeliveryDate === responseData.expectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
+                                            ))
+                                        )
+
+                                        responseData = responseData.sort(function (a, b) {
+                                            var dateA = new Date(a.date).getTime();
+                                            var dateB = new Date(b.date).getTime();
+                                            return dateA < dateB ? 1 : -1;
+                                        })
+                                        console.log("DATA---->2", responseData);
+
                                         this.setState({
-                                            artmisHistory: response.data
+                                            artmisHistory: responseData
                                         }, () => {
                                             this.toggleLarge();
                                         });
@@ -1271,7 +1292,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
-                    return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>)
+                    return (
+                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
                     )
                 }
             },
@@ -1572,7 +1595,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                &nbsp;
+                            &nbsp;
                                 {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                         </FormGroup>
                     </CardFooter>
