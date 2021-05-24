@@ -128,7 +128,7 @@ export default class ShipmentLinkingNotifications extends Component {
         document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
 
-        this.setState({ loading1: true })
+        this.setState({ loading: true })
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
@@ -155,7 +155,7 @@ export default class ShipmentLinkingNotifications extends Component {
             console.log("FINAL SUBMIT changedmtList---", changedmtList);
             ManualTaggingService.updateNotification(changedmtList)
                 .then(response => {
-                    document.getElementById('div2').style.display = 'block';
+                    // document.getElementById('div2').style.display = 'block';
                     this.setState({
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: 'green',
@@ -166,7 +166,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         () => {
                             this.hideSecondComponent();
                             this.filterData(this.state.planningUnitIds);
-
+                            this.getNotificationSummary();
                         })
 
                 }).catch(
@@ -861,20 +861,16 @@ export default class ShipmentLinkingNotifications extends Component {
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                var outputListAfterSearch = [];
+                                console.log("my order no.---",this.el.getValueFromCoords(14, y));
                                 let orderNo = this.el.getValueFromCoords(14, y);
                                 let primeLineNo = this.el.getValueFromCoords(15, y);
-                                // this.buildARTMISHistory();
-                                // this.toggleLarge();
                                 ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                     .then(response => {
                                         this.setState({
                                             artmisHistory: response.data
                                         }, () => {
-                                            // this.buildARTMISHistory();
                                             this.toggleLarge();
                                         });
                                     }).catch(
