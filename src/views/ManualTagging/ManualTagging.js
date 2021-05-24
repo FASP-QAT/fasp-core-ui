@@ -529,7 +529,7 @@ export default class ManualTagging extends Component {
             console.log("checkboxValue---", checkboxValue);
             if (checkboxValue == "true") {
                 console.log("jexcel instance---", this.state.instance);
-                (this.state.tempNotes != null && this.state.tempNotes != "" ? this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true) : '')
+                this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
             } else {
                 console.log("inside else---", checkboxValue);
                 this.state.instance.setValueFromCoords(7, y, "", true);
@@ -1947,40 +1947,40 @@ export default class ManualTagging extends Component {
         for (var j = 0; j < manualTaggingList.length; j++) {
             data = [];
             if (this.state.active1) {
-                data[0] = manualTaggingList[j].shipmentId;
-                data[1] = manualTaggingList[j].shipmentTransId;
+                data[0] = manualTaggingList[j].shipmentId
+                data[1] = manualTaggingList[j].shipmentTransId
                 data[2] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
                 data[4] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[5] = manualTaggingList[j].procurementAgent.code;
+                data[5] = manualTaggingList[j].procurementAgent.code
                 data[6] = manualTaggingList[j].orderNo
-                data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
+                data[7] = this.addCommas(manualTaggingList[j].shipmentQty)
                 data[8] = manualTaggingList[j].notes
             } else if (this.state.active2) {
                 let shipmentQty = (manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
-                data[0] = manualTaggingList[j].parentShipmentId;
-                data[1] = manualTaggingList[j].shipmentId;
-                data[2] = manualTaggingList[j].shipmentTransId;
-                data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+                data[0] = manualTaggingList[j].parentShipmentId
+                data[1] = manualTaggingList[j].shipmentId
+                data[2] = manualTaggingList[j].shipmentTransId
+                data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
                 // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[7] = manualTaggingList[j].erpStatus;
-                data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
-                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
-                data[11] = manualTaggingList[j].notes;
-                data[12] = manualTaggingList[j].orderNo;
+                data[7] = manualTaggingList[j].erpStatus
+                data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
+                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1)
+                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
+                data[11] = manualTaggingList[j].notes
+                data[12] = manualTaggingList[j].orderNo
                 data[13] = manualTaggingList[j].primeLineNo
             }
             else {
-                data[0] = manualTaggingList[j].erpOrderId;
-                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+                data[0] = manualTaggingList[j].erpOrderId
+                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
                 data[4] = manualTaggingList[j].erpStatus
-                data[5] = this.addCommas(manualTaggingList[j].shipmentQty);
+                data[5] = this.addCommas(manualTaggingList[j].shipmentQty)
 
             }
             manualTaggingArray[count] = data;
