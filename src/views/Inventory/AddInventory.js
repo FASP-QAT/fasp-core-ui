@@ -161,7 +161,8 @@ export default class AddInventory extends Component {
         // });
 
 
-        let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
         worksheet.dataValidations.add('L2:L100', {
             type: 'list',
             allowBlank: false,
