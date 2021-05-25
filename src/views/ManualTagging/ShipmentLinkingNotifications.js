@@ -674,6 +674,7 @@ export default class ShipmentLinkingNotifications extends Component {
             data[7] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
+            console.log("conversion factor---",manualTaggingList[j].conversionFactor);
             data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);

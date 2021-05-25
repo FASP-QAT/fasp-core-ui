@@ -2172,8 +2172,29 @@ export default class ManualTagging extends Component {
                                     let primeLineNo = this.el.getValueFromCoords(13, y);
                                     ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                         .then(response => {
+
+                                            let responseData = response.data.sort(function (a, b) {
+                                                var dateA = new Date(a.date).getTime();
+                                                var dateB = new Date(b.date).getTime();
+                                                return dateA > dateB ? 1 : -1;
+                                            })
+                                            responseData = responseData.filter((responseData, index, self) =>
+                                                index === self.findIndex((t) => (
+                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.expectedDeliveryDate === responseData.expectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                    && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
+                                                ))
+                                            )
+    
+                                            responseData = responseData.sort(function (a, b) {
+                                                var dateA = new Date(a.date).getTime();
+                                                var dateB = new Date(b.date).getTime();
+                                                return dateA < dateB ? 1 : -1;
+                                            })
+                                            console.log("DATA---->2", responseData);
+    
+
                                             this.setState({
-                                                artmisHistory: response.data
+                                                artmisHistory: responseData
                                             }, () => {
                                                 // this.buildARTMISHistory();
                                                 this.toggleArtmisHistoryModal();
@@ -2474,7 +2495,8 @@ export default class ManualTagging extends Component {
 
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
-            return getLabelText(cell, this.state.lang);
+            console.log("cell----",cell)
+            return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
         }
@@ -2736,7 +2758,10 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
-                    return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    // )
+                    return (
+                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
                     )
                 }
             },
@@ -2750,7 +2775,7 @@ export default class ManualTagging extends Component {
             },
             {
                 dataField: 'erpPlanningUnit',
-                text: "ERP Planning Unit",
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
