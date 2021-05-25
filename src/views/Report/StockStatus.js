@@ -259,7 +259,7 @@ class StockStatus extends Component {
         item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
       )
     }).join(' \n')).replaceAll(' ', '%20')
-      , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+      , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
 
     for (var i = 0; i < A.length; i++) {
@@ -301,7 +301,7 @@ class StockStatus extends Component {
             item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , ele.adjustment == null ? '' : ele.adjustment, ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", this.roundN(ele.mos), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", this.roundN(ele.mos), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
         console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
@@ -472,7 +472,7 @@ class StockStatus extends Component {
         return (
           item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code)
       }).join(' \n')
-        , this.formatter(ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+        , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na"), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
     let content = {
       margin: { top: 150, bottom: 50 },
@@ -675,7 +675,7 @@ class StockStatus extends Component {
             return (
               item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code)
           }).join(' \n')
-            , this.formatter(ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
+            , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), this.formatter(this.roundN(ele.mos)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
         let content = {
           margin: { top: 150, bottom: 50 },
@@ -1070,7 +1070,8 @@ class StockStatus extends Component {
                       expiredStock: list[0].expiredStock,
                       unmetDemand: list[0].unmetDemand,
                       regionCount: list[0].regionCount,
-                      regionCountForStock: list[0].regionCountForStock
+                      regionCountForStock: list[0].regionCountForStock,
+                      nationalAdjustment: list[0].nationalAdjustment
                     }
                   } else {
                     var json = {
@@ -1089,7 +1090,8 @@ class StockStatus extends Component {
                       expiredStock: 0,
                       unmetDemand: 0,
                       regionCount: 1,
-                      regionCountForStock: 0
+                      regionCountForStock: 0,
+                      nationalAdjustment: 0,
                     }
                   }
                   data.push(json)
@@ -1377,7 +1379,8 @@ class StockStatus extends Component {
                       expiredStock: list[0].expiredStock,
                       unmetDemand: list[0].unmetDemand,
                       regionCount: list[0].regionCount,
-                      regionCountForStock: list[0].regionCountForStock
+                      regionCountForStock: list[0].regionCountForStock,
+                      nationalAdjustment: list[0].nationalAdjustment
                     }
                   } else {
                     var json = {
@@ -1396,7 +1399,8 @@ class StockStatus extends Component {
                       expiredStock: 0,
                       unmetDemand: 0,
                       regionCount: 1,
-                      regionCountForStock: 0
+                      regionCountForStock: 0,
+                      nationalAdjustment: 0
                     }
                   }
                   data.push(json)
@@ -3321,7 +3325,7 @@ class StockStatus extends Component {
                             </td>
 
                             <td>
-                              {this.formatter(this.state.stockStatusList[idx].adjustment)}
+                              {this.formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].expiredStock != 0 ? this.formatter(this.state.stockStatusList[idx].expiredStock) : ''}
