@@ -65,5 +65,10 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/realmCountry/${realmCountryId}`, {}
         );
     }
+
+    getPlanningUnitByProgramIdsAndTracerCategorieIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/tracerCategory/program/`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();

@@ -1168,6 +1168,7 @@ class AuthenticationService {
                     break;
                 case "/report/shipmentSummery":
                 case "/report/shipmentSummery/:message":
+                case "/report/shipmentSummery/:budgetId/:budgetCode":
                     if (bfunction.includes("ROLE_BF_SHIPMENT_DETAILS_REPORT")) {
                         return true;
                     }

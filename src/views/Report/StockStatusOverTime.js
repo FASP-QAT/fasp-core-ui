@@ -49,6 +49,7 @@ const options = {
                 ticks: {
                     beginAtZero: true,
                     fontColor: 'black',
+                    max: 50,
                     callback: function (value) {
                         var cell1 = value
                         cell1 += '';
@@ -174,7 +175,11 @@ class StockStatusOverTime extends Component {
         return Number(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
     }
     formatAmc = value => {
+        if(value!=null){
         return Number(Math.round(value * Math.pow(10, 0)) / Math.pow(10, 0));
+        }else{
+            return null;
+        }
     }
     dateFormatter = value => {
         return moment(value).format('MMM YY')
@@ -993,6 +998,8 @@ class StockStatusOverTime extends Component {
                                             amcCalcualted = (sumOfConsumptions) / countAMC;
                                             console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
                                             mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
+                                        }else if(countAMC==0){
+                                            amcCalcualted=null;
                                         }
 
 
@@ -1023,7 +1030,7 @@ class StockStatusOverTime extends Component {
                                             "planningUnit": pu.planningUnit,
                                             "stock": 0,
                                             "consumptionQty": 0,
-                                            "amc": 0,
+                                            "amc": null,
                                             "amcMonthCount": 0,
                                             "mos": null
                                         }
@@ -1229,7 +1236,7 @@ class StockStatusOverTime extends Component {
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, this.formatAmc(elt.amc), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([this.dateFormatter(elt.dt).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc!=null?this.formatAmc(elt.amc):"", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1444,15 +1451,18 @@ class StockStatusOverTime extends Component {
         //     '#f86c6b'
         // ]
         const backgroundColor = [
-            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-            '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         ]
         console.log(this.state.matricsList)
 
         // var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
         // var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
 
@@ -1714,6 +1724,7 @@ class StockStatusOverTime extends Component {
 
                                     </div>
                                 </div>
+                                <div className="col-md-12 pt-1"> <span><b>{i18n.t('static.stockStatusOverTime.noteBelowGraph')}</b></span></div>
                                 <div className="col-md-12">
                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
