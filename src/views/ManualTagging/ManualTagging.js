@@ -2496,6 +2496,15 @@ export default class ManualTagging extends Component {
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
             console.log("cell----",cell)
+            return getLabelText(cell, this.state.lang);
+        } else {
+            return "";
+        }
+    }
+
+    formatLabelHistory(cell, row) {
+        if (cell != null && cell != "") {
+            console.log("cell----",cell)
             return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
@@ -2779,7 +2788,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                formatter: this.formatLabelHistory
             },
 
             {
