@@ -1144,7 +1144,7 @@ export default class DataSourceListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
                         </div>
 
                     </CardBody>

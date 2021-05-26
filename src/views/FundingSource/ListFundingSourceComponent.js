@@ -740,7 +740,7 @@ class FundingSourceListComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
                         </div>
                     </CardBody>
                 </Card>

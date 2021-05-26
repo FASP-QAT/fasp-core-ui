@@ -2613,7 +2613,7 @@ class ShipmentGlobalDemandView extends Component {
                                         <div className="col-md-12">
                                             {this.state.procurementAgentSplit.length > 0 &&
                                                 <div className="table-responsive ">
-                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
                                                         <thead>
                                                             <tr>
