@@ -1350,7 +1350,7 @@ export default class ForecastingUnitListComponent extends Component {
 
                         </Col>
                         {/* <div className="SearchMarginTopLarge"> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> </div>
                         {/* </div> */}
 
                     </CardBody>

@@ -476,7 +476,7 @@ class ListRoleComponent extends Component {
                     </div>
                     <CardBody className="pb-md-0">
                         <div className="">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> </div>
                         </div>
                     </CardBody>
                 </Card>

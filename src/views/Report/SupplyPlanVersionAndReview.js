@@ -1285,7 +1285,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </Form>
                         </div>
                         <div className="ReportSearchMarginTop">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                             </div>
                         </div>
 
