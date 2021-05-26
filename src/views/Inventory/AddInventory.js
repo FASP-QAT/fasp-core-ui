@@ -21,6 +21,8 @@ import moment from "moment"
 import { Online } from 'react-detect-offline';
 import { Prompt } from 'react-router'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 const entityname = i18n.t('static.inventory.inventorydetils')
 export default class AddInventory extends Component {
@@ -43,6 +45,10 @@ export default class AddInventory extends Component {
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            planningUnitId: '',
+            regionList: [],
+            dataSourceList: [],
+            realmCountryPlanningUnitList: [],
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -57,7 +63,241 @@ export default class AddInventory extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.exportCSV = this.exportCSV.bind(this);
     }
+
+    exportCSV() {
+
+        //Create workbook and worksheet
+        let workbook = new Workbook();
+        let worksheet = (this.state.inventoryDataType.value == 1 ? workbook.addWorksheet(i18n.t('static.supplyplan.inventoryDataEntry')) : workbook.addWorksheet(i18n.t('static.supplyplan.adjustmentDataEntryTemplate')));
+
+        //Add Header Row
+
+        worksheet.columns = [
+            { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.region.region'), key: 'name', width: 25 },
+            { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
+            { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 40 },
+            { header: i18n.t('static.supplyPlan.inventoryType'), key: 'name', width: 32 },
+            { header: i18n.t('static.supplyPlan.quantityCountryProduct'), key: 'name', width: 32 },
+            { header: i18n.t('static.supplyPlan.quantityCountryProduct'), key: 'name', width: 12 },
+            { header: i18n.t('static.unit.multiplierFromARUTOPU'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.quantityQATProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.supplyPlan.quantityQATProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.common.note'), key: 'string', width: 25 },
+            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+        ];
+
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
+            // console.log('ROW--------->' + colNumber + ' = ' + cell.value);
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFFF00' },
+                bgColor: { argb: 'FF0000FF' },
+                // font: { bold: true }
+            }
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+
+
+        //2 Dropdown
+        let dataSourceVar = [];
+        let datasourceList = this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < datasourceList.length; i++) {
+            dataSourceVar.push(datasourceList[i].name);
+        }
+        worksheet.dataValidations.add('C2:C100', {
+            type: 'list',
+            allowBlank: false,
+            // formulae: ['"male,female,other"'],
+            // formulae: [`"${jsonDropdown.join(",")}"`],
+            // formulae: [`"${dataSourceVar}"`],
+            formulae: [`"${dataSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //region
+        let regionVar = [];
+        let regionList = this.state.regionList;
+        for (let i = 0; i < regionList.length; i++) {
+            regionVar.push(regionList[i].name);
+        }
+
+        worksheet.dataValidations.add('B2:B100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${regionVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        //alternateReportingUnit
+        // let alternateReportingUnitVar = [];
+        // let alternateReportingUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        //     a = a.name.toLowerCase();
+        //     b = b.name.toLowerCase();
+        //     return a < b ? -1 : a > b ? 1 : 0;
+        // });
+        // for (let i = 0; i < alternateReportingUnitList.length; i++) {
+        //     alternateReportingUnitVar.push(alternateReportingUnitList[i].name);
+        // }
+        // worksheet.dataValidations.add('D2:D100', {
+        //     type: 'list',
+        //     allowBlank: false,
+        //     formulae: [`"${alternateReportingUnitVar.join(",")}"`],
+        //     showErrorMessage: true,
+        //     // errorStyle: 'error',
+        //     // error: 'Invalid value',
+        // });
+
+
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
+        worksheet.dataValidations.add('L2:L100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${activeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        //Validations
+        if (this.state.inventoryDataType.value == 1) {
+            worksheet.dataValidations.add('G2:G100', {
+                type: 'whole',
+                operator: 'greaterThan',
+                showErrorMessage: true,
+                formulae: [-1],
+                // errorStyle: 'error',
+                // errorTitle: 'Invalid Value',
+                // error: 'Invalid Value'
+            });
+        } else {
+            worksheet.dataValidations.add('F2:F100', {
+                type: 'whole',
+                operator: 'greaterThan',
+                showErrorMessage: true,
+                formulae: [-1],
+                // errorStyle: 'error',
+                // errorTitle: 'Invalid Value',
+                // error: 'Invalid Value'
+            });
+        }
+
+
+        //Gray color
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('E' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+
+            if (this.state.inventoryDataType.value == 1) {
+                worksheet.getCell('F' + (+i + 2)).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'cccccc' },
+                    bgColor: { argb: '96C8FB' }
+                }
+            } else {
+                worksheet.getCell('G' + (+i + 2)).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'cccccc' },
+                    bgColor: { argb: '96C8FB' }
+                }
+            }
+
+
+            worksheet.getCell('H' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('I' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+
+            worksheet.getCell('J' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+
+        }
+
+        //Protection
+
+
+        // worksheet.getColumn('G2').protection = {
+        //     locked: false,
+        //     hidden: true,
+        // };
+        // worksheet.getCell('G3').protection = {
+        //     locked: false,
+        //     hidden: true,
+        // };
+
+        worksheet.protect();
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        if (this.state.inventoryDataType.value == 1) {
+            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+                cell.protection = { locked: false };
+            });
+        } else {
+            worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+                cell.protection = { locked: false };
+            });
+        }
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        // Generate Excel File with given name
+
+        workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            // fs.saveAs(blob, 'candidate.xlsx');
+            // fs.saveAs(blob, i18n.t('static.supplyplan.inventoryDataEntry') + '.xlsx');
+            fs.saveAs(blob, (this.state.inventoryDataType.value == 1 ? i18n.t('static.supplyplan.inventoryDataEntry') : i18n.t('static.supplyplan.adjustmentDataEntryTemplate')) + '.xlsx');
+
+        })
+
+    }
+
 
     show() {
     }
@@ -526,7 +766,10 @@ export default class AddInventory extends Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        <a href={this.state.inventoryDataType.value == 1 ? `${API_URL}/file/inventoryDataEntryTemplate` : `${API_URL}/file/adjustmentsDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                            <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        }
+                                        {/* <a href={this.state.inventoryDataType.value == 1 ? `${API_URL}/file/inventoryDataEntryTemplate` : `${API_URL}/file/adjustmentsDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
                                         {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>

@@ -8,7 +8,7 @@ import {
 import { Prompt } from 'react-router'
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, API_URL, polling } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, API_URL, polling } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -22,6 +22,8 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment"
 import { Online } from "react-detect-offline";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 
@@ -48,7 +50,10 @@ export default class ConsumptionDetails extends React.Component {
             regionList: [],
             showActive: "",
             regionId: "",
-            consumptionType: ""
+            consumptionType: "",
+            dataSources: [],
+            planningUnitId: '',
+            realmCountryPlanningUnitList: []
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -62,7 +67,203 @@ export default class ConsumptionDetails extends React.Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
         this.pickRange = React.createRef();
+    }
+
+    exportCSV() {
+
+        //Create workbook and worksheet
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(i18n.t('static.supplyplan.consumptionDataEntry'));
+
+        //Add Header Row
+
+        worksheet.columns = [
+            { header: i18n.t('static.report.consumptionDate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.inventory.region'), key: 'name', width: 25 },
+            { header: i18n.t('static.consumption.consumptionType'), key: 'name', width: 40 },
+            { header: i18n.t('static.dashboard.datasource'), key: 'name', width: 40 },
+            { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 32 },
+            { header: i18n.t('static.supplyPlan.quantityCountryProduct'), key: 'name', width: 32 },
+            { header: i18n.t('static.unit.multiplierFromARUTOPU'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.quantityPU'), key: 'name', width: 12 },
+            { header: i18n.t('static.consumption.daysofstockout'), key: 'name', width: 25 },
+            { header: i18n.t('static.common.note'), key: 'string', width: 25 },
+            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+        ];
+
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
+            // console.log('ROW--------->' + colNumber + ' = ' + cell.value);
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFFF00' },
+                bgColor: { argb: 'FF0000FF' },
+                // font: { bold: true }
+            }
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+
+
+        let dataSourceVar = [];
+        let datasourceList = this.state.dataSourceList.filter(c => (c.dataSourceTypeId == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceTypeId == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE) && c.active.toString() == "true");
+
+        for (let i = 0; i < datasourceList.length; i++) {
+            dataSourceVar.push(datasourceList[i].name);
+        }
+
+        worksheet.dataValidations.add('D2:D100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${dataSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //region
+        let regionVar = [];
+        let regionList = this.state.regionList;
+        for (let i = 0; i < regionList.length; i++) {
+            regionVar.push(regionList[i].name);
+        }
+
+        worksheet.dataValidations.add('B2:B100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${regionVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let consumptionTypeDropdown = [i18n.t('static.report.actual'), i18n.t('static.consumption.forcast')];
+        worksheet.dataValidations.add('C2:C100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${consumptionTypeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //alternateReportingUnit
+        // let alternateReportingUnitVar = [];
+        // let alternateReportingUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        //     a = a.name.toLowerCase();
+        //     b = b.name.toLowerCase();
+        //     return a < b ? -1 : a > b ? 1 : 0;
+        // });
+        // for (let i = 0; i < alternateReportingUnitList.length; i++) {
+        //     alternateReportingUnitVar.push(alternateReportingUnitList[i].name);
+        // }
+        // worksheet.dataValidations.add('E2:E100', {
+        //     type: 'list',
+        //     allowBlank: false,
+        //     formulae: [`"${alternateReportingUnitVar.join(",")}"`],
+        //     showErrorMessage: true,
+        //     // errorStyle: 'error',
+        //     // error: 'Invalid value',
+        // });
+
+
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
+        worksheet.dataValidations.add('K2:K100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${activeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //Validations
+
+        worksheet.dataValidations.add('F2:F100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        worksheet.dataValidations.add('I2:I100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('G' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('H' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+        }
+
+        //Protection
+
+        // worksheet.getColumn('G2').protection = {
+        //     locked: false,
+        //     hidden: true,
+        // };
+        // worksheet.getCell('G3').protection = {
+        //     locked: false,
+        //     hidden: true,
+        // };
+
+        worksheet.protect();
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('B').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('C').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        // Generate Excel File with given name
+
+        workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, i18n.t('static.supplyplan.consumptionDataEntry') + '.xlsx');
+        })
+
     }
 
     show() {
@@ -569,7 +770,11 @@ export default class ConsumptionDetails extends React.Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        <a href={`${API_URL}/file/consumptionDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        {/* <a href={`${API_URL}/file/consumptionDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
+                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                            <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        }
+                                        {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportCSV()} />} */}
                                         {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>
