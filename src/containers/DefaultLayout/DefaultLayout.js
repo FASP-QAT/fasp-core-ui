@@ -271,6 +271,10 @@ const MorbidityScenarioOne = React.lazy(() => import('../../Samples/MorbiditySce
 const MorbidityScenarioTwo = React.lazy(() => import('../../Samples/MorbidityScenarioTwo'));
 const MorbidityScenarioThree = React.lazy(() => import('../../Samples/MorbidityScenarioThree'));
 
+const DemographicScenarioOne = React.lazy(() => import('../../Samples/DemographicScenarioOne'));
+const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
+const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/myTree', name: "Tree", component: BasicPrimitiveTreeDemo },
@@ -631,6 +635,10 @@ const routes = [
   { path: '/morbidity/scenarioOne',name:'Morbidity Scenario One', component: MorbidityScenarioOne },
   { path: '/morbidity/scenarioTwo',name:'Morbidity Scenario Two', component: MorbidityScenarioTwo },
   { path: '/morbidity/scenarioThree',name:'Morbidity Scenario Three', component: MorbidityScenarioThree },
+
+  { path: '/demographic/scenarioOne',name:'Demographic Scenario One', component: DemographicScenarioOne },
+  { path: '/demographic/scenarioTwo',name:'Demographic Scenario Two', component: DemographicScenarioTwo },
+  { path: '/demographic/scenarioThree',name:'Demographic Scenario Three', component: DemographicScenarioThree },
 ];
 
 class DefaultLayout extends Component {
@@ -2176,20 +2184,20 @@ class DefaultLayout extends Component {
                         children: [
                           {
                             name: 'Scenario 1',
-                            url: '',
+                            url: '/demographic/scenarioOne',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
                           },
 
                           {
                             name: 'Scenario 2',
-                            url: '',
+                            url: '/demographic/scenarioTwo',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
                           },
                           {
                             name: 'Scenario 3',
-                            url: '',
+                            url: '/demographic/scenarioThree',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
                           },
