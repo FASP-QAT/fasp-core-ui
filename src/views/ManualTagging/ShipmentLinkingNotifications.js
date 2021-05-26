@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -147,7 +147,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             id: parseInt(map1.get("17"))
                         },
                         shipmentQty: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        programId: programId
+                        programId: programId,
+                        shipmentId: (map1.get("3") === '' ? null : map1.get("3"))
                     }
                     changedmtList.push(json);
                 }
@@ -674,7 +675,7 @@ export default class ShipmentLinkingNotifications extends Component {
             data[7] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
-            console.log("conversion factor---",manualTaggingList[j].conversionFactor);
+            console.log("conversion factor---", manualTaggingList[j].conversionFactor);
             data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
@@ -1258,6 +1259,18 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
+    formatExpiryDate(cell, row) {
+        if (cell != null && cell != "") {
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP_WITHOUT_DATE}`);
+            return dateMonthAsWord;
+        } else {
+            return "";
+        }
+    }
+    // DATE_FORMAT_CAP_WITHOUT_DATE
+
     addCommas(cell, row) {
         cell += '';
         var x = cell.split('.');
@@ -1400,7 +1413,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatDate
+                formatter: this.formatExpiryDate
             }
 
         ];
@@ -1443,6 +1456,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
+                                        {/* <div> */}
 
                                         <ToolkitProvider
                                             keyField="optList"
@@ -1454,7 +1468,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 ">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -1469,8 +1483,11 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 )
                                             }
                                         </ToolkitProvider>
-                                        <br />
-                                        {this.state.batchDetails.length > 0 &&
+                                    </div>
+                                    <br />
+
+                                    {this.state.batchDetails.length > 0 &&
+                                        <div>
                                             <ToolkitProvider
                                                 keyField="optList"
                                                 data={this.state.batchDetails}
@@ -1481,7 +1498,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             >
                                                 {
                                                     props => (
-                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                        <div className="TableCust ShipmentNotificationtable">
                                                             {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
@@ -1495,9 +1512,9 @@ export default class ShipmentLinkingNotifications extends Component {
                                                         </div>
                                                     )
                                                 }
-                                            </ToolkitProvider>}
+                                            </ToolkitProvider></div>}
 
-                                    </div><br />
+                                    <br />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
