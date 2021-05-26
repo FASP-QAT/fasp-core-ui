@@ -233,6 +233,10 @@ const StockAdjustment = React.lazy(() => import('./views/Report/StockAdjustment'
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
+const MorbidityScenarioOne = React.lazy(() => import('../../Samples/MorbidityScenarioOne'));
+const MorbidityScenarioTwo = React.lazy(() => import('../../Samples/MorbidityScenarioTwo'));
+const MorbidityScenarioThree = React.lazy(() => import('../../Samples/MorbidityScenarioThree'));
+
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -241,6 +245,10 @@ const routes = [
   
   { path: '/myTree', name: i18n.t('static.dashboard.consumptiondetails'), component: BasicPrimitiveTreeDemo },
   { path: '/myTree2', name: i18n.t('static.dashboard.consumptiondetails'), component: DragNDrop },
+  { path: '/morbidity/scenarioOne',name:'Scenario One', component: MorbidityScenarioOne },
+  { path: '/morbidity/scenarioTwo',name:'Morbidity Scenario Two', component: MorbidityScenarioTwo },
+  { path: '/morbidity/scenarioThree',name:'Morbidity Scenario Three', component: MorbidityScenarioThree },
+
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.report.problem') }), component: AddProblem },

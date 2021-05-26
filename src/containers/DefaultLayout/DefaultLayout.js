@@ -28,7 +28,7 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const BasicPrimitiveTreeDemo = React.lazy(() => import('../../views/BasicPrimitiveTree/BasicPrimitiveTreeDemo'));
-const DragNDrop= React.lazy(() => import('../../Samples/DragNDropTwo'));
+const DragNDrop = React.lazy(() => import('../../Samples/DragNDropTwo'));
 const AddInventory = React.lazy(() => import('../../views/Inventory/AddInventory'));
 const AddDimension = React.lazy(() => import('../../views/Dimension/AddDimensionComponent'));
 const DimensionList = React.lazy(() => import('../../views/Dimension/DimensionListComponent'));
@@ -267,6 +267,9 @@ const UploadUserManual = React.lazy(() => import('../../views/UserManual/UploadU
 const AddIntegration = React.lazy(() => import('../../views/Integration/AddIntegrationComponent'));
 const IntegrationList = React.lazy(() => import('../../views/Integration/IntegrationListComponent'));
 const EditIntegration = React.lazy(() => import('../../views/Integration/EditIntegrationComponent'));
+const MorbidityScenarioOne = React.lazy(() => import('../../Samples/MorbidityScenarioOne'));
+const MorbidityScenarioTwo = React.lazy(() => import('../../Samples/MorbidityScenarioTwo'));
+const MorbidityScenarioThree = React.lazy(() => import('../../Samples/MorbidityScenarioThree'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -624,7 +627,10 @@ const routes = [
   // { path: '/integration/listIntegration/:message', component: IntegrationList },
   { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
   { path: '/integration/listIntegration/:message', component: IntegrationList },
-  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration }
+  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration },
+  { path: '/morbidity/scenarioOne',name:'Morbidity Scenario One', component: MorbidityScenarioOne },
+  { path: '/morbidity/scenarioTwo',name:'Morbidity Scenario Two', component: MorbidityScenarioTwo },
+  { path: '/morbidity/scenarioThree',name:'Morbidity Scenario Three', component: MorbidityScenarioThree },
 ];
 
 class DefaultLayout extends Component {
@@ -2134,12 +2140,61 @@ class DefaultLayout extends Component {
 
 
                         ]
-                      }
+                      },
+                      // structure for methods---------------------------------------
+                      {
+                        name: 'Morbidity Structure',
+                        icon: 'fa fa-list',
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
+                        children: [
+                          {
+                            name: 'Scenario 1',
+                            url: '/morbidity/scenarioOne',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
 
+                          {
+                            name: 'Scenario 2',
+                            url: '/morbidity/scenarioTwo',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
+                          {
+                            name: 'Scenario 3',
+                            url: '/morbidity/scenarioThree',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
+                        ]
+                      },
 
+                      {
+                        name: 'Demographic Structure',
+                        icon: 'fa fa-list',
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
+                        children: [
+                          {
+                            name: 'Scenario 1',
+                            url: '',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
 
-
-
+                          {
+                            name: 'Scenario 2',
+                            url: '',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
+                          {
+                            name: 'Scenario 3',
+                            url: '',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_ADD_USER') ? false : true) }
+                          },
+                        ]
+                      },
                       // {
                       //   name: "Supply plan",
                       //   icon: 'fa fa-list',  
@@ -2608,7 +2663,6 @@ class DefaultLayout extends Component {
 
                             ]
                           },
-
 
                           //3) Shipment Reports
                           // {

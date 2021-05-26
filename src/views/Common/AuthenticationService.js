@@ -495,6 +495,9 @@ class AuthenticationService {
                     }
                     break;
                 case "/myTree2":
+                case "/morbidity/scenarioOne":
+                case "/morbidity/scenarioTwo":
+                case "/morbidity/scenarioThree":
                     if (bfunction.includes("ROLE_BF_ADD_USER")) {
                         return true;
                     }
