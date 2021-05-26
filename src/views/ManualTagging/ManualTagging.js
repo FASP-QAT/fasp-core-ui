@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP,DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -104,6 +104,7 @@ export default class ManualTagging extends Component {
         this.filterData = this.filterData.bind(this);
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.formatLabelHistory = this.formatLabelHistory.bind(this);
         this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -2496,6 +2497,15 @@ export default class ManualTagging extends Component {
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
             console.log("cell----",cell)
+            return getLabelText(cell, this.state.lang);
+        } else {
+            return "";
+        }
+    }
+
+    formatLabelHistory(cell, row) {
+        if (cell != null && cell != "") {
+            console.log("cell----",cell)
             return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
@@ -2546,6 +2556,17 @@ export default class ManualTagging extends Component {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+            return dateMonthAsWord;
+        } else {
+            return "";
+        }
+    }
+
+    formatExpiryDate(cell, row) {
+        if (cell != null && cell != "") {
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP_WITHOUT_DATE}`);
             return dateMonthAsWord;
         } else {
             return "";
@@ -2779,7 +2800,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatLabel
+                formatter: this.formatLabelHistory
             },
 
             {
@@ -2839,7 +2860,7 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                formatter: this.formatDate
+                formatter: this.formatExpiryDate
             }
 
         ];
@@ -3583,7 +3604,7 @@ export default class ManualTagging extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable3 ">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />

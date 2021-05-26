@@ -504,6 +504,10 @@ label.arrow_label:after {
   border: 1px solid #e5e7e8;
 }
 
+.reactTableNotification .react-bootstrap-table{
+  max-height: 300px !important;
+}
+
 .react-bootstrap-table-pagination {
   margin-top: 10px;
 }
@@ -4001,3 +4005,7 @@ color: #000000!important;
 .ShipmentSummeryReportMarginTop {
   margin-top: -38px;
 }
+
+// .reactTableNotification table{
+//   height: 300px !important;
+// }
