@@ -232,7 +232,7 @@ export default class DemographicScenarioTwo extends Component {
                         <div className="ContactTitle" style={{color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
                     </div>
                     <div className="ContactPhone" style={{color:itemConfig.nodeValueColor,left:'2px',top: '31px', width: '95%',height: '36px'}}>{itemConfig.nodeValue}</div>
-                    <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div>
+                    {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
                 </div>
             ))
         }
@@ -281,6 +281,7 @@ export default class DemographicScenarioTwo extends Component {
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
+            linesColor:Colors.Black,
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
