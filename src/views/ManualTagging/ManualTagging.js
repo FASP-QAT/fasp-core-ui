@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP,DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT,DATE_FORMAT_CAP,DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -513,7 +513,8 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
+                    // this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
+                    this.state.instance.setValueFromCoords(8, y, `=ROUND(qty * (value != null && value != "" ? value : 1),4)`, true);
                 }
 
             }
@@ -536,7 +537,7 @@ export default class ManualTagging extends Component {
                 this.state.instance.setValueFromCoords(7, y, "", true);
                 this.state.instance.setValueFromCoords(9, y, "", true);
                 var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty)), true);
+                this.state.instance.setValueFromCoords(8, y, `=ROUND(qty,4)`, true);
             }
         }
         // //Active
@@ -1764,12 +1765,12 @@ export default class ManualTagging extends Component {
                 data[1] = erpDataList[j].erpOrderId;
                 data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
                 data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
-                data[4] = this.formatDate(erpDataList[j].expectedDeliveryDate);
+                data[4] = erpDataList[j].expectedDeliveryDate;
                 data[5] = erpDataList[j].erpStatus;
-                data[6] = this.addCommas(erpDataList[j].shipmentQty);
+                data[6] = erpDataList[j].shipmentQty;
                 data[7] = '';
                 // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
-                data[8] = this.addCommas(erpDataList[j].shipmentQty);
+                data[8] = erpDataList[j].shipmentQty;
                 data[9] = '';
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
@@ -1781,13 +1782,13 @@ export default class ManualTagging extends Component {
                 data[1] = erpDataList[j].erpOrderId;
                 data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
                 data[3] = getLabelText(erpDataList[j].planningUnitLabel);
-                data[4] = this.formatDate(erpDataList[j].currentEstimatedDeliveryDate);
+                data[4] = erpDataList[j].currentEstimatedDeliveryDate;
                 data[5] = erpDataList[j].status;
-                data[6] = this.addCommas(erpDataList[j].quantity);
-                let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
+                data[6] = erpDataList[j].quantity;
+                let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
                 data[7] = (erpDataList[j].active ? conversionFactor : "");
                 convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = this.addCommas(Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity)));
+                data[8] = `=ROUND((erpDataList[j].active ? convertedQty : erpDataList[j].quantity),4)`
                 data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
@@ -1836,9 +1837,9 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                    type: 'text',
+                    type: 'calendar',
                     readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    options: { format: JEXCEL_DATE_FORMAT },
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
@@ -1847,16 +1848,16 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.erpShipmentQty'),
-                    type: 'text',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
-                    type: 'text',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    type: 'text',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1952,11 +1953,11 @@ export default class ManualTagging extends Component {
                 data[0] = manualTaggingList[j].shipmentId
                 data[1] = manualTaggingList[j].shipmentTransId
                 data[2] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
+                data[3] = manualTaggingList[j].expectedDeliveryDate
                 data[4] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[5] = manualTaggingList[j].procurementAgent.code
                 data[6] = manualTaggingList[j].orderNo
-                data[7] = this.addCommas(manualTaggingList[j].shipmentQty)
+                data[7] = manualTaggingList[j].shipmentQty
                 data[8] = manualTaggingList[j].notes
             } else if (this.state.active2) {
                 let shipmentQty = (manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
@@ -1966,12 +1967,13 @@ export default class ManualTagging extends Component {
                 data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
+                data[6] = manualTaggingList[j].expectedDeliveryDate
                 // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[7] = manualTaggingList[j].erpStatus
-                data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
-                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1)
-                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
+                // `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
+                data[8] = `=ROUND((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)),4)`
+                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
+                data[10] = `=ROUND(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1),4)`
                 data[11] = manualTaggingList[j].notes
                 data[12] = manualTaggingList[j].orderNo
                 data[13] = manualTaggingList[j].primeLineNo
@@ -1980,9 +1982,9 @@ export default class ManualTagging extends Component {
                 data[0] = manualTaggingList[j].erpOrderId
                 data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate)
+                data[3] = manualTaggingList[j].expectedDeliveryDate
                 data[4] = manualTaggingList[j].erpStatus
-                data[5] = this.addCommas(manualTaggingList[j].shipmentQty)
+                data[5] = manualTaggingList[j].shipmentQty
 
             }
             manualTaggingArray[count] = data;
@@ -2003,7 +2005,8 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2015,8 +2018,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                        type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT},
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtshipmentStatus'),
@@ -2033,7 +2036,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.common.notes'),
@@ -2078,11 +2082,13 @@ export default class ManualTagging extends Component {
                 columns: [
                     {
                         title: i18n.t('static.mt.parentShipmentId'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2102,8 +2108,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                        type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT},
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2112,16 +2118,19 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.manualTagging.conversionFactor'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
 
                     {
                         title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
 
                     {
@@ -2194,6 +2203,12 @@ export default class ManualTagging extends Component {
                                             })
                                             console.log("DATA---->2", responseData);
     
+                                            responseData = responseData.sort(function (a, b) {
+                                                var dateA = a.erpOrderId;
+                                                var dateB = b.erpOrderId;
+                                                return dateA < dateB ? 1 : -1;
+                                            })
+                                            console.log("DATA---->3", responseData);
 
                                             this.setState({
                                                 artmisHistory: responseData
@@ -2272,8 +2287,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                        type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT},
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2282,7 +2297,8 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.00', decimal: '.'
                     },
                 ],
                 editable: false,
@@ -2787,6 +2803,13 @@ export default class ManualTagging extends Component {
                         ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
                     )
                 }
+            },
+            {
+                dataField: 'erpOrderId',
+                text: 'ERP Order Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
 
             {
