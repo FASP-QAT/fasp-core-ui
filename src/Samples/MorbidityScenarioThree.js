@@ -282,6 +282,7 @@ export default class MorbidityScenarioThree extends Component {
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
             // itemTitleFirstFontColor: Colors.White,
+            linesColor:Colors.Black,
             templates: [{
                 name: "contactTemplate",
                 itemSize: { width: 175, height: 75 },

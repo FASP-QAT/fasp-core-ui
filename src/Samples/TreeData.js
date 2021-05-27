@@ -633,7 +633,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "59%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 2,
@@ -650,7 +650,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "14.93%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 3,
@@ -667,7 +667,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "90%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 4,
@@ -737,7 +737,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "65%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 2,
@@ -754,7 +754,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "25.5%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 3,
@@ -771,7 +771,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "80%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 4,
@@ -841,7 +841,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "78.6%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 2,
@@ -858,7 +858,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "18%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 3,
@@ -875,7 +875,7 @@ export default{
             email: "akil.m@altius.cc", 
             phone: "352-206-7599", 
             valueType:-1,
-            label: "" ,
+            label: "77%" ,
             nodeValueColor:Colors.Black
         },
         {   id: 4,
