@@ -2985,7 +2985,7 @@ export default class ManualTagging extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}
@@ -3173,7 +3173,7 @@ export default class ManualTagging extends Component {
                                                                         // keyField='erpOrderId'
                                                                         ref={n => this.node = n}
                                                                         selectRow={selectRow}
-                                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                        striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
                                                                         rowEvents={{
 
