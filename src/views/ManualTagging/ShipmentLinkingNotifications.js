@@ -744,8 +744,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                     type: 'text',
-                    readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
@@ -1474,7 +1473,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
                                                             }}

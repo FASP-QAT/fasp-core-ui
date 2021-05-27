@@ -1837,8 +1837,7 @@ export default class ManualTagging extends Component {
                 {
                     title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                     type: 'text',
-                    readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
@@ -2016,7 +2015,6 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                         type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtshipmentStatus'),
@@ -2056,6 +2054,8 @@ export default class ManualTagging extends Component {
                 allowManualInsertColumn: false,
                 allowDeleteRow: false,
                 onselection: this.selected,
+
+
                 oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
@@ -2103,7 +2103,6 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2273,7 +2272,6 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'text',
-                        options: { format: JEXCEL_DATE_FORMAT_SM },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -3111,7 +3109,7 @@ export default class ManualTagging extends Component {
                             </Row>
 
                             <div className="ReportSearchMarginTop">
-                                <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
+                                <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                 </div>
                             </div>
 
@@ -3145,7 +3143,7 @@ export default class ManualTagging extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}
@@ -3333,7 +3331,7 @@ export default class ManualTagging extends Component {
                                                                         // keyField='erpOrderId'
                                                                         ref={n => this.node = n}
                                                                         selectRow={selectRow}
-                                                                        striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
                                                                         rowEvents={{
 
@@ -3539,7 +3537,7 @@ export default class ManualTagging extends Component {
 
                                                             <ol className="list-group list-groupMt">
                                                                 <li class="list-summery  ">
-                                                                    <Table id="mytable1" responsive className="table-fixed table-bordered text-center mt-2">
+                                                                    <Table id="mytable1" responsive className="table-fixed table-hover table-bordered text-center mt-2">
                                                                         <thead>
                                                                             <tr>
                                                                                 <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
@@ -3611,7 +3609,7 @@ export default class ManualTagging extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
                                                             }}
@@ -3638,7 +3636,7 @@ export default class ManualTagging extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}
