@@ -2583,7 +2583,7 @@ export default class ManualTagging extends Component {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            return dateMonthAsWord;
+            return dateMonthAsWord.toUpperCase();
         } else {
             return "";
         }
@@ -2813,14 +2813,6 @@ export default class ManualTagging extends Component {
                     )
                 }
             },
-            {
-                dataField: 'erpOrderId',
-                text: 'ERP Order Id',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
