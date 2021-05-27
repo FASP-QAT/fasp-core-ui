@@ -513,8 +513,9 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    // this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
-                    this.state.instance.setValueFromCoords(8, y, `=ROUND(qty * (value != null && value != "" ? value : 1),4)`, true);
+                    this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
+                    // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
+                    // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                 }
 
             }
@@ -1788,7 +1789,7 @@ export default class ManualTagging extends Component {
                 let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
                 data[7] = (erpDataList[j].active ? conversionFactor : "");
                 convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = `=ROUND((erpDataList[j].active ? convertedQty : erpDataList[j].quantity),4)`
+                data[8] = Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity))
                 data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
                 data[10] = 0;
                 data[11] = erpDataList[j].orderNo;
@@ -1848,16 +1849,16 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.erpShipmentQty'),
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
-                    mask: '#,##.00', decimal: '.'
+                    mask: '#,##.0000', decimal: '.'
                 },
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1971,9 +1972,9 @@ export default class ManualTagging extends Component {
                 // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[7] = manualTaggingList[j].erpStatus
                 // `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                data[8] = `=ROUND((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)),4)`
+                data[8] = Math.round((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
-                data[10] = `=ROUND(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1),4)`
+                data[10] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
                 data[11] = manualTaggingList[j].notes
                 data[12] = manualTaggingList[j].orderNo
                 data[13] = manualTaggingList[j].primeLineNo
@@ -2006,7 +2007,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2037,7 +2038,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.common.notes'),
@@ -2085,12 +2086,12 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.mt.parentShipmentId'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2121,18 +2122,18 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.manualTagging.conversionFactor'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##.0000', decimal: '.'
                     },
 
                     {
                         title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
 
                     {
@@ -2300,7 +2301,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
                         type: 'numeric',
-                        mask: '#,##.00', decimal: '.'
+                        mask: '#,##', decimal: '.'
                     },
                 ],
                 editable: false,
