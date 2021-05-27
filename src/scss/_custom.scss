@@ -936,6 +936,9 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
+.RowClickable .jexcel_content .jexcel tbody.draggable tr{
+  cursor: pointer;
+  }
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
@@ -1449,7 +1452,7 @@ h5,
 
 .table {
   color: #212721 !important;
-  cursor: pointer !important;
+  // cursor: pointer !important;
 }
 
 .btn-secondary {
@@ -3986,6 +3989,7 @@ color: #000000!important;
 
 .eyeIconFontSize{
   font-size: 19px;
+  cursor: pointer !important;
 }
 
 // .reactTableNotification table{
