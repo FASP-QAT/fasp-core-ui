@@ -3564,7 +3564,7 @@ export default class ManualTagging extends Component {
 
                                                             <ol className="list-group list-groupMt">
                                                                 <li class="list-summery  ">
-                                                                    <Table id="mytable1" responsive className="table-fixed table-hover table-bordered text-center mt-2">
+                                                                    <Table id="mytable1" responsive className="table-fixed table-bordered text-center mt-2">
                                                                         <thead>
                                                                             <tr>
                                                                                 <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
