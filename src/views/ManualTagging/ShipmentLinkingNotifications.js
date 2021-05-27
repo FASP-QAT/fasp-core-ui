@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT,JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -279,7 +279,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.el.setValueFromCoords(11, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
+                    this.el.setValueFromCoords(11, y, (qty * (value != null && value != "" ? value : 1)), true);
                 }
 
             }
@@ -672,17 +672,17 @@ export default class ShipmentLinkingNotifications extends Component {
             data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
             data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
             data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-            data[7] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+            data[7] = manualTaggingList[j].expectedDeliveryDate;
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
             console.log("conversion factor---", manualTaggingList[j].conversionFactor);
-            data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
+            data[9] = `=ROUND(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty,4)`;
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
-                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
+                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1);
             } else {
                 data[10] = ""
             }
-            data[11] = this.addCommas(Math.round(manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
+            data[11] = `=ROUND((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)),4)`;
             data[12] = manualTaggingList[j].notes
             data[13] = 0
             data[14] = manualTaggingList[j].orderNo
@@ -718,12 +718,14 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 {
                     title: i18n.t('static.mt.parentShipmentId'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.mt.childShipmentId'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -743,8 +745,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'calendar',
+                    readOnly: true,
+                    options: { format: JEXCEL_DATE_FORMAT },
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
@@ -754,17 +757,20 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.'
                 },
 
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
 
@@ -891,6 +897,13 @@ export default class ShipmentLinkingNotifications extends Component {
                                         })
                                         console.log("DATA---->2", responseData);
 
+                                        responseData = responseData.sort(function (a, b) {
+                                            var dateA = a.erpOrderId;
+                                            var dateB = b.erpOrderId;
+                                            return dateA > dateB ? 1 : -1;
+                                        })
+                                        console.log("DATA---->3", responseData);
+
                                         this.setState({
                                             artmisHistory: responseData
                                         }, () => {
@@ -961,7 +974,7 @@ export default class ShipmentLinkingNotifications extends Component {
             data = [];
 
             data[0] = getLabelText(notificationSummaryList[j].label);
-            data[1] = this.addCommas(notificationSummaryList[j].notificationCount);
+            data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
 
             notificationSummaryArray[count] = data;
@@ -987,7 +1000,8 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 {
                     title: i18n.t('static.mt.notificationCount'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1312,7 +1326,13 @@ export default class ShipmentLinkingNotifications extends Component {
                     )
                 }
             },
-
+            {
+                dataField: 'erpOrderId',
+                text: 'ERP Order Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
@@ -1473,7 +1493,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
                                                             }}
