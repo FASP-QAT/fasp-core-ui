@@ -936,6 +936,7 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
+<<<<<<< HEAD
 .RowheightForjexcel .jexcel_overflow>tbody>tr>td:nth-child(22){ 
   height: 100px;
   overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
@@ -967,6 +968,11 @@ label.arrow_label:after {
   cursor: pointer;
 }
 
+=======
+.RowClickable .jexcel_content .jexcel tbody.draggable tr{
+  cursor: pointer;
+  }
+>>>>>>> QAT-355
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
@@ -1481,6 +1487,10 @@ h5,
 
 .table {
   color: #212721 !important;
+<<<<<<< HEAD
+=======
+  // cursor: pointer !important;
+>>>>>>> QAT-355
 }
 
 .btn-secondary {
@@ -4017,6 +4027,7 @@ color: #000000!important;
 
 .eyeIconFontSize{
   font-size: 19px;
+  cursor: pointer !important;
 }
 .ShipmentSummeryReportMarginTop {
   margin-top: -38px;
@@ -4025,3 +4036,6 @@ color: #000000!important;
 // .reactTableNotification table{
 //   height: 300px !important;
 // }
+.ShipmentSummeryReportMarginTop {
+  margin-top: -38px;
+}

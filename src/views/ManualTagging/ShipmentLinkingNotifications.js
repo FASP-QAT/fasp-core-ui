@@ -744,7 +744,8 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
