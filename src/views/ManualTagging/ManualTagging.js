@@ -354,8 +354,14 @@ export default class ManualTagging extends Component {
         // let planningUnitId = this.state.planningUnitIdUpdated;
         ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.shipmentId;
+                    var itemLabelB = b.shipmentId;
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    notLinkedShipments: response.data
+                    notLinkedShipments: listArray
                 });
             }).catch(
                 error => {
@@ -3049,7 +3055,7 @@ export default class ManualTagging extends Component {
                                                         value={this.state.countryId}
                                                         onChange={(e) => { this.countryChange(e); }}
                                                     >
-                                                        <option value="-1">{i18n.t('static.common.all')}</option>
+                                                        <option value="-1">{i18n.t('static.common.select')}</option>
                                                         {countries}
                                                     </Input>
                                                 </InputGroup>
