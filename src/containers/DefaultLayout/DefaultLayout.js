@@ -2151,7 +2151,7 @@ class DefaultLayout extends Component {
                       },
                       // structure for methods---------------------------------------
                       {
-                        name: 'Morbidity Structure',
+                        name: 'Morbidity Tree',
                         icon: 'fa fa-list',
                         attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
                         children: [
@@ -2178,7 +2178,7 @@ class DefaultLayout extends Component {
                       },
 
                       {
-                        name: 'Demographic Structure',
+                        name: 'Demographic Tree',
                         icon: 'fa fa-list',
                         attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')) ? false : true) },
                         children: [
