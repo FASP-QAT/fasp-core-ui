@@ -589,6 +589,8 @@ export default class ManualTagging extends Component {
                 active5: false,
                 checkboxValue: false,
                 tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -598,6 +600,8 @@ export default class ManualTagging extends Component {
                 active5: true,
                 checkboxValue: false,
                 tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         }
     }
@@ -950,17 +954,17 @@ export default class ManualTagging extends Component {
             }
             else {
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    console.log("value---",parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    console.log("value---", parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
                     qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
         }
-        console.log("qty---",qty);
+        console.log("qty---", qty);
         if (validation == true) {
 
             this.setState({
-                displaySubmitButton: (count > 0 ? true : false),
+                displaySubmitButton: (count > 0 ? (this.state.active3 ? ((this.state.active4 || this.state.active5) ? true : false) : true) : false),
                 totalQuantity: this.addCommas(qty),
                 displayTotalQty: (count > 0 ? true : false)
             })
