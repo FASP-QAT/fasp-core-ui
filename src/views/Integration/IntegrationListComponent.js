@@ -246,7 +246,7 @@ export default class IntegrationListComponent extends Component {
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
@@ -256,22 +256,24 @@ export default class IntegrationListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="table-responsive pt-md-1 pb-md-1">
+                    <CardBody className="table-responsive pt-md-1 pb-md-1 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
-                    </CardBody>
-                </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
+                                    <div class="spinner-border blue ml-4" role="status">
 
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </CardBody>
+                </Card>
+
             </div>
         );
     }

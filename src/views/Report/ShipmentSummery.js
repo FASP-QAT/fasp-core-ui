@@ -2232,7 +2232,7 @@ class ShipmentSummery extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
 
@@ -2413,41 +2413,41 @@ class ShipmentSummery extends Component {
                                         {/* </Col> */}
                                     </div>
                                 </Form>
-
-                                <Col md="12 pl-0">
-                                    <div className="row">
-                                        {
-                                            this.state.shipmentDetailsMonthList.length > 0
-                                            &&
-                                            <div className="col-md-12 p-0">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        <Bar id="cool-canvas" data={bar} options={options} />
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            {
+                                                this.state.shipmentDetailsMonthList.length > 0
+                                                &&
+                                                <div className="col-md-12 p-0">
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                {/* <div className="col-md-12">
+                                                    {/* <div className="col-md-12">
                                                         <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
 
                                                     </div> */}
-                                            </div>
-                                        }
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    {/* <tbody>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-md-12 pl-0 pr-0">
+                                                {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                    <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -2461,36 +2461,37 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody> */}
-                                                    <tbody>
-                                                        {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                            this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
-                                                                <tr id="addr0" key={idx} >
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>
-                                                            )}
-                                                    </tbody>
+                                                        <tbody>
+                                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                                this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
+                                                                    <tr id="addr0" key={idx} >
+                                                                        <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    </tr>
+                                                                )}
+                                                        </tbody>
 
-                                                </Table>}
-                                        </div>
-                                    </div>
-
-                                </Col>
-                                <Col md="12 pl-0">
-                                    <div className="row">
-                                        <FormGroup className="col-md-10 mt-3 ">
-                                            <ul className="legendcommitversion list-group">
-                                                {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
-                                            </ul>
-                                        </FormGroup>
-                                        <div className="ShipmentSummeryReportMarginTop" id="mytable2">
-                                            <div id="shipmentDetailsListTableDiv" className="jexcelremoveReadonlybackground">
+                                                    </Table>}
                                             </div>
                                         </div>
-                                    </div>
-                                </Col>
+
+                                    </Col>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-10 mt-3 ">
+                                                <ul className="legendcommitversion list-group">
+                                                    {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
+                                                </ul>
+                                            </FormGroup>
+                                            <div className="ShipmentSummeryReportMarginTop" id="mytable2">
+                                                <div id="shipmentDetailsListTableDiv" className="jexcelremoveReadonlybackground">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                </div>
                             </div>
                         </div>
                     </CardBody>

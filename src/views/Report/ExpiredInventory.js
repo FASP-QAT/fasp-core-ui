@@ -1375,8 +1375,19 @@ export default class ExpiredInventory extends Component {
                             </div>
                         </div>
                         {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
-                        <div className="">
+                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </CardBody>
@@ -1434,17 +1445,6 @@ export default class ExpiredInventory extends Component {
                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

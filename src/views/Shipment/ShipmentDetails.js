@@ -922,7 +922,7 @@ export default class ShipmentDetails extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     {checkOnline === 'Online' &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
@@ -943,77 +943,77 @@ export default class ShipmentDetails extends React.Component {
                             render={
                                 ({
                                 }) => (
-                                    <Form name='simpleForm'>
-                                        <div className=" pl-0">
-                                            <div className="row">
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                    <div className="controls edit">
+                                        <Form name='simpleForm'>
+                                            <div className=" pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                        <div className="controls edit">
 
-                                                        <Picker
-                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                            ref={this.pickRange}
-                                                            value={rangeValue}
-                                                            lang={pickerLang}
-                                                            //theme="light"
-                                                            onChange={this.handleRangeChange}
-                                                            onDismiss={this.handleRangeDissmis}
-                                                        >
-                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                        </Picker>
-                                                    </div>
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
 
-                                                </FormGroup>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                    <div className="controls ">
-                                                        <Select
-                                                            name="programSelect"
-                                                            id="programSelect"
-                                                            bsSize="sm"
-                                                            options={this.state.programList}
-                                                            value={this.state.programSelect}
-                                                            onChange={(e) => { this.getPlanningUnitList(e); }}
-                                                        />
-                                                    </div>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-3 ">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                    <div className="controls ">
-                                                        <Select
-                                                            name="planningUnit"
-                                                            id="planningUnit"
-                                                            bsSize="sm"
-                                                            options={this.state.planningUnitList}
-                                                            value={this.state.planningUnit}
-                                                            onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
-                                                        />
-                                                    </div>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-3 ">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.shipmentType')}</Label>
-                                                    <div className="controls ">
-                                                        <Select
-                                                            name="shipmentType"
-                                                            id="shipmentType"
-                                                            bsSize="sm"
-                                                            multi
-                                                            options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
-                                                            value={this.state.shipmentType}
-                                                            onChange={(e) => { this.updateDataType(e); }}
-                                                        />
-                                                    </div>
-                                                </FormGroup>
-                                                {/* {this.state.shipmentChangedFlag == 1 && <FormGroup check inline>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls ">
+                                                            <Select
+                                                                name="programSelect"
+                                                                id="programSelect"
+                                                                bsSize="sm"
+                                                                options={this.state.programList}
+                                                                value={this.state.programSelect}
+                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                        <div className="controls ">
+                                                            <Select
+                                                                name="planningUnit"
+                                                                id="planningUnit"
+                                                                bsSize="sm"
+                                                                options={this.state.planningUnitList}
+                                                                value={this.state.planningUnit}
+                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3 ">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.shipmentType')}</Label>
+                                                        <div className="controls ">
+                                                            <Select
+                                                                name="shipmentType"
+                                                                id="shipmentType"
+                                                                bsSize="sm"
+                                                                multi
+                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
+                                                                value={this.state.shipmentType}
+                                                                onChange={(e) => { this.updateDataType(e); }}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                    {/* {this.state.shipmentChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.shipmentChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
                                                     </FormGroup>} */}
-                                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-                                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
+                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Form>
-                                )} />
+                                        </Form>
+                                    )} />
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
@@ -1021,10 +1021,21 @@ export default class ShipmentDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
                             <div className="table-responsive" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1080,17 +1091,7 @@ export default class ShipmentDetails extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

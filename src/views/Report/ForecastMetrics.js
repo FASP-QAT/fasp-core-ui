@@ -1499,7 +1499,7 @@ class ForecastMetrics extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1709,23 +1709,23 @@ class ForecastMetrics extends Component {
                 </div>
               </Col> */}
 
-            <div className="ReportSearchMarginTop">
+            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
               <div id="tableDiv" className="jexcelremoveReadonlybackground">
+              </div>
+            </div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                  <div class="spinner-border blue ml-4" role="status">
+
+                  </div>
+                </div>
               </div>
             </div>
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
 
 
       </div>
