@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT,DATE_FORMAT_CAP,DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -498,7 +498,7 @@ export default class ManualTagging extends Component {
             var col = ("H").concat(parseInt(y) + 1);
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-
+            var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -512,13 +512,15 @@ export default class ManualTagging extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
+
+                    console.log("my value-----------------------", Math.round(qty * (value != null && value != "" ? value : 1)));
+
                     // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
                     // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                 }
 
             }
+            this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
         }
         // if (x == 0) {
         //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
@@ -538,7 +540,7 @@ export default class ManualTagging extends Component {
                 this.state.instance.setValueFromCoords(7, y, "", true);
                 this.state.instance.setValueFromCoords(9, y, "", true);
                 var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                this.state.instance.setValueFromCoords(8, y, `=ROUND(qty,4)`, true);
+                this.state.instance.setValueFromCoords(8, y, Math.round(qty), true);
             }
         }
         // //Active
@@ -935,24 +937,28 @@ export default class ManualTagging extends Component {
 
     displayButton() {
         var validation = this.checkValidation();
-        if (validation == true) {
-            var tableJson = this.state.instance.getJson(null, false);
-            let count = 0, qty = 0;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                if (this.state.active2) {
-                    count++;
-                    if (map1.get("0")) {
-                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
-                    }
-                }
-                else {
-                    if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
-                        count++;
-                    }
+
+        var tableJson = this.state.instance.getJson(null, false);
+        let count = 0, qty = 0;
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (this.state.active2) {
+                count++;
+                if (map1.get("0")) {
+                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
+            else {
+                if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                    console.log("value---",parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    count++;
+                }
+            }
+        }
+        console.log("qty---",qty);
+        if (validation == true) {
+
             this.setState({
                 displaySubmitButton: (count > 0 ? true : false),
                 totalQuantity: this.addCommas(qty),
@@ -960,7 +966,9 @@ export default class ManualTagging extends Component {
             })
         } else {
             this.setState({
-                displaySubmitButton: false
+                displaySubmitButton: false,
+                totalQuantity: this.addCommas(qty),
+                displayTotalQty: (count > 0 ? true : false)
             })
         }
     }
@@ -2006,8 +2014,8 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
-                        type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2020,7 +2028,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                         type: 'calendar',
-                        options: { format: JEXCEL_DATE_FORMAT},
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtshipmentStatus'),
@@ -2085,13 +2093,13 @@ export default class ManualTagging extends Component {
                 columns: [
                     {
                         title: i18n.t('static.mt.parentShipmentId'),
-                        type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
-                        type: 'numeric',
-                        mask: '#,##', decimal: '.'
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2112,7 +2120,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'calendar',
-                        options: { format: JEXCEL_DATE_FORMAT},
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2198,14 +2206,14 @@ export default class ManualTagging extends Component {
                                                     && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
                                                 ))
                                             )
-    
+
                                             responseData = responseData.sort(function (a, b) {
                                                 var dateA = new Date(a.date).getTime();
                                                 var dateB = new Date(b.date).getTime();
                                                 return dateA < dateB ? 1 : -1;
                                             })
                                             console.log("DATA---->2", responseData);
-    
+
                                             responseData = responseData.sort(function (a, b) {
                                                 var dateA = a.erpOrderId;
                                                 var dateB = b.erpOrderId;
@@ -2291,7 +2299,7 @@ export default class ManualTagging extends Component {
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
                         type: 'calendar',
-                        options: { format: JEXCEL_DATE_FORMAT},
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2517,7 +2525,7 @@ export default class ManualTagging extends Component {
 
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
-            console.log("cell----",cell)
+            console.log("cell----", cell)
             return getLabelText(cell, this.state.lang);
         } else {
             return "";
@@ -2526,7 +2534,7 @@ export default class ManualTagging extends Component {
 
     formatLabelHistory(cell, row) {
         if (cell != null && cell != "") {
-            console.log("cell----",cell)
+            console.log("cell----", cell)
             return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
@@ -2577,7 +2585,7 @@ export default class ManualTagging extends Component {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            return dateMonthAsWord;
+            return dateMonthAsWord.toUpperCase();
         } else {
             return "";
         }
@@ -2807,14 +2815,6 @@ export default class ManualTagging extends Component {
                     )
                 }
             },
-            {
-                dataField: 'erpOrderId',
-                text: 'ERP Order Id',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),

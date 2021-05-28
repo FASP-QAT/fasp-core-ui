@@ -279,7 +279,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.el.setValueFromCoords(11, y, (qty * (value != null && value != "" ? value : 1)), true);
+                    this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
                 }
 
             }
@@ -676,13 +676,13 @@ export default class ShipmentLinkingNotifications extends Component {
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
             console.log("conversion factor---", manualTaggingList[j].conversionFactor);
-            data[9] = `=ROUND(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty,4)`;
+            data[9] = Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
                 data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1);
             } else {
                 data[10] = ""
             }
-            data[11] = `=ROUND((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)),4)`;
+            data[11] = Math.round((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
             data[12] = manualTaggingList[j].notes
             data[13] = 0
             data[14] = manualTaggingList[j].orderNo
@@ -719,13 +719,13 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.mt.parentShipmentId'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    // mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.mt.childShipmentId'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    // mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1267,7 +1267,7 @@ export default class ShipmentLinkingNotifications extends Component {
             // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
-            return dateMonthAsWord;
+            return dateMonthAsWord.toUpperCase();
         } else {
             return "";
         }
@@ -1326,13 +1326,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     )
                 }
             },
-            {
-                dataField: 'erpOrderId',
-                text: 'ERP Order Id',
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
+            
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
@@ -1554,7 +1548,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         </Modal>
                         {/* Consumption modal */}
                         <div className="col-md-12 pl-0">
-                            <div id="tableDiv1" className="jexcelremoveReadonlybackground">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable">
                             </div>
                         </div>
                         <div className="col-md-12 pl-0">
