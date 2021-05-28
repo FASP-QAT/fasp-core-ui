@@ -2467,6 +2467,8 @@ export default class ManualTagging extends Component {
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
+
+                        listArray = listArray.filter(c => (c.active == true))
                         this.setState({
                             planningUnits: listArray
                         }, () => {
