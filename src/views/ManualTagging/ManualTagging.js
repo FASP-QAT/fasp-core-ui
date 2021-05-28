@@ -354,8 +354,14 @@ export default class ManualTagging extends Component {
         // let planningUnitId = this.state.planningUnitIdUpdated;
         ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.shipmentId;
+                    var itemLabelB = b.shipmentId;
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    notLinkedShipments: response.data
+                    notLinkedShipments: listArray
                 });
             }).catch(
                 error => {
@@ -589,6 +595,8 @@ export default class ManualTagging extends Component {
                 active5: false,
                 checkboxValue: false,
                 tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -598,6 +606,8 @@ export default class ManualTagging extends Component {
                 active5: true,
                 checkboxValue: false,
                 tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         }
     }
@@ -950,17 +960,17 @@ export default class ManualTagging extends Component {
             }
             else {
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    console.log("value---",parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    console.log("value---", parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
                     qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
         }
-        console.log("qty---",qty);
+        console.log("qty---", qty);
         if (validation == true) {
 
             this.setState({
-                displaySubmitButton: (count > 0 ? true : false),
+                displaySubmitButton: (count > 0 ? (this.state.active3 ? ((this.state.active4 || this.state.active5) ? true : false) : true) : false),
                 totalQuantity: this.addCommas(qty),
                 displayTotalQty: (count > 0 ? true : false)
             })
@@ -1381,15 +1391,18 @@ export default class ManualTagging extends Component {
             fundingSourceId: -1,
             budgetId: -1
         })
-        let productCategoryIdList = this.state.productCategoryValues.map(ele => (ele.value).toString())
-        let planningUnitIdList = this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        let planningUnitIdList = this.state.planningUnitValues.length == this.state.planningUnits1.length && this.state.planningUnitValues.length != 0 ? [] : (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
         var json = {
             countryId: countryId,
             productCategoryIdList: productCategoryIdList,
             planningUnitIdList: planningUnitIdList,
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
         }
-        if ((productCategoryIdList != null && productCategoryIdList != "") || (planningUnitIdList != null && planningUnitIdList != "")) {
+        console.log("length1---",this.state.planningUnitValues.length);
+        console.log("length2---",this.state.planningUnits1.length);
+        console.log("json---", json);
+        if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             ManualTaggingService.getShipmentListForManualTagging(json)
                 .then(response => {
                     this.setState({
@@ -3044,7 +3057,7 @@ export default class ManualTagging extends Component {
                                                         value={this.state.countryId}
                                                         onChange={(e) => { this.countryChange(e); }}
                                                     >
-                                                        <option value="-1">{i18n.t('static.common.all')}</option>
+                                                        <option value="-1">{i18n.t('static.common.select')}</option>
                                                         {countries}
                                                     </Input>
                                                 </InputGroup>
