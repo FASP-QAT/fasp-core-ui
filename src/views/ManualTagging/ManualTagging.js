@@ -1385,15 +1385,18 @@ export default class ManualTagging extends Component {
             fundingSourceId: -1,
             budgetId: -1
         })
-        let productCategoryIdList = this.state.productCategoryValues.map(ele => (ele.value).toString())
-        let planningUnitIdList = this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        let planningUnitIdList = this.state.planningUnitValues.length == this.state.planningUnits1.length && this.state.planningUnitValues.length != 0 ? [] : (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
         var json = {
             countryId: countryId,
             productCategoryIdList: productCategoryIdList,
             planningUnitIdList: planningUnitIdList,
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
         }
-        if ((productCategoryIdList != null && productCategoryIdList != "") || (planningUnitIdList != null && planningUnitIdList != "")) {
+        console.log("length1---",this.state.planningUnitValues.length);
+        console.log("length2---",this.state.planningUnits1.length);
+        console.log("json---", json);
+        if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             ManualTaggingService.getShipmentListForManualTagging(json)
                 .then(response => {
                     this.setState({
