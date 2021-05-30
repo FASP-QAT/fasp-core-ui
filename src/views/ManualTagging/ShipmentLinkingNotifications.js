@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT,JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -100,17 +100,22 @@ export default class ShipmentLinkingNotifications extends Component {
 
     displayButton() {
         var validation = this.checkValidation();
-        if (validation == true) {
-            var tableJson = this.el.getJson(null, false);
-            let count = 0;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
-                    count++;
-                }
+        var tableJson = this.el.getJson(null, false);
+        let count = 0;
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
+                count++;
             }
+        }
+        if (validation == true) {
+
             this.setState({
                 displaySubmitButton: (count > 0 ? true : false)
+            })
+        } else {
+            this.setState({
+                displaySubmitButton: false
             })
         }
     }
@@ -122,7 +127,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.actionCancelled'))
     }
     updateDetails() {
         document.getElementById('div2').style.display = 'block';
@@ -278,11 +283,12 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
+                   
                 }
 
             }
+            var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
         }
 
         // if (x == 9) {
@@ -758,19 +764,19 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.'
+                    mask: '#,##.0000', decimal: '.'
                 },
 
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
 
@@ -900,7 +906,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         responseData = responseData.sort(function (a, b) {
                                             var dateA = a.erpOrderId;
                                             var dateB = b.erpOrderId;
-                                            return dateA > dateB ? 1 : -1;
+                                            return dateA < dateB ? 1 : -1;
                                         })
                                         console.log("DATA---->3", responseData);
 
@@ -1326,7 +1332,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     )
                 }
             },
-            
+
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),

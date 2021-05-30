@@ -1206,6 +1206,7 @@ export default class ManualTagging extends Component {
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
                 .then(response => {
+                    console.log("response.data------",response.data)
                     this.setState({
                         artmisList: response.data,
                         displayButton: false
