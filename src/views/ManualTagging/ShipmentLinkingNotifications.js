@@ -24,7 +24,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
 
 
-const entityname = i18n.t('static.dashboard.manualTagging');
+const entityname = i18n.t('static.mt.shipmentLinkingNotification');
 export default class ShipmentLinkingNotifications extends Component {
 
     constructor(props) {
@@ -183,6 +183,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                 color: 'red',
                                 loading: false,
                                 loading1: false
+                            }, () => {
+                                this.hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -201,6 +203,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
@@ -209,6 +213,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
@@ -217,6 +223,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }
@@ -283,7 +291,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                   
+
                 }
 
             }
@@ -366,6 +374,7 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
     filterData = (planningUnitIds) => {
+        document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
         var addressed = document.getElementById("addressed").value;
 
@@ -403,7 +412,10 @@ export default class ShipmentLinkingNotifications extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -419,19 +431,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                 }
@@ -526,7 +547,10 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
+                            color: 'red',
                             loading: false
+                        }, () => {
+                            this.hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -542,19 +566,28 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                         }
@@ -920,7 +953,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
+                                                    color: 'red',
                                                     loading: false
+                                                }, () => {
+                                                    this.hideSecondComponent();
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -936,19 +972,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                 }
@@ -1143,7 +1188,10 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
+                            color: 'red',
                             loading: false
+                        }, () => {
+                            this.hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1159,19 +1207,28 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                         }
@@ -1220,7 +1277,10 @@ export default class ShipmentLinkingNotifications extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
+                                color: 'red',
                                 loading: false
+                            }, () => {
+                                this.hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1236,19 +1296,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }
