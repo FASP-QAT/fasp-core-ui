@@ -519,8 +519,6 @@ export default class ManualTagging extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
 
-                    console.log("my value-----------------------", Math.round(qty * (value != null && value != "" ? value : 1)));
-
                     // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
                     // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                 }

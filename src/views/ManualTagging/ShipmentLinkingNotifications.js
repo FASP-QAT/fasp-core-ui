@@ -108,6 +108,8 @@ export default class ShipmentLinkingNotifications extends Component {
                 count++;
             }
         }
+        console.log("count---", count);
+        console.log("validation---", validation)
         if (validation == true) {
 
             this.setState({
@@ -247,23 +249,33 @@ export default class ShipmentLinkingNotifications extends Component {
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 value = value.replace(/,/g, "");
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
+                var notificationType = this.el.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (notificationType == 2) {
+                    if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        console.log("------------------1----------------------")
                         valid = false;
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
+                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            console.log("------------------2----------------------")
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                            console.log("------------------3----------------------")
+                        }
 
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    console.log("------------------4----------------------")
                 }
 
             }
@@ -282,15 +294,18 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                console.log("------------------5----------------------")
             } else {
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    console.log("------------------6----------------------")
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
+                    console.log("------------------7----------------------")
 
                 }
 
@@ -309,8 +324,13 @@ export default class ShipmentLinkingNotifications extends Component {
             if (x == 0) {
                 value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 if (value === "false") {
+                    this.el.setValueFromCoords(10, y, "", true);
+                    this.el.setValueFromCoords(12, y, "", true);
+                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    this.el.setValueFromCoords(11, y, Math.round(qty), true);
                     this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
                     this.el.setComments(("K").concat(parseInt(y) + 1), "");
+                    console.log("------------------8----------------------")  
                 }
             }
         }
@@ -880,9 +900,14 @@ export default class ShipmentLinkingNotifications extends Component {
 
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
-
-                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
+                        if (rowData[0]) {
+                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        } 
+                        else {
+                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        }
 
                         cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
