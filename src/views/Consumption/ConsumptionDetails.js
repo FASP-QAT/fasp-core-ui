@@ -80,16 +80,16 @@ export default class ConsumptionDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.report.consumptionDate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
-            { header: i18n.t('static.inventory.region'), key: 'name', width: 25 },
+            { header: i18n.t('static.pipeline.consumptionDate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.consumption.consumptionType'), key: 'name', width: 40 },
-            { header: i18n.t('static.dashboard.datasource'), key: 'name', width: 40 },
+            { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
             { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 32 },
             { header: i18n.t('static.supplyPlan.quantityCountryProduct'), key: 'name', width: 32 },
             { header: i18n.t('static.unit.multiplierFromARUTOPU'), key: 'name', width: 12 },
             { header: i18n.t('static.supplyPlan.quantityPU'), key: 'name', width: 12 },
             { header: i18n.t('static.consumption.daysofstockout'), key: 'name', width: 25 },
-            { header: i18n.t('static.common.note'), key: 'string', width: 25 },
+            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
             { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
         ];
 

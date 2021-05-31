@@ -91,7 +91,7 @@ export default class ShipmentDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
             { header: i18n.t('static.report.id'), key: 'name', width: 25 },
             { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
             { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
