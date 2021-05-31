@@ -1111,7 +1111,7 @@ class Budgets extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2 ) ? item.versionId+'*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -1358,7 +1358,7 @@ class Budgets extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
@@ -1460,76 +1460,78 @@ class Budgets extends Component {
 
                             </div>
                         </Col>
-                        <Col md="12 pl-0">
-                            <div className="row">
-                                {
-                                    this.state.selBudget.length > 0
-                                    &&
-                                    <div className="col-md-12 p-0">
-                                        <div className="col-md-12">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                <HorizontalBar id="cool-canvas" data={bar} options={chartoptions} />
-
-                                            </div>
-                                        </div>
-                                        <div className="col-md-12">
-                                            <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                            </button>
-
-                                        </div>
-                                    </div>}
-
-
-                            </div>
-
-
-
-                            {this.state.show && this.state.selBudget.length > 0 &&
-                                <ToolkitProvider
-                                    keyField="budgetId"
-                                    data={this.state.selBudget}
-                                    columns={columns}
-                                    search={{ searchFormatted: true }}
-                                    hover
-                                    filter={filterFactory()}
-                                >
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <Col md="12 pl-0">
+                                <div className="row">
                                     {
-                                        props => (
-                                            <div>
-                                                <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                    {/*<SearchBar {...props.searchProps} />
-                                                        <ClearSearchButton {...props.searchProps} />*/}
+                                        this.state.selBudget.length > 0
+                                        &&
+                                        <div className="col-md-12 p-0">
+                                            <div className="col-md-12">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    <HorizontalBar id="cool-canvas" data={bar} options={chartoptions} />
+
                                                 </div>
-                                                <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                    // pagination={paginationFactory(options)}
-                                                    rowEvents={{
-                                                        onClick: (e, row, rowIndex) => {
-                                                            console.log("***row",row);
-                                                            window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
-                                                        }
-                                                    }}
-                                                    {...props.baseProps}
-                                                />
                                             </div>
-                                        )
-                                    }
-                                </ToolkitProvider>}
-                        </Col>
-                    </CardBody>
-                </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div className="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            <div className="col-md-12">
+                                                <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                    {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                </button>
 
-                            <div className="spinner-border blue ml-4" role="status">
+                                            </div>
+                                        </div>}
 
+
+                                </div>
+
+
+
+                                {this.state.show && this.state.selBudget.length > 0 &&
+                                    <ToolkitProvider
+                                        keyField="budgetId"
+                                        data={this.state.selBudget}
+                                        columns={columns}
+                                        search={{ searchFormatted: true }}
+                                        hover
+                                        filter={filterFactory()}
+                                    >
+                                        {
+                                            props => (
+                                                <div>
+                                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                        {/*<SearchBar {...props.searchProps} />
+                                                        <ClearSearchButton {...props.searchProps} />*/}
+                                                    </div>
+                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        // pagination={paginationFactory(options)}
+                                                        rowEvents={{
+                                                            onClick: (e, row, rowIndex) => {
+                                                                console.log("***row", row);
+                                                                window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
+                                                            }
+                                                        }}
+                                                        {...props.baseProps}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    </ToolkitProvider>}
+                            </Col>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div className="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div className="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </CardBody>
+                </Card>
+            </div >
         )
     }
 }

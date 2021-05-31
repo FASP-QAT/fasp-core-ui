@@ -940,7 +940,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 var value = this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", "");
                 var map1 = new Map(Object.entries(tableJson[i]));
                 var oldValue = map1.get("10")
-                if (value != oldValue && map1.get("8")>0) {
+                if (value != oldValue && map1.get("8") > 0) {
                     isMultiplierChanged = 1;
                 }
                 console.log("9 map---" + map1.get("9"))
@@ -1048,7 +1048,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             }
                         }
                     );
-            }else{
+            } else {
                 this.setState({
                     loading: false
                 })
@@ -2775,7 +2775,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     {/* <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
@@ -2842,7 +2842,18 @@ export default class RealmCountryPlanningUnitList extends Component {
                         </Form>
 
 
-                        <div id="tableDiv">
+                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </CardBody>
@@ -2862,17 +2873,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     }
 
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         );
     }
