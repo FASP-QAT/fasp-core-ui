@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { OrgDiagram } from 'basicprimitivesreact';
-import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType } from 'basicprimitives';
+import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,7 +12,66 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
 import CardBody from 'reactstrap/lib/CardBody';
 import CardFooter from 'reactstrap/lib/CardFooter';
+import Provider from '../Samples/Provider'
 
+const ItemTypes = {
+    NODE: 'node'
+}
+const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
+    const opacity = isDragging ? 0.4 : 1
+    let itemTitleColor = Colors.RoyalBlue;
+    if (isOver) {
+        if (canDrop) {
+            itemTitleColor = "green";
+        } else {
+            itemTitleColor = "red";
+        }
+    }
+
+    return connectDropTarget(connectDragSource(
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+            <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
+                <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+            </div>
+            <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
+
+        </div>
+    ))
+}
+
+const NodeDragSource = DragSource(
+    ItemTypes.NODE,
+    {
+        beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
+        endDrag(props, monitor) {
+            const { onMoveItem } = props;
+            const item = monitor.getItem()
+            const dropResult = monitor.getDropResult()
+            if (dropResult) {
+                onMoveItem(dropResult.id, item.id);
+            }
+        },
+    },
+    (connect, monitor) => ({
+        connectDragSource: connect.dragSource(),
+        isDragging: monitor.isDragging(),
+    }),
+)(Node);
+const NodeDragDropSource = DropTarget(
+    ItemTypes.NODE,
+    {
+        drop: ({ itemConfig }) => ({ id: itemConfig.id }),
+        canDrop: ({ canDropItem, itemConfig }, monitor) => {
+            const { id } = monitor.getItem();
+            return canDropItem(itemConfig.id, id);
+        },
+    },
+    (connect, monitor) => ({
+        connectDropTarget: connect.dropTarget(),
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+    }),
+)(NodeDragSource);
 
 export default class MorbidityScenarioOne extends Component {
     constructor() {
@@ -25,6 +84,7 @@ export default class MorbidityScenarioOne extends Component {
         this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
         this.onHighlightChanged = this.onHighlightChanged.bind(this);
         this.onCursoChanged = this.onCursoChanged.bind(this);
+        this.resetTree = this.resetTree.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
@@ -36,6 +96,10 @@ export default class MorbidityScenarioOne extends Component {
             items: TreeData.morbidity_scenario_one,
             currentItemConfig: {}
         }
+    }
+
+    resetTree() {
+        this.setState({ items: TreeData.morbidity_scenario_one });
     }
     dataChange(event) {
         // alert("hi");
@@ -208,69 +272,54 @@ export default class MorbidityScenarioOne extends Component {
         });
     }
 
-
     render() {
-        console.log("this.state+++", this.state);
-        const ItemTypes = {
-            NODE: 'node'
-        }
-
-        const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
-            const opacity = isDragging ? 0.4 : 1
-            let itemTitleColor = Colors.RoyalBlue;
-            if (isOver) {
-                if (canDrop) {
-                    itemTitleColor = "green";
-                } else {
-                    itemTitleColor = "red";
-                }
+        // console.log("this.state+++", this.state);
+        let treeLevel = this.state.items.length;
+        const treeLevelItems = []
+        for (var i = 0; i <= treeLevel; i++) {
+            if (i == 0) {
+                treeLevelItems.push({
+                    annotationType: AnnotationType.Level,
+                    levels: [0],
+                    title: "Level 0",
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Dotted
+                });
             }
-
-            return connectDropTarget(connectDragSource(
-                <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
-                    <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
-                        <div className="ContactTitle" style={{color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
-                    </div>
-                    <div className="ContactPhone" style={{color:itemConfig.nodeValueColor,left:'2px',top: '31px', width: '95%',height: '36px'}}>{itemConfig.nodeValue}</div>
-
-                </div>
-            ))
+            else if (i % 2 == 0) {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Solid
+                })
+                );
+            }
+            else {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0.08,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Dotted
+                }));
+            }
+            console.log("level json***", treeLevelItems);
         }
-
-        const NodeDragSource = DragSource(
-            ItemTypes.NODE,
-            {
-                beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
-                endDrag(props, monitor) {
-                    const { onMoveItem } = props;
-                    const item = monitor.getItem()
-                    const dropResult = monitor.getDropResult()
-                    if (dropResult) {
-                        onMoveItem(dropResult.id, item.id);
-                    }
-                },
-            },
-            (connect, monitor) => ({
-                connectDragSource: connect.dragSource(),
-                isDragging: monitor.isDragging(),
-            }),
-        )(Node);
-        const NodeDragDropSource = DropTarget(
-            ItemTypes.NODE,
-            {
-                drop: ({ itemConfig }) => ({ id: itemConfig.id }),
-                canDrop: ({ canDropItem, itemConfig }, monitor) => {
-                    const { id } = monitor.getItem();
-                    return canDropItem(itemConfig.id, id);
-                },
-            },
-            (connect, monitor) => ({
-                connectDropTarget: connect.dropTarget(),
-                isOver: monitor.isOver(),
-                canDrop: monitor.canDrop(),
-            }),
-        )(NodeDragSource);
-
         const config = {
             ...this.state,
             // pageFitMode: PageFitMode.Enabled,
@@ -282,7 +331,8 @@ export default class MorbidityScenarioOne extends Component {
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
             // itemTitleFirstFontColor: Colors.White,
-            linesColor:Colors.Black,
+            linesColor: Colors.Black,
+            annotations: treeLevelItems,
             templates: [{
                 name: "contactTemplate",
                 itemSize: { width: 175, height: 75 },
@@ -306,19 +356,21 @@ export default class MorbidityScenarioOne extends Component {
                             <div className="container">
                                 <div class="sample">
                                     {/* <h3>DragNDrop Tree.</h3> */}
-                                    <DndProvider backend={HTML5Backend}>
+                                    <Provider>
                                         <div className="placeholder" style={{ clear: 'both' }} >
-                                            {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                             <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                         </div>
+                                    </Provider>
 
-                                    </DndProvider>
                                 </div>
                             </div>
                         </CardBody>
                         <CardFooter>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
         </div>
+
     }
 }
