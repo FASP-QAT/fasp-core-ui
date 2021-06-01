@@ -394,7 +394,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
                                         }, () => {
-                                            this.props.updateState("currencyList", currencyList);                                            
+                                            this.props.updateState("currencyList", currencyList);
                                             this.props.updateState("dataSourceList", dataSourceList);
                                             this.props.updateState("fundingSourceList", fundingSourceList);
                                             this.props.updateState("procurementAgentList", procurementAgentList);
@@ -1040,6 +1040,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             allowExport: false,
                                                                             onchange: this.shipmentDatesChanged,
                                                                             editable: tableEditable,
+                                                                            onbeforepaste:function(obj,data,x,y){
+                                                                                return false;
+                                                                            },
                                                                             contextMenu: function (obj, x, y, e) {
                                                                                 var items = [];
                                                                                 return items;
@@ -1888,7 +1891,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 4) {
-            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -2030,7 +2033,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(31, y, 1, true);
             }
 
-            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -2500,7 +2503,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
                 if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
@@ -2573,7 +2576,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
                     valid = false;
                 }
-                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
+                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 } else {
@@ -3144,7 +3147,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     },
                     productCost: productCost.toString().replaceAll("\,", ""),
                     shipmentId: 0,
-                    batchInfoList:[]
+                    batchInfoList: []
                 }
                 shipmentListAfterUpdate.push(shipmentJson);
             }
@@ -3241,7 +3244,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+                var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
                 if (validation == false) {
                     valid = false;
                 } else {

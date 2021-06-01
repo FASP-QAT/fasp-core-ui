@@ -808,7 +808,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(15, y, 1, true);
         }
         if (x == 0) {
-            var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
             } else {
@@ -1448,7 +1448,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         positiveValidation(colArr[c], y, elInstance);
                     }
                     var col = ("C").concat(parseInt(y) + 1);
-                    var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                    var validation = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
