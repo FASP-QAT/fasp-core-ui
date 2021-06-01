@@ -93,7 +93,7 @@ export default class ShipmentDetails extends React.Component {
         worksheet.columns = [
             { header: i18n.t('static.common.active'), key: 'string', width: 25 },
             { header: i18n.t('static.report.id'), key: 'name', width: 25 },
-            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
             { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
             { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
             { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
@@ -141,6 +141,18 @@ export default class ShipmentDetails extends React.Component {
             showErrorMessage: true,
             // errorStyle: 'error',
             // error: 'Invalid value',
+        });
+
+        worksheet.dataValidations.add('E2:E100', {
+            type: 'date',
+            // operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [new Date()],
+            allowBlank: false,
+            prompt: 'Format (yyyy-dd-mm)',
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
         });
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
