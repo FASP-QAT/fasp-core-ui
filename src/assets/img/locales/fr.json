@@ -1090,6 +1090,7 @@
     "static.commitVersion.problemReportId": "Identifiant du rapport de problème",
     "static.common.action": "Action",
     "static.supplyPlan.stockOut": "Rupture de stock",
+    "static.dataEntry.planningUnitId": "ID de lunité de planification",
     "static.jexcel.clear": "Effacer",
     "static.manualTagging.price": "Prix",
     "static.product.reorderFrequency": "Intervalle de commande en mois",

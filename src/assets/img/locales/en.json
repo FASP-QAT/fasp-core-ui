@@ -1090,6 +1090,7 @@
     "static.commitVersion.problemReportId": "Problem Report ID",
     "static.common.action": "Action",
     "static.supplyPlan.stockOut": "Stock Out",
+    "static.dataEntry.planningUnitId": "Planning Unit Id",
     "static.jexcel.clear": "Clear",
     "static.manualTagging.price": "Total Cost (USD)",
     "static.product.reorderFrequency": "Reorder Interval In Months",
