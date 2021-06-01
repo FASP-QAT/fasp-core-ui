@@ -2003,7 +2003,7 @@ export default class ManualTagging extends Component {
                 data[7] = manualTaggingList[j].shipmentQty
                 data[8] = manualTaggingList[j].notes
             } else if (this.state.active2) {
-                let shipmentQty = (manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
+                let shipmentQty = manualTaggingList[j].shipmentQty;
                 data[0] = manualTaggingList[j].parentShipmentId
                 data[1] = manualTaggingList[j].shipmentId
                 data[2] = manualTaggingList[j].shipmentTransId
@@ -2011,10 +2011,8 @@ export default class ManualTagging extends Component {
                 data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                 data[6] = manualTaggingList[j].expectedDeliveryDate
-                // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                 data[7] = manualTaggingList[j].erpStatus
-                // `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                data[8] = Math.round((manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)))
+                data[8] = Math.round(manualTaggingList[j].shipmentQty)
                 data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
                 data[10] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
                 data[11] = manualTaggingList[j].notes
