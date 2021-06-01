@@ -1884,6 +1884,7 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.erpShipmentQty'),
+                    type: 'numeric',
                     mask: '#,##', decimal: '.',
                     readOnly: true
                 },
@@ -1898,6 +1899,7 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
+                    type: 'numeric',
                     mask: '#,##', decimal: '.',
                     readOnly: true
                 },
