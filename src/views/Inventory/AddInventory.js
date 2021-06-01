@@ -103,6 +103,18 @@ export default class AddInventory extends Component {
         });
 
 
+        worksheet.dataValidations.add('A2:A100', {
+            type: 'date',
+            // operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [new Date()],
+            allowBlank: false,
+            prompt: 'Format (yyyy-dd-mm)',
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
         //2 Dropdown
         let dataSourceVar = [];
         let datasourceList = this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
