@@ -140,6 +140,7 @@ export default class ManualTagging extends Component {
         this.toggle = this.toggle.bind(this);
         this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
 
     }
 
@@ -562,20 +563,34 @@ export default class ManualTagging extends Component {
         this.el.setValueFromCoords(10, y, 1, true);
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[3]));
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        }
+        elInstance.setValueFromCoords(10, y, 1, true);
+    }
+
     onPaste(instance, data) {
-        // var z = -1;
-        // for (var i = 0; i < data.length; i++) {
-        //     if (z != data[i].y) {
-        //         var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-        //         if (index == "" || index == null || index == undefined) {
-        //             (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-        //             (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
-        //             (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-        //             (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-        //             z = data[i].y;
-        //         }
-        //     }
-        // }
+        // console.log("DATA------->", data);
+        // // console.log("DATA------->1", parseFloat(data[0].value));
+
+
+        if (data.length == 1 && Object.keys(data[0])[2] == "value") {
+            (instance.jexcel).setValueFromCoords(7, data[0].y, parseFloat(data[0].value), true);
+        }
+        else {
+            for (var i = 0; i < data.length; i++) {
+                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+            }
+        }
+
+
+
+
     }
 
     dataChangeCheckbox(event) {
@@ -1204,7 +1219,7 @@ export default class ManualTagging extends Component {
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
                 .then(response => {
-                    console.log("response.data------",response.data)
+                    console.log("response.data------", response.data)
                     this.setState({
                         artmisList: response.data,
                         displayButton: false
@@ -1390,7 +1405,7 @@ export default class ManualTagging extends Component {
             fundingSourceId: -1,
             budgetId: -1
         })
-        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
         let planningUnitIdList = this.state.planningUnitValues.length == this.state.planningUnits1.length && this.state.planningUnitValues.length != 0 ? [] : (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
         var json = {
             countryId: countryId,
@@ -1398,8 +1413,8 @@ export default class ManualTagging extends Component {
             planningUnitIdList: planningUnitIdList,
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
         }
-        console.log("length1---",this.state.planningUnitValues.length);
-        console.log("length2---",this.state.planningUnits1.length);
+        console.log("length1---", this.state.planningUnitValues.length);
+        console.log("length2---", this.state.planningUnits1.length);
         console.log("json---", json);
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             ManualTaggingService.getShipmentListForManualTagging(json)
@@ -1874,7 +1889,12 @@ export default class ManualTagging extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
-                    mask: '#,##.0000', decimal: '.'
+                    type: 'numeric',
+                    mask: '#,##.0000',
+                    decimal: '.',
+                    textEditor: true,
+                    disabledMaskOnEdition: true
+
                 },
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
@@ -1935,7 +1955,7 @@ export default class ManualTagging extends Component {
                     }
                 }
             }.bind(this),
-            oneditionend: this.onedit,
+            oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
