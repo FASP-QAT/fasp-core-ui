@@ -20,6 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 // routes config
 //import routes from '../../routes';
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
+import ManualTaggingService from '../../api/ManualTaggingService.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const ChangeInLocalProgramVersion = React.lazy(() => import('../../CommonComponent/ChangeInLocalProgramVersion'));
@@ -46,6 +47,7 @@ const AddSubFundingSource = React.lazy(() => import('../../views/SubFundingSourc
 const ListSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/EditSubFundingSourceComponent'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard'));
+const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
 const RealmDashboard = React.lazy(() => import('../../views/RealmDashboard'));
 const ProgramDashboard = React.lazy(() => import('../../views/ProgramDashboard'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
@@ -361,6 +363,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
+  { path: '/shipmentLinkingNotification', exact: true, name: 'static.mt.shipmentLinkingNotification', component: ShipmentLinkingNotifications },
 
   { path: '/RealmDashboard', name: 'static.dashboard.realmdashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'static.dashboard.programdashboard', component: ProgramDashboard },
@@ -537,7 +540,8 @@ const routes = [
   { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
-  { path: '/report/shipmentSummery/:message', name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
+  { path: '/report/shipmentSummery/:message',exact:true,name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
+  { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
@@ -629,6 +633,7 @@ class DefaultLayout extends Component {
     this.state = {
       businessFunctions: [],
       name: "",
+      notificationCount: 0,
       //Timer
       // 15 min
       // timeout: 1000 * 450 * 1,
@@ -648,6 +653,8 @@ class DefaultLayout extends Component {
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
     this.getProgramData = this.getProgramData.bind(this);
+    this.getNotificationCount = this.getNotificationCount.bind(this);
+
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
@@ -687,6 +694,7 @@ class DefaultLayout extends Component {
     if (this.state.name !== name) {
       console.log("P*** Call indexed db methods0---------------------------")
       this.getProgramData();
+      this.getNotificationCount();
       // this.getDownloadedPrograms();
       // this.checkIfLocalProgramVersionChanged();
       this.setState({
@@ -753,11 +761,34 @@ class DefaultLayout extends Component {
     }
 
   }
+  showShipmentLinkingAlerts(e) {
+    e.preventDefault();
+    this.props.history.push(`/shipmentLinkingNotification`)
+  }
   showDashboard(e) {
     // console.log("e------------------", e);
     e.preventDefault();
     var id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}`)
+  }
+
+  getNotificationCount() {
+    if (isSiteOnline()) {
+      AuthenticationService.setupAxiosInterceptors();
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
+          this.setState({
+            notificationCount: response.data
+          })
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
+    }
   }
   getProgramData() {
     console.log("P***get programs called");
@@ -947,7 +978,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -1499,8 +1530,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.supplyPlandata'),
                         icon: 'fa fa-list',
                         attributes: {
-                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_DELINKING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
+                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT')) ? false : true)
                         },
                         children: [
                           {
@@ -1527,11 +1557,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-truck',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
                           },
+
                           {
-                            name: i18n.t('static.dashboard.delinking'),
-                            url: '/shipment/delinking',
-                            icon: 'fa fa-chain-broken',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELINKING') ? false : true) }
+                            name: i18n.t('static.mt.shipmentLinkingNotification'),
+                            url: '/shipmentLinkingNotification',
+                            icon: 'fa fa-truck',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') ? false : true) }
                           },
                           {
                             name: i18n.t('static.quantimed.quantimedImport'),

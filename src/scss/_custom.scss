@@ -2653,8 +2653,16 @@ input::placeholder {
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
 
-  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 165px !important; }
-  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(7){ width: 165px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(7){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(1){ width: 10px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(2){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(3){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(4){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(8){ width: 50px !important; }
+  .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(9){ width: 50px !important; }
+  
   .expand-button {
     position: relative;
   }
@@ -3924,6 +3932,9 @@ color: #000000!important;
 .selection-cell-header{
   text-align: center;
 }
+.selection-cell{
+  text-align: center;
+}
 
 .jtabs .jtabs-content > div.jtabs-selected {
   display: grid!important;
@@ -3934,6 +3945,17 @@ color: #000000!important;
   background: #c1c1c1!important;
 }
 
+.checkinlinedisplay{
+  display: inline-flex !important;
+  align-items: center;
+    padding-left: 0;
+    margin-right: 0.75rem;
+}
+
 .hideCross .close span{
   display: none !important;
+}
+
+.ShipmentSummeryReportMarginTop {
+  margin-top: -38px;
 }

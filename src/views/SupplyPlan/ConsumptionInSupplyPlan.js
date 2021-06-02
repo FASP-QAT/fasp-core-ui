@@ -787,9 +787,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     positiveValidation("F", y, elInstance)
                 }
-                if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
-                    this.batchDetailsClicked(elInstance, x, y, "", true);
-                }
+                // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
+                //     this.batchDetailsClicked(elInstance, x, y, "", true);
+                // }
             }
         }
 
@@ -844,9 +844,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
-                    if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
-                        this.batchDetailsClicked(elInstance, x, y, "", true);
-                    }
+                    // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
+                    //     this.batchDetailsClicked(elInstance, x, y, "", true);
+                    // }
                 }
             }
             if (rowData[2] == 2) {

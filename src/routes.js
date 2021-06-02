@@ -20,6 +20,7 @@ const AddSubFundingSource = React.lazy(() => import('./views/SubFundingSource/Ad
 const ListSubFundingSource = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/SubFundingSource/EditSubFundingSourceComponent'));
 const ApplicationDashboard = React.lazy(() => import('./views/ApplicationDashboard'));
+const ShipmentLinkingNotifications = React.lazy(() => import('./views/ManualTagging/ShipmentLinkingNotifications'));
 const RealmDashboard = React.lazy(() => import('./views/RealmDashboard'));
 const ProgramDashboard = React.lazy(() => import('./views/ProgramDashboard'));
 const AddFundingSource = React.lazy(() => import('./views/FundingSource/AddFundingSourceComponent'));
@@ -327,7 +328,8 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-
+  
+  { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },

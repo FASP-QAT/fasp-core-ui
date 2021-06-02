@@ -1143,18 +1143,26 @@ class GlobalConsumption extends Component {
 
 
     const backgroundColor = [
-      '#002f6c',
-      '#118b70',
-      '#EDB944',
-      '#20a8d8',
-      '#d1e3f5',
-      '#212721',
-      '#4dbd74',
-      '#f86c6b',
-      '#F48521',
-      '#ED5626',
-      '#cfcdc9',
-      '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+      // '#002f6c',
+      // '#118b70',
+      // '#EDB944',
+      // '#20a8d8',
+      // '#d1e3f5',
+      // '#212721',
+      // '#4dbd74',
+      // '#f86c6b',
+      // '#F48521',
+      // '#ED5626',
+      // '#cfcdc9',
+      // '#004876', '#0063a0', '#007ecc', '#0093ee', '#82caf8', '#c8e6f4'
+
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
 
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];

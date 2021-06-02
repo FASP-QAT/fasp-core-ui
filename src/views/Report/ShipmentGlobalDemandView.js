@@ -2234,14 +2234,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#6a82a8',
+                backgroundColor: '#205493',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#dee7f8',
+                backgroundColor: '#a7c6ed',
                 borderWidth: 0,
             }
             ]
@@ -2251,13 +2251,22 @@ class ShipmentGlobalDemandView extends Component {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
-                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
-                    '#042e6a',
-                    '#59cacc', '#118b70',
-                    '#EDB944',
-                    '#F48521',
-                    '#ED5626',
-                    '#3fe488'],
+                // backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944', '#20a8d8',
+                //     '#042e6a',
+                //     '#59cacc', '#118b70',
+                //     '#EDB944',
+                //     '#F48521',
+                //     '#ED5626',
+                //     '#3fe488'],
+                backgroundColor: [
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                ],
                 legend: {
                     position: 'bottom'
                 }

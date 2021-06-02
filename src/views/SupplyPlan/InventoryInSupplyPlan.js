@@ -185,7 +185,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
-                                    active: dataSourceResult[k].active
+                                    active: dataSourceResult[k].active,
+                                    label:dataSourceResult[k].label
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -864,9 +865,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         } else {
                             positiveValidation("F", y, elInstance)
                         }
-                        if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                            this.batchDetailsClicked(elInstance, x, y, "", true)
-                        }
+                        // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                        //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                        // }
                     }
                 }
             }
@@ -890,9 +891,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("G", y, elInstance)
                     }
-                    if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
-                        this.batchDetailsClicked(elInstance, x, y, "", true)
-                    }
+                    // if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && Number(elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != 0) {
+                    //     this.batchDetailsClicked(elInstance, x, y, "", true)
+                    // }
                 }
             } else {
                 var batchDetails = rowData[13];
