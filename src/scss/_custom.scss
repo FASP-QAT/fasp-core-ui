@@ -4012,3 +4012,39 @@ color: #000000!important;
 .ShipmentSummeryReportMarginTop {
   margin-top: -38px;
 }
+// CSS for mod1 and mod2 tabs
+.itemWhidth{
+  width:100px!important;
+  text-align:center!important;
+}
+@media (min-width: 992px){
+  .itemWhidth{
+    width:0px;
+    text-align:center;
+  }
+  .sidebar-minimized .sidebar .nav-item:hover > .nav-link.bgColourRemoveItem{
+    background: none!important;
+  }
+.sidebar-minimized .sidebar .nav-link.bgColourRemoveLink  {
+    width: 0px !important;
+    background:none!important;
+    color: #fff !important;
+}
+  .sidebar-minimized .sidebar .nav-link :hover .bgColourRemoveLink{
+    background: none!important; 
+  }
+  }
+  
+  @media (min-width: 992px){
+  .sidebar-minimized .sidebar .nav.nav-tabs.marginTopTabs {
+    width: 50px;
+    margin-top: -143px!important;
+
+  }
+}
+.module1{
+  background-color:#c4d2e4!important;
+}
+.module2{
+  background-color:#d9ead3!important;
+}
