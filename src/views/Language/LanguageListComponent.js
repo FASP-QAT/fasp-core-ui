@@ -385,7 +385,7 @@ export default class LanguageListComponent extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [0,150, 150,150, 100,100,100],
+                                colWidths: [0, 150, 150, 150, 100, 100, 100],
                                 colHeaderClasses: ["Reqasterisk"],
                                 columns: [
                                     {
@@ -558,7 +558,7 @@ export default class LanguageListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className=" pt-md-1 pb-md-1 table-responsive">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_LANGUAGE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
                         </div>
 
                     </CardBody>
