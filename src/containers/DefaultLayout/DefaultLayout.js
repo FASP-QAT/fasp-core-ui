@@ -1272,6 +1272,11 @@ class DefaultLayout extends Component {
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      //supply planning
+                      {
+                        name: "Supply Planning",
+                        icon: 'fa fa-list',
+                        children: [
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         // url: '/program',
@@ -2018,7 +2023,8 @@ class DefaultLayout extends Component {
                             ]
                           },
 
-
+                        ]
+                      },
                           // //3) Shipment Reports
                           // {
                           //   name: i18n.t('static.report.shipmentReports'),
@@ -2123,9 +2129,89 @@ class DefaultLayout extends Component {
 
 
                         ]
-                      }
+                      },
 
-
+//Forcast Data Module 2
+{
+  name: "Forcast Data Module 2",
+  icon: 'fa fa-list',
+  children: [
+  {
+  name: "Dataset management",
+  url: '/supplyPlan',
+  icon: 'fa fa-list-alt',
+  children: [
+  {
+  name: "Load Dataset",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  
+  },
+  {
+  name: "Load Cosmption",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  
+  },
+  {
+  name: "Commit",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  
+  },
+  
+  
+  ]
+  },
+  {
+  name: "Tree Design",
+  url: '/supplyPlan',
+  icon: 'fa fa-list-alt',
+  children: [
+  {
+  name: "High Level",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  },
+  {
+  name: "Lower Level/Dosing",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  },
+  {
+  name: "Input Reports",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  },
+  ]
+  },
+  {
+  name: "Forcast Outputs",
+  url: '/supplyPlan',
+  icon: 'fa fa-list-alt',
+  children: [
+  {
+  name: "Compare Scenarios",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  },
+  {
+  name: "Output Reports",
+  url: '/report/stockStatusAcrossPlanningUnits',
+  icon: 'fa fa-exchange',
+  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') ? false : true) }
+  },
+  ]
+  }
+  ]
+  },
 
 
 
