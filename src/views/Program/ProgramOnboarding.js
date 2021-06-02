@@ -75,15 +75,17 @@ export default class ProgramOnboarding extends Component {
 
                 plannedToSubmittedLeadTime:PLANNED_TO_SUBMITTED,
                 
-                healthArea: {
-                    id: ''
-                },
+                // healthArea: {
+                //     id: ''
+                // },
                 programNotes: '',
                 regionArray: [],
+                healthAreaArray: [],
                 programPlanningUnits: []
             },
             lang: localStorage.getItem('lang'),
             regionId: '',
+            healthAreaId:'',
             realmList: [],
             realmCountryList: [],
             organisationList: [],
@@ -103,6 +105,7 @@ export default class ProgramOnboarding extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
 
 
 
@@ -461,7 +464,7 @@ export default class ProgramOnboarding extends Component {
             this.refs.regionChild.getRegionList();
 
             program.organisation.id = '';
-            program.healthArea.id = '';
+            program.healthAreaArray = [];
             program.regionArray = [];
 
         } if (event.target.name == 'organisationId') {
@@ -655,6 +658,18 @@ export default class ProgramOnboarding extends Component {
             regionIdArray[i] = regionId[i].value;
         }
         program.regionArray = regionIdArray;
+        this.setState({ program: program });
+    }
+
+    updateFieldDataHealthArea(value) {
+        let { program } = this.state;
+        this.setState({ healthAreaId: value });
+        var healthAreaId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
     }
 
@@ -875,7 +890,7 @@ export default class ProgramOnboarding extends Component {
 
                                 </div>
                                 <div id="stepThree">
-                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state} generateHealthAreaCode={this.generateHealthAreaCode}></StepThree>
+                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} updateFieldDataHealthArea={this.updateFieldDataHealthArea} items={this.state} generateHealthAreaCode={this.generateHealthAreaCode}></StepThree>
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
