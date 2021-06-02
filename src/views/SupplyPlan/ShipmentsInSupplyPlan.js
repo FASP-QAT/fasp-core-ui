@@ -1901,7 +1901,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 4) {
-            var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
+            var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -2043,7 +2043,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(31, y, 1, true);
             }
 
-            var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
+            var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -3254,7 +3254,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("dateWithInvalid", "E", y, rowData[4], elInstance, "", "", "", 4);
+                var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
                 if (validation == false) {
                     valid = false;
                 } else {
