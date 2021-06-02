@@ -504,6 +504,10 @@ label.arrow_label:after {
   border: 1px solid #e5e7e8;
 }
 
+.reactTableNotification .react-bootstrap-table{
+  max-height: 300px !important;
+}
+
 .react-bootstrap-table-pagination {
   margin-top: 10px;
 }
@@ -932,6 +936,23 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
+
+.RowClickable .jexcel_content .jexcel tbody.draggable tr{ 
+  cursor: pointer;
+}
+
+.table-hover{
+  cursor: pointer;
+}
+ 
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(3){
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(4){
+  cursor: pointer;
+}
+
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
@@ -1274,6 +1295,7 @@ a:hover {
 .hoverTd:hover {
   background-color: #e5e5e5;
   color: #000!important;
+  cursor: pointer;
 }
 
 .modalWidth {
@@ -1445,7 +1467,6 @@ h5,
 
 .table {
   color: #212721 !important;
-  cursor: pointer !important;
 }
 
 .btn-secondary {
@@ -2653,6 +2674,13 @@ input::placeholder {
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
   .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
 
+
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(1){ width: 10px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(2){ width: 170px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(4){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 120px !important; }
+  .FortablewidthMannualtaggingtable3 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 120px !important; }
+
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(6){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(7){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(1){ width: 10px !important; }
@@ -2662,7 +2690,8 @@ input::placeholder {
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(5){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(8){ width: 50px !important; }
   .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(9){ width: 50px !important; }
-  
+  .ShipmentNotificationtable .react-bootstrap-table .table thead tr th:nth-child(0){ width: 50% !important; }
+  .ShipmentNotificationtable .react-bootstrap-table .table thead tr th:nth-child(1){ width: 50% !important; }
   .expand-button {
     position: relative;
   }
@@ -3899,6 +3928,7 @@ background-color: yellow;
   height: auto !important;
 }
 .FortablewidthMannualtaggingtable2 .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
+.FortablewidthMannualtaggingtable3 .react-bootstrap-table .table td:nth-child(1){width: 150px !important;}
 
 .highCriticality{
 background-color: #f48282!important;
@@ -3956,6 +3986,29 @@ color: #000000!important;
   display: none !important;
 }
 
+.list-groupMt{
+  margin-bottom: -11px !important;
+}
+.list-summer-iconMt{
+  font-size: 10px !important;
+    color: #000 !important;
+    margin-top: 3px !important;
+}
+
+.list-summer-iconMt1{
+  font-size: 8px !important;
+    color: #000 !important;
+    margin-top: 3px !important;
+}
+
+.eyeIconFontSize{
+  font-size: 19px;
+  cursor: pointer !important;
+}
+
+// .reactTableNotification table{
+//   height: 300px !important;
+// }
 .ShipmentSummeryReportMarginTop {
   margin-top: -38px;
 }

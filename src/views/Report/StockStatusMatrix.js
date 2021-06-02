@@ -1913,7 +1913,7 @@ export default class StockStatusMatrix extends React.Component {
             </div>
             <div class="TableCust">
               {this.state.data.length > 0 &&
-                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                <Table striped bordered responsive="md" style={{ width: "100%" }}>
                   <thead>
                     <tr>
                       <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>

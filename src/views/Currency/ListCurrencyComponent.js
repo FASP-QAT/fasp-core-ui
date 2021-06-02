@@ -601,7 +601,7 @@ export default class CurrencyListComponent extends Component {
                     </div>
                     <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground"></div>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_CURRENCY') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}></div>
                     </CardBody>
                 </Card>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
