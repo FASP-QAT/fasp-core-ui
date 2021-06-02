@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
+import { Formik } from 'formik';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
-  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
+  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader,
+  FormFeedback
 } from 'reactstrap';
+import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED,SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -26,6 +29,39 @@ import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 
 const entityname = i18n.t('static.dashboard.commitVersion')
+
+const initialValues = {
+  notes:''
+}
+
+const validationSchema = function (values, t) {
+  return Yup.object().shape({
+      notes: Yup.string()
+          .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+  })
+}
+const validate = (getValidationSchema) => {
+  return (values) => {
+
+      const validationSchema = getValidationSchema(values, i18n.t)
+      try {
+          validationSchema.validateSync(values, { abortEarly: false })
+          return {}
+      } catch (error) {
+          return getErrorsFromValidationError(error)
+      }
+  }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+  const FIRST_ERROR = 0
+  return validationError.inner.reduce((errors, error) => {
+      return {
+          ...errors,
+          [error.path]: error.errors[FIRST_ERROR],
+      }
+  }, {})
+}
 
 export default class syncPage extends Component {
 
@@ -40,7 +76,8 @@ export default class syncPage extends Component {
       conflictsCount: 0,
       loading: true,
       versionType: 1,
-      openCount: 0
+      openCount: 0,
+      notes:''
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -79,8 +116,37 @@ export default class syncPage extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.versionTypeChanged = this.versionTypeChanged.bind(this);
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
+    this.notesChange=this.notesChange.bind(this);
     // this.checkValidations = this.checkValidations.bind(this);
   }
+
+  notesChange(event){
+    this.setState({
+      notes:event.target.value
+    })
+  }
+
+  touchAll(setTouched, errors) {
+    setTouched({
+        notes:true
+    }
+    );
+    this.validateForm(errors);
+}
+validateForm(errors) {
+    this.findFirstError('budgetForm', (fieldName) => {
+        return Boolean(errors[fieldName])
+    })
+}
+findFirstError(formName, hasError) {
+    const form = document.forms[formName]
+    for (let i = 0; i < form.length; i++) {
+        if (hasError(form[i].name)) {
+            form[i].focus()
+            break
+        }
+    }
+}
 
   versionTypeChanged(event) {
     this.setState({
@@ -2821,6 +2887,29 @@ export default class syncPage extends Component {
                 </Form>
                 <div id="detailsDiv">
                   <div className="animated fadeIn">
+                  <Formik
+                                initialValues={initialValues}
+                                validate={validate(validationSchema)}
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                  this.synchronize()
+                                }}
+                                render={
+                                    ({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleChange,
+                                        handleBlur,
+                                        handleSubmit,
+                                        isSubmitting,
+                                        isValid,
+                                        setTouched,
+                                        handleReset,
+                                        setFieldValue,
+                                        setFieldTouched,
+                                        setFieldError
+                                    }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                     <Col md="12 pl-0 pt-3">
                       <div className="d-md-flex">
                         <FormGroup className="col-md-3">
@@ -2842,18 +2931,27 @@ export default class syncPage extends Component {
                               <Input type="textarea"
                                 name="notes"
                                 // maxLength={600} 
-                                id="notes">
+                                id="notes"
+                                valid={!errors.notes && this.state.notes != ''}
+                                                            invalid={touched.notes && !!errors.notes}
+                                                            onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.notes}
+                                >
                               </Input>
+                              <FormFeedback className="red">{errors.notes}</FormFeedback>
                             </InputGroup>
                           </div>
                         </FormGroup>
                         <FormGroup className="tab-ml-1 mt-4">
                           <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                           &nbsp;
                 </FormGroup>
                       </div>
                     </Col>
+                    </Form>
+                                        )} />
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>

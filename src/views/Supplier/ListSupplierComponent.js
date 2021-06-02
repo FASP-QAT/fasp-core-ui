@@ -681,7 +681,7 @@ class SupplierListComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_SUPPLIER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
                         </div>
                     </CardBody>
                 </Card>
