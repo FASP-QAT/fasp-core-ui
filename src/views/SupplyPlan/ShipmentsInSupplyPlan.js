@@ -394,7 +394,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
                                         }, () => {
-                                            this.props.updateState("currencyList", currencyList);                                            
+                                            this.props.updateState("currencyList", currencyList);
                                             this.props.updateState("dataSourceList", dataSourceList);
                                             this.props.updateState("fundingSourceList", fundingSourceList);
                                             this.props.updateState("procurementAgentList", procurementAgentList);
@@ -1873,6 +1873,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = instance.jexcel;
         var rowData = elInstance.getRowData(y);
         var planningUnitId = rowData[2];
+        if (planningUnitId == "" || planningUnitId == undefined || planningUnitId == null) {
+            elInstance.setValueFromCoords(2, y, document.getElementById("planningUnitId").value, true);
+        }
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         if ((x == 4 || x == 6 || x == 5 || x == 7) && rowData[23] == "") {
@@ -3144,7 +3147,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     },
                     productCost: productCost.toString().replaceAll("\,", ""),
                     shipmentId: 0,
-                    batchInfoList:[]
+                    batchInfoList: []
                 }
                 shipmentListAfterUpdate.push(shipmentJson);
             }
