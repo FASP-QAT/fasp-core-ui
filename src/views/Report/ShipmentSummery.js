@@ -796,7 +796,7 @@ class ShipmentSummery extends Component {
             // data[2] = shipmentDetailsList[j].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder') : ''
             data[2] = shipmentDetailsList[j].emergencyOrder;
             // data[3] = shipmentDetailsList[j].erpOrder == true ? i18n.t('static.report.erpOrder') : '';
-            data[3] = shipmentDetailsList[j].erpOrder;
+            data[3] = shipmentDetailsList[j].erpFlag;
             // data[4] = shipmentDetailsList[j].localProcurement == true ? i18n.t('static.report.localprocurement') : '';
             data[4] = shipmentDetailsList[j].localProcurement;
             data[5] = shipmentDetailsList[j].orderNo != null ? shipmentDetailsList[j].orderNo : '';
