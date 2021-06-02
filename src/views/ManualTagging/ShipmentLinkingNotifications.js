@@ -65,6 +65,7 @@ export default class ShipmentLinkingNotifications extends Component {
         this.getNotificationSummary = this.getNotificationSummary.bind(this);
         this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
         this.viewBatchData = this.viewBatchData.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     viewBatchData(event, row) {
@@ -330,7 +331,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     this.el.setValueFromCoords(11, y, Math.round(qty), true);
                     this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
                     this.el.setComments(("K").concat(parseInt(y) + 1), "");
-                    console.log("------------------8----------------------")  
+                    console.log("------------------8----------------------")
                 }
             }
         }
@@ -344,20 +345,27 @@ export default class ShipmentLinkingNotifications extends Component {
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[3]));
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        }
+        elInstance.setValueFromCoords(13, y, 1, true);
+    }
+
+
     onPaste(instance, data) {
-        // var z = -1;
-        // for (var i = 0; i < data.length; i++) {
-        //     if (z != data[i].y) {
-        //         var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-        //         if (index == "" || index == null || index == undefined) {
-        //             (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-        //             (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
-        //             (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-        //             (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-        //             z = data[i].y;
-        //         }
-        //     }
-        // }
+        if (data.length == 1 && Object.keys(data[0])[2] == "value") {
+            (instance.jexcel).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
+        }
+        else {
+            for (var i = 0; i < data.length; i++) {
+                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+            }
+        }
     }
 
     programChange(event) {
@@ -823,7 +831,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
                     type: 'numeric',
-                    mask: '#,##.0000', decimal: '.'
+                    mask: '#,##.0000',
+                    decimal: '.',
+                    textEditor: true,
+                    disabledMaskOnEdition: true
+
                 },
 
                 {
@@ -903,7 +915,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         if (rowData[0]) {
                             cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                             cell.classList.remove('readonly');
-                        } 
+                        }
                         else {
                             cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
                             cell.classList.add('readonly');
@@ -921,8 +933,9 @@ export default class ShipmentLinkingNotifications extends Component {
             onfilter: function (el) {
                 el.jexcel.updateTable();
             },
-            oneditionend: this.onedit,
+            oneditionend: this.oneditionend,
             copyCompatibility: true,
+            onpaste: this.onPaste,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
