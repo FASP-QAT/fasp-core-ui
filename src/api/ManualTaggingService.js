@@ -60,6 +60,11 @@ class ManualTaggingSerice {
         );
     }
 
+    getNotificationSummary() {
+        return axios.get(`${API_URL}/api/getNotificationSummary/`, {
+        });
+    }
+
 }
 
 export default new ManualTaggingSerice()

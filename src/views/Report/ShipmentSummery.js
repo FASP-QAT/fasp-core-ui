@@ -796,7 +796,7 @@ class ShipmentSummery extends Component {
             // data[2] = shipmentDetailsList[j].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder') : ''
             data[2] = shipmentDetailsList[j].emergencyOrder;
             // data[3] = shipmentDetailsList[j].erpOrder == true ? i18n.t('static.report.erpOrder') : '';
-            data[3] = shipmentDetailsList[j].erpOrder;
+            data[3] = shipmentDetailsList[j].erpFlag;
             // data[4] = shipmentDetailsList[j].localProcurement == true ? i18n.t('static.report.localprocurement') : '';
             data[4] = shipmentDetailsList[j].localProcurement;
             data[5] = shipmentDetailsList[j].orderNo != null ? shipmentDetailsList[j].orderNo : '';
@@ -2438,7 +2438,7 @@ class ShipmentSummery extends Component {
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
+                                                <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
                                                     <thead>
                                                         <tr>
                                                             <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
@@ -2486,7 +2486,7 @@ class ShipmentSummery extends Component {
                                             </ul>
                                         </FormGroup>
                                         <div className="ShipmentSummeryReportMarginTop" id="mytable2">
-                                            <div id="shipmentDetailsListTableDiv" className="jexcelremoveReadonlybackground">
+                                            <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId")!=null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
                                             </div>
                                         </div>
                                     </div>

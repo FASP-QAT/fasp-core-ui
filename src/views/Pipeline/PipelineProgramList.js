@@ -562,7 +562,7 @@ export default class PipelineProgramList extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                         </div>
                     </CardBody>
                 </Card>
