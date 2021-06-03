@@ -71,6 +71,7 @@ export default class PipelineProgramSetup extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
+                healthAreaArray: [],
 
                 arrivedToDeliveredLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
@@ -130,6 +131,7 @@ export default class PipelineProgramSetup extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
 
         this.generateCountryCode = this.generateCountryCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
@@ -820,6 +822,18 @@ export default class PipelineProgramSetup extends Component {
         this.setState({ program: program });
     }
 
+    updateFieldDataHealthArea(value) {
+        let { program } = this.state;
+        this.setState({ healthAreaId: value });
+        var healthAreaId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
+        this.setState({ program: program });
+    }
+
     getRegionList(e) {
 
         // AuthenticationService.setupAxiosInterceptors();
@@ -1398,7 +1412,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList} generateCountryCode={this.generateCountryCode}></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                    <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} dataChange={this.dataChange} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>
+                                                    <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} updateFieldDataHealthArea={this.updateFieldDataHealthArea} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
                                                     <PipelineProgramDataStepFour endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo} items={this.state} dataChange={this.dataChange} generateOrganisationCode={this.generateOrganisationCode}></PipelineProgramDataStepFour>
