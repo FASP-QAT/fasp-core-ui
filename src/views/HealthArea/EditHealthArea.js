@@ -512,7 +512,7 @@ export default class EditHealthAreaComponent extends Component {
                                         setFieldTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='healthAreaForm' autocomplete="off">
-                                                <CardBody className="pb-0">
+                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
@@ -626,6 +626,17 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <CardFooter>
                                                     <FormGroup>

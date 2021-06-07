@@ -379,7 +379,6 @@ export default class ExportProgram extends Component {
                                                 </div>
                                             </div>
                                         </div>
-
                                         <CardFooter>
                                             <FormGroup>
 
