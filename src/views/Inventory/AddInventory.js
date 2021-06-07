@@ -75,7 +75,7 @@ export default class AddInventory extends Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
             { header: i18n.t('static.supplyPlan.alternatePlanningUnit'), key: 'name', width: 40 },
@@ -106,9 +106,9 @@ export default class AddInventory extends Component {
             type: 'date',
             // operator: 'greaterThan',
             showErrorMessage: true,
-            formulae: [new Date()],
+            formulae: [new Date('3021-01-01')],
             allowBlank: false,
-            prompt: 'Format (yyyy-dd-mm)',
+            prompt: 'Format (YYYY-MM-DD)',
             // errorStyle: 'error',
             // errorTitle: 'Invalid Value',
             // error: 'Invalid Value'
