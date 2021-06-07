@@ -433,7 +433,7 @@ class EditBudgetComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -447,7 +447,7 @@ class EditBudgetComponent extends Component {
                                     budgetCode: this.state.budget.budgetCode,
                                     startDate: this.state.budget.startDate,
                                     stopDate: this.state.budget.stopDate,
-                                    fundingSourceId:this.state.budget.fundingSource.fundingSourceId
+                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -547,7 +547,7 @@ class EditBudgetComponent extends Component {
                                         setFieldError
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
-                                                <CardBody>
+                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
@@ -747,6 +747,17 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <CardFooter>
                                                     <FormGroup>
 
@@ -762,17 +773,7 @@ class EditBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
