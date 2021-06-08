@@ -76,6 +76,7 @@ const NodeDragDropSource = DropTarget(
 export default class MorbidityScenarioOne extends Component {
     constructor() {
         super();
+
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
         this.onMoveItem = this.onMoveItem.bind(this);
@@ -89,7 +90,7 @@ export default class MorbidityScenarioOne extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.state = {
-            modalOpen: false,
+            openAddNodeModal: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
@@ -113,19 +114,26 @@ export default class MorbidityScenarioOne extends Component {
         this.setState({ currentItemConfig: currentItemConfig });
     }
     onAddButtonClick(itemConfig) {
-        const { items } = this.state;
-        var newItem = {
-            id: parseInt(items.length + 1),
-            parent: itemConfig.id,
-            title: "New Title",
-            description: "New Description"
-            // image: "/react/photos/z.png"
-        };
 
-        this.setState({
-            items: [...items, newItem],
-            cursorItem: newItem.id
-        });
+        this.setState({ openAddNodeModal: true });
+
+        // const { items } = this.state;
+        // var newItem = {
+        //     id: parseInt(items.length + 1),
+        //     parent: itemConfig.id,
+        //     title: "New Title",
+        //     description: "New Description",
+        //     itemTitleColor: Colors.White,
+        //     titleTextColor: Colors.Black,
+        //     nodeBackgroundColor: Colors.White,
+        //     borderColor: Colors.Black,
+        //     // image: "/react/photos/z.png"
+        // };
+
+        // this.setState({
+        //     items: [...items, newItem],
+        //     cursorItem: newItem.id
+        // });
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
@@ -328,6 +336,44 @@ export default class MorbidityScenarioOne extends Component {
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
             buttonsPanelSize: 40,
+            onButtonsRender: (({ context: itemConfig }) => {
+                return <>  <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        this.onAddButtonClick(itemConfig);
+                    }}>
+                    <FontAwesomeIcon icon={faPlus} />
+                </button>
+                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    {itemConfig.parent != null &&
+                        <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                confirmAlert({
+                                    message: "Are you sure you want to delete this node.",
+                                    buttons: [
+                                        {
+                                            label: i18n.t('static.program.yes'),
+                                            onClick: () => {
+                                                this.onRemoveButtonClick(itemConfig);
+                                            }
+                                        },
+                                        {
+                                            label: i18n.t('static.program.no')
+                                        }
+                                    ]
+                                });
+                            }}>
+                            <FontAwesomeIcon icon={faTrash} />
+                        </button>}
+
+                </>
+            }),
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
             // itemTitleFirstFontColor: Colors.White,
@@ -370,6 +416,45 @@ export default class MorbidityScenarioOne extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
+            {/* Modal start------------------- */}
+            <Modal isOpen={this.state.openAddNodeModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Edit Node</strong>
+                    <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeValueType"
+                            bsSize="sm"
+                            onChange={(e) => { this.dataChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Percentage</option>
+                            <option value="2">Derived value</option>
+                            <option value="3">Use Expression (y=mx+c)</option>
+                            <option value="4">Forecasting Unit</option>
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Modal end------------------------ */}
         </div>
 
     }
