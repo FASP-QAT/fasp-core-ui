@@ -748,7 +748,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
         if (x == 0 || x == 10) {
-            var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
             if (valid == true) {
                 if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && rowData[10].toString() == "true" && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
@@ -1189,7 +1189,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
 
                         var rowData = elInstance.getRowData(y);
-                        var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                        var validation = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
                         console.log("A-------------------->", validation);
                         if (validation == false) {
                             console.log("A--------------------> in if");
