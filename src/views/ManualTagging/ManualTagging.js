@@ -825,8 +825,8 @@ export default class ManualTagging extends Component {
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
-            planningUnitValues:[],
-            productCategoryValues:[],
+            planningUnitValues: [],
+            productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
@@ -2755,7 +2755,7 @@ export default class ManualTagging extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <CardBody className="pb-lg-5">
                         {/* <Col md="10 ml-0"> */}
                         <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
@@ -2765,7 +2765,7 @@ export default class ManualTagging extends Component {
 
                                 <FormGroup className="pl-3">
                                     {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }} 
+                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }}
                                     >
                                         <Input
                                             className="form-check-input"
@@ -2784,7 +2784,7 @@ export default class ManualTagging extends Component {
                                             {i18n.t('static.mt.notLinkedQAT')}
                                         </Label>
                                     </FormGroup>
-                                    <FormGroup check inline 
+                                    <FormGroup check inline
                                     >
                                         <Input
                                             className="form-check-input"
@@ -2950,10 +2950,23 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop">
+                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground">
                                 </div>
                             </div>
+
+                            <div style={{ display: this.state.loading1 ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
 
@@ -3281,17 +3294,7 @@ export default class ManualTagging extends Component {
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </div>
-                            <div style={{ display: this.state.loading1 ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                        <div class="spinner-border blue ml-4" role="status">
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </Modal>
                         {/* Consumption modal */}
                     </CardBody>
