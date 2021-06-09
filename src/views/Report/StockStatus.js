@@ -957,6 +957,43 @@ class StockStatus extends Component {
               this.hideFirstComponent()
             }.bind(this);
             realmRequest.onsuccess = function (event) {
+
+            var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
+            var dsOs = dsTransaction.objectStore('dataSource');
+            var dsRequest = dsOs.getAll();
+            dsRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            dsRequest.onsuccess = function (event) {
+              var dsResult=dsRequest.result;
+
+              var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+            var fsOs = fsTransaction.objectStore('fundingSource');
+            var fsRequest = fsOs.getAll();
+            fsRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            fsRequest.onsuccess = function (event) {
+              var fsResult=fsRequest.result;
+
+              var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var paOs = paTransaction.objectStore('procurementAgent');
+            var paRequest = paOs.getAll();
+            paRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            paRequest.onsuccess = function (event) {
+              var paResult=paRequest.result;
+
               var maxForMonths = 0;
               var realm = realmRequest.result;
               var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1004,6 +1041,36 @@ class StockStatus extends Component {
               var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
               var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
               var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
+              inList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                inList[idx].dataSource=simpleDsObject;
+              }
+              })
+              coList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                coList[idx].dataSource=simpleDsObject;
+              }
+              })
+              shList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                shList[idx].dataSource=simpleDsObject;
+              }
+              })
               console.log("ShList+++", shList);
               this.setState({
                 inList: inList,
@@ -1037,8 +1104,26 @@ class StockStatus extends Component {
                   if (list.length > 0) {
                     var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                     var totalShipmentQty = 0;
-                    shiplist.map(elt => {
+                    shiplist.map((elt,idx) => {
                       totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
+                      var fundingSource=fsResult.filter(fs=>fs.fundingSourceId==elt.fundingSource.id);
+                      if(fundingSource.length>0){
+                        var simpleFSObject={
+                          id:fundingSource[0].fundingSourceId,
+                          label:fundingSource[0].label,
+                          code:fundingSource[0].fundingSourceCode
+                        }
+                        shiplist[idx].fundingSource=simpleFSObject;
+                      }
+                      var procurementAgent=paResult.filter(pa=>pa.procurementAgentId==elt.procurementAgent.id);
+                      if(procurementAgent.length>0){
+                        var simplePAObject={
+                          id:procurementAgent[0].procurementAgentId,
+                          label:procurementAgent[0].label,
+                          code:procurementAgent[0].procurementAgentCode
+                        }
+                        shiplist[idx].procurementAgent=simplePAObject;
+                      }
                     })
                     var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                     var totalforecastConsumption = null;
@@ -1118,7 +1203,9 @@ class StockStatus extends Component {
 
           }.bind(this)
         }.bind(this)
-
+      }.bind(this)
+    }.bind(this)
+  }.bind(this)
 
 
 
@@ -1328,6 +1415,41 @@ class StockStatus extends Component {
             this.hideFirstComponent()
           }.bind(this);
           realmRequest.onsuccess = function (event) {
+            var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
+            var dsOs = dsTransaction.objectStore('dataSource');
+            var dsRequest = dsOs.getAll();
+            dsRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            dsRequest.onsuccess = function (event) {
+              var dsResult=dsRequest.result;
+
+              var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+            var fsOs = fsTransaction.objectStore('fundingSource');
+            var fsRequest = fsOs.getAll();
+            fsRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            fsRequest.onsuccess = function (event) {
+              var fsResult=fsRequest.result;
+
+              var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var paOs = paTransaction.objectStore('procurementAgent');
+            var paRequest = paOs.getAll();
+            paRequest.onerror = function (event) {
+              this.setState({
+                loading: false,
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            paRequest.onsuccess = function (event) {
+              var paResult=paRequest.result;
             var selectedPlanningUnitdata = {};
             var selectedplanningunit = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]
             console.log('selectedplanningunit', selectedplanningunit)
@@ -1382,6 +1504,36 @@ class StockStatus extends Component {
               var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
               var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
               var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
+              inList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                inList[idx].dataSource=simpleDsObject;
+              }
+              })
+              coList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                coList[idx].dataSource=simpleDsObject;
+              }
+              })
+              shList.map((c,idx)=>{
+                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
+                if(dataSource.length>0){
+                var simpleDsObject={
+                  id:dataSource[0].dataSourceId,
+                  label:dataSource[0].label
+                }
+                shList[idx].dataSource=simpleDsObject;
+              }
+              })
               for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                 var monthlydata = [];
 
@@ -1396,8 +1548,26 @@ class StockStatus extends Component {
                   if (list.length > 0) {
                     var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                     var totalShipmentQty = 0;
-                    shiplist.map(elt => {
+                    shiplist.map((elt,idx) => {
                       totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
+                      var fundingSource=fsResult.filter(fs=>fs.fundingSourceId==elt.fundingSource.id);
+                      if(fundingSource.length>0){
+                        var simpleFSObject={
+                          id:fundingSource[0].fundingSourceId,
+                          label:fundingSource[0].label,
+                          code:fundingSource[0].fundingSourceCode
+                        }
+                        shiplist[idx].fundingSource=simpleFSObject;
+                      }
+                      var procurementAgent=paResult.filter(pa=>pa.procurementAgentId==elt.procurementAgent.id);
+                      if(procurementAgent.length>0){
+                        var simplePAObject={
+                          id:procurementAgent[0].procurementAgentId,
+                          label:procurementAgent[0].label,
+                          code:procurementAgent[0].procurementAgentCode
+                        }
+                        shiplist[idx].procurementAgent=simplePAObject;
+                      }
                     })
                     var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
                     var totalforecastConsumption = null;
@@ -1825,6 +1995,9 @@ class StockStatus extends Component {
 
         }.bind(this)
       }.bind(this)
+    }.bind(this)
+  }.bind(this)
+}.bind(this)
 
     }
     else {

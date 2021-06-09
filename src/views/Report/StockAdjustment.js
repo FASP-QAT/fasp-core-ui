@@ -847,6 +847,24 @@ class StockAdjustmentComponent extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
 
+                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                var dataSourceRequest = dataSourceOs.getAll();
+                dataSourceRequest.onerror = function (event) {
+                }.bind(this);
+                dataSourceRequest.onsuccess = function (event) {
+                    var dataSourceResult = [];
+                    dataSourceResult = dataSourceRequest.result;
+
+                    var puTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                        var puOs = puTransaction.objectStore('programPlanningUnit');
+                        var puRequest = puOs.getAll();
+                        puRequest.onerror = function (event) {
+                        }.bind(this);
+                        puRequest.onsuccess = function (e) {
+                            var puResult = [];
+                            puResult = puRequest.result;
+
                         console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -859,17 +877,18 @@ class StockAdjustmentComponent extends Component {
                             console.log(inventoryList)
 
                             inventoryList.map(ele => {
-
+                                var dataSource=dataSourceResult.filter(c=>c.dataSourceId==ele.dataSource.id);
+                                var planningUnit=puResult.filter(c=>c.planningUnit.id==ele.planningUnit.id);
                                 var json = {
                                     program: programJson,
                                     // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
                                     inventoryDate: ele.inventoryDate,
-                                    planningUnit: ele.planningUnit,
+                                    planningUnit: planningUnit.length>0?planningUnit[0].planningUnit:ele.planningUnit,
                                     stockAdjustemntQty: ele.adjustmentQty,
                                     lastModifiedBy: programJson.currentVersion.lastModifiedBy,
                                     lastModifiedDate: programJson.currentVersion.lastModifiedDate,
                                     notes: ele.notes,
-                                    dataSource: ele.dataSource
+                                    dataSource: dataSource.length>0?dataSource[0]:ele.dataSource
                                 }
                                 data.push(json)
                             })
@@ -883,6 +902,8 @@ class StockAdjustmentComponent extends Component {
                         });
                     }.bind(this)
                 }.bind(this)
+            }.bind(this)
+        }.bind(this)
             } else {
                 this.setState({ loading: true })
                 var inputjson = {
