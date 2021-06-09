@@ -1593,11 +1593,44 @@ class ShipmentSummery extends Component {
                             for (var k = 0; k < myResult.length; k++) {
                                 var planningUnitObj = {
                                     id: myResult[k].planningUnitId,
-                                    multiplier: myResult[k].multiplier
+                                    multiplier: myResult[k].multiplier,
+                                    label:myResult[k].label,
+                                    forecastingUnit:myResult[k].forecastingUnit
                                 }
                                 planningList[k] = planningUnitObj
                             }
+                            var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var paOs = paTransaction.objectStore('procurementAgent');
+                            var paRequest = paOs.getAll();
+                            var procurementAgentList = [];
+    
+                            paRequest.onerror = function (event) {
+                                // Handle errors!
+                                this.setState({
+                                    loading: false
+                                })
+                            };
+    
+    
+                            paRequest.onsuccess = function (e) {
+                                var paResult = [];
+                                paResult = paRequest.result;
 
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                            var bOs = bTransaction.objectStore('budget');
+                            var bRequest = bOs.getAll();
+    
+                            bRequest.onerror = function (event) {
+                                // Handle errors!
+                                this.setState({
+                                    loading: false
+                                })
+                            };
+    
+    
+                            bRequest.onsuccess = function (e) {
+                                var bResult = [];
+                                bResult = bRequest.result;
                             console.log("planningList------>", planningList);
 
                             for (let i = 0; i < planningUnitFilter.length; i++) {
@@ -1608,14 +1641,41 @@ class ShipmentSummery extends Component {
                                         j = planningList.length;
                                     }
                                 }
-
+                                var planningUnit=planningList.filter(c=>c.id==planningUnitFilter[i].planningUnit.id);
+                                var procurementAgent=paResult.filter(c=>c.procurementAgentId==planningUnitFilter[i].procurementAgent.id);
+                                if(procurementAgent.length>0){
+                                    var simplePAObject={
+                                        id:procurementAgent[0].procurementAgentId,
+                                        label:procurementAgent[0].label,
+                                        code:procurementAgent[0].procurementAgentCode
+                                    }
+                                }
+                                var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==planningUnitFilter[i].fundingSource.id);
+                                if(fundingSource.length>0){
+                                    var simpleFSObject={
+                                        id:fundingSource[0].fundingSourceId,
+                                        label:fundingSource[0].label,
+                                        code:fundingSource[0].fundingSourceCode
+                                    }
+                                }
+                                var budget=[];
+                                if(planningUnitFilter[i].budget.id>0){
+                                var budget=bResult.filter(c=>c.budgetId==planningUnitFilter[i].budget.id);
+                                if(budget.length>0){
+                                    var simpleBObject={
+                                        id:budget[0].budgetId,
+                                        label:budget[0].label,
+                                        code:budget[0].budgetCode
+                                    }
+                                }
+                            }
                                 let json = {
                                     "shipmentId": planningUnitFilter[i].shipmentId,
-                                    "planningUnit": planningUnitFilter[i].planningUnit,
-                                    "forecastingUnit": planningUnitFilter[i].planningUnit.forecastingUnit,
+                                    "planningUnit": planningUnit.length>0?planningUnit[0]:planningUnitFilter[i].planningUnit,
+                                    "forecastingUnit": planningUnit.length>0?planningUnit[0].forecastingUnit:planningUnitFilter[i].planningUnit.forecastingUnit,
                                     "multiplier": multiplier,
-                                    "procurementAgent": planningUnitFilter[i].procurementAgent,
-                                    "fundingSource": planningUnitFilter[i].fundingSource,
+                                    "procurementAgent": procurementAgent.length>0?simplePAObject:planningUnitFilter[i].procurementAgent,
+                                    "fundingSource": fundingSource.length>0?simpleFSObject:planningUnitFilter[i].fundingSource,
                                     "shipmentStatus": planningUnitFilter[i].shipmentStatus,
                                     "shipmentQty": planningUnitFilter[i].shipmentQty,
                                     "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
@@ -1627,7 +1687,7 @@ class ShipmentSummery extends Component {
                                     "erpFlag": planningUnitFilter[i].erpFlag,
                                     "localProcurement": planningUnitFilter[i].localProcurement,
                                     "orderNo": planningUnitFilter[i].orderNo,
-                                    "budget": planningUnitFilter[i].budget,
+                                    "budget": budget.length>0?simpleBObject:planningUnitFilter[i].budget,
                                     // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
                                     // "programCode": programJson.programCode
                                 }
@@ -1647,6 +1707,14 @@ class ShipmentSummery extends Component {
                             const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
                             console.log('fundingSourceIds', fundingSourceIds)
                             fundingSourceIds.map(ele => {
+                                var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==ele);
+                                if(fundingSource.length>0){
+                                    var simpleFSObject={
+                                        id:fundingSource[0].fundingSourceId,
+                                        label:fundingSource[0].label,
+                                        code:fundingSource[0].fundingSourceCode
+                                    }
+                                }
                                 var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
                                 console.log('fundingSourceList', fundingSourceList)
                                 var cost = 0;
@@ -1657,7 +1725,7 @@ class ShipmentSummery extends Component {
                                     quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
                                 })
                                 var json = {
-                                    "fundingSource": fundingSourceList[0].fundingSource,
+                                    "fundingSource": fundingSource.length>0?simpleFSObject:fundingSourceList[0].fundingSource,
                                     "orderCount": fundingSourceList.length,
                                     "cost": cost,
                                     "quantity": quantity
@@ -1746,6 +1814,8 @@ class ShipmentSummery extends Component {
                         }.bind(this)
                     }.bind(this);
                 }.bind(this)
+            }.bind(this)
+        }.bind(this)
             } else {
                 this.setState({ loading: true })
                 var inputjson = {
