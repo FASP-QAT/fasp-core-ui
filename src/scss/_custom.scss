@@ -936,9 +936,23 @@ label.arrow_label:after {
 .RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
-.RowClickable .jexcel_content .jexcel tbody.draggable tr{
+
+.RowClickable .jexcel_content .jexcel tbody.draggable tr{ 
   cursor: pointer;
-  }
+}
+
+.table-hover{
+  cursor: pointer;
+}
+ 
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(3){
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(4){
+  cursor: pointer;
+}
+
 .RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
@@ -1281,6 +1295,7 @@ a:hover {
 .hoverTd:hover {
   background-color: #e5e5e5;
   color: #000!important;
+  cursor: pointer;
 }
 
 .modalWidth {
@@ -1452,7 +1467,6 @@ h5,
 
 .table {
   color: #212721 !important;
-  // cursor: pointer !important;
 }
 
 .btn-secondary {

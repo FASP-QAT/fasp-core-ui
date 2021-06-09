@@ -1466,7 +1466,7 @@ class ListBudgetComponent extends Component {
               </FormGroup>
             </Col> */}
 
-            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className="jexcelremoveReadonlybackground">
+            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
             </div>
             <h5 style={{ color: 'red' }}>{i18n.t('static.budget.redRow')}</h5>
 
