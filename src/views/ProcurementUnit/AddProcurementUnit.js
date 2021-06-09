@@ -720,7 +720,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         multiplier: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
+            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.procurementUnit.validMultiplierText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         // .max(10, i18n.t("Eneter valid number with digits less then 10.")),
