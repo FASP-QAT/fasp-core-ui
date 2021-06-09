@@ -117,6 +117,7 @@ export default class syncPage extends Component {
     this.versionTypeChanged = this.versionTypeChanged.bind(this);
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
     this.notesChange=this.notesChange.bind(this);
+    this.checkLastModifiedDateForProgram=this.checkLastModifiedDateForProgram.bind(this)
     // this.checkValidations = this.checkValidations.bind(this);
   }
 
@@ -1193,7 +1194,7 @@ findFirstError(formName, hasError) {
 
         proList.sort((a, b) => {
           var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                  
           return itemLabelA > itemLabelB ? 1 : -1;
         });
 
@@ -1206,7 +1207,8 @@ findFirstError(formName, hasError) {
               // loading: false,
               programId: proList[0].value
             }, () => {
-              this.getDataForCompare(proList[0]);
+              // this.getDataForCompare(proList[0]);
+              this.checkLastModifiedDateForProgram(proList[0]);
             })
           } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
             this.setState({
@@ -1215,7 +1217,8 @@ findFirstError(formName, hasError) {
               // loading: false,
               programId: localStorage.getItem("sesProgramId")
             }, () => {
-              this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
             })
           } else {
             this.setState({
@@ -1279,7 +1282,7 @@ findFirstError(formName, hasError) {
     document.getElementById("detailsDiv").style.display = "none";
   }
 
-  getDataForCompare(value) {
+  checkLastModifiedDateForProgram(value){
     console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
@@ -1308,6 +1311,97 @@ findFirstError(formName, hasError) {
     console.log("@@@this.state.programList", this.state.programList);
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+
+    if (programId != 0) {
+      localStorage.setItem("sesProgramId", programId);
+      ProgramService.getLastModifiedDateForProgram(singleProgramId,programVersion).then(response1 => {
+        if (response1.status == 200) {
+          var lastModifiedDate=response1.data;
+          var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+                var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+                var lastSyncDateRequest = lastSyncDateTransaction.getAll();
+                lastSyncDateRequest.onsuccess = function (event) {
+                    var lastSyncDate = lastSyncDateRequest.result[0];
+                    var result = lastSyncDateRequest.result;
+                    for (var i = 0; i < result.length; i++) {
+                        if (result[i].id == 0) {
+                            var lastSyncDate = lastSyncDateRequest.result[i];
+                        }
+                    }
+                    if (lastSyncDate == undefined) {
+                        lastSyncDate = "2020-01-01 00:00:00";
+                    } else {
+                        lastSyncDate = lastSyncDate.lastSyncDate;
+                    }
+                    if(moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss")>moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")){
+                      alert(i18n.t('static.commitVersion.outdatedsync'));
+                      this.props.history.push(`/masterDataSync`)
+                    }else{
+                      this.getDataForCompare(value);
+                    }
+                  }.bind(this)
+                }.bind(this)
+        }
+      }).catch(error => {
+        console.log("@@@Error1",error);
+        console.log("@@@Error1",error.message);
+        console.log("@@@Error1",error.response ? error.response.status : "")
+        if (error.message === "Network Error") {
+          console.log("+++in catch 1")
+          this.setState({
+            message: 'static.common.networkError',
+            loading: false,
+            statuses: [],
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            case 412:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            default:
+              console.log("+++in catch 2")
+              this.setState({
+                message: 'static.unkownError',
+                loading: false,
+                statuses: [],
+              });
+              break;
+          }
+        }
+      })
+    }
+  }
+
+  getDataForCompare(value) {
+    var programId = value != "" && value != undefined ? value.value : 0;
+    var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
+    var singleProgramId=(this.state.programList).filter(c => c.value == programId)[0].programId;
 
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
@@ -1966,7 +2060,7 @@ findFirstError(formName, hasError) {
                                     var downloadedProgramDataShipment = downloadedProgramData.shipmentList;
 
                                     var modifiedShipmentIds = []
-                                    latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                    latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
                                     oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
 
                                     var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
@@ -2868,7 +2962,7 @@ findFirstError(formName, hasError) {
                             bsSize="sm"
                             options={this.state.programList}
                             value={this.state.programId}
-                            onChange={(e) => { this.getDataForCompare(e); }}
+                            onChange={(e) => { this.checkLastModifiedDateForProgram(e); }}
                           />
                         </div>
                       </FormGroup>
@@ -2930,7 +3024,7 @@ findFirstError(formName, hasError) {
                             <InputGroup>
                               <Input type="textarea"
                                 name="notes"
-                                // maxLength={600} 
+                                // maxLength={600}
                                 id="notes"
                                 valid={!errors.notes && this.state.notes != ''}
                                                             invalid={touched.notes && !!errors.notes}
@@ -3414,7 +3508,7 @@ findFirstError(formName, hasError) {
                     color: "red"
                   }, () => {
                     this.hideFirstComponent()
-                    this.getDataForCompare(this.state.programId);
+                    this.checkLastModifiedDateForProgram(this.state.programId);
                   });
 
                 }
@@ -3555,7 +3649,7 @@ findFirstError(formName, hasError) {
             if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 1 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 2 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 8 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 10 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 14 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 15 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 25) {
               index = latestProgramDataProblemList.findIndex(
                 f =>
-                  // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
+                  // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
@@ -3580,7 +3674,7 @@ findFirstError(formName, hasError) {
             }
             // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
             //   index = latestProgramDataProblemList.findIndex(
-            //     f => 
+            //     f =>
             //       moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
             //       && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
             //       && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
