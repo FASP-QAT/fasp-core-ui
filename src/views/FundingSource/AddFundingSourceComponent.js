@@ -350,7 +350,7 @@ class AddFundingSourceComponent extends Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-        <Row style={{ display: this.state.loading ? "none" : "block" }}>
+        <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               {/* <CardHeader>
@@ -438,7 +438,7 @@ class AddFundingSourceComponent extends Component {
                     handleReset
                   }) => (
                       <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='fundingSourceForm' autocomplete="off">
-                        <CardBody>
+                        <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span className="red Reqasterisk">*</span></Label><Input
                               type="select"
@@ -527,6 +527,17 @@ class AddFundingSourceComponent extends Component {
                           </FormGroup>
 
                         </CardBody>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                              <div class="spinner-border blue ml-4" role="status">
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <CardFooter>
                           <FormGroup>
 
@@ -546,17 +557,7 @@ class AddFundingSourceComponent extends Component {
             </Card>
           </Col>
         </Row>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
         {/* <div>
           <h6>{i18n.t(this.state.message)}</h6>
           <h6>{i18n.t(this.props.match.params.message)}</h6>

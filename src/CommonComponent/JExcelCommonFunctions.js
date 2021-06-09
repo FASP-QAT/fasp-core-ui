@@ -1,6 +1,7 @@
 import i18n from '../../src/i18n';
 import { func } from 'prop-types';
 import moment from 'moment';
+import ConsumptionInSupplyPlanComponent from '../views/SupplyPlan/ConsumptionInSupplyPlan';
 
 export function jExcelLoadedFunction(instance, number) {
     if (number == undefined) {
@@ -288,6 +289,32 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             return false;
         } else {
             if (moment(value).format("YYYY-MM") == "Invalid date") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                return true;
+            }
+        }
+    }else if(type == "dateWithInvalidForShipment"){
+        var col = (colName).concat(parseInt(rowNo) + 1);
+        if (value == "") {
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            return false;
+        } else {
+            if (moment(value).format("YYYY-MM") == "Invalid date") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            }else if(!(moment(value, 'YYYY-MM-DD',true).isValid() || moment(value, 'YYYY-MM-DD HH:mm:ss',true).isValid())){
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
