@@ -1040,7 +1040,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             allowExport: false,
                                                                             onchange: this.shipmentDatesChanged,
                                                                             editable: tableEditable,
-                                                                            onbeforepaste:function(obj,data,x,y){
+                                                                            onbeforepaste: function (obj, data, x, y) {
                                                                                 return false;
                                                                             },
                                                                             contextMenu: function (obj, x, y, e) {
@@ -3361,6 +3361,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
             }
         } else if (negativeBudget == 0) {
+            return valid;
+        } else {
             return valid;
         }
     }
