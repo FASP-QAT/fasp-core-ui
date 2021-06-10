@@ -445,7 +445,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             } else {
                                                 index = shipmentList[i].index;
                                             }
-                                            if (this.props.items.indexOfShipmentContainingBatch != undefined && this.props.items.indexOfShipmentContainingBatch >= 0 && index == this.props.items.indexOfShipmentContainingBatch && (shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)) {
+                                            if (this.props.items.indexOfShipmentContainingBatch != undefined && this.props.items.indexOfShipmentContainingBatch >= 0 && index == this.props.items.indexOfShipmentContainingBatch) {
                                                 yForBatch = i;
                                             }
                                             this.setState({
@@ -817,7 +817,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                                    if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS) && rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
+                                                    if (rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                             onclick: function () {
@@ -3329,7 +3329,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                 var shipmentStatus = elInstance.getRowData(y)[3];
                 if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
-                    if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                    // if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
                         var totalShipmentQty = (rowData[26]);
                         var adjustedOrderQty = elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
@@ -3347,7 +3347,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         } else {
                             positiveValidation("K", y, elInstance);
                         }
-                    }
+                    // }
                 }
             } else {
                 valid = false;
