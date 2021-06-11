@@ -31,7 +31,8 @@ const validationSchema = function (values) {
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningUnit.enterAssociatedForecastingUnit')),
         multiplier: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
+            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningUnit.multiplier'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
@@ -515,8 +516,8 @@ export default class AddPlanningUnit extends Component {
                 </Row>
 
                 <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                    {/* <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6> */}
                 </div>
             </div>
         );
