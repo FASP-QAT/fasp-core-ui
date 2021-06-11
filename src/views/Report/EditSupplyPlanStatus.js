@@ -4336,6 +4336,7 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
@@ -4422,6 +4423,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
+                                    document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
@@ -4511,7 +4513,7 @@ class EditSupplyPlanStatus extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                    {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                     {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                     <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
