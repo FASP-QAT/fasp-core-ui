@@ -146,11 +146,12 @@ export default class ManualTagging extends Component {
 
     viewBatchData(event, row) {
         console.log("event---", event);
-        console.log("row---", row);
+        console.log("row---", row.maxFilename);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            
             this.setState({
-                batchDetails: row.shipmentList
+                batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
             });
         } else {
             this.setState({
@@ -2847,6 +2848,7 @@ export default class ManualTagging extends Component {
                     )
                 }
             },
+
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
@@ -2864,7 +2866,7 @@ export default class ManualTagging extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
