@@ -4145,7 +4145,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                     <thead>
                                         <tr>
-                                            <th className="BorderNoneSupplyPlan"></th>
+                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                             {
                                                 this.state.monthsArray.map(item => {
@@ -4162,7 +4162,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     <tbody>
 
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
@@ -4171,7 +4171,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                             {
                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -4184,7 +4184,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -4196,7 +4196,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -4219,7 +4219,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -4237,7 +4237,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                             {
@@ -4257,7 +4257,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -4275,7 +4275,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -4292,7 +4292,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -4309,7 +4309,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -4320,7 +4320,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -4338,7 +4338,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -4355,7 +4355,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -4372,7 +4372,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -4389,7 +4389,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                             {
                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -4398,7 +4398,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                             {
                                                 this.state.expiredStockArr.map(item1 => {
@@ -4415,7 +4415,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -4424,7 +4424,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -4433,7 +4433,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
@@ -4442,7 +4442,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         {/* <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                             {
                                                 this.state.minStockMoS.map(item1 => (
@@ -4451,7 +4451,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                             {
                                                 this.state.maxStockMoS.map(item1 => (
@@ -4460,7 +4460,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr> */}
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                             {
                                                 this.state.unmetDemand.map(item1 => (
