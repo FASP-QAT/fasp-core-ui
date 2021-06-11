@@ -776,7 +776,7 @@ export default class AddInventory extends Component {
                             </div>
                         </div>
                     }
-                    <CardBody className="pb-lg-2 pt-lg-2" >
+                    <CardBody className="pb-lg-2 pt-lg-0" >
                         <Formik
                             render={
                                 ({
