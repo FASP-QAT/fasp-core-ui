@@ -39,7 +39,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.product.productunittext')),
         genericLabel: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
-            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            // .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .matches(/^$|^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
     })
 }
 
