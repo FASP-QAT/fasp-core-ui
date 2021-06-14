@@ -1696,6 +1696,7 @@
     "static.program.programName": "Program name",
     "static.ticket.requestTo": "Request to...",
     "static.pipelineProgram.programId": " Program ID",
+    "static.commitVersion.outdatedsync": "Your master data sync is outdated. Redirecting to master data sync.",
     "static.report.wapeFormulaNote": "Note : We have used Weighted Absolute Percentage Error (WAPE) Formulae here",
     "static.dashboard.tracercategory": "Tracer Categories",
     "static.supplyPlan.nonPsmShipmentsDetails": "Non-PSM Shipment Details",
