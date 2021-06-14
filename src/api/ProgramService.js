@@ -179,5 +179,10 @@ class ProgramService {
         );
     }
 
+    getLastModifiedDateForProgram(programId, versionId) {
+        return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
+        );
+    }
+
 }
 export default new ProgramService()
