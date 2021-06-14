@@ -1574,6 +1574,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     batchDetailsClicked(obj, x, y, shipmentEditable, autoPopup) {
+        this.props.updateState("showBatchSaveButton", shipmentEditable);
         this.props.updateState("loading", true);
         if (this.props.shipmentPage == "shipmentDataEntry") {
             this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
