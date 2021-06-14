@@ -1142,10 +1142,23 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("RESP------>y2", y2);
         console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
 
-        if (y1 == 0 && y2 != 0) {
+
+        // if (y1 == 0 && y2 != 0) {
+        //     console.log("RESP------>Header");
+        // } else {
+        //     console.log("RESP------>Not");
+        //     this.setState({
+        //         programId: instance.getValueFromCoords(2, y1)
+        //     }, () => {
+        //         document.getElementById("addressed").value = 0;
+        //         this.getPlanningUnitList();
+        //     })
+        // }
+        let typeofColumn = instance.selectedHeader;
+        if (typeof typeofColumn === 'string') {
             console.log("RESP------>Header");
         } else {
-            console.log("RESP------>Not");
+            console.log("RESP------>not Header");
             this.setState({
                 programId: instance.getValueFromCoords(2, y1)
             }, () => {
