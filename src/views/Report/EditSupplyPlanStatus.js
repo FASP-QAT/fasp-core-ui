@@ -172,6 +172,7 @@ class EditSupplyPlanStatus extends Component {
             batchInfoInInventoryPopUp: [],
             problemCategoryList: [],
             ledgerForBatch: [],
+            showBatchSaveButton: false,
 
             program: {
                 programId: this.props.match.params.programId,

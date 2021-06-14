@@ -124,7 +124,8 @@ export default class SupplyPlanComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
             // startDateFormat:curDate
         }
 
@@ -2051,7 +2052,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </div>
                                 <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                    {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
@@ -3984,59 +3985,59 @@ export default class SupplyPlanComponent extends React.Component {
                             render={
                                 ({
                                 }) => (
-                                        <Form name='simpleForm'>
-                                            <div className=" pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
+                                    <Form name='simpleForm'>
+                                        <div className=" pl-0">
+                                            <div className="row">
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
 
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={this.state.startDate}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="programSelect"
-                                                                id="programSelect"
-                                                                bsSize="sm"
-                                                                options={this.state.programList}
-                                                                value={this.state.programSelect}
-                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="planningUnit"
-                                                                id="planningUnit"
-                                                                bsSize="sm"
-                                                                options={this.state.planningUnitList}
-                                                                value={this.state.planningUnit}
-                                                                onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
-                                                </div>
-
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={this.state.startDate}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-4">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="programSelect"
+                                                            id="programSelect"
+                                                            bsSize="sm"
+                                                            options={this.state.programList}
+                                                            value={this.state.programSelect}
+                                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-4 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="planningUnit"
+                                                            id="planningUnit"
+                                                            bsSize="sm"
+                                                            options={this.state.planningUnitList}
+                                                            value={this.state.planningUnit}
+                                                            onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
-                                        </Form>
-                                    )} />
+
+                                        </div>
+                                    </Form>
+                                )} />
 
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="animated fadeIn" style={{ display: this.state.display }}>

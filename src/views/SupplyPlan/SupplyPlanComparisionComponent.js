@@ -95,7 +95,8 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
 
         }
         this.getMonthArray = this.getMonthArray.bind(this);

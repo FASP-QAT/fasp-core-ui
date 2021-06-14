@@ -74,7 +74,7 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             this.setState({
-                batchDetails: row.shipmentList
+                batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
             });
         } else {
             this.setState({
@@ -1457,7 +1457,7 @@ export default class ShipmentLinkingNotifications extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',

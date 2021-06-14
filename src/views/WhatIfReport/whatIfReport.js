@@ -180,7 +180,8 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
         }
 
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
@@ -4885,7 +4886,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                             <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
