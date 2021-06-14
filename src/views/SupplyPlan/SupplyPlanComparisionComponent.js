@@ -95,7 +95,8 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
 
         }
         this.getMonthArray = this.getMonthArray.bind(this);
@@ -1334,7 +1335,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                    amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3090,14 +3091,14 @@ export default class SupplyPlanComponent extends React.Component {
 
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map((sl,count) => {
+        shipmentList.map((sl, count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
-                var index=count;
+                var index = count;
                 this.setState({
-                    indexOfShipmentContainingBatch:index
+                    indexOfShipmentContainingBatch: index
                 })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
