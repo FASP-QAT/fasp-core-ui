@@ -146,11 +146,12 @@ export default class ManualTagging extends Component {
 
     viewBatchData(event, row) {
         console.log("event---", event);
-        console.log("row---", row);
+        console.log("row---", row.maxFilename);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            
             this.setState({
-                batchDetails: row.shipmentList
+                batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
             });
         } else {
             this.setState({
@@ -968,13 +969,13 @@ export default class ManualTagging extends Component {
             if (this.state.active2) {
                 count++;
                 if (map1.get("0")) {
-                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
             else {
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    console.log("value---", parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
-                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    console.log("value---", Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
@@ -1831,7 +1832,7 @@ export default class ManualTagging extends Component {
                 data[12] = erpDataList[j].primeLineNo;
                 data[13] = 0;
                 if (erpDataList[j].active) {
-                    qty = parseInt(qty) + convertedQty;
+                    qty = Number(qty) + convertedQty;
                 }
             }
             erpDataArray[count] = data;
@@ -2847,6 +2848,7 @@ export default class ManualTagging extends Component {
                     )
                 }
             },
+
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
@@ -2864,7 +2866,7 @@ export default class ManualTagging extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',

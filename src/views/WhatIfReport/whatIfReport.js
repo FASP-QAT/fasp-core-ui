@@ -180,7 +180,8 @@ export default class WhatIfReportComponent extends React.Component {
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
         }
 
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
@@ -2896,7 +2897,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                    amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3996,81 +3997,81 @@ export default class WhatIfReportComponent extends React.Component {
                                 isValid,
                                 setTouched
                             }) => (
-                                    <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
+                                <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
 
-                                        <Col md="12 pl-0">
-                                            <div className="d-md-flex">
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <div className="controls WhatifInputFeild">
+                                                <FormGroup className="">
+                                                    <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="scenarioId"
+                                                        id="scenarioId"
+                                                        bsSize="sm"
+                                                        valid={!errors.scenarioId && this.state.scenarioId != ''}
+                                                        invalid={touched.scenarioId && !!errors.scenarioId}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.scenarioId}
+                                                        onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
+                                                        <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                        <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
+                                                        <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
+                                                        <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
+                                                        <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                                </FormGroup>
+                                            </div>
+                                            <Input
+                                                type="hidden"
+                                                name="needPercentageValidation"
+                                                id="needPercentageValidation"
+                                                value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
+                                            />
+                                            <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
                                                 <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="">
-                                                        <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                    <FormGroup className="tab-ml-1">
+                                                        <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                         <Input
-                                                            type="select"
-                                                            name="scenarioId"
-                                                            id="scenarioId"
+                                                            type="text"
+                                                            name="percentage"
+                                                            id="percentage"
                                                             bsSize="sm"
-                                                            valid={!errors.scenarioId && this.state.scenarioId != ''}
-                                                            invalid={touched.scenarioId && !!errors.scenarioId}
+                                                            valid={!errors.percentage && this.state.percentage != ''}
+                                                            invalid={touched.percentage && !!errors.percentage}
                                                             onBlur={handleBlur}
-                                                            value={this.state.scenarioId}
+                                                            value={this.state.percentage}
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
-                                                            <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
-                                                            <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
-                                                            <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
-                                                            <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
-                                                            <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
                                                         </Input>
-                                                        <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.percentage}</FormFeedback>
                                                     </FormGroup>
                                                 </div>
-                                                <Input
-                                                    type="hidden"
-                                                    name="needPercentageValidation"
-                                                    id="needPercentageValidation"
-                                                    value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
-                                                />
-                                                <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
-                                                    <div className="controls WhatifInputFeild">
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
-                                                            <Input
-                                                                type="text"
-                                                                name="percentage"
-                                                                id="percentage"
-                                                                bsSize="sm"
-                                                                valid={!errors.percentage && this.state.percentage != ''}
-                                                                invalid={touched.percentage && !!errors.percentage}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.percentage}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                            </div>
+                                            <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
+                                                <div className="controls WhatifInputFeild">
+                                                    <FormGroup className="tab-ml-1">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
+                                                        <div className="controls edit">
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={this.state.rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
                                                             >
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.percentage}</FormFeedback>
-                                                        </FormGroup>
-                                                    </div>
+                                                                <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
                                                 </div>
-                                                <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
-                                                    <div className="controls WhatifInputFeild">
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
-                                                            <div className="controls edit">
-                                                                <Picker
-                                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                    ref={this.pickRange}
-                                                                    value={this.state.rangeValue}
-                                                                    lang={pickerLang}
-                                                                    //theme="light"
-                                                                    onChange={this.handleRangeChange}
-                                                                    onDismiss={this.handleRangeDissmis}
-                                                                >
-                                                                    <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                                </Picker>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                    {/* <div className="controls WhatifInputFeild">
+                                                {/* <div className="controls WhatifInputFeild">
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                             <DatePicker
@@ -4088,16 +4089,16 @@ export default class WhatIfReportComponent extends React.Component {
                                                             />
                                                         </FormGroup>
                                                     </div> */}
-                                                </div>
-                                                <FormGroup className="tab-ml-1 mt-4">
-                                                    <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            </div>
+                                            <FormGroup className="tab-ml-1 mt-4">
+                                                <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                     &nbsp;
                                                     </FormGroup>
-                                            </div>
-                                        </Col>
+                                        </div>
+                                    </Col>
 
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                     <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }}>{i18n.t('static.whatIf.scenarioList')}</span>
                     <Row className="pt-3 pb-3 scenarioListDiv" >
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -4890,7 +4891,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                             <div className="pt-4"></div>
@@ -5044,14 +5045,14 @@ export default class WhatIfReportComponent extends React.Component {
 
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map((sl,count) => {
+        shipmentList.map((sl, count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
-                var index=count;
+                var index = count;
                 this.setState({
-                    indexOfShipmentContainingBatch:index
+                    indexOfShipmentContainingBatch: index
                 })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
