@@ -3366,6 +3366,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         } else if (negativeBudget == 0) {
             return valid;
+        } else {
+            return valid;
         }
     }
 
