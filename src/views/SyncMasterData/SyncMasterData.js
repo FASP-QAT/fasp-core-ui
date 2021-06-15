@@ -480,7 +480,7 @@ export default class SyncMasterData extends Component {
                 db1 = e.target.result;
                 var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
                 var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
-                var updatedSyncDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+                var updatedSyncDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                 this.setState({
                     updatedSyncDate: updatedSyncDate
                 })
