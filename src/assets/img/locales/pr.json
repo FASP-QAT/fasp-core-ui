@@ -949,6 +949,7 @@
     "static.common.delete": "Excluir",
     "static.supplyPlan.actualConsumption": "Consumo Real",
     "static.integration.addBodyParameter": "Adicionar parâmetro de corpo",
+    "static.planningUnit.conversionFactor": "São permitidos no máximo 10 dígitos e 2 dígitos após o decimal.",
     "static.common.back": "Costas",
     "static.procurementUnit.unitsPerContainer": "Unidades por contêiner",
     "static.quantimed.quantimedImportScreenOne": "Arquivo de importação de dados",

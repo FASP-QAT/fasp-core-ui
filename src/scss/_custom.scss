@@ -3744,7 +3744,7 @@ margin-left: -45px;
 .clone {
 	// position:absolute;
 	top:0;
-	left:0;
+	left:23px;
 	// pointer-events:none;
 }
 
@@ -4011,4 +4011,9 @@ color: #000000!important;
 // }
 .ShipmentSummeryReportMarginTop {
   margin-top: -38px;
+}
+
+.clone1{
+left:0;
+z-index:999;
 }

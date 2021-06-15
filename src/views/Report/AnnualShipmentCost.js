@@ -196,7 +196,9 @@ class AnnualShipmentCost extends Component {
                                     shipmentList = programJson.shipmentList;
                                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
-                                        var planningUnitId = p.value
+                                        console.log("P+++++++++++",p);
+                                        var planningUnitId = p.value;
+                                        var planningUnitLabel=p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
                                         if (reportbaseValue == 1) {
@@ -249,7 +251,7 @@ class AnnualShipmentCost extends Component {
                                                         'fundingsource': fundingSource.fundingSourceCode,
                                                         'procurementAgent': procurementAgent.procurementAgentCode,
                                                         'PLANNING_UNIT_ID': planningUnitId,
-                                                        'planningUnit': list[0].planningUnit.label.label_en
+                                                        'planningUnit': planningUnitLabel
 
                                                     };
                                                     var monthstartfrom = this.state.rangeValue.from.month
