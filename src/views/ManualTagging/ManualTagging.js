@@ -2227,23 +2227,18 @@ export default class ManualTagging extends Component {
                                         .then(response => {
 
                                             let responseData = response.data.sort(function (a, b) {
-                                                var dateA = new Date(a.date).getTime();
-                                                var dateB = new Date(b.date).getTime();
-                                                return dateA > dateB ? 1 : -1;
+                                                var dateA = new Date(a.receivedOn).getTime();
+                                                var dateB = new Date(b.receivedOn).getTime();
+                                                return dateA < dateB ? 1 : -1;
                                             })
+                                            console.log("history---",response.data);
                                             responseData = responseData.filter((responseData, index, self) =>
                                                 index === self.findIndex((t) => (
-                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.expectedDeliveryDate === responseData.expectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
                                                     && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
                                                 ))
                                             )
-
-                                            responseData = responseData.sort(function (a, b) {
-                                                var dateA = new Date(a.date).getTime();
-                                                var dateB = new Date(b.date).getTime();
-                                                return dateA < dateB ? 1 : -1;
-                                            })
-                                            console.log("DATA---->2", responseData);
+                                            console.log("history-2--",responseData);
 
                                             responseData = responseData.sort(function (a, b) {
                                                 var dateA = a.erpOrderId;

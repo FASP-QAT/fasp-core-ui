@@ -2668,7 +2668,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                                     <thead>
                                                         <tr>
-                                                            <th className="BorderNoneSupplyPlan"></th>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                                             {
                                                                 this.state.monthsArray.map(item => {
@@ -2685,7 +2685,7 @@ class EditSupplyPlanStatus extends Component {
                                                     <tbody>
 
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
@@ -2694,7 +2694,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                                             {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -2707,7 +2707,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -2719,7 +2719,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                                             {
                                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -2737,7 +2737,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -2749,7 +2749,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                                             {
@@ -2769,7 +2769,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -2787,7 +2787,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -2804,7 +2804,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -2821,7 +2821,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -2832,7 +2832,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                                             {
                                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -2850,7 +2850,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -2867,7 +2867,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -2884,7 +2884,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -2901,7 +2901,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                                             {
                                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -2910,7 +2910,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                                             {
                                                                 this.state.expiredStockArr.map(item1 => {
@@ -2927,7 +2927,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -2936,7 +2936,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -2945,7 +2945,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                                             {
                                                                 this.state.amcTotalData.map(item1 => (
@@ -2954,7 +2954,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         {/* <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                                             {
                                                                 this.state.minStockMoS.map(item1 => (
@@ -2963,7 +2963,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                                             {
                                                                 this.state.maxStockMoS.map(item1 => (
@@ -2972,7 +2972,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr> */}
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                                             {
                                                                 this.state.unmetDemand.map(item1 => (
@@ -4337,6 +4337,7 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
@@ -4423,6 +4424,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
+                                    document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
@@ -4512,7 +4514,7 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                 {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
