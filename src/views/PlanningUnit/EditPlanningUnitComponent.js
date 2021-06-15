@@ -350,7 +350,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             className="form-check-input"
@@ -382,7 +382,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             check htmlFor="inline-radio2">
                                                             {i18n.t('static.common.disabled')}
                                                         </Label>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
