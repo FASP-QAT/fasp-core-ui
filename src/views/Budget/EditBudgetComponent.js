@@ -481,7 +481,7 @@ class EditBudgetComponent extends Component {
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     // budget.stopDate = new Date(stopDateString);
                                     console.log("check----->1", budget.budgetAmt);
-                                    budget.budgetAmt = budget.budgetAmt.replace(',', '');
+                                    budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
                                     console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
