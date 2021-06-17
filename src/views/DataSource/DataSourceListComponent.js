@@ -1002,6 +1002,9 @@ export default class DataSourceListComponent extends Component {
     }
 
     selected = function (instance, cell, x, y, value) {
+        console.log("selected x--->", x);
+        console.log("selected y--->", y);
+        console.log("selected value--->", value);
         if ((x == 0 && value != 0) || (y == 0)) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
@@ -1144,7 +1147,7 @@ export default class DataSourceListComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

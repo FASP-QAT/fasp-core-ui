@@ -69,7 +69,8 @@ class warehouseCapacity extends Component {
             countryValues: [],
             countryLabels: [],
             loading: true,
-            programId: ''
+            programId: '',
+            programs: []
 
         };
         this.getCountrylist = this.getCountrylist.bind(this);

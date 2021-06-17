@@ -757,7 +757,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         multiplier: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
+            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.procurementUnit.validMultiplierText'))
             .min(0, i18n.t('static.procurementUnit.validValueText')),
         // .max(12, i18n.t("Eneter valid number with digits less then 10.")),
@@ -1635,7 +1636,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
-                                            </FormGroup>
+                                                </FormGroup>
                                                 </CardFooter>
                                             </Form>
                                         )} />

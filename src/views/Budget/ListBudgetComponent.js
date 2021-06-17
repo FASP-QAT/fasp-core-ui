@@ -1380,7 +1380,7 @@ class ListBudgetComponent extends Component {
               </div>
             </div>
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
+          <CardBody className="pb-lg-0 ">
             <Col md="6 pl-0">
               <div className="d-md-flex Selectdiv2">
 
@@ -1467,7 +1467,7 @@ class ListBudgetComponent extends Component {
             </Col> */}
 
             {/* <div id="loader" className="center"></div> */}
-            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>
               <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1485,7 +1485,6 @@ class ListBudgetComponent extends Component {
 
           </CardBody>
         </Card>
-
       </div>
     )
   }

@@ -1376,7 +1376,7 @@ export default class ExpiredInventory extends Component {
                         </div>
                         {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -1390,6 +1390,7 @@ export default class ExpiredInventory extends Component {
                                 </div>
                             </div>
                         </div>
+
                     </CardBody>
                 </Card>
                 <Modal isOpen={this.state.expiredStockModal}
@@ -1445,6 +1446,7 @@ export default class ExpiredInventory extends Component {
                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
+
             </div>
         );
     }

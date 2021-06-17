@@ -24,7 +24,8 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.planningUnit.plannignUnitName')),
         multiplier: Yup.string()
-            .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
+            .matches(/^\d{1,10}(\.\d{1,2})?$/, i18n.t('static.planningUnit.conversionFactor'))
+            // .matches(/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.planningUnit.multiplier'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
@@ -435,7 +436,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
-                                                    </FormGroup>
+                                                </FormGroup>
                                                 </CardFooter>
                                             </Form>
 
@@ -446,8 +447,8 @@ export default class EditPlanningUnitComponent extends Component {
                 </Row>
 
                 <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                    {/* <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6> */}
                 </div>
             </div>
         );

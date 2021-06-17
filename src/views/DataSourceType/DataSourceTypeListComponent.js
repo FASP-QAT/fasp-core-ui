@@ -713,7 +713,7 @@ export default class DataSourceTypeListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv">
@@ -740,7 +740,7 @@ export default class DataSourceTypeListComponent extends Component {
                         }
                         <div className="SearchMarginTop">
                             {/* <div id="loader" className="center"></div> */}
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

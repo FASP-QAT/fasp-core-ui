@@ -2185,7 +2185,7 @@ class ShipmentGlobalView extends Component {
                                                 {/* table1 */}
                                                 {this.state.table1Body.length > 0 &&
                                                     <div className="table-responsive ">
-                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
                                                             <thead>
                                                                 <tr>
@@ -2225,7 +2225,7 @@ class ShipmentGlobalView extends Component {
 
                                                 {this.state.shipmentList.length > 0 &&
                                                     <div className="table-responsive ">
-                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
                                                             <thead>
                                                                 <tr>
@@ -2267,23 +2267,24 @@ class ShipmentGlobalView extends Component {
                                     </div>
                                 </Col>
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                        </div>
-                        <div style={{ display: this.state.loading ? "block" : "none" }}>
-                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                <div class="align-items-center">
-                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
 
-                                    <div class="spinner-border blue ml-4" role="status">
-
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                     </CardBody>
                 </Card>
-            </div>
+
+            </div >
         );
     }
 }

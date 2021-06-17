@@ -1407,7 +1407,7 @@ class GlobalConsumption extends Component {
                       {this.state.show && this.state.consumptions.length > 0 &&
                         <div className="table-responsive ">
 
-                          <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                          <Table responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
                             <thead>
                               <tr>

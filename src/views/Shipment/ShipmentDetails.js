@@ -62,6 +62,7 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentList: [],
             budgetList: [],
             shipmentStatusList: [],
+            showBatchSaveButton: false
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -92,11 +93,11 @@ export default class ShipmentDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
             { header: i18n.t('static.report.id'), key: 'name', width: 25 },
-            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
             { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
-            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
             { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
             { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
@@ -142,6 +143,18 @@ export default class ShipmentDetails extends React.Component {
             showErrorMessage: true,
             // errorStyle: 'error',
             // error: 'Invalid value',
+        });
+
+        worksheet.dataValidations.add('E2:E100', {
+            type: 'date',
+            // operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [new Date('3021-01-01')],
+            allowBlank: false,
+            prompt: 'Format (YYYY-MM-DD)',
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
         });
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
@@ -1077,7 +1090,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             <Button id="shipmentDetailsPopCancelButton" size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">

@@ -256,9 +256,9 @@ export default class IntegrationListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="table-responsive pt-md-1 pb-md-1 pt-lg-0">
+                    <CardBody className="table-responsive pt-md-1 pb-md-1">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_INTEGRATION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -271,6 +271,7 @@ export default class IntegrationListComponent extends Component {
                                 </div>
                             </div>
                         </div>
+
                     </CardBody>
                 </Card>
 

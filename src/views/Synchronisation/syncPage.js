@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
+import { Formik } from 'formik';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
-  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader
+  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter, Modal, ModalBody, ModalFooter, ModalHeader,
+  FormFeedback
 } from 'reactstrap';
+import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -26,6 +29,39 @@ import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 
 const entityname = i18n.t('static.dashboard.commitVersion')
+
+const initialValues = {
+  notes: ''
+}
+
+const validationSchema = function (values, t) {
+  return Yup.object().shape({
+    notes: Yup.string()
+      .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+  })
+}
+const validate = (getValidationSchema) => {
+  return (values) => {
+
+    const validationSchema = getValidationSchema(values, i18n.t)
+    try {
+      validationSchema.validateSync(values, { abortEarly: false })
+      return {}
+    } catch (error) {
+      return getErrorsFromValidationError(error)
+    }
+  }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+  const FIRST_ERROR = 0
+  return validationError.inner.reduce((errors, error) => {
+    return {
+      ...errors,
+      [error.path]: error.errors[FIRST_ERROR],
+    }
+  }, {})
+}
 
 export default class syncPage extends Component {
 
@@ -40,7 +76,8 @@ export default class syncPage extends Component {
       conflictsCount: 0,
       loading: true,
       versionType: 1,
-      openCount: 0
+      openCount: 0,
+      notes: ''
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -79,7 +116,37 @@ export default class syncPage extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.versionTypeChanged = this.versionTypeChanged.bind(this);
     this.generateDataAfterResolveConflictsForQPL = this.generateDataAfterResolveConflictsForQPL.bind(this);
+    this.notesChange = this.notesChange.bind(this);
+    this.checkLastModifiedDateForProgram = this.checkLastModifiedDateForProgram.bind(this)
     // this.checkValidations = this.checkValidations.bind(this);
+  }
+
+  notesChange(event) {
+    this.setState({
+      notes: event.target.value
+    })
+  }
+
+  touchAll(setTouched, errors) {
+    setTouched({
+      notes: true
+    }
+    );
+    this.validateForm(errors);
+  }
+  validateForm(errors) {
+    this.findFirstError('budgetForm', (fieldName) => {
+      return Boolean(errors[fieldName])
+    })
+  }
+  findFirstError(formName, hasError) {
+    const form = document.forms[formName]
+    for (let i = 0; i < form.length; i++) {
+      if (hasError(form[i].name)) {
+        form[i].focus()
+        break
+      }
+    }
   }
 
   versionTypeChanged(event) {
@@ -1140,7 +1207,8 @@ export default class syncPage extends Component {
               // loading: false,
               programId: proList[0].value
             }, () => {
-              this.getDataForCompare(proList[0]);
+              // this.getDataForCompare(proList[0]);
+              this.checkLastModifiedDateForProgram(proList[0]);
             })
           } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
             this.setState({
@@ -1149,7 +1217,8 @@ export default class syncPage extends Component {
               // loading: false,
               programId: localStorage.getItem("sesProgramId")
             }, () => {
-              this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
             })
           } else {
             this.setState({
@@ -1213,7 +1282,7 @@ export default class syncPage extends Component {
     document.getElementById("detailsDiv").style.display = "none";
   }
 
-  getDataForCompare(value) {
+  checkLastModifiedDateForProgram(value) {
     console.log("+++Started with commit version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
     document.getElementById("detailsDiv").style.display = "block";
     this.setState({
@@ -1240,6 +1309,97 @@ export default class syncPage extends Component {
     var programId = value != "" && value != undefined ? value.value : 0;
     console.log("@@@ProgramId", programId);
     console.log("@@@this.state.programList", this.state.programList);
+    var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
+    var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+
+    if (programId != 0) {
+      localStorage.setItem("sesProgramId", programId);
+      ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
+        if (response1.status == 200) {
+          var lastModifiedDate = response1.data;
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['lastSyncDate'], 'readwrite');
+            var lastSyncDateTransaction = transaction.objectStore('lastSyncDate');
+            var lastSyncDateRequest = lastSyncDateTransaction.getAll();
+            lastSyncDateRequest.onsuccess = function (event) {
+              var lastSyncDate = lastSyncDateRequest.result[0];
+              var result = lastSyncDateRequest.result;
+              for (var i = 0; i < result.length; i++) {
+                if (result[i].id == 0) {
+                  var lastSyncDate = lastSyncDateRequest.result[i];
+                }
+              }
+              if (lastSyncDate == undefined) {
+                lastSyncDate = "2020-01-01 00:00:00";
+              } else {
+                lastSyncDate = lastSyncDate.lastSyncDate;
+              }
+              if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+                alert(i18n.t('static.commitVersion.outdatedsync'));
+                this.props.history.push(`/masterDataSync`)
+              } else {
+                this.getDataForCompare(value);
+              }
+            }.bind(this)
+          }.bind(this)
+        }
+      }).catch(error => {
+        console.log("@@@Error1", error);
+        console.log("@@@Error1", error.message);
+        console.log("@@@Error1", error.response ? error.response.status : "")
+        if (error.message === "Network Error") {
+          console.log("+++in catch 1")
+          this.setState({
+            message: 'static.common.networkError',
+            loading: false,
+            statuses: [],
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            case 412:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false,
+                statuses: [],
+              });
+              break;
+            default:
+              console.log("+++in catch 2")
+              this.setState({
+                message: 'static.unkownError',
+                loading: false,
+                statuses: [],
+              });
+              break;
+          }
+        }
+      })
+    }
+  }
+
+  getDataForCompare(value) {
+    var programId = value != "" && value != undefined ? value.value : 0;
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
 
@@ -1900,7 +2060,7 @@ export default class syncPage extends Component {
                                     var downloadedProgramDataShipment = downloadedProgramData.shipmentList;
 
                                     var modifiedShipmentIds = []
-                                    latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId).map(item => { modifiedShipmentIds.push(item.shipmentId) });
+                                    latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
                                     oldProgramDataShipment.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => modifiedShipmentIds.push(item.shipmentId));
 
                                     var latestModifiedShipmentData = latestProgramDataShipment.filter(c => modifiedShipmentIds.includes(c.shipmentId));
@@ -2802,7 +2962,7 @@ export default class syncPage extends Component {
                             bsSize="sm"
                             options={this.state.programList}
                             value={this.state.programId}
-                            onChange={(e) => { this.getDataForCompare(e); }}
+                            onChange={(e) => { this.checkLastModifiedDateForProgram(e); }}
                           />
                         </div>
                       </FormGroup>
@@ -2821,39 +2981,71 @@ export default class syncPage extends Component {
                 </Form>
                 <div id="detailsDiv">
                   <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Col md="12 pl-0 pt-3">
-                      <div className="d-md-flex">
-                        <FormGroup className="col-md-3">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input type="select"
-                                bsSize="sm"
-                                name="versionType" id="versionType" onChange={this.versionTypeChanged}>
-                                {versionTypes}
-                              </Input>
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input type="textarea"
-                                name="notes"
-                                // maxLength={600} 
-                                id="notes">
-                              </Input>
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                        <FormGroup className="tab-ml-1 mt-4">
-                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                          {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
-                          &nbsp;
+                    <Formik
+                      initialValues={initialValues}
+                      validate={validate(validationSchema)}
+                      onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.synchronize()
+                      }}
+                      render={
+                        ({
+                          values,
+                          errors,
+                          touched,
+                          handleChange,
+                          handleBlur,
+                          handleSubmit,
+                          isSubmitting,
+                          isValid,
+                          setTouched,
+                          handleReset,
+                          setFieldValue,
+                          setFieldTouched,
+                          setFieldError
+                        }) => (
+                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                              <Col md="12 pl-0 pt-3">
+                                <div className="d-md-flex">
+                                  <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                    <div className="controls ">
+                                      <InputGroup>
+                                        <Input type="select"
+                                          bsSize="sm"
+                                          name="versionType" id="versionType" onChange={this.versionTypeChanged}>
+                                          {versionTypes}
+                                        </Input>
+                                      </InputGroup>
+                                    </div>
+                                  </FormGroup>
+                                  <FormGroup className="col-md-6">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                    <div className="controls ">
+                                      <InputGroup>
+                                        <Input type="textarea"
+                                          name="notes"
+                                          // maxLength={600} 
+                                          id="notes"
+                                          valid={!errors.notes && this.state.notes != ''}
+                                          invalid={touched.notes && !!errors.notes}
+                                          onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                          onBlur={handleBlur}
+                                          value={this.state.notes}
+                                        >
+                                        </Input>
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                      </InputGroup>
+                                    </div>
+                                  </FormGroup>
+                                  <FormGroup className="tab-ml-1 mt-4">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                    &nbsp;
                 </FormGroup>
-                      </div>
-                    </Col>
+                                </div>
+                              </Col>
+                            </Form>
+                          )} />
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -2909,6 +3101,7 @@ export default class syncPage extends Component {
                       </div>
                     </div>
                   </div>
+
                 </div>
               </CardBody>
               {/* <CardFooter> */}
@@ -3318,7 +3511,7 @@ export default class syncPage extends Component {
                     color: "red"
                   }, () => {
                     this.hideFirstComponent()
-                    this.getDataForCompare(this.state.programId);
+                    this.checkLastModifiedDateForProgram(this.state.programId);
                   });
 
                 }
