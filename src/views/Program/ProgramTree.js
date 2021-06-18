@@ -323,8 +323,13 @@ class Program extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         // console.log("response.data------------>", response.data)
+                        var lang=this.state.lang;
                         this.setState({
-                            countryList: response.data
+                            countryList: (response.data).sort(function (a, b) {
+                                a = getLabelText(a.realmCountry.label, lang).toLowerCase();
+                                b = getLabelText(b.realmCountry.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
                         })
                         // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
                         //     .then(response => {
@@ -666,13 +671,21 @@ class Program extends Component {
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
-                                                                    item.healthAreaList.map(item1 => (
+                                                                    item.healthAreaList.sort(function (a, b) {
+                                                                        a = getLabelText(a.label, this.state.lang).toLowerCase();
+                                                                        b = getLabelText(b.label, this.state.lang).toLowerCase();
+                                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                                    }.bind(this)).map(item1 => (
                                                                         <li>
                                                                             <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
                                                                             <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
+                                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).sort(function (a, b) {
+                                                                                        a = getLabelText(a.program.label, this.state.lang).toLowerCase();
+                                                                                        b = getLabelText(b.program.label, this.state.lang).toLowerCase();
+                                                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                                                    }.bind(this)).map(item2 => (
 
                                                                                         <li>
                                                                                             {/* {item2} */}
