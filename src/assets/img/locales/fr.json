@@ -1697,6 +1697,7 @@
     "static.program.programName": "Nom du programme",
     "static.ticket.requestTo": "Demande de...",
     "static.pipelineProgram.programId": "Identifiant du programme",
+    "static.commitVersion.outdatedsync": "La synchronisation de vos données de base est obsolète. Redirection vers la synchronisation des données principales.",
     "static.report.wapeFormulaNote": "Remarque: nous avons utilisé ici les formules d`erreur en pourcentage absolu pondéré (WAPE)",
     "static.dashboard.tracercategory": "Catégories de traceurs",
     "static.supplyPlan.nonPsmShipmentsDetails": "Détails de l`envoi non PSM",

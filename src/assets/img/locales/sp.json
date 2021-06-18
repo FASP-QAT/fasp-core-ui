@@ -1697,6 +1697,7 @@
     "static.program.programName": "Nombre del programa",
     "static.ticket.requestTo": "Solicitud de...",
     "static.pipelineProgram.programId": "Identificador del programa",
+    "static.commitVersion.outdatedsync": "Su sincronización de datos maestros está desactualizada. Redirigiendo a la sincronización de datos maestros.",
     "static.report.wapeFormulaNote": "Nota: Hemos utilizado fórmulas de error de porcentaje absoluto ponderado (WAPE) aquí",
     "static.dashboard.tracercategory": "Categorías de seguimiento",
     "static.supplyPlan.nonPsmShipmentsDetails": "Detalles de pedidos no comprados por PSM",
