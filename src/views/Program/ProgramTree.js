@@ -323,7 +323,7 @@ class Program extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         // console.log("response.data------------>", response.data)
-                        var lang=this.state.lang;
+                        var lang = this.state.lang;
                         this.setState({
                             countryList: (response.data).sort(function (a, b) {
                                 a = getLabelText(a.realmCountry.label, lang).toLowerCase();
