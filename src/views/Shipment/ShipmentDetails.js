@@ -1036,7 +1036,7 @@ export default class ShipmentDetails extends React.Component {
 
                         <div className="shipmentconsumptionSearchMarginTop">
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
-                            <div className="table-responsive" id="shipmentsDetailsTableDiv">
+                            <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
                             </div>
                         </div>

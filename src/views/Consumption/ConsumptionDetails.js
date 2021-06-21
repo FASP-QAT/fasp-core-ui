@@ -907,7 +907,7 @@ export default class ConsumptionDetails extends React.Component {
 
                         <div className="shipmentconsumptionSearchMarginTop">
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
-                            <div className="table-responsive" id="consumptionTableDiv">
+                            <div className="table-responsive consumptionDataEntryTable" id="consumptionTableDiv">
                                 <div id="consumptionTable" />
                             </div>
                         </div>
