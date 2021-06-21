@@ -9,11 +9,12 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter, selectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import MultiSelect from 'react-multi-select-component';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -34,7 +35,6 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
-import MultiSelect from 'react-multi-select-component';
 import ProblemListDashboard from '../Report/ProblemListDashboard';
 import { Prompt } from 'react-router-dom';
 const entityname = i18n.t('static.report.problem');
@@ -60,6 +60,7 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
+            problemStatusValues: [],
             // problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
@@ -1730,9 +1731,9 @@ export default class ConsumptionDetails extends React.Component {
                                         <MultiSelect
                                             name="problemStatusId"
                                             id="problemStatusId"
-                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             value={this.state.problemStatusValues}
                                             onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             labelledBy={i18n.t('static.common.select')}
                                         />
                                     </div>
