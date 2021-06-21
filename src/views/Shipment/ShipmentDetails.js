@@ -145,17 +145,21 @@ export default class ShipmentDetails extends React.Component {
             // error: 'Invalid value',
         });
 
-        worksheet.dataValidations.add('E2:E100', {
-            type: 'date',
-            // operator: 'greaterThan',
-            showErrorMessage: true,
-            formulae: [new Date('3021-01-01')],
-            allowBlank: false,
-            prompt: 'Format (YYYY-MM-DD)',
-            // errorStyle: 'error',
-            // errorTitle: 'Invalid Value',
-            // error: 'Invalid Value'
-        });
+        // worksheet.dataValidations.add('E2:E100', {
+        //     type: 'date',
+        //     // operator: 'greaterThan',
+        //     showErrorMessage: true,
+        //     formulae: [new Date('3021-01-01')],
+        //     allowBlank: false,
+        //     prompt: 'Format (YYYY-MM-DD)',
+        //     // errorStyle: 'error',
+        //     // errorTitle: 'Invalid Value',
+        //     // error: 'Invalid Value'
+        // });
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('E' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+        }
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
         worksheet.dataValidations.add('F2:F100', {

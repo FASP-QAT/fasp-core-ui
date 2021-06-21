@@ -182,17 +182,21 @@ export default class ConsumptionDetails extends React.Component {
 
         //Validations
 
-        worksheet.dataValidations.add('A2:A100', {
-            type: 'date',
-            // operator: 'greaterThan',
-            showErrorMessage: true,
-            formulae: [new Date('3021-01-01')],
-            allowBlank: false,
-            prompt: 'Format (YYYY-MM-DD)',
-            // errorStyle: 'error',
-            // errorTitle: 'Invalid Value',
-            // error: 'Invalid Value'
-        });
+        // worksheet.dataValidations.add('A2:A100', {
+        //     type: 'date',
+        //     // operator: 'greaterThan',
+        //     showErrorMessage: true,
+        //     formulae: [new Date('3021-01-01')],
+        //     allowBlank: false,
+        //     prompt: 'Format (YYYY-MM-DD)',
+        //     // errorStyle: 'error',
+        //     // errorTitle: 'Invalid Value',
+        //     // error: 'Invalid Value'
+        // });
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('A' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+        }
 
         worksheet.dataValidations.add('F2:F100', {
             type: 'whole',
