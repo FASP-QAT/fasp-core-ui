@@ -1564,6 +1564,8 @@ export default class ShipmentLinkingNotifications extends Component {
 
             }, this);
 
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />

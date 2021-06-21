@@ -149,7 +149,7 @@ export default class ManualTagging extends Component {
         console.log("row---", row.maxFilename);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
-            
+
             this.setState({
                 batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
             });
@@ -2725,6 +2725,9 @@ export default class ManualTagging extends Component {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
+
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         const { planningUnits1 } = this.state;
         let planningUnitMultiList1 = planningUnits1.length > 0
             && planningUnits1.map((item, i) => {
