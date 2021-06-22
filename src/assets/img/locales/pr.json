@@ -962,6 +962,7 @@
     "static.dashboard.realmheader": "Reino",
     "static.message.pipelineProgramImportSuccess": "Programa importado com sucesso",
     "static.problemReport.resolvedExample": "Uma unidade de planejamento é sinalizada por não seguir a previsão dinâmica. O usuário insere uma nota de que esta unidade de planejamento não segue a previsão dinâmica, pois não é um produto sazonal. O revisor marca isso como resolvido porque a explicação provavelmente não mudará no futuro.",
+    "static.dataEntry.dateValidation": "Use o formato de data (AAAA-MM-DD)",
     "static.mt.selectFundingSource": "Selecione a fonte de financiamento",
     "static.supplyPlan.budgetArray": "Matriz de orçamento",
     "static.inventory.inventorydetils": "Detalhes de estoque",
