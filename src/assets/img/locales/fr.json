@@ -962,6 +962,7 @@
     "static.dashboard.realmheader": "Domaine",
     "static.message.pipelineProgramImportSuccess": "Programme importé avec succès",
     "static.problemReport.resolvedExample": "Une unité de planification est signalée pour ne pas suivre les prévisions dynamiques. L`utilisateur doit ajouter une remarque indiquant que cette unité de planification ne suit pas la prévision dynamique car il ne s`agit pas d`un produit saisonnier. Le réviseur marque cela comme résolu car l`explication ne changera probablement pas à l`avenir.",
+    "static.dataEntry.dateValidation": "Veuillez utiliser le format de date (AAAA-MM-JJ)",
     "static.mt.selectFundingSource": "Veuillez sélectionner la source de financement",
     "static.supplyPlan.budgetArray": "Tableau de budget",
     "static.inventory.inventorydetils": "Détails de l`inventaire",

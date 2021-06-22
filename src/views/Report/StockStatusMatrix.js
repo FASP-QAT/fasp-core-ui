@@ -1750,7 +1750,7 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1911,7 +1911,7 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
               </div>
             </div>
-            <div class="TableCust">
+            <div class="TableCust" style={{ display: this.state.loading ? "none" : "block" }}>
               {this.state.data.length > 0 &&
                 <Table striped bordered responsive="md" style={{ width: "100%" }}>
                   <thead>
@@ -1967,19 +1967,20 @@ export default class StockStatusMatrix extends React.Component {
 
 
             </div>
-          </CardBody>
-        </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
+                  <div class="spinner-border blue ml-4" role="status">
 
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
+
 
 
       </div>)
