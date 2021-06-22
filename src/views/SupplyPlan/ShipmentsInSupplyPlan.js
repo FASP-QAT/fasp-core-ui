@@ -86,7 +86,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(24, data[i].y, -1, true);
                     (instance.jexcel).setValueFromCoords(25, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(26, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(27, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(28, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(29, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
