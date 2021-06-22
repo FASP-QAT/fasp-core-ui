@@ -2730,6 +2730,9 @@ export default class ManualTagging extends Component {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
+
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         const { planningUnits1 } = this.state;
         let planningUnitMultiList1 = planningUnits1.length > 0
             && planningUnits1.map((item, i) => {

@@ -867,7 +867,7 @@ export default class AddInventory extends Component {
 
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
-                            <div className="table-responsive" id="adjustmentsTableDiv">
+                            <div className="table-responsive inventoryDataEntryTable" id="adjustmentsTableDiv">
                                 <div id="adjustmentsTable"  className="InventoryRowheightForjexcel"/>
                             </div>
                         </div>
