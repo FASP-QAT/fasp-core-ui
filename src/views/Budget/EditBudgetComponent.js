@@ -34,7 +34,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            // .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         budgetCode: Yup.string()
@@ -220,9 +221,12 @@ class EditBudgetComponent extends Component {
 
                     var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
                     var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
+                    let budgetObj = response.data;
+                    budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                    console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
 
                     this.setState({
-                        budget: response.data, loading: false,
+                        budget: budgetObj, loading: false,
                         rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                     });
                 }
@@ -447,7 +451,7 @@ class EditBudgetComponent extends Component {
                                     budgetCode: this.state.budget.budgetCode,
                                     startDate: this.state.budget.startDate,
                                     stopDate: this.state.budget.stopDate,
-                                    fundingSourceId:this.state.budget.fundingSource.fundingSourceId
+                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -476,7 +480,9 @@ class EditBudgetComponent extends Component {
 
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     // budget.stopDate = new Date(stopDateString);
-                                    console.log("this.state.budget----->", budget);
+                                    console.log("check----->1", budget.budgetAmt);
+                                    budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
+                                    console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
