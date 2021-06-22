@@ -962,6 +962,7 @@
     "static.dashboard.realmheader": "Realm",
     "static.message.pipelineProgramImportSuccess": "Program imported successfully",
     "static.problemReport.resolvedExample": "A planning unit gets flagged for not following dynamic forecasting. The user enters a note that this planning unit does not follow dynamic forecasting because it is not a seasonal product. The reviewer marks this as 'Resolved' because the explanation will most likely not change in the future.",
+    "static.dataEntry.dateValidation": "Please use (YYYY-MM-DD) date format",
     "static.mt.selectFundingSource": "Please select funding source",
     "static.supplyPlan.budgetArray": "Budget Array",
     "static.inventory.inventorydetils": "Inventory Details",
