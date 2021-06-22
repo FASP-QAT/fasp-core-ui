@@ -1519,7 +1519,7 @@ class AnnualShipmentCost extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
@@ -1735,7 +1735,7 @@ class AnnualShipmentCost extends Component {
                                 </Form>
                                 <Col md="12 pl-0">
 
-                                    <div className="row">
+                                    <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                                         <div className="col-md-12 p-0" id="div_id">
                                             {this.state.outPutList.length > 0 &&
                                                 // {true &&
@@ -1746,6 +1746,17 @@ class AnnualShipmentCost extends Component {
 
                                         </div>
                                     </div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Col>
 
 
@@ -1754,17 +1765,6 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

@@ -781,7 +781,7 @@ export default class ImportProgram extends Component {
                 <h5 style={{ color: "red" }} id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card className="mt-2">
                     <Formik
                         initialValues={initialValues}
                         render={
@@ -821,6 +821,19 @@ export default class ImportProgram extends Component {
                                                 <FormFeedback>{errors.programId}</FormFeedback>
                                             </FormGroup>
                                         </CardBody>
+                                        <div style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                                    <div class="spinner-border blue ml-4" role="status">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <CardFooter>
                                             <FormGroup>
 
@@ -836,17 +849,7 @@ export default class ImportProgram extends Component {
                                 )} />
                 </Card>
 
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </>
         )
