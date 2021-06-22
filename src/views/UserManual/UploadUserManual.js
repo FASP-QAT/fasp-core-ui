@@ -131,10 +131,10 @@ export default class uploadUserManual extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 id="div2" className={this.state.color}>{this.state.message}</h5>
-                <Card className="mt-2" style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card className="mt-2">
 
                     <Form noValidate name='simpleForm'>
-                        <CardBody className="pb-lg-2 pt-lg-2">
+                        <CardBody className="pb-lg-2 pt-lg-2" style={{ display: this.state.loading ? "none" : "block" }}>
                             <FormGroup>
                                 <Col md="3">
                                     <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.userManual.fileinputPdf')}</Label>
@@ -145,6 +145,18 @@ export default class uploadUserManual extends Component {
                                 </Col>
                             </FormGroup>
                         </CardBody>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -156,17 +168,7 @@ export default class uploadUserManual extends Component {
                     </Form>
                 </Card>
 
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </>
         )

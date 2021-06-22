@@ -89,7 +89,7 @@ class SupplyPlanVersionAndReview extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() },
-            programId:-1
+            programId: -1
 
 
 
@@ -110,13 +110,13 @@ class SupplyPlanVersionAndReview extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.setProgramId=this.setProgramId.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
     }
 
-    setProgramId(event){
+    setProgramId(event) {
         this.setState({
-            programId:event.target.value
-        },()=>{
+            programId: event.target.value
+        }, () => {
             this.fetchData();
         })
     }
@@ -211,9 +211,9 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
-                    options:{isTime:1,format:"DD-Mon-YY HH24:MM PM"},
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MM PM" },
                     readOnly: true,
-                    type:'calendar'
+                    type: 'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
@@ -443,7 +443,7 @@ class SupplyPlanVersionAndReview extends Component {
     }
     filterProgram = () => {
         let countryId = document.getElementById("countryId").value;
-        if (countryId != 0 && countryId!=-1) {
+        if (countryId != 0 && countryId != -1) {
             const programLst = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId)
             if (programLst.length > 0) {
 
@@ -455,7 +455,7 @@ class SupplyPlanVersionAndReview extends Component {
                     programLst: []
                 });
             }
-        }else if(countryId==-1){
+        } else if (countryId == -1) {
             const programLst = this.state.programs;
             this.setState({
                 programLst: programLst
@@ -475,7 +475,7 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    programs: listArray, loading: false,programLst:listArray
+                    programs: listArray, loading: false, programLst: listArray
                 })
             }).catch(
                 error => {
@@ -1176,7 +1176,7 @@ class SupplyPlanVersionAndReview extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.supplyplanversionandreviewReport')}</strong> */}
                         {
@@ -1282,24 +1282,25 @@ class SupplyPlanVersionAndReview extends Component {
                                 </div>
                             </Form>
                         </div>
-                        <div className="ReportSearchMarginTop">
+                        <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
 
