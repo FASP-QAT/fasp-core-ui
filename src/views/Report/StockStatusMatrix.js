@@ -1122,6 +1122,7 @@ export default class StockStatusMatrix extends React.Component {
                 var programId = (document.getElementById("programId").value).split("_")[0];
                 var proList = []
                 console.log(myResult)
+                let incrmental = 0;
                 for (var i = 0; i < myResult.length; i++) {
                   if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -1130,7 +1131,10 @@ export default class StockStatusMatrix extends React.Component {
                     let tempPUObj = myResult[i];
                     tempPUObj["tracerCategoryId"] = tempTCId;
                     // proList[i] = myResult[i];
-                    proList[i] = tempPUObj;
+
+                    proList[incrmental] = tempPUObj;
+                    incrmental = incrmental + 1;
+                    // console.log("Log-------->", tempTCId);
                   }
                 }
 
@@ -1139,9 +1143,15 @@ export default class StockStatusMatrix extends React.Component {
                 }, this);
 
 
+                // console.log("Log--------> ******** ", tracerCategoryValues);
+                console.log("Log--------> ******** 00", proList);
+                console.log("Log--------> ******** -00", proList.length);
+
                 let data1 = [];
                 for (let i = 0; i < proList.length; i++) {
                   for (let j = 0; j < tracerCategoryValues.length; j++) {
+                    console.log("Log--------> ******** 11", proList[i]);
+                    console.log("Log--------> ******** 22", i);
                     if (tracerCategoryValues[j].tracerCategoryId == proList[i].tracerCategoryId) {
                       data1.push(proList[i]);
                     }
