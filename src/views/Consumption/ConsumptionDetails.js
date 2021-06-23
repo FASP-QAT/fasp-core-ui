@@ -798,7 +798,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </div>
                     }
-                    <CardBody className="pb-lg-5 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Formik
                             render={
                                 ({

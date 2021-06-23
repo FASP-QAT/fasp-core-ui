@@ -1379,6 +1379,7 @@ export default class ExpiredInventory extends Component {
                             <div id="tableDiv" className={document.getElementById("versionId")!=null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"}>
                             </div>
                         </div>
+
                     </CardBody>
                 </Card>
                 <Modal isOpen={this.state.expiredStockModal}

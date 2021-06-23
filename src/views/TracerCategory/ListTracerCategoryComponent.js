@@ -836,7 +836,7 @@ class ListTracerCategoryComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
+                    <CardBody className="pb-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
                                 <FormGroup className="Selectdiv mt-md-2 mb-md-0">
@@ -872,7 +872,6 @@ class ListTracerCategoryComponent extends Component {
                                 </div>
                             </div>
                         </div>
-
                     </CardBody>
                 </Card>
 

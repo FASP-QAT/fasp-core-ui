@@ -353,21 +353,23 @@ export default class EditPlanningUnitComponent extends Component {
                                                     {/* <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            id="active1"
-                                                            name="active"
-                                                            value={true}
-                                                            checked={this.state.planningUnit.active === true}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio1">
-                                                            {i18n.t('static.common.active')}
-                                                        </Label>
+                                                            type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            // invalid={touched.label && !!errors.label || this.state.planningUnit.label.label_en == ''}
+                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.planningUnit.label.label_en}
+                                                            required
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup check inline>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"
@@ -439,7 +441,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
-                                                    </FormGroup>
+                                                </FormGroup>
                                                 </CardFooter>
                                             </Form>
 
