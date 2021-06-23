@@ -359,7 +359,8 @@ class ShipmentSummery extends Component {
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes != null && re[item].notes != '' && re[item].notes != "") ? re[item].notes.replaceAll('#', ' ').replaceAll(' ', '%20') : '')
+
             ]))
         }
         for (var i = 0; i < B.length; i++) {
