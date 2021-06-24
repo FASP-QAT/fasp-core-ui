@@ -3182,7 +3182,6 @@ export default class ManualTagging extends Component {
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                                 </div>
                             </div>
-
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
@@ -3547,7 +3546,6 @@ export default class ManualTagging extends Component {
                                     </div>
                                 </div>
                             </div>
-
                         </Modal>
                         {/* Consumption modal */}
                         {/* Details modal start */}

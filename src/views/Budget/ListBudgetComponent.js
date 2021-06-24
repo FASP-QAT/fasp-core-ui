@@ -1380,7 +1380,7 @@ class ListBudgetComponent extends Component {
               </div>
             </div>
           </div>
-          <CardBody className="pb-lg-0 pt-lg-0">
+          <CardBody className="pb-lg-0 ">
             <Col md="6 pl-0">
               <div className="d-md-flex Selectdiv2">
 
@@ -1485,7 +1485,6 @@ class ListBudgetComponent extends Component {
 
           </CardBody>
         </Card>
-
       </div>
     )
   }

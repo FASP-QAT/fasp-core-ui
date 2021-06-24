@@ -474,7 +474,7 @@ class ListRoleComponent extends Component {
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-md-0 pt-lg-0">
+                    <CardBody className="pb-md-0">
                         <div className="">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ROLE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
@@ -492,6 +492,7 @@ class ListRoleComponent extends Component {
                         </div>
                     </CardBody>
                 </Card>
+
             </div>
         );
     }

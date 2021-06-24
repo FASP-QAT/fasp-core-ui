@@ -1135,7 +1135,7 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-1 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="9 pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3" id="realmDiv">

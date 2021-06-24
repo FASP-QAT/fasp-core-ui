@@ -359,7 +359,8 @@ class ShipmentSummery extends Component {
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes != null && re[item].notes != '' && re[item].notes != "") ? re[item].notes.replaceAll('#', ' ').replaceAll(' ', '%20') : '')
+
             ]))
         }
         for (var i = 0; i < B.length; i++) {
@@ -1594,8 +1595,8 @@ class ShipmentSummery extends Component {
                                 var planningUnitObj = {
                                     id: myResult[k].planningUnitId,
                                     multiplier: myResult[k].multiplier,
-                                    label:myResult[k].label,
-                                    forecastingUnit:myResult[k].forecastingUnit
+                                    label: myResult[k].label,
+                                    forecastingUnit: myResult[k].forecastingUnit
                                 }
                                 planningList[k] = planningUnitObj
                             }
@@ -1603,219 +1604,219 @@ class ShipmentSummery extends Component {
                             var paOs = paTransaction.objectStore('procurementAgent');
                             var paRequest = paOs.getAll();
                             var procurementAgentList = [];
-    
+
                             paRequest.onerror = function (event) {
                                 // Handle errors!
                                 this.setState({
                                     loading: false
                                 })
                             };
-    
-    
+
+
                             paRequest.onsuccess = function (e) {
                                 var paResult = [];
                                 paResult = paRequest.result;
 
                                 var bTransaction = db1.transaction(['budget'], 'readwrite');
-                            var bOs = bTransaction.objectStore('budget');
-                            var bRequest = bOs.getAll();
-    
-                            bRequest.onerror = function (event) {
-                                // Handle errors!
-                                this.setState({
-                                    loading: false
-                                })
-                            };
-    
-    
-                            bRequest.onsuccess = function (e) {
-                                var bResult = [];
-                                bResult = bRequest.result;
-                            console.log("planningList------>", planningList);
+                                var bOs = bTransaction.objectStore('budget');
+                                var bRequest = bOs.getAll();
 
-                            for (let i = 0; i < planningUnitFilter.length; i++) {
-                                let multiplier = 0;
-                                for (let j = 0; j < planningList.length; j++) {
-                                    if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
-                                        multiplier = planningList[j].multiplier;
-                                        j = planningList.length;
-                                    }
-                                }
-                                var planningUnit=planningList.filter(c=>c.id==planningUnitFilter[i].planningUnit.id);
-                                var procurementAgent=paResult.filter(c=>c.procurementAgentId==planningUnitFilter[i].procurementAgent.id);
-                                if(procurementAgent.length>0){
-                                    var simplePAObject={
-                                        id:procurementAgent[0].procurementAgentId,
-                                        label:procurementAgent[0].label,
-                                        code:procurementAgent[0].procurementAgentCode
-                                    }
-                                }
-                                var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==planningUnitFilter[i].fundingSource.id);
-                                if(fundingSource.length>0){
-                                    var simpleFSObject={
-                                        id:fundingSource[0].fundingSourceId,
-                                        label:fundingSource[0].label,
-                                        code:fundingSource[0].fundingSourceCode
-                                    }
-                                }
-                                var budget=[];
-                                if(planningUnitFilter[i].budget.id>0){
-                                var budget=bResult.filter(c=>c.budgetId==planningUnitFilter[i].budget.id);
-                                if(budget.length>0){
-                                    var simpleBObject={
-                                        id:budget[0].budgetId,
-                                        label:budget[0].label,
-                                        code:budget[0].budgetCode
-                                    }
-                                }
-                            }
-                                let json = {
-                                    "shipmentId": planningUnitFilter[i].shipmentId,
-                                    "planningUnit": planningUnit.length>0?planningUnit[0]:planningUnitFilter[i].planningUnit,
-                                    "forecastingUnit": planningUnit.length>0?planningUnit[0].forecastingUnit:planningUnitFilter[i].planningUnit.forecastingUnit,
-                                    "multiplier": multiplier,
-                                    "procurementAgent": procurementAgent.length>0?simplePAObject:planningUnitFilter[i].procurementAgent,
-                                    "fundingSource": fundingSource.length>0?simpleFSObject:planningUnitFilter[i].fundingSource,
-                                    "shipmentStatus": planningUnitFilter[i].shipmentStatus,
-                                    "shipmentQty": planningUnitFilter[i].shipmentQty,
-                                    "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
-                                    "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
-                                    "notes": planningUnitFilter[i].notes,
-                                    "emergencyOrder": planningUnitFilter[i].emergencyOrder,
-                                    "erpFlag": planningUnitFilter[i].erpFlag,
-                                    "localProcurement": planningUnitFilter[i].localProcurement,
-                                    "orderNo": planningUnitFilter[i].orderNo,
-                                    "budget": budget.length>0?simpleBObject:planningUnitFilter[i].budget,
-                                    // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
-                                    // "programCode": programJson.programCode
-                                }
-                                data.push(json);
-                            }
+                                bRequest.onerror = function (event) {
+                                    // Handle errors!
+                                    this.setState({
+                                        loading: false
+                                    })
+                                };
 
-                            data = myFundingSourceIds.length > 0 ? data.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : data;
-                            data = myBudgetIds.length > 0 ? data.filter(b => myBudgetIds.includes(b.budget.id)) : data;
 
-                            data = data.sort(function (a, b) {
-                                return parseInt(a.shipmentId) - parseInt(b.shipmentId);
-                            })
+                                bRequest.onsuccess = function (e) {
+                                    var bResult = [];
+                                    bResult = bRequest.result;
+                                    console.log("planningList------>", planningList);
 
-                            console.log("data***", data);
-                            ///////////--------------------------- table one content
-                            var shipmentDetailsFundingSourceList = []
-                            const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
-                            console.log('fundingSourceIds', fundingSourceIds)
-                            fundingSourceIds.map(ele => {
-                                var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==ele);
-                                if(fundingSource.length>0){
-                                    var simpleFSObject={
-                                        id:fundingSource[0].fundingSourceId,
-                                        label:fundingSource[0].label,
-                                        code:fundingSource[0].fundingSourceCode
-                                    }
-                                }
-                                var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
-                                console.log('fundingSourceList', fundingSourceList)
-                                var cost = 0;
-                                var quantity = 0;
-                                console.log('fundingSourceList', fundingSourceList)
-                                fundingSourceList.map(c => {
-                                    cost = cost + Number(c.productCost) + Number(c.freightCost)
-                                    quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
-                                })
-                                var json = {
-                                    "fundingSource": fundingSource.length>0?simpleFSObject:fundingSourceList[0].fundingSource,
-                                    "orderCount": fundingSourceList.length,
-                                    "cost": cost,
-                                    "quantity": quantity
-                                }
-                                shipmentDetailsFundingSourceList.push(json)
-                            })
-                            console.log("data ofline----->", data);
-                            console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
-
-                            var shipmentDetailsMonthList = [];
-                            var monthstartfrom = this.state.rangeValue.from.month
-                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                var monthlydata = [];
-                                console.log(programJson)
-                                for (var month = monthstartfrom; month <= 12; month++) {
-                                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                    console.log(dtstr, ' ', enddtStr)
-                                    var dt = dtstr
-                                    var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-
-                                    shiplist = myFundingSourceIds.length > 0 ? shiplist.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : shiplist;
-                                    shiplist = myBudgetIds.length > 0 ? shiplist.filter(b => myBudgetIds.includes(b.budget.id)) : shiplist;
-                                    console.log("shipList***", shiplist);
-
-                                    var onholdCost = 0
-                                    var plannedCost = 0
-                                    var receivedCost = 0
-                                    var shippedCost = 0
-                                    var submittedCost = 0
-                                    var approvedCost = 0
-                                    var arrivedCost = 0
-                                    var submittedCost = 0
-                                    shiplist.map(ele => {
-                                        console.log(ele)
-                                        if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                            plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
-                                            //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                            submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                            approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
-                                            shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                            arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                            receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                            onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                    for (let i = 0; i < planningUnitFilter.length; i++) {
+                                        let multiplier = 0;
+                                        for (let j = 0; j < planningList.length; j++) {
+                                            if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
+                                                multiplier = planningList[j].multiplier;
+                                                j = planningList.length;
+                                            }
                                         }
+                                        var planningUnit = planningList.filter(c => c.id == planningUnitFilter[i].planningUnit.id);
+                                        var procurementAgent = paResult.filter(c => c.procurementAgentId == planningUnitFilter[i].procurementAgent.id);
+                                        if (procurementAgent.length > 0) {
+                                            var simplePAObject = {
+                                                id: procurementAgent[0].procurementAgentId,
+                                                label: procurementAgent[0].label,
+                                                code: procurementAgent[0].procurementAgentCode
+                                            }
+                                        }
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[i].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var budget = [];
+                                        if (planningUnitFilter[i].budget.id > 0) {
+                                            var budget = bResult.filter(c => c.budgetId == planningUnitFilter[i].budget.id);
+                                            if (budget.length > 0) {
+                                                var simpleBObject = {
+                                                    id: budget[0].budgetId,
+                                                    label: budget[0].label,
+                                                    code: budget[0].budgetCode
+                                                }
+                                            }
+                                        }
+                                        let json = {
+                                            "shipmentId": planningUnitFilter[i].shipmentId,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0] : planningUnitFilter[i].planningUnit,
+                                            "forecastingUnit": planningUnit.length > 0 ? planningUnit[0].forecastingUnit : planningUnitFilter[i].planningUnit.forecastingUnit,
+                                            "multiplier": multiplier,
+                                            "procurementAgent": procurementAgent.length > 0 ? simplePAObject : planningUnitFilter[i].procurementAgent,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[i].fundingSource,
+                                            "shipmentStatus": planningUnitFilter[i].shipmentStatus,
+                                            "shipmentQty": planningUnitFilter[i].shipmentQty,
+                                            "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
+                                            "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
+                                            "notes": planningUnitFilter[i].notes,
+                                            "emergencyOrder": planningUnitFilter[i].emergencyOrder,
+                                            "erpFlag": planningUnitFilter[i].erpFlag,
+                                            "localProcurement": planningUnitFilter[i].localProcurement,
+                                            "orderNo": planningUnitFilter[i].orderNo,
+                                            "budget": budget.length > 0 ? simpleBObject : planningUnitFilter[i].budget,
+                                            // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
+                                            // "programCode": programJson.programCode
+                                        }
+                                        data.push(json);
+                                    }
+
+                                    data = myFundingSourceIds.length > 0 ? data.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : data;
+                                    data = myBudgetIds.length > 0 ? data.filter(b => myBudgetIds.includes(b.budget.id)) : data;
+
+                                    data = data.sort(function (a, b) {
+                                        return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                                     })
 
-                                    let json = {
-                                        "dt": new Date(from, month - 1),
-                                        "approvedCost": approvedCost,
-                                        "arrivedCost": arrivedCost,
-                                        "onholdCost": onholdCost,
-                                        "plannedCost": plannedCost,
-                                        "receivedCost": receivedCost,
-                                        "shippedCost": shippedCost,
-                                        "submittedCost": submittedCost
-                                    }
-                                    shipmentDetailsMonthList.push(json)
-                                    if (month == this.state.rangeValue.to.month && from == to) {
-                                        console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
-                                        this.setState({
-                                            shipmentDetailsList: data,
-                                            shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
-                                            shipmentDetailsMonthList: shipmentDetailsMonthList,
-                                            message: '',
-                                            viewById: viewById, loading: false
-                                        }, () => {
-                                            this.buildJExcel();
+                                    console.log("data***", data);
+                                    ///////////--------------------------- table one content
+                                    var shipmentDetailsFundingSourceList = []
+                                    const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
+                                    console.log('fundingSourceIds', fundingSourceIds)
+                                    fundingSourceIds.map(ele => {
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == ele);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        var cost = 0;
+                                        var quantity = 0;
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        fundingSourceList.map(c => {
+                                            cost = cost + Number(c.productCost) + Number(c.freightCost)
+                                            quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
                                         })
-                                        return;
+                                        var json = {
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : fundingSourceList[0].fundingSource,
+                                            "orderCount": fundingSourceList.length,
+                                            "cost": cost,
+                                            "quantity": quantity
+                                        }
+                                        shipmentDetailsFundingSourceList.push(json)
+                                    })
+                                    console.log("data ofline----->", data);
+                                    console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
+
+                                    var shipmentDetailsMonthList = [];
+                                    var monthstartfrom = this.state.rangeValue.from.month
+                                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                        var monthlydata = [];
+                                        console.log(programJson)
+                                        for (var month = monthstartfrom; month <= 12; month++) {
+                                            var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                            var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                                            console.log(dtstr, ' ', enddtStr)
+                                            var dt = dtstr
+                                            var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+
+                                            shiplist = myFundingSourceIds.length > 0 ? shiplist.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : shiplist;
+                                            shiplist = myBudgetIds.length > 0 ? shiplist.filter(b => myBudgetIds.includes(b.budget.id)) : shiplist;
+                                            console.log("shipList***", shiplist);
+
+                                            var onholdCost = 0
+                                            var plannedCost = 0
+                                            var receivedCost = 0
+                                            var shippedCost = 0
+                                            var submittedCost = 0
+                                            var approvedCost = 0
+                                            var arrivedCost = 0
+                                            var submittedCost = 0
+                                            shiplist.map(ele => {
+                                                console.log(ele)
+                                                if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                                    plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
+                                                    //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                                    submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                                    approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
+                                                    shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                                    arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                                    receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                }
+                                            })
+
+                                            let json = {
+                                                "dt": new Date(from, month - 1),
+                                                "approvedCost": approvedCost,
+                                                "arrivedCost": arrivedCost,
+                                                "onholdCost": onholdCost,
+                                                "plannedCost": plannedCost,
+                                                "receivedCost": receivedCost,
+                                                "shippedCost": shippedCost,
+                                                "submittedCost": submittedCost
+                                            }
+                                            shipmentDetailsMonthList.push(json)
+                                            if (month == this.state.rangeValue.to.month && from == to) {
+                                                console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
+                                                this.setState({
+                                                    shipmentDetailsList: data,
+                                                    shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
+                                                    shipmentDetailsMonthList: shipmentDetailsMonthList,
+                                                    message: '',
+                                                    viewById: viewById, loading: false
+                                                }, () => {
+                                                    this.buildJExcel();
+                                                })
+                                                return;
+                                            }
+
+                                        }
+                                        monthstartfrom = 1
+
                                     }
 
-                                }
-                                monthstartfrom = 1
 
-                            }
-
-
+                                }.bind(this)
+                            }.bind(this);
                         }.bind(this)
-                    }.bind(this);
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        }.bind(this)
             } else {
                 this.setState({ loading: true })
                 var inputjson = {
@@ -2573,7 +2574,6 @@ class ShipmentSummery extends Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </CardBody>
