@@ -242,9 +242,37 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
         var elInstance = this.state.problemEl;
-        var rowData = elInstance.getRowData(y);
-        if (x != 22 && rowData[22] != 1) {
-            elInstance.setValueFromCoords(22, y, 1, true);
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        let problemList = this.state.problemList;
+        var rowData1 = elInstance.getRowData(y);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.problemReportId == rowData1[0]);
+        // console.log("problemList in changed method ***", problemList);
+        if (x == 10) {
+            if (problemList[0].problemStatus.id != value) {
+                // console.log("in if 1***");
+                elInstance.setValueFromCoords(20, y, true, true);
+            }
+            if (problemList[0].problemStatus.id == value) {
+                elInstance.setValueFromCoords(20, y, false, true);
+                // console.log("in if 2***");
+            }
+        }
+
+        if (x == 10 || x == 20) {
+            var rowData = elInstance.getRowData(y);
+            // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
+            // console.log("current problem status ***", rowData[10]);
+            // console.log("problemStatus on server ***", problemList[0].reviewed);
+            // console.log("current problem status ***", rowData[20]);
+            // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
+            // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+                // console.log("in if***");
+                elInstance.setValueFromCoords(22, y, 1, true);
+            } else {
+                // console.log("in else***");
+                elInstance.setValueFromCoords(22, y, 0, true);
+            }
         }
 
         if (x == 20) {
@@ -2202,6 +2230,7 @@ class EditSupplyPlanStatus extends Component {
             };
             problemStatusRequest.onsuccess = function (e) {
                 var myResult = [];
+                var problemStatusJson = [];
                 myResult = problemStatusRequest.result;
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
@@ -2210,9 +2239,16 @@ class EditSupplyPlanStatus extends Component {
                         id: myResult[i].id
                     }
                     proList[i] = Json
+
+                    if (myResult[i].id == 1 || myResult[i].id == 3) {
+                        problemStatusJson.push({ label: getLabelText(myResult[i].label, lan), value: myResult[i].id });
+                    }
                 }
+
+                
                 this.setState({
-                    problemStatusList: proList
+                    problemStatusList: proList,
+                    problemStatusValues: problemStatusJson
                 })
 
                 var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -3520,16 +3556,16 @@ class EditSupplyPlanStatus extends Component {
                 var criticalityId = rowData[16];
                 var problemStatusId = rowData[12];
                 if (criticalityId == 3) {
-                    console.log("In if");
+                    // console.log("In if");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
-                    console.log("cell classlist------------------>", cell.classList);
+                    // console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {
-                    console.log("In if 1");
+                    // console.log("In if 1");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1) {
-                    console.log("In if 2");
+                    // console.log("In if 2");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
@@ -4518,8 +4554,8 @@ class EditSupplyPlanStatus extends Component {
                                                 {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
-                                                    &nbsp;
-                                             </FormGroup>
+                                                &nbsp;
+                                            </FormGroup>
                                         </CardFooter>
                                     </Form>
                                 )} />
