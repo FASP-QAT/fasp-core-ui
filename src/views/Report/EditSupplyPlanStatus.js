@@ -215,7 +215,9 @@ class EditSupplyPlanStatus extends Component {
             editable: false,
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
-            problemReportChanged: 0
+            problemReportChanged: 0,
+            problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -228,6 +230,7 @@ class EditSupplyPlanStatus extends Component {
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
         this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
+        this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -2245,7 +2248,7 @@ class EditSupplyPlanStatus extends Component {
                     }
                 }
 
-                
+
                 this.setState({
                     problemStatusList: proList,
                     problemStatusValues: problemStatusJson
@@ -2398,6 +2401,12 @@ class EditSupplyPlanStatus extends Component {
             && problemStatusList.map((item, i) => {
                 return ({ label: item.name, value: item.id })
 
+            }, this);
+
+        const { problemReviewedList } = this.state;
+        let problemReviewed = problemReviewedList.length > 0
+            && problemReviewedList.map((item, i) => {
+                return ({ label: item.name, value: item.id })
             }, this);
 
         let bar = {}
@@ -3119,6 +3128,20 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </FormGroup>
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="reviewedStatusId"
+                                        id="reviewedStatusId"
+                                        options={problemReviewed && problemReviewed.length > 0 ? problemReviewed : []}
+                                        value={this.state.problemReviewedValues}
+                                        onChange={(e) => { this.handleProblemReviewedChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
                                 <div className="controls SelectField">
                                     <InputGroup>
@@ -3127,14 +3150,13 @@ class EditSupplyPlanStatus extends Component {
                                             name="reviewedStatusId" id="reviewedStatusId"
                                             onChange={this.fetchData}
                                         >
-                                            {/* <option value="0">Please select</option> */}
                                             <option value="0">No</option>
                                             <option value="1">Yes</option>
 
                                         </Input>
                                     </InputGroup>
                                 </div>
-                            </FormGroup>
+                            </FormGroup> */}
                         </div>
                     </Col>
                     <br />
@@ -3182,6 +3204,34 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    handleProblemReviewedChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemReviewedIds = event
+            problemReviewedIds = problemReviewedIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemReviewedValues: problemReviewedIds.map(ele => ele),
+                problemReviewedLabels: problemReviewedIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemReviewedValues===>", this.state.problemReviewedValues);
+                this.fetchData()
+            })
+        }
+    }
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
@@ -3217,7 +3267,8 @@ class EditSupplyPlanStatus extends Component {
             // let problemStatusId = ;
             let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
             console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
-            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            let reviewedStatusId = this.state.problemReviewedValues.map(ele => (ele.value));
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
             let problemTypeId = document.getElementById('problemTypeId').value;
@@ -3226,12 +3277,13 @@ class EditSupplyPlanStatus extends Component {
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                 problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
-                if (reviewedStatusId != -1) {
-                    if (reviewedStatusId == 0) {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
-                    } else {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
-                    }
+                if (reviewedStatusId != []) {
+                    problemReportFilterList = problemReportFilterList.filter(c => reviewedStatusId.includes(c.reviewed == true ? 1 : 0));
+                    // if (reviewedStatusId == 0) {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    // } else {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    // }
                 }
                 if (problemTypeId != -1) {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
