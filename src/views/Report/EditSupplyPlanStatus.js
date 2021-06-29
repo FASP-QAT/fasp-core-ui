@@ -3133,7 +3133,7 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </FormGroup>
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.problemStatus')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemReport.reviewed')}</Label>
                                 {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
                                 <div className="controls problemListSelectField">
                                     <MultiSelect
