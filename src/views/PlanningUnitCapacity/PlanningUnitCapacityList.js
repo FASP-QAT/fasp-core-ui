@@ -601,7 +601,7 @@ export default class PlanningUnitCapacityList extends Component {
                         </div>
 
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0">
+                    <CardBody className="pb-lg-2">
                         <Col md="3 pl-0">
                             <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunit')}</Label>

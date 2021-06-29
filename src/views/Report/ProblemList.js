@@ -9,11 +9,12 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter, selectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import MultiSelect from 'react-multi-select-component';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
@@ -34,7 +35,6 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
-import MultiSelect from 'react-multi-select-component';
 import ProblemListDashboard from '../Report/ProblemListDashboard';
 import { Prompt } from 'react-router-dom';
 const entityname = i18n.t('static.report.problem');
@@ -60,6 +60,7 @@ export default class ConsumptionDetails extends React.Component {
             lang: localStorage.getItem('lang'),
             loading: false,
             problemCategoryList: [],
+            problemStatusValues: [],
             // problemStatusValues: localStorage.getItem("sesProblemStatus") != "" ? JSON.parse(localStorage.getItem("sesProblemStatus")) : [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             programId: localStorage.getItem("sesProgramId") != "" ? localStorage.getItem("sesProgramId") : '',
             showProblemDashboard: 0,
@@ -277,7 +278,8 @@ export default class ConsumptionDetails extends React.Component {
                                 programId: programIdd
                             }, () => {
                                 if (this.state.programId != '' && this.state.programId != undefined) {
-                                    this.fetchData();
+                                    // this.fetchData();
+                                    this.getProblemListAfterCalculation();
                                 }
                             })
                         }
@@ -291,7 +293,8 @@ export default class ConsumptionDetails extends React.Component {
                                 programId: proList[0].id
                             }, () => {
                                 if (this.state.programId != '' && this.state.programId != undefined) {
-                                    this.fetchData();
+                                    // this.fetchData();
+                                    this.getProblemListAfterCalculation();
                                 }
                             })
                         } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
@@ -307,8 +310,8 @@ export default class ConsumptionDetails extends React.Component {
                                     // if (needToCalculate == "false") {
                                     //     this.fetchData();
                                     // } else {
-                                    // this.getProblemListAfterCalculation();
-                                    this.fetchData();
+                                    this.getProblemListAfterCalculation();
+                                    // this.fetchData();
 
                                     // }
                                 }
@@ -924,11 +927,11 @@ export default class ConsumptionDetails extends React.Component {
                 doc.setFontSize(6)
                 doc.setPage(i)
                 doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
 
-                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 20, {
                     align: 'center'
                 })
             }
@@ -949,7 +952,7 @@ export default class ConsumptionDetails extends React.Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
 
@@ -957,12 +960,12 @@ export default class ConsumptionDetails extends React.Component {
                     //     align: 'left'
                     // })
                     var statusText = doc.splitTextToSize((i18n.t('static.report.problemStatus') + ' : ' + (this.state.problemStatusValues.map(ele => ele.label)).join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130, statusText)
+                    doc.text(doc.internal.pageSize.width / 8, 110, statusText)
 
-                    doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.problemActionReport.problemCategory') + ' : ' + document.getElementById("problemCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.problemActionReport.problemCategory') + ' : ' + document.getElementById("problemCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
 
@@ -1020,19 +1023,19 @@ export default class ConsumptionDetails extends React.Component {
 
         let content = {
             margin: { top: 90, bottom: 80 },
-            startY: 200,
+            startY: 170,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 70 },
-                1: { cellWidth: 50 },
-                2: { cellWidth: 100 },
-                3: { cellWidth: 140 },
+                0: { cellWidth: 80 },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 150 },
+                3: { cellWidth: 150 },
                 4: { cellWidth: 30 },
-                5: { cellWidth: 140 },
+                5: { cellWidth: 130 },
                 6: { cellWidth: 30 },
-                7: { cellWidth: 130 },
+                7: { cellWidth: 90 },
                 8: { cellWidth: 50 },
                 9: { cellWidth: 40 },
 
@@ -1689,8 +1692,8 @@ export default class ConsumptionDetails extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
-                                                // onChange={(e) => { this.getProblemListAfterCalculation() }}
-                                                onChange={(e) => { this.fetchData() }}
+                                                onChange={(e) => { this.getProblemListAfterCalculation() }}
+                                                // onChange={(e) => { this.fetchData() }}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="0">{i18n.t('static.common.select')}</option>
@@ -1724,9 +1727,9 @@ export default class ConsumptionDetails extends React.Component {
                                         <MultiSelect
                                             name="problemStatusId"
                                             id="problemStatusId"
-                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             value={this.state.problemStatusValues}
                                             onChange={(e) => { this.handleProblemStatusChange(e) }}
+                                            options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             labelledBy={i18n.t('static.common.select')}
                                         />
                                     </div>

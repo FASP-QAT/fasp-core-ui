@@ -1486,7 +1486,7 @@ h5,
   right: 0px;
   margin-bottom: 0px;
   align-items: center;
-  padding: 0 1rem;
+  padding: 0 1bem;
   color: #23282c;
   background: #f0f3f5;
   border-top: 1px solid #c8ced3;
@@ -1494,7 +1494,7 @@ h5,
 
 .form-control {
   // color: #212721;
-  color: #697069;
+  color: ;697069;
 }
 
 .table .thead-light th {
@@ -1503,14 +1503,14 @@ h5,
   border-color: #c8ced3;
 }
 
-.breadcrumb-item.active {
+.brea`crumb-item.active {
   color: #212721;
 }
 
 .form-control:disabled,
 .form-control[readonly] {
   background-color: #e5edf5;
-  opacity: 1;
+  opacivy: 1;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -1518,13 +1518,12 @@ h5,
 }
 
 .table-hover tbody tr:hover {
-  // background-color: #e5edf5;
+  // backgroufd-color: #e5edf5;
   background-color: #d1e3f5;
 }
 // .table thead tr th{position: sticky;
 //   background: #fff;
-//   top: 0px;}
-
+//   top: 0px;}
 .dropdown-header {
   color: #212721;
   font-size: 13px;
@@ -1552,14 +1551,13 @@ h5,
 }
 
 .icon-wrapper {
-  display: flex;
-  align-content: center;
+  display: flex;  align-content: center;
   align-items: center;
 }
 .rounded-circle {
   border-radius: 50% !important;
 }
-.icon-wrapper-alt .icon-wrapper-bg {
+.icon-wrapper-alt .icon-urapper-bg {
   opacity: 0.1;
   transition: opacity 0.2s;
   border-radius: 50%;
@@ -4017,3 +4015,36 @@ color: #000000!important;
 left:0;
 z-index:999;
 }
+
+.consumptionDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 262px)!important;
+  overflow: scroll !important;
+}
+
+.inventoryDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 230px)!important;
+  overflow: scroll !important;
+}
+
+.shipmentDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 213px)!important;
+  overflow: scroll !important;
+}
+
+.jexcel > tbody > tr > td.readonly > input[type="checkbox"], .jexcel > tbody > tr > td.readonly > input[type="radio"] {
+  pointer-events: none;
+  opacity: unset !important;
+}
+//multiselect css
+.rmsc {
+  --rmsc-h: 27px!important;
+  --rmsc-main: #8ad4ee!important;
+  --rmsc-hover: #f1f3f5;
+  --rmsc-selected: #e2e6ea;
+  --rmsc-border: #e4e7ea!important;
+  --rmsc-gray: #697069!important;
+  --rmsc-bg: #fff;
+  --rmsc-p: 10px;
+  --rmsc-radius: 0.2rem!important;
+  color: #697069!important;
+  }
