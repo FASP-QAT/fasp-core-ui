@@ -33,8 +33,7 @@ export default class AuthenticationServiceComponent extends Component {
     // }
     componentDidMount = () => {
         console.log("Common component component did mount called-------------");
-	    var checkOnline=isSiteOnline();
-        var result = AuthenticationService.validateRequest(checkOnline);
+        var result = AuthenticationService.validateRequest();
         console.log("result----" + result);
         if (result != "") {
             if (result == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
@@ -43,7 +42,7 @@ export default class AuthenticationServiceComponent extends Component {
                 this.props.history.push(result)
             }
 
-        } else if (checkOnline) {
+        } else if (localStorage.getItem("sessionType") === 'Online') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
             let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -53,8 +52,7 @@ export default class AuthenticationServiceComponent extends Component {
             axios.interceptors.request.use((config) => {
                 console.log("common request axios interceptors--->", config);
                 // Do something before request is sent
-                var checkOnline=isSiteOnline();
-                var result1 = AuthenticationService.validateRequest(checkOnline);
+                var result1 = AuthenticationService.validateRequest();
                 console.log("result1----" + result1);
                 let url = config.url;
                 // console.log("url---", url);
