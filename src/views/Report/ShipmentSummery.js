@@ -535,7 +535,7 @@ class ShipmentSummery extends Component {
         data = this.state.shipmentDetailsList.map(
             ele => [
                 getLabelText(ele.planningUnit.label, this.state.lang),
-                this.formatter(ele.shipmentId),
+                ele.shipmentId,
                 ele.emergencyOrder,
                 ele.erpOrder == true ? true : false,
                 ele.localProcurement,
@@ -835,8 +835,6 @@ class ShipmentSummery extends Component {
                 {
                     title: i18n.t('static.report.id'),
                     type: 'numeric',
-                    mask: '#,##.00',
-                    decimal: '.',
                     // readOnly: true
                 },
                 {
