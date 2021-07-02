@@ -1362,7 +1362,11 @@ export default class QatProblemActionNew extends Component {
                                                 } catch (err) {
                                                     // console.log("In error@@@")
                                                     if (this.props.fetchData != undefined) {
-                                                        this.props.fetchData();
+                                                        if (this.props.page == "syncMasterData") {
+                                                            this.props.fetchData(1, programId);
+                                                        } else {
+                                                            this.props.fetchData();
+                                                        }
                                                     }
                                                 }
                                                 var putRequest = problemOs.put(programRequestList[pp]);
@@ -1385,8 +1389,13 @@ export default class QatProblemActionNew extends Component {
                                                         if (this.props.updateState != undefined) {
                                                             this.props.updateState(key, false);
                                                             // this.props.fetchData();
-                                                        } if (this.props.fetchData != undefined) {
-                                                            this.props.fetchData();
+                                                        }
+                                                        if (this.props.fetchData != undefined) {
+                                                            if (this.props.page == "syncMasterData") {
+                                                                this.props.fetchData(1, programId);
+                                                            } else {
+                                                                this.props.fetchData();
+                                                            }
                                                         }
 
                                                     }.bind(this);

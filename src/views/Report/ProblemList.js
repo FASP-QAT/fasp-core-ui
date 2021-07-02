@@ -1656,7 +1656,7 @@ export default class ConsumptionDetails extends React.Component {
                     when={this.state.showUpdateButton == true}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
-                <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
+                <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" page="problemList"></QatProblemActionNew>
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
@@ -1699,7 +1699,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 value={this.state.programId}
                                                 name="programId" id="programId"
                                                 onChange={(e) => { this.getProblemListAfterCalculation() }}
-                                                // onChange={(e) => { this.fetchData() }}
+                                            // onChange={(e) => { this.fetchData() }}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="0">{i18n.t('static.common.select')}</option>
