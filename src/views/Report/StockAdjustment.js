@@ -58,9 +58,9 @@ class StockAdjustmentComponent extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -848,62 +848,62 @@ class StockAdjustmentComponent extends Component {
                     programRequest.onsuccess = function (e) {
 
                         var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                var dataSourceRequest = dataSourceOs.getAll();
-                dataSourceRequest.onerror = function (event) {
-                }.bind(this);
-                dataSourceRequest.onsuccess = function (event) {
-                    var dataSourceResult = [];
-                    dataSourceResult = dataSourceRequest.result;
-
-                    var puTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                        var puOs = puTransaction.objectStore('programPlanningUnit');
-                        var puRequest = puOs.getAll();
-                        puRequest.onerror = function (event) {
+                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                        var dataSourceRequest = dataSourceOs.getAll();
+                        dataSourceRequest.onerror = function (event) {
                         }.bind(this);
-                        puRequest.onsuccess = function (e) {
-                            var puResult = [];
-                            puResult = puRequest.result;
+                        dataSourceRequest.onsuccess = function (event) {
+                            var dataSourceResult = [];
+                            dataSourceResult = dataSourceRequest.result;
 
-                        console.log("2----", programRequest)
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        console.log(programJson)
-                        console.log(startDate, endDate)
-                        var data = []
-                        planningUnitIds.map(planningUnitId => {
-                            var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
-                            console.log(inventoryList)
+                            var puTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                            var puOs = puTransaction.objectStore('programPlanningUnit');
+                            var puRequest = puOs.getAll();
+                            puRequest.onerror = function (event) {
+                            }.bind(this);
+                            puRequest.onsuccess = function (e) {
+                                var puResult = [];
+                                puResult = puRequest.result;
 
-                            inventoryList.map(ele => {
-                                var dataSource=dataSourceResult.filter(c=>c.dataSourceId==ele.dataSource.id);
-                                var planningUnit=puResult.filter(c=>c.planningUnit.id==ele.planningUnit.id);
-                                var json = {
-                                    program: programJson,
-                                    // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
-                                    inventoryDate: ele.inventoryDate,
-                                    planningUnit: planningUnit.length>0?planningUnit[0].planningUnit:ele.planningUnit,
-                                    stockAdjustemntQty: ele.adjustmentQty,
-                                    lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-                                    lastModifiedDate: programJson.currentVersion.lastModifiedDate,
-                                    notes: ele.notes,
-                                    dataSource: dataSource.length>0?dataSource[0]:ele.dataSource
-                                }
-                                data.push(json)
-                            })
-                        })
-                        console.log("inventory List--------->", data);;
-                        this.setState({
-                            data: data
-                            , message: ''
-                        }, () => {
-                            this.buildJExcel();
-                        });
+                                console.log("2----", programRequest)
+                                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                console.log(programJson)
+                                console.log(startDate, endDate)
+                                var data = []
+                                planningUnitIds.map(planningUnitId => {
+                                    var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
+                                    console.log(inventoryList)
+
+                                    inventoryList.map(ele => {
+                                        var dataSource = dataSourceResult.filter(c => c.dataSourceId == ele.dataSource.id);
+                                        var planningUnit = puResult.filter(c => c.planningUnit.id == ele.planningUnit.id);
+                                        var json = {
+                                            program: programJson,
+                                            // inventoryDate: moment(ele.inventoryDate).format('MMM YYYY'),
+                                            inventoryDate: ele.inventoryDate,
+                                            planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
+                                            stockAdjustemntQty: ele.adjustmentQty,
+                                            lastModifiedBy: programJson.currentVersion.lastModifiedBy,
+                                            lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                            notes: ele.notes,
+                                            dataSource: dataSource.length > 0 ? dataSource[0] : ele.dataSource
+                                        }
+                                        data.push(json)
+                                    })
+                                })
+                                console.log("inventory List--------->", data);;
+                                this.setState({
+                                    data: data
+                                    , message: ''
+                                }, () => {
+                                    this.buildJExcel();
+                                });
+                            }.bind(this)
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
-            }.bind(this)
-        }.bind(this)
             } else {
                 this.setState({ loading: true })
                 var inputjson = {

@@ -44,9 +44,9 @@ export default class ConsumptionDetails extends React.Component {
             timeout: 0,
             showConsumption: 0,
             consumptionChangedFlag: 0,
-            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             regionList: [],
             showActive: "",
             regionId: "",
@@ -803,112 +803,112 @@ export default class ConsumptionDetails extends React.Component {
                             render={
                                 ({
                                 }) => (
-                                        <Form name='simpleForm'>
-                                            <div className=" pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
+                                    <Form name='simpleForm'>
+                                        <div className=" pl-0">
+                                            <div className="row">
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
 
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={rangeValue}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="programSelect"
-                                                                id="programSelect"
-                                                                bsSize="sm"
-                                                                options={this.state.programList}
-                                                                value={this.state.programSelect}
-                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="planningUnit"
-                                                                id="planningUnit"
-                                                                bsSize="sm"
-                                                                options={this.state.planningUnitList}
-                                                                value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.region.region')}</Label>
-                                                        <div className="controls ">
-                                                            <Input
-                                                                type="select"
-                                                                name="regionId"
-                                                                id="regionId"
-                                                                bsSize="sm"
-                                                                value={this.state.regionId}
-                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                                {regions}
-                                                            </Input>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.consumptionType')}</Label>
-                                                        <div className="controls ">
-                                                            <Input
-                                                                type="select"
-                                                                name="consumptionType"
-                                                                id="consumptionType"
-                                                                value={this.state.consumptionType}
-                                                                bsSize="sm"
-                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                                <option value={ACTUAL_CONSUMPTION_TYPE}>{i18n.t('static.consumption.actual')}</option>
-                                                                <option value={FORCASTED_CONSUMPTION_TYPE}>{i18n.t('static.consumption.forcast')}</option>
-                                                            </Input>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.active')}</Label>
-                                                        <div className="controls ">
-                                                            <Input
-                                                                type="select"
-                                                                name="showActive"
-                                                                id="showActive"
-                                                                value={this.state.showActive}
-                                                                bsSize="sm"
-                                                                onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                                <option value="1">{i18n.t('static.common.active')}</option>
-                                                                <option value="2">{i18n.t('static.dataentry.inactive')}</option>
-                                                            </Input>
-                                                        </div>
-                                                    </FormGroup>
-                                                    {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="programSelect"
+                                                            id="programSelect"
+                                                            bsSize="sm"
+                                                            options={this.state.programList}
+                                                            value={this.state.programSelect}
+                                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="planningUnit"
+                                                            id="planningUnit"
+                                                            bsSize="sm"
+                                                            options={this.state.planningUnitList}
+                                                            value={this.state.planningUnit}
+                                                            onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.region.region')}</Label>
+                                                    <div className="controls ">
+                                                        <Input
+                                                            type="select"
+                                                            name="regionId"
+                                                            id="regionId"
+                                                            bsSize="sm"
+                                                            value={this.state.regionId}
+                                                            onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.all')}</option>
+                                                            {regions}
+                                                        </Input>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.consumptionType')}</Label>
+                                                    <div className="controls ">
+                                                        <Input
+                                                            type="select"
+                                                            name="consumptionType"
+                                                            id="consumptionType"
+                                                            value={this.state.consumptionType}
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.all')}</option>
+                                                            <option value={ACTUAL_CONSUMPTION_TYPE}>{i18n.t('static.consumption.actual')}</option>
+                                                            <option value={FORCASTED_CONSUMPTION_TYPE}>{i18n.t('static.consumption.forcast')}</option>
+                                                        </Input>
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.active')}</Label>
+                                                    <div className="controls ">
+                                                        <Input
+                                                            type="select"
+                                                            name="showActive"
+                                                            id="showActive"
+                                                            value={this.state.showActive}
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.formSubmit(this.state.planningUnit, this.state.rangeValue); }}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.all')}</option>
+                                                            <option value="1">{i18n.t('static.common.active')}</option>
+                                                            <option value="2">{i18n.t('static.dataentry.inactive')}</option>
+                                                        </Input>
+                                                    </div>
+                                                </FormGroup>
+                                                {/* {this.state.consumptionChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.consumptionChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
                                                     </FormGroup>} */}
-                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
-                                                </div>
+                                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
-                                        </Form>
-                                    )} />
+                                        </div>
+                                    </Form>
+                                )} />
 
                         <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />

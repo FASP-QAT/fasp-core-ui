@@ -67,9 +67,9 @@ class ProcurementAgentExport extends Component {
             fundingSourceLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -1227,29 +1227,29 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
-                                        var planningUnit=this.state.planningUnits.filter(c=>c.planningUnit.id==planningUnitFilter[j].planningUnit.id);
-                                        var procurementAgent=this.state.procurementAgents.filter(c=>c.procurementAgentId==planningUnitFilter[j].procurementAgent.id);
-                                        if(procurementAgent.length>0){
-                                            var simplePAObject={
-                                                id:procurementAgent[0].procurementAgentId,
-                                                label:procurementAgent[0].label,
-                                                code:procurementAgent[0].procurementAgentCode
+                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == planningUnitFilter[j].procurementAgent.id);
+                                        if (procurementAgent.length > 0) {
+                                            var simplePAObject = {
+                                                id: procurementAgent[0].procurementAgentId,
+                                                label: procurementAgent[0].label,
+                                                code: procurementAgent[0].procurementAgentCode
                                             }
                                         }
-                                        var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==planningUnitFilter[j].fundingSource.id);
-                                        if(fundingSource.length>0){
-                                            var simpleFSObject={
-                                                id:fundingSource[0].fundingSourceId,
-                                                label:fundingSource[0].label,
-                                                code:fundingSource[0].fundingSourceCode
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[j].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
                                             }
                                         }
                                         let json = {
                                             "active": true,
                                             "shipmentId": planningUnitFilter[j].shipmentId,
-                                            "procurementAgent": procurementAgent.length>0?simplePAObject:planningUnitFilter[j].procurementAgent,
-                                            "fundingSource": fundingSource.length>0?simpleFSObject:planningUnitFilter[j].fundingSource,
-                                            "planningUnit": planningUnit.length>0?planningUnit[0].planningUnit:planningUnitFilter[j].planningUnit,
+                                            "procurementAgent": procurementAgent.length > 0 ? simplePAObject : planningUnitFilter[j].procurementAgent,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
@@ -1551,20 +1551,20 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
-                                        var planningUnit=this.state.planningUnits.filter(c=>c.planningUnit.id==planningUnitFilter[j].planningUnit.id);
-                                        var fundingSource=this.state.fundingSources.filter(c=>c.fundingSourceId==planningUnitFilter[j].fundingSource.id);
-                                        if(fundingSource.length>0){
-                                            var simpleFSObject={
-                                                id:fundingSource[0].fundingSourceId,
-                                                label:fundingSource[0].label,
-                                                code:fundingSource[0].fundingSourceCode
+                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[j].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
                                             }
-                                        }                                        
+                                        }
                                         let json = {
                                             "active": true,
                                             "shipmentId": planningUnitFilter[j].shipmentId,
-                                            "fundingSource": fundingSource.length>0?simpleFSObject:planningUnitFilter[j].fundingSource,
-                                            "planningUnit": planningUnit.length>0?planningUnit[0].planningUnit:planningUnitFilter[j].planningUnit,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
@@ -1858,11 +1858,11 @@ class ProcurementAgentExport extends Component {
                                     } else {
                                         freight = seaFreight;
                                     }
-                                    var planningUnit=this.state.planningUnits.filter(c=>c.planningUnit.id==planningUnitFilter[j].planningUnit.id);
+                                    var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
                                     let json = {
                                         "active": true,
                                         "shipmentId": planningUnitFilter[j].shipmentId,
-                                        "planningUnit": planningUnit.length>0?planningUnit[0].planningUnit:planningUnitFilter[j].planningUnit,
+                                        "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
