@@ -4,7 +4,7 @@ import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotati
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faEdit, faDigitalTachograph } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../i18n'
 import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -491,6 +491,9 @@ export default class DemographicScenarioOne extends Component {
                         }}>
                         <FontAwesomeIcon icon={faEdit} />
                     </button>
+                    <button key="4" className="StyledButton" style={{ width: '23px', height: '23px' }}>
+                        <FontAwesomeIcon icon={faDigitalTachograph} />
+                    </button>
 
                     {itemConfig.parent != null &&
                         <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
@@ -523,7 +526,7 @@ export default class DemographicScenarioOne extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 190, height: 75 },
+                itemSize: { width: 190, height: 100 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 onItemRender: ({ context: itemConfig }) => {
