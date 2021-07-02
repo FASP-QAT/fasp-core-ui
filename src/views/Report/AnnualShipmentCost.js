@@ -64,9 +64,9 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             outPutList: [],
             message: '',
             programId: '',
@@ -196,9 +196,9 @@ class AnnualShipmentCost extends Component {
                                     shipmentList = programJson.shipmentList;
                                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
-                                        console.log("P+++++++++++",p);
+                                        console.log("P+++++++++++", p);
                                         var planningUnitId = p.value;
-                                        var planningUnitLabel=p.label;
+                                        var planningUnitLabel = p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
                                         if (reportbaseValue == 1) {
