@@ -115,9 +115,9 @@ class ForcastMatrixOverTime extends Component {
       countries: [],
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
       versionId: '',
       planningUnitLabel: ''
@@ -850,7 +850,7 @@ class ForcastMatrixOverTime extends Component {
                 var absvalue = 0;
                 var currentActualconsumption = null;
                 var currentForcastConsumption = null;
-                for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
+                for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
                   if (i == 0) {
                     i = 12;
                     year = year - 1
