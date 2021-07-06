@@ -7,16 +7,16 @@ import { generateRandomAplhaNumericCode } from '../../CommonComponent/Javascript
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
     console.log("###Started with calculations of supply plan", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
-    console.log("###ProgramId",programId);
-    console.log("###Planning unit Id",planningUnitId);
-    console.log("###Planning unit list",planningUnitList);
-    console.log("###Planning unit list",minimumDate);
+    console.log("###ProgramId", programId);
+    console.log("###Planning unit Id", planningUnitId);
+    console.log("###Planning unit list", planningUnitList);
+    console.log("###Planning unit list", minimumDate);
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
             problemListChild.qatProblemActions(programId, "loading", true);
         } else {
-            props.fetchData(1);
+            props.fetchData(1, programId);
         }
         // }
     } else {
@@ -994,7 +994,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         } catch (err) {
                             console.log("@@@ in error in calculate")
-                            props.fetchData(1)
+                            props.fetchData(1, programId)
                         }
                         programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                         programJsonForStoringTheResult.supplyPlan = supplyPlanData;
@@ -1092,7 +1092,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
                                         problemListChild.qatProblemActions(programId, "loading", true);
                                     } else {
-                                        props.fetchData(1)
+                                        props.fetchData(1, programId)
                                     }
                                     // }
                                 }

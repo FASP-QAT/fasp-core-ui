@@ -271,10 +271,10 @@ export default class AddHealthAreaComponent extends Component {
 
   componentDidMount() {
     // console.log("check---" + AuthenticationService.checkTypeOfSession());
-    if (!AuthenticationService.checkTypeOfSession()) {
-      alert("You can't change your session from online to offline or vice versa.");
-      this.props.history.push(`/`)
-    }
+    // if (!AuthenticationService.checkTypeOfSession()) {
+    //   alert("You can't change your session from online to offline or vice versa.");
+    //   this.props.history.push(`/`)
+    // }
     // AuthenticationService.setupAxiosInterceptors();
     CountryService.getCountryListAll()
       .then(response => {

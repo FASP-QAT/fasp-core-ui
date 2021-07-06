@@ -114,9 +114,9 @@ class StockStatus extends Component {
       stockStatusList: [],
       versions: [],
       show: false,
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
       versionId: '',
       planningUnitLabel: ''
@@ -958,254 +958,254 @@ class StockStatus extends Component {
             }.bind(this);
             realmRequest.onsuccess = function (event) {
 
-            var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
-            var dsOs = dsTransaction.objectStore('dataSource');
-            var dsRequest = dsOs.getAll();
-            dsRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            dsRequest.onsuccess = function (event) {
-              var dsResult=dsRequest.result;
-
-              var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
-            var fsOs = fsTransaction.objectStore('fundingSource');
-            var fsRequest = fsOs.getAll();
-            fsRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            fsRequest.onsuccess = function (event) {
-              var fsResult=fsRequest.result;
-
-              var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-            var paOs = paTransaction.objectStore('procurementAgent');
-            var paRequest = paOs.getAll();
-            paRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            paRequest.onsuccess = function (event) {
-              var paResult=paRequest.result;
-
-              var maxForMonths = 0;
-              var realm = realmRequest.result;
-              var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-              var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-              if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
-                maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-              } else {
-                maxForMonths = pu.minMonthsOfStock
-              }
-              var minStockMoS = parseInt(maxForMonths);
-
-              // Calculations for Max Stock
-              var minForMonths = 0;
-              var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-              if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-              } else {
-                minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-              }
-              var maxStockMoS = parseInt(minForMonths);
-              if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-              }
-
-
-              // Calculations for Max Stock
-              var minForMonths = 0;
-              var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-              if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-              } else {
-                minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-              }
-              var maxStockMoS = parseInt(minForMonths);
-              if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-              }
-
-              let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-              let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-              console.log("EndDate+++", endDate)
-              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-              console.log("ShipmentList+++", shipmentList);
-              var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
-              var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
-              var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
-              var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
-              inList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                inList[idx].dataSource=simpleDsObject;
-              }
-              })
-              coList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                coList[idx].dataSource=simpleDsObject;
-              }
-              })
-              shList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                shList[idx].dataSource=simpleDsObject;
-              }
-              })
-              console.log("ShList+++", shList);
-              this.setState({
-                inList: inList,
-                coList: coList,
-                shList: shList
-              })
-              var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
-              if (prevMonthSupplyPlan.length > 0) {
+              var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
+              var dsOs = dsTransaction.objectStore('dataSource');
+              var dsRequest = dsOs.getAll();
+              dsRequest.onerror = function (event) {
                 this.setState({
-                  firstMonthRegionCount: prevMonthSupplyPlan[0].regionCount,
-                  firstMonthRegionCountForStock: prevMonthSupplyPlan[0].regionCountForStock,
+                  loading: false,
                 })
-              } else {
-                this.setState({
-                  firstMonthRegionCount: 1,
-                  firstMonthRegionCountForStock: 0,
-                })
-              }
+                this.hideFirstComponent()
+              }.bind(this);
+              dsRequest.onsuccess = function (event) {
+                var dsResult = dsRequest.result;
 
-              var monthstartfrom = this.state.rangeValue.from.month
-              for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                var monthlydata = [];
-                console.log(programJson)
-                for (var month = monthstartfrom; month <= 12; month++) {
-                  var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                  var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                  console.log(dtstr, ' ', enddtStr)
-                  var dt = dtstr
-                  var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                  console.log(list)
-                  if (list.length > 0) {
-                    var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-                    var totalShipmentQty = 0;
-                    shiplist.map((elt,idx) => {
-                      totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
-                      var fundingSource=fsResult.filter(fs=>fs.fundingSourceId==elt.fundingSource.id);
-                      if(fundingSource.length>0){
-                        var simpleFSObject={
-                          id:fundingSource[0].fundingSourceId,
-                          label:fundingSource[0].label,
-                          code:fundingSource[0].fundingSourceCode
-                        }
-                        shiplist[idx].fundingSource=simpleFSObject;
-                      }
-                      var procurementAgent=paResult.filter(pa=>pa.procurementAgentId==elt.procurementAgent.id);
-                      if(procurementAgent.length>0){
-                        var simplePAObject={
-                          id:procurementAgent[0].procurementAgentId,
-                          label:procurementAgent[0].label,
-                          code:procurementAgent[0].procurementAgentCode
-                        }
-                        shiplist[idx].procurementAgent=simplePAObject;
-                      }
-                    })
-                    var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                    var totalforecastConsumption = null;
-                    conList.map(elt => {
-                      totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
-                    })
-                    var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                    var totalActualConsumption = null;
-                    conListAct.map(elt => {
-                      totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
-                    })
-                    console.log(conList)
-                    console.log(totalforecastConsumption)
-                    var json = {
-                      dt: new Date(from, month - 1),
-                      forecastedConsumptionQty: totalforecastConsumption,
-                      actualConsumptionQty: totalActualConsumption,
-                      actualConsumption: list[0].actualFlag,
-                      finalConsumptionQty: list[0].consumptionQty,
-                      shipmentQty: totalShipmentQty,
-                      shipmentInfo: shiplist,
-                      adjustment: list[0].adjustmentQty,
-                      closingBalance: list[0].closingBalance,
-                      openingBalance: list[0].openingBalance,
-                      mos: list[0].mos,
-                      amc: list[0].amc,
-                      minMos: minStockMoS,
-                      maxMos: maxStockMoS,
-                      expiredStock: list[0].expiredStock,
-                      unmetDemand: list[0].unmetDemand,
-                      regionCount: list[0].regionCount,
-                      regionCountForStock: list[0].regionCountForStock,
-                      nationalAdjustment: list[0].nationalAdjustment
-                    }
-                  } else {
-                    var json = {
-                      dt: new Date(from, month - 1),
-                      consumptionQty: 0,
-                      actualConsumption: false,
-                      shipmentQty: 0,
-                      shipmentInfo: [],
-                      adjustment: 0,
-                      closingBalance: 0,
-                      openingBalance: '',
-                      mos: '',
-                      amc: '',
-                      minMos: minStockMoS,
-                      maxMos: maxStockMoS,
-                      expiredStock: 0,
-                      unmetDemand: 0,
-                      regionCount: 1,
-                      regionCountForStock: 0,
-                      nationalAdjustment: 0,
-                    }
-                  }
-                  data.push(json)
-                  console.log(json)
-                  if (month == this.state.rangeValue.to.month && from == to) {
-                    this.setState({
-                      stockStatusList: data,
-                      message: '', loading: false
-                    })
-
-                    return;
-                  }
+                var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                var fsOs = fsTransaction.objectStore('fundingSource');
+                var fsRequest = fsOs.getAll();
+                fsRequest.onerror = function (event) {
                   this.setState({
                     loading: false,
-                    planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
                   })
+                  this.hideFirstComponent()
+                }.bind(this);
+                fsRequest.onsuccess = function (event) {
+                  var fsResult = fsRequest.result;
 
-                }
-                monthstartfrom = 1
+                  var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                  var paOs = paTransaction.objectStore('procurementAgent');
+                  var paRequest = paOs.getAll();
+                  paRequest.onerror = function (event) {
+                    this.setState({
+                      loading: false,
+                    })
+                    this.hideFirstComponent()
+                  }.bind(this);
+                  paRequest.onsuccess = function (event) {
+                    var paResult = paRequest.result;
 
-              }
+                    var maxForMonths = 0;
+                    var realm = realmRequest.result;
+                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                      maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                    } else {
+                      maxForMonths = pu.minMonthsOfStock
+                    }
+                    var minStockMoS = parseInt(maxForMonths);
 
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                      minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoS = parseInt(minForMonths);
+                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                    }
+
+
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                      minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoS = parseInt(minForMonths);
+                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
+                    }
+
+                    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+                    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+                    console.log("EndDate+++", endDate)
+                    var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    console.log("ShipmentList+++", shipmentList);
+                    var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
+                    var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
+                    var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
+                    var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
+                    inList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        inList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    coList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        coList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    shList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        shList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    console.log("ShList+++", shList);
+                    this.setState({
+                      inList: inList,
+                      coList: coList,
+                      shList: shList
+                    })
+                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
+                    if (prevMonthSupplyPlan.length > 0) {
+                      this.setState({
+                        firstMonthRegionCount: prevMonthSupplyPlan[0].regionCount,
+                        firstMonthRegionCountForStock: prevMonthSupplyPlan[0].regionCountForStock,
+                      })
+                    } else {
+                      this.setState({
+                        firstMonthRegionCount: 1,
+                        firstMonthRegionCountForStock: 0,
+                      })
+                    }
+
+                    var monthstartfrom = this.state.rangeValue.from.month
+                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                      var monthlydata = [];
+                      console.log(programJson)
+                      for (var month = monthstartfrom; month <= 12; month++) {
+                        var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                        var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                        console.log(dtstr, ' ', enddtStr)
+                        var dt = dtstr
+                        var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
+                        console.log(list)
+                        if (list.length > 0) {
+                          var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+                          var totalShipmentQty = 0;
+                          shiplist.map((elt, idx) => {
+                            totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
+                            var fundingSource = fsResult.filter(fs => fs.fundingSourceId == elt.fundingSource.id);
+                            if (fundingSource.length > 0) {
+                              var simpleFSObject = {
+                                id: fundingSource[0].fundingSourceId,
+                                label: fundingSource[0].label,
+                                code: fundingSource[0].fundingSourceCode
+                              }
+                              shiplist[idx].fundingSource = simpleFSObject;
+                            }
+                            var procurementAgent = paResult.filter(pa => pa.procurementAgentId == elt.procurementAgent.id);
+                            if (procurementAgent.length > 0) {
+                              var simplePAObject = {
+                                id: procurementAgent[0].procurementAgentId,
+                                label: procurementAgent[0].label,
+                                code: procurementAgent[0].procurementAgentCode
+                              }
+                              shiplist[idx].procurementAgent = simplePAObject;
+                            }
+                          })
+                          var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                          var totalforecastConsumption = null;
+                          conList.map(elt => {
+                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                          })
+                          var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                          var totalActualConsumption = null;
+                          conListAct.map(elt => {
+                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                          })
+                          console.log(conList)
+                          console.log(totalforecastConsumption)
+                          var json = {
+                            dt: new Date(from, month - 1),
+                            forecastedConsumptionQty: totalforecastConsumption,
+                            actualConsumptionQty: totalActualConsumption,
+                            actualConsumption: list[0].actualFlag,
+                            finalConsumptionQty: list[0].consumptionQty,
+                            shipmentQty: totalShipmentQty,
+                            shipmentInfo: shiplist,
+                            adjustment: list[0].adjustmentQty,
+                            closingBalance: list[0].closingBalance,
+                            openingBalance: list[0].openingBalance,
+                            mos: list[0].mos,
+                            amc: list[0].amc,
+                            minMos: minStockMoS,
+                            maxMos: maxStockMoS,
+                            expiredStock: list[0].expiredStock,
+                            unmetDemand: list[0].unmetDemand,
+                            regionCount: list[0].regionCount,
+                            regionCountForStock: list[0].regionCountForStock,
+                            nationalAdjustment: list[0].nationalAdjustment
+                          }
+                        } else {
+                          var json = {
+                            dt: new Date(from, month - 1),
+                            consumptionQty: 0,
+                            actualConsumption: false,
+                            shipmentQty: 0,
+                            shipmentInfo: [],
+                            adjustment: 0,
+                            closingBalance: 0,
+                            openingBalance: '',
+                            mos: '',
+                            amc: '',
+                            minMos: minStockMoS,
+                            maxMos: maxStockMoS,
+                            expiredStock: 0,
+                            unmetDemand: 0,
+                            regionCount: 1,
+                            regionCountForStock: 0,
+                            nationalAdjustment: 0,
+                          }
+                        }
+                        data.push(json)
+                        console.log(json)
+                        if (month == this.state.rangeValue.to.month && from == to) {
+                          this.setState({
+                            stockStatusList: data,
+                            message: '', loading: false
+                          })
+
+                          return;
+                        }
+                        this.setState({
+                          loading: false,
+                          planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+                        })
+
+                      }
+                      monthstartfrom = 1
+
+                    }
+
+                  }.bind(this)
+
+                }.bind(this)
+              }.bind(this)
             }.bind(this)
-
           }.bind(this)
         }.bind(this)
-      }.bind(this)
-    }.bind(this)
-  }.bind(this)
 
 
 
@@ -1237,9 +1237,9 @@ class StockStatus extends Component {
             var inventoryList = [];
             var consumptionList = [];
             var shipmentList = [];
-            var responseData=response.data;
+            var responseData = response.data;
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredResponseData=(response.data).filter(c=>moment(c.dt).format("YYYY-MM")>=moment(startDate).format("YYYY-MM"));
+            var filteredResponseData = (response.data).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             filteredResponseData.map(c => {
               c.inventoryInfo.map(i => inventoryList.push(i))
               c.consumptionInfo.map(ci => consumptionList.push(ci))
@@ -1377,579 +1377,579 @@ class StockStatus extends Component {
               this.hideFirstComponent()
             }.bind(this);
             dsRequest.onsuccess = function (event) {
-              var dsResult=dsRequest.result;
+              var dsResult = dsRequest.result;
 
               var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
-            var fsOs = fsTransaction.objectStore('fundingSource');
-            var fsRequest = fsOs.getAll();
-            fsRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            fsRequest.onsuccess = function (event) {
-              var fsResult=fsRequest.result;
-
-              var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-            var paOs = paTransaction.objectStore('procurementAgent');
-            var paRequest = paOs.getAll();
-            paRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            paRequest.onsuccess = function (event) {
-              var paResult=paRequest.result;
-            var selectedPlanningUnitdata = {};
-            var selectedplanningunit = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]
-            console.log('selectedplanningunit', selectedplanningunit)
-            var planningunitList = this.state.planningUnits.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
-            planningunitList.push(selectedplanningunit)
-            var pcnt = 0
-            console.log('planningunitList', planningunitList)
-            planningunitList.map(pu => {
-              console.log('**pu', pu)
-              var data = [];
-              var monthstartfrom = this.state.rangeValue.from.month
-              var fromYear = this.state.rangeValue.from.year
-              var toYear = this.state.rangeValue.to.year
-              var toMonth = this.state.rangeValue.to.month
-              var maxForMonths = 0;
-              var realm = realmRequest.result;
-              var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-              var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-              if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
-                maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-              } else {
-                maxForMonths = pu.minMonthsOfStock
-              }
-              var minStockMoS = parseInt(maxForMonths);
-
-              // Calculations for Max Stock
-              var minForMonths = 0;
-              var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-              if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-              } else {
-                minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-              }
-              var maxStockMoS = parseInt(minForMonths);
-              if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-              }
-
-
-
-              let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-              let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-              var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
-              var firstMonthRegionCount = 1;
-              var firstMonthRegionCountForStock = 0;
-              if (prevMonthSupplyPlan.length > 0) {
-                firstMonthRegionCount = prevMonthSupplyPlan[0].regionCount;
-                firstMonthRegionCountForStock = prevMonthSupplyPlan[0].regionCountForStock
-              }
-              var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-              var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id);
-              var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
-              var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
-              var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
-              inList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                inList[idx].dataSource=simpleDsObject;
-              }
-              })
-              coList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                coList[idx].dataSource=simpleDsObject;
-              }
-              })
-              shList.map((c,idx)=>{
-                var dataSource=dsResult.filter(d=>d.dataSourceId==c.dataSource.id);
-                if(dataSource.length>0){
-                var simpleDsObject={
-                  id:dataSource[0].dataSourceId,
-                  label:dataSource[0].label
-                }
-                shList[idx].dataSource=simpleDsObject;
-              }
-              })
-              for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                var monthlydata = [];
-
-                for (var month = monthstartfrom; month <= 12; month++) {
-                  var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                  var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                  console.log(dtstr, ' ', enddtStr)
-                  var dt = dtstr
-                  var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.planningUnit.id && c.transDate == dt)
-
-                  console.log(list)
-                  if (list.length > 0) {
-                    var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-                    var totalShipmentQty = 0;
-                    shiplist.map((elt,idx) => {
-                      totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
-                      var fundingSource=fsResult.filter(fs=>fs.fundingSourceId==elt.fundingSource.id);
-                      if(fundingSource.length>0){
-                        var simpleFSObject={
-                          id:fundingSource[0].fundingSourceId,
-                          label:fundingSource[0].label,
-                          code:fundingSource[0].fundingSourceCode
-                        }
-                        shiplist[idx].fundingSource=simpleFSObject;
-                      }
-                      var procurementAgent=paResult.filter(pa=>pa.procurementAgentId==elt.procurementAgent.id);
-                      if(procurementAgent.length>0){
-                        var simplePAObject={
-                          id:procurementAgent[0].procurementAgentId,
-                          label:procurementAgent[0].label,
-                          code:procurementAgent[0].procurementAgentCode
-                        }
-                        shiplist[idx].procurementAgent=simplePAObject;
-                      }
-                    })
-                    var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                    var totalforecastConsumption = null;
-                    conList.map(elt => {
-                      totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
-                    })
-
-                    var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                    var totalActualConsumption = null;
-                    conListAct.map(elt => {
-                      totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
-                    })
-                    console.log(conList)
-                    console.log(totalforecastConsumption)
-                    var json = {
-                      dt: new Date(from, month - 1),
-                      forecastedConsumptionQty: totalforecastConsumption,
-                      actualConsumptionQty: totalActualConsumption,
-                      actualConsumption: list[0].actualFlag,
-                      finalConsumptionQty: list[0].consumptionQty,
-                      shipmentQty: totalShipmentQty,
-                      shipmentInfo: shiplist,
-                      adjustment: list[0].adjustmentQty,
-                      closingBalance: list[0].closingBalance,
-                      openingBalance: list[0].openingBalance,
-                      mos: list[0].mos,
-                      amc: list[0].amc,
-                      minMos: minStockMoS,
-                      maxMos: maxStockMoS,
-                      expiredStock: list[0].expiredStock,
-                      unmetDemand: list[0].unmetDemand,
-                      regionCount: list[0].regionCount,
-                      regionCountForStock: list[0].regionCountForStock,
-                      nationalAdjustment: list[0].nationalAdjustment
-                    }
-                  } else {
-                    var json = {
-                      dt: new Date(from, month - 1),
-                      consumptionQty: 0,
-                      actualConsumption: false,
-                      shipmentQty: 0,
-                      shipmentInfo: [],
-                      adjustment: 0,
-                      closingBalance: 0,
-                      openingBalance: '',
-                      mos: '',
-                      amc: '',
-                      minMos: minStockMoS,
-                      maxMos: maxStockMoS,
-                      expiredStock: 0,
-                      unmetDemand: 0,
-                      regionCount: 1,
-                      regionCountForStock: 0,
-                      nationalAdjustment: 0
-                    }
-                  }
-                  data.push(json)
-                  if (month == this.state.rangeValue.to.month && from == to) {
-                    month = 12
-                    var bar = {
-
-                      labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
-                      datasets: [
-                        {
-                          label: i18n.t('static.supplyPlan.delivered'),
-                          yAxisID: 'A',
-                          stack: 1,
-                          backgroundColor: '#002f6c',
-                          borderColor: 'rgba(179,181,198,1)',
-                          pointBackgroundColor: 'rgba(179,181,198,1)',
-                          pointBorderColor: '#fff',
-                          pointHoverBackgroundColor: '#fff',
-                          pointHoverBorderColor: 'rgba(179,181,198,1)',
-                          data: data.map((item, index) => {
-                            let count = 0;
-                            (item.shipmentInfo.map((ele, index) => {
-
-                              ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
-                            }))
-                            return count
-                          })
-                        },
-                        {
-                          label: i18n.t('static.supplyPlan.shipped'),
-                          yAxisID: 'A',
-                          stack: 1,
-                          backgroundColor: '#006789',
-                          borderColor: 'rgba(179,181,198,1)',
-                          pointBackgroundColor: 'rgba(179,181,198,1)',
-                          pointBorderColor: '#fff',
-                          pointHoverBackgroundColor: '#fff',
-                          pointHoverBorderColor: 'rgba(179,181,198,1)',
-                          data: data.map((item, index) => {
-                            let count = 0;
-                            (item.shipmentInfo.map((ele, index) => {
-                              (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
-                            }))
-                            return count
-                          })
-                        },
-
-                        {
-                          label: i18n.t('static.supplyPlan.approved'),
-                          yAxisID: 'A',
-                          stack: 1,
-                          backgroundColor: '#205493',
-                          borderColor: 'rgba(179,181,198,1)',
-                          pointBackgroundColor: 'rgba(179,181,198,1)',
-                          pointBorderColor: '#fff',
-                          pointHoverBackgroundColor: '#fff',
-                          pointHoverBorderColor: 'rgba(179,181,198,1)',
-                          data: data.map((item, index) => {
-                            let count = 0;
-                            (item.shipmentInfo.map((ele, index) => {
-                              (ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
-                            }))
-                            return count
-                          })
-                        },
-                        {
-                          label: i18n.t('static.supplyPlan.planned'),
-                          backgroundColor: '#a7c6ed',
-                          borderColor: 'rgba(179,181,198,1)',
-                          pointBackgroundColor: 'rgba(179,181,198,1)',
-                          pointBorderColor: '#fff',
-                          pointHoverBackgroundColor: '#fff',
-                          pointHoverBorderColor: 'rgba(179,181,198,1)',
-                          yAxisID: 'A',
-                          stack: 1,
-                          data: data.map((item, index) => {
-                            let count = 0;
-                            (item.shipmentInfo.map((ele, index) => {
-                              (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
-                            }))
-                            return count
-                          })
-                        },
-                        {
-                          type: "line",
-                          yAxisID: 'B',
-                          label: i18n.t('static.report.minmonth'),
-                          backgroundColor: 'rgba(255,193,8,0.2)',
-                          borderColor: '#59cacc',
-                          borderStyle: 'dotted',
-                          borderDash: [10, 10],
-                          fill: '+1',
-                          backgroundColor: 'transparent',
-                          ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                          },
-                          showInLegend: true,
-                          pointStyle: 'line',
-                          pointRadius: 0,
-                          yValueFormatString: "$#,##0",
-                          lineTension: 0,
-                          data: data.map((item, index) => (item.minMos))
-                        }
-                        , {
-                          type: "line",
-                          yAxisID: 'B',
-                          label: i18n.t('static.report.maxmonth'),
-                          backgroundColor: 'rgba(0,0,0,0)',
-                          borderColor: '#59cacc',
-                          borderStyle: 'dotted',
-                          backgroundColor: 'transparent',
-                          borderDash: [10, 10],
-                          fill: true,
-                          ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                          },
-                          lineTension: 0,
-                          pointStyle: 'line',
-                          pointRadius: 0,
-                          showInLegend: true,
-                          yValueFormatString: "$#,##0",
-                          data: data.map((item, index) => (item.maxMos))
-                        }
-                        , {
-                          type: "line",
-                          yAxisID: 'B',
-                          label: i18n.t('static.report.mos'),
-                          borderColor: '#118b70',
-                          backgroundColor: 'transparent',
-                          ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                          },
-                          lineTension: 0,
-                          showInLegend: true,
-                          pointStyle: 'line',
-                          pointRadius: 0,
-                          yValueFormatString: "$#,##0",
-                          data: data.map((item, index) => {
-                            if (item.mos != '') {
-                              return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-                            } else {
-                              return ''
-                            }
-                          })
-                        }
-                        , {
-                          type: "line",
-                          yAxisID: 'A',
-                          label: i18n.t('static.supplyPlan.consumption'),
-                          backgroundColor: 'transparent',
-                          borderColor: '#ba0c2f',
-                          ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                          },
-                          lineTension: 0,
-                          showInLegend: true,
-                          pointStyle: 'line',
-                          pointRadius: 0,
-                          yValueFormatString: "$#,##0",
-                          data: data.map((item, index) => (item.finalConsumptionQty))
-                        },
-                        {
-                          label: i18n.t('static.report.stock'),
-                          yAxisID: 'A',
-                          type: 'line',
-                          borderColor: '#cfcdc9',
-                          ticks: {
-                            fontSize: 2,
-                            fontColor: 'transparent',
-                          },
-                          lineTension: 0,
-                          pointStyle: 'line',
-                          pointRadius: 0,
-                          showInLegend: true,
-                          data: data.map((item, index) => (item.closingBalance))
-                        }
-
-                      ],
-
-                    };
-                    var chartOptions = {
-                      title: {
-                        display: false,
-                        text: ""
-                      },
-                      scales: {
-                        yAxes: [{
-                          id: 'A',
-                          position: 'left',
-                          scaleLabel: {
-                            labelString: i18n.t('static.shipment.qty'),
-                            display: true,
-                            fontSize: "12",
-                            fontColor: 'black'
-                          },
-                          ticks: {
-                            beginAtZero: true,
-                            fontColor: 'black',
-                            callback: function (value) {
-                              var cell1 = value
-                              cell1 += '';
-                              var x = cell1.split('.');
-                              var x1 = x[0];
-                              var x2 = x.length > 1 ? '.' + x[1] : '';
-                              var rgx = /(\d+)(\d{3})/;
-                              while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                              }
-                              return x1 + x2;
-
-                            }
-
-                          }, gridLines: {
-                            color: 'rgba(171,171,171,1)',
-                            lineWidth: 0
-                          }
-
-                        }, {
-                          id: 'B',
-                          position: 'right',
-                          scaleLabel: {
-                            labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                            fontColor: 'black',
-                            display: true,
-
-                          },
-                          ticks: {
-                            beginAtZero: true,
-                            fontColor: 'black',
-                            callback: function (value) {
-                              var cell1 = value
-                              cell1 += '';
-                              var x = cell1.split('.');
-                              var x1 = x[0];
-                              var x2 = x.length > 1 ? '.' + x[1] : '';
-                              var rgx = /(\d+)(\d{3})/;
-                              while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                              }
-                              return x1 + x2;
-
-                            }
-
-                          },
-                          gridLines: {
-                            color: 'rgba(171,171,171,1)',
-                            lineWidth: 0
-                          }
-                        }],
-                        xAxes: [{
-
-                          scaleLabel: {
-                            display: true,
-                            labelString: i18n.t('static.common.month'),
-                            fontColor: 'black',
-                            fontStyle: "normal",
-                            fontSize: "12"
-                          },
-                          ticks: {
-                            fontColor: 'black',
-                            fontStyle: "normal",
-                            fontSize: "12"
-                          },
-                          gridLines: {
-                            color: 'rgba(171,171,171,1)',
-                            lineWidth: 0
-                          }
-                        }]
-                      },
-
-                      tooltips: {
-                        enabled: false,
-                        custom: CustomTooltips,
-                        callbacks: {
-                          label: function (tooltipItem, data) {
-
-                            let label = data.labels[tooltipItem.index];
-                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                            var cell1 = value
-                            cell1 += '';
-                            var x = cell1.split('.');
-                            var x1 = x[0];
-                            var x2 = x.length > 1 ? '.' + x[1] : '';
-                            var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                              x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                          }
-                        }
-                      },
-                      maintainAspectRatio: false,
-                      legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                          usePointStyle: true,
-                          fontColor: 'black'
-                        }
-                      }
-                    }
-
-                    var planningUnitexport = {
-                      planningUnit: pu.planningUnit,
-                      data: data,
-                      bar: bar,
-                      chartOptions: chartOptions,
-                      inList: inList,
-                      coList: coList,
-                      shList: shList,
-                      firstMonthRegionCount: firstMonthRegionCount,
-                      firstMonthRegionCountForStock: firstMonthRegionCountForStock
-                    }
-                    if (pu.planningUnit.id != document.getElementById("planningUnitId").value) {
-                      PlanningUnitDataForExport.push(planningUnitexport)
-                      // this.setState({
-                      //   PlanningUnitDataForExport:PlanningUnitDataForExport,
-                      //   loading: false,
-                      //  }, () => {
-                      //   this.forceUpdate()
-                      //   console.log('updating data')
-                      // })
-                    } else {
-                      selectedPlanningUnitdata = planningUnitexport
-                      console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
-                    }
-                  }
-
-                }
-                monthstartfrom = 1
-
-              }
-
-
-
-
-
-
-              pcnt = pcnt + 1
-              console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
-              if (pcnt == planningunitList.length) {
-                PlanningUnitDataForExport.push(selectedPlanningUnitdata)
+              var fsOs = fsTransaction.objectStore('fundingSource');
+              var fsRequest = fsOs.getAll();
+              fsRequest.onerror = function (event) {
                 this.setState({
-                  PlanningUnitDataForExport: PlanningUnitDataForExport,
-                  loading: false
+                  loading: false,
+                })
+                this.hideFirstComponent()
+              }.bind(this);
+              fsRequest.onsuccess = function (event) {
+                var fsResult = fsRequest.result;
 
-                }, () => {
-                  setTimeout(() => {
-
-                    if (report == 1) {
-                      this.exportPDF()
-                      document.getElementById("bars_div").style.display = 'none';
+                var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                var paOs = paTransaction.objectStore('procurementAgent');
+                var paRequest = paOs.getAll();
+                paRequest.onerror = function (event) {
+                  this.setState({
+                    loading: false,
+                  })
+                  this.hideFirstComponent()
+                }.bind(this);
+                paRequest.onsuccess = function (event) {
+                  var paResult = paRequest.result;
+                  var selectedPlanningUnitdata = {};
+                  var selectedplanningunit = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]
+                  console.log('selectedplanningunit', selectedplanningunit)
+                  var planningunitList = this.state.planningUnits.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
+                  planningunitList.push(selectedplanningunit)
+                  var pcnt = 0
+                  console.log('planningunitList', planningunitList)
+                  planningunitList.map(pu => {
+                    console.log('**pu', pu)
+                    var data = [];
+                    var monthstartfrom = this.state.rangeValue.from.month
+                    var fromYear = this.state.rangeValue.from.year
+                    var toYear = this.state.rangeValue.to.year
+                    var toMonth = this.state.rangeValue.to.month
+                    var maxForMonths = 0;
+                    var realm = realmRequest.result;
+                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
+                      maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
                     } else {
-                      this.exportCSV()
+                      maxForMonths = pu.minMonthsOfStock
+                    }
+                    var minStockMoS = parseInt(maxForMonths);
+
+                    // Calculations for Max Stock
+                    var minForMonths = 0;
+                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
+                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                    } else {
+                      minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
+                    }
+                    var maxStockMoS = parseInt(minForMonths);
+                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                     }
 
 
-                  }, 2000)
 
-                })
-              }
-            })
+                    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+                    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
+                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
+                    var firstMonthRegionCount = 1;
+                    var firstMonthRegionCountForStock = 0;
+                    if (prevMonthSupplyPlan.length > 0) {
+                      firstMonthRegionCount = prevMonthSupplyPlan[0].regionCount;
+                      firstMonthRegionCountForStock = prevMonthSupplyPlan[0].regionCountForStock
+                    }
+                    var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id);
+                    var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
+                    var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
+                    var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
+                    inList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        inList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    coList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        coList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    shList.map((c, idx) => {
+                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
+                      if (dataSource.length > 0) {
+                        var simpleDsObject = {
+                          id: dataSource[0].dataSourceId,
+                          label: dataSource[0].label
+                        }
+                        shList[idx].dataSource = simpleDsObject;
+                      }
+                    })
+                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                      var monthlydata = [];
+
+                      for (var month = monthstartfrom; month <= 12; month++) {
+                        var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                        var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                        console.log(dtstr, ' ', enddtStr)
+                        var dt = dtstr
+                        var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.planningUnit.id && c.transDate == dt)
+
+                        console.log(list)
+                        if (list.length > 0) {
+                          var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+                          var totalShipmentQty = 0;
+                          shiplist.map((elt, idx) => {
+                            totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
+                            var fundingSource = fsResult.filter(fs => fs.fundingSourceId == elt.fundingSource.id);
+                            if (fundingSource.length > 0) {
+                              var simpleFSObject = {
+                                id: fundingSource[0].fundingSourceId,
+                                label: fundingSource[0].label,
+                                code: fundingSource[0].fundingSourceCode
+                              }
+                              shiplist[idx].fundingSource = simpleFSObject;
+                            }
+                            var procurementAgent = paResult.filter(pa => pa.procurementAgentId == elt.procurementAgent.id);
+                            if (procurementAgent.length > 0) {
+                              var simplePAObject = {
+                                id: procurementAgent[0].procurementAgentId,
+                                label: procurementAgent[0].label,
+                                code: procurementAgent[0].procurementAgentCode
+                              }
+                              shiplist[idx].procurementAgent = simplePAObject;
+                            }
+                          })
+                          var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                          var totalforecastConsumption = null;
+                          conList.map(elt => {
+                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
+                          })
+
+                          var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
+                          var totalActualConsumption = null;
+                          conListAct.map(elt => {
+                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
+                          })
+                          console.log(conList)
+                          console.log(totalforecastConsumption)
+                          var json = {
+                            dt: new Date(from, month - 1),
+                            forecastedConsumptionQty: totalforecastConsumption,
+                            actualConsumptionQty: totalActualConsumption,
+                            actualConsumption: list[0].actualFlag,
+                            finalConsumptionQty: list[0].consumptionQty,
+                            shipmentQty: totalShipmentQty,
+                            shipmentInfo: shiplist,
+                            adjustment: list[0].adjustmentQty,
+                            closingBalance: list[0].closingBalance,
+                            openingBalance: list[0].openingBalance,
+                            mos: list[0].mos,
+                            amc: list[0].amc,
+                            minMos: minStockMoS,
+                            maxMos: maxStockMoS,
+                            expiredStock: list[0].expiredStock,
+                            unmetDemand: list[0].unmetDemand,
+                            regionCount: list[0].regionCount,
+                            regionCountForStock: list[0].regionCountForStock,
+                            nationalAdjustment: list[0].nationalAdjustment
+                          }
+                        } else {
+                          var json = {
+                            dt: new Date(from, month - 1),
+                            consumptionQty: 0,
+                            actualConsumption: false,
+                            shipmentQty: 0,
+                            shipmentInfo: [],
+                            adjustment: 0,
+                            closingBalance: 0,
+                            openingBalance: '',
+                            mos: '',
+                            amc: '',
+                            minMos: minStockMoS,
+                            maxMos: maxStockMoS,
+                            expiredStock: 0,
+                            unmetDemand: 0,
+                            regionCount: 1,
+                            regionCountForStock: 0,
+                            nationalAdjustment: 0
+                          }
+                        }
+                        data.push(json)
+                        if (month == this.state.rangeValue.to.month && from == to) {
+                          month = 12
+                          var bar = {
+
+                            labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
+                            datasets: [
+                              {
+                                label: i18n.t('static.supplyPlan.delivered'),
+                                yAxisID: 'A',
+                                stack: 1,
+                                backgroundColor: '#002f6c',
+                                borderColor: 'rgba(179,181,198,1)',
+                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                data: data.map((item, index) => {
+                                  let count = 0;
+                                  (item.shipmentInfo.map((ele, index) => {
+
+                                    ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+                                  }))
+                                  return count
+                                })
+                              },
+                              {
+                                label: i18n.t('static.supplyPlan.shipped'),
+                                yAxisID: 'A',
+                                stack: 1,
+                                backgroundColor: '#006789',
+                                borderColor: 'rgba(179,181,198,1)',
+                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                data: data.map((item, index) => {
+                                  let count = 0;
+                                  (item.shipmentInfo.map((ele, index) => {
+                                    (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+                                  }))
+                                  return count
+                                })
+                              },
+
+                              {
+                                label: i18n.t('static.supplyPlan.approved'),
+                                yAxisID: 'A',
+                                stack: 1,
+                                backgroundColor: '#205493',
+                                borderColor: 'rgba(179,181,198,1)',
+                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                data: data.map((item, index) => {
+                                  let count = 0;
+                                  (item.shipmentInfo.map((ele, index) => {
+                                    (ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+                                  }))
+                                  return count
+                                })
+                              },
+                              {
+                                label: i18n.t('static.supplyPlan.planned'),
+                                backgroundColor: '#a7c6ed',
+                                borderColor: 'rgba(179,181,198,1)',
+                                pointBackgroundColor: 'rgba(179,181,198,1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                yAxisID: 'A',
+                                stack: 1,
+                                data: data.map((item, index) => {
+                                  let count = 0;
+                                  (item.shipmentInfo.map((ele, index) => {
+                                    (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                                  }))
+                                  return count
+                                })
+                              },
+                              {
+                                type: "line",
+                                yAxisID: 'B',
+                                label: i18n.t('static.report.minmonth'),
+                                backgroundColor: 'rgba(255,193,8,0.2)',
+                                borderColor: '#59cacc',
+                                borderStyle: 'dotted',
+                                borderDash: [10, 10],
+                                fill: '+1',
+                                backgroundColor: 'transparent',
+                                ticks: {
+                                  fontSize: 2,
+                                  fontColor: 'transparent',
+                                },
+                                showInLegend: true,
+                                pointStyle: 'line',
+                                pointRadius: 0,
+                                yValueFormatString: "$#,##0",
+                                lineTension: 0,
+                                data: data.map((item, index) => (item.minMos))
+                              }
+                              , {
+                                type: "line",
+                                yAxisID: 'B',
+                                label: i18n.t('static.report.maxmonth'),
+                                backgroundColor: 'rgba(0,0,0,0)',
+                                borderColor: '#59cacc',
+                                borderStyle: 'dotted',
+                                backgroundColor: 'transparent',
+                                borderDash: [10, 10],
+                                fill: true,
+                                ticks: {
+                                  fontSize: 2,
+                                  fontColor: 'transparent',
+                                },
+                                lineTension: 0,
+                                pointStyle: 'line',
+                                pointRadius: 0,
+                                showInLegend: true,
+                                yValueFormatString: "$#,##0",
+                                data: data.map((item, index) => (item.maxMos))
+                              }
+                              , {
+                                type: "line",
+                                yAxisID: 'B',
+                                label: i18n.t('static.report.mos'),
+                                borderColor: '#118b70',
+                                backgroundColor: 'transparent',
+                                ticks: {
+                                  fontSize: 2,
+                                  fontColor: 'transparent',
+                                },
+                                lineTension: 0,
+                                showInLegend: true,
+                                pointStyle: 'line',
+                                pointRadius: 0,
+                                yValueFormatString: "$#,##0",
+                                data: data.map((item, index) => {
+                                  if (item.mos != '') {
+                                    return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+                                  } else {
+                                    return ''
+                                  }
+                                })
+                              }
+                              , {
+                                type: "line",
+                                yAxisID: 'A',
+                                label: i18n.t('static.supplyPlan.consumption'),
+                                backgroundColor: 'transparent',
+                                borderColor: '#ba0c2f',
+                                ticks: {
+                                  fontSize: 2,
+                                  fontColor: 'transparent',
+                                },
+                                lineTension: 0,
+                                showInLegend: true,
+                                pointStyle: 'line',
+                                pointRadius: 0,
+                                yValueFormatString: "$#,##0",
+                                data: data.map((item, index) => (item.finalConsumptionQty))
+                              },
+                              {
+                                label: i18n.t('static.report.stock'),
+                                yAxisID: 'A',
+                                type: 'line',
+                                borderColor: '#cfcdc9',
+                                ticks: {
+                                  fontSize: 2,
+                                  fontColor: 'transparent',
+                                },
+                                lineTension: 0,
+                                pointStyle: 'line',
+                                pointRadius: 0,
+                                showInLegend: true,
+                                data: data.map((item, index) => (item.closingBalance))
+                              }
+
+                            ],
+
+                          };
+                          var chartOptions = {
+                            title: {
+                              display: false,
+                              text: ""
+                            },
+                            scales: {
+                              yAxes: [{
+                                id: 'A',
+                                position: 'left',
+                                scaleLabel: {
+                                  labelString: i18n.t('static.shipment.qty'),
+                                  display: true,
+                                  fontSize: "12",
+                                  fontColor: 'black'
+                                },
+                                ticks: {
+                                  beginAtZero: true,
+                                  fontColor: 'black',
+                                  callback: function (value) {
+                                    var cell1 = value
+                                    cell1 += '';
+                                    var x = cell1.split('.');
+                                    var x1 = x[0];
+                                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                                    var rgx = /(\d+)(\d{3})/;
+                                    while (rgx.test(x1)) {
+                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                    }
+                                    return x1 + x2;
+
+                                  }
+
+                                }, gridLines: {
+                                  color: 'rgba(171,171,171,1)',
+                                  lineWidth: 0
+                                }
+
+                              }, {
+                                id: 'B',
+                                position: 'right',
+                                scaleLabel: {
+                                  labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                                  fontColor: 'black',
+                                  display: true,
+
+                                },
+                                ticks: {
+                                  beginAtZero: true,
+                                  fontColor: 'black',
+                                  callback: function (value) {
+                                    var cell1 = value
+                                    cell1 += '';
+                                    var x = cell1.split('.');
+                                    var x1 = x[0];
+                                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                                    var rgx = /(\d+)(\d{3})/;
+                                    while (rgx.test(x1)) {
+                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                    }
+                                    return x1 + x2;
+
+                                  }
+
+                                },
+                                gridLines: {
+                                  color: 'rgba(171,171,171,1)',
+                                  lineWidth: 0
+                                }
+                              }],
+                              xAxes: [{
+
+                                scaleLabel: {
+                                  display: true,
+                                  labelString: i18n.t('static.common.month'),
+                                  fontColor: 'black',
+                                  fontStyle: "normal",
+                                  fontSize: "12"
+                                },
+                                ticks: {
+                                  fontColor: 'black',
+                                  fontStyle: "normal",
+                                  fontSize: "12"
+                                },
+                                gridLines: {
+                                  color: 'rgba(171,171,171,1)',
+                                  lineWidth: 0
+                                }
+                              }]
+                            },
+
+                            tooltips: {
+                              enabled: false,
+                              custom: CustomTooltips,
+                              callbacks: {
+                                label: function (tooltipItem, data) {
+
+                                  let label = data.labels[tooltipItem.index];
+                                  let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                                  var cell1 = value
+                                  cell1 += '';
+                                  var x = cell1.split('.');
+                                  var x1 = x[0];
+                                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                                  var rgx = /(\d+)(\d{3})/;
+                                  while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                  }
+                                  return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                                }
+                              }
+                            },
+                            maintainAspectRatio: false,
+                            legend: {
+                              display: true,
+                              position: 'bottom',
+                              labels: {
+                                usePointStyle: true,
+                                fontColor: 'black'
+                              }
+                            }
+                          }
+
+                          var planningUnitexport = {
+                            planningUnit: pu.planningUnit,
+                            data: data,
+                            bar: bar,
+                            chartOptions: chartOptions,
+                            inList: inList,
+                            coList: coList,
+                            shList: shList,
+                            firstMonthRegionCount: firstMonthRegionCount,
+                            firstMonthRegionCountForStock: firstMonthRegionCountForStock
+                          }
+                          if (pu.planningUnit.id != document.getElementById("planningUnitId").value) {
+                            PlanningUnitDataForExport.push(planningUnitexport)
+                            // this.setState({
+                            //   PlanningUnitDataForExport:PlanningUnitDataForExport,
+                            //   loading: false,
+                            //  }, () => {
+                            //   this.forceUpdate()
+                            //   console.log('updating data')
+                            // })
+                          } else {
+                            selectedPlanningUnitdata = planningUnitexport
+                            console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
+                          }
+                        }
+
+                      }
+                      monthstartfrom = 1
+
+                    }
 
 
+
+
+
+
+                    pcnt = pcnt + 1
+                    console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
+                    if (pcnt == planningunitList.length) {
+                      PlanningUnitDataForExport.push(selectedPlanningUnitdata)
+                      this.setState({
+                        PlanningUnitDataForExport: PlanningUnitDataForExport,
+                        loading: false
+
+                      }, () => {
+                        setTimeout(() => {
+
+                          if (report == 1) {
+                            this.exportPDF()
+                            document.getElementById("bars_div").style.display = 'none';
+                          } else {
+                            this.exportCSV()
+                          }
+
+
+                        }, 2000)
+
+                      })
+                    }
+                  })
+
+
+                }.bind(this)
+
+              }.bind(this)
+            }.bind(this)
           }.bind(this)
-
         }.bind(this)
       }.bind(this)
-    }.bind(this)
-  }.bind(this)
-}.bind(this)
 
     }
     else {
@@ -1969,7 +1969,7 @@ class StockStatus extends Component {
           console.log('response+++=>', response.data)
           response.data.map(plannningUnitItem => {
             let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredPlanningUnitData=plannningUnitItem.filter(c=>moment(c.dt).format("YYYY-MM")>=moment(startDateForFilter).format("YYYY-MM"));
+            var filteredPlanningUnitData = plannningUnitItem.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
             var bar = {
 
               labels: filteredPlanningUnitData.map((item, index) => (this.dateFormatter(item.dt))),
@@ -2268,7 +2268,7 @@ class StockStatus extends Component {
             }
             var data = plannningUnitItem;
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredData=data.filter(c=>moment(c.dt).format("YYYY-MM")>=moment(startDate).format("YYYY-MM"));
+            var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             var planningUnit = plannningUnitItem[0].planningUnit
             console.log('planningUnit', planningUnit)
             var conList = [];
