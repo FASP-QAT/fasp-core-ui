@@ -147,7 +147,7 @@ class AuthenticationService {
         return decryptedUser.realm.realmId;
     }
 
-    checkTypeOfSession() {
+    checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
         let typeOfSession = localStorage.getItem('typeOfSession');
         let checkSite = isSiteOnline();
@@ -156,7 +156,8 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite)) {
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+        if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
             console.log("offline to online false");
@@ -467,7 +468,8 @@ class AuthenticationService {
         // console.log("bfuntion---", bfunction);
         return bfunction;
     }
-    authenticatedRoute(route) {
+    authenticatedRoute(route,url) {
+    if (url=="") {
         console.log("route---" + route);
 
         localStorage.setItem("isOfflinePage", 0);
@@ -479,7 +481,7 @@ class AuthenticationService {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             console.log("cur user available");
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (isSiteOnline() && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
+            if (localStorage.getItem("sessionType") === 'Online' && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
                 console.log("token not available");
                 return true;
             }
@@ -1260,6 +1262,10 @@ class AuthenticationService {
         // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         // keysToRemove.forEach(k => localStorage.removeItem(k))
         return false;
+    }else {
+        localStorage.setItem("sessionChanged", 1)
+        return "/login/static.message.sessionChange";
+    }        
 
     }
     displayHeaderTitle(url) {
@@ -1284,8 +1290,8 @@ class AuthenticationService {
         console.log("inside validate request")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (this.checkTypeOfSession()) {
-                if (isSiteOnline()) {
+            // if (this.checkTypeOfSession()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                         // if (this.checkLastActionTaken()) {
                         //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1318,10 +1324,10 @@ class AuthenticationService {
                 //         return "/logout/static.message.sessionExpired";
                 //     }
                 // }
-            } else {
-                localStorage.setItem("sessionChanged", 1)
-                return "/login/static.message.sessionChange";
-            }
+            // } else {
+            //     localStorage.setItem("sessionChanged", 1)
+            //     return "/login/static.message.sessionChange";
+            // }
         } else {
             console.log("offline to online ");
             if (localStorage.getItem("sessionChanged") == 1) {
