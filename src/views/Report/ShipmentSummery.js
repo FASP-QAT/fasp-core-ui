@@ -234,9 +234,9 @@ class ShipmentSummery extends Component {
             shipmentDetailsMonthList: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: '',
@@ -535,7 +535,7 @@ class ShipmentSummery extends Component {
         data = this.state.shipmentDetailsList.map(
             ele => [
                 getLabelText(ele.planningUnit.label, this.state.lang),
-                this.formatter(ele.shipmentId),
+                ele.shipmentId,
                 ele.emergencyOrder,
                 ele.erpOrder == true ? true : false,
                 ele.localProcurement,
@@ -835,8 +835,6 @@ class ShipmentSummery extends Component {
                 {
                     title: i18n.t('static.report.id'),
                     type: 'numeric',
-                    mask: '#,##.00',
-                    decimal: '.',
                     // readOnly: true
                 },
                 {
