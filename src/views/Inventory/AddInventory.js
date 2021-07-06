@@ -192,6 +192,7 @@ export default class AddInventory extends Component {
                 operator: 'greaterThan',
                 showErrorMessage: true,
                 formulae: [-1],
+                // formulae: [-100000000],
                 // errorStyle: 'error',
                 // errorTitle: 'Invalid Value',
                 // error: 'Invalid Value'
@@ -201,7 +202,8 @@ export default class AddInventory extends Component {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
-                formulae: [-1],
+                // formulae: [-1],
+                formulae: [-100000000],
                 // errorStyle: 'error',
                 // errorTitle: 'Invalid Value',
                 // error: 'Invalid Value'
