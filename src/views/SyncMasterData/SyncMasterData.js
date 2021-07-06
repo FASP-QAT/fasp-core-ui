@@ -35,7 +35,8 @@ export default class SyncMasterData extends Component {
             syncedMasters: 0,
             syncedPercentage: 0,
             message: "",
-            loading: true
+            loading: true,
+            programSynced: []
         }
         this.syncMasters = this.syncMasters.bind(this);
         this.retryClicked = this.retryClicked.bind(this);
@@ -114,7 +115,7 @@ export default class SyncMasterData extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={this.fetchData} objectStore="programData"></QatProblemActionNew>
+                <QatProblemActionNew ref="problemListChild" updateState={undefined} fetchData={this.fetchData} objectStore="programData" page="syncMasterData"></QatProblemActionNew>
                 {/* <QatProblemActions ref="problemListChild" updateState={undefined} fetchData={undefined} objectStore="programData"></QatProblemActions> */}
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
@@ -352,10 +353,10 @@ export default class SyncMasterData extends Component {
                             //     })
                             // document.getElementById("retryButtonDiv").style.display = "block";
                             valid = false;
-                            this.fetchData(1);
+                            this.fetchData(1, programList[i].id);
                         }
                     }).catch(error => {
-                        this.fetchData(1);
+                        this.fetchData(1, 1);
                         // console.log("D------------------------> 3 error", error);
                         if (error.message === "Network Error") {
                             // console.log("D--------------------------->in 3")
@@ -426,14 +427,28 @@ export default class SyncMasterData extends Component {
         return valid;
     }
 
-    fetchData(hasPrograms) {
+    fetchData(hasPrograms, programId) {
         // console.log("In fetch data @@@", this.state.syncedMasters)
         // console.log("HasPrograms@@@", hasPrograms);
         var realmId = AuthenticationService.getRealmId();
+        console.log("ProgramId###", programId);
+        console.log("hasPrograms###", hasPrograms);
         if (hasPrograms != 0) {
+            var programSynced = this.state.programSynced;
+            console.log("ProgramSYnced###", programSynced);
+            var indexForProgram = -1;
+            if (programId != 1) {
+                indexForProgram = programSynced.findIndex(c => c == programId);
+            }
+            var syncCount = TOTAL_NO_OF_MASTERS_IN_SYNC;
+            if (indexForProgram == -1) {
+                programSynced.push(programId);
+                console.log("####programSynced.length", programSynced.length);
+                syncCount = syncCount + programSynced.length;
+            }
             this.setState({
-                syncedMasters: this.state.syncedMasters + 1,
-                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                syncedMasters: syncCount,
+                syncedPercentage: Math.floor(((syncCount) / this.state.totalMasters) * 100)
             })
         }
         if (this.state.syncedMasters === this.state.totalMasters) {
@@ -1069,7 +1084,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                                                                                                                                                                     }, () => {
                                                                                                                                                                                                                                                                                                                                                         // console.log("M sync after problem state updated---", this.state.syncedMasters)
-                                                                                                                                                                                                                                                                                                                                                        this.fetchData(0);
+                                                                                                                                                                                                                                                                                                                                                        this.fetchData(0, 0);
                                                                                                                                                                                                                                                                                                                                                     })
                                                                                                                                                                                                                                                                                                                                                 }.bind(this);
                                                                                                                                                                                                                                                                                                                                             })

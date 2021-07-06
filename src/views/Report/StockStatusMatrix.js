@@ -72,7 +72,7 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true,
@@ -1122,6 +1122,7 @@ export default class StockStatusMatrix extends React.Component {
                 var programId = (document.getElementById("programId").value).split("_")[0];
                 var proList = []
                 console.log(myResult)
+                let incrmental = 0;
                 for (var i = 0; i < myResult.length; i++) {
                   if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -1130,7 +1131,10 @@ export default class StockStatusMatrix extends React.Component {
                     let tempPUObj = myResult[i];
                     tempPUObj["tracerCategoryId"] = tempTCId;
                     // proList[i] = myResult[i];
-                    proList[i] = tempPUObj;
+
+                    proList[incrmental] = tempPUObj;
+                    incrmental = incrmental + 1;
+                    // console.log("Log-------->", tempTCId);
                   }
                 }
 
@@ -1139,9 +1143,15 @@ export default class StockStatusMatrix extends React.Component {
                 }, this);
 
 
+                // console.log("Log--------> ******** ", tracerCategoryValues);
+                console.log("Log--------> ******** 00", proList);
+                console.log("Log--------> ******** -00", proList.length);
+
                 let data1 = [];
                 for (let i = 0; i < proList.length; i++) {
                   for (let j = 0; j < tracerCategoryValues.length; j++) {
+                    console.log("Log--------> ******** 11", proList[i]);
+                    console.log("Log--------> ******** 22", i);
                     if (tracerCategoryValues[j].tracerCategoryId == proList[i].tracerCategoryId) {
                       data1.push(proList[i]);
                     }
@@ -1750,7 +1760,7 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1911,7 +1921,7 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
               </div>
             </div>
-            <div class="TableCust">
+            <div class="TableCust" style={{ display: this.state.loading ? "none" : "block" }}>
               {this.state.data.length > 0 &&
                 <Table striped bordered responsive="md" style={{ width: "100%" }}>
                   <thead>
@@ -1967,19 +1977,20 @@ export default class StockStatusMatrix extends React.Component {
 
 
             </div>
-          </CardBody>
-        </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
+                  <div class="spinner-border blue ml-4" role="status">
 
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
+
 
 
       </div>)

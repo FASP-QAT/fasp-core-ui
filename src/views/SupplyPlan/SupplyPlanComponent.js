@@ -121,8 +121,8 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             batchInfoInInventoryPopUp: [],
             ledgerForBatch: [],
             showBatchSaveButton: false
@@ -3916,7 +3916,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
@@ -3991,91 +3991,95 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
-                                            <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                <ul className="legendcommitversion list-group">
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                                    <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
-                                                </ul>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                <ul className="legendcommitversion list-group">
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
-                                                    <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                                </ul>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                <ul className="legendcommitversion list-group">
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
-                                                    {
-                                                        this.state.paColors.map(item1 => (
-                                                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
-                                                        ))
-                                                    }
-                                                    <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                    <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                    <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
-                                                    <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-                                                </ul>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
-                                                <ul className="legendcommitversion list-group">
-                                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
-                                                    <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
-                                                    <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
-                                                </ul>
-                                            </FormGroup>
+
                                         </div>
                                     </Form>
                                 )} />
-                        <div className="animated fadeIn" style={{ display: this.state.display }}>
-                            <Row>
-                                <Col xs="12" md="12" className="mb-4  mt-3">
-                                    <Nav tabs>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '1'}
-                                                onClick={() => { this.toggle(0, '1'); }}
-                                            >{i18n.t('static.supplyPlan.currentSupplyPlan')} </NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '2'}
-                                                onClick={() => { this.toggle(0, '2'); }}
-                                            >
-                                                {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
-                                            </NavLink>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="animated fadeIn" style={{ display: this.state.display }}>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
+                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
+                                        {
+                                            this.state.paColors.map(item1 => (
+                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                            ))
+                                        }
+                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                        <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
+                                        <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <Row>
+                                    <Col xs="12" md="12" className="mb-4  mt-3">
+                                        <Nav tabs>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '1'}
+                                                    onClick={() => { this.toggle(0, '1'); }}
+                                                >{i18n.t('static.supplyPlan.currentSupplyPlan')} </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '2'}
+                                                    onClick={() => { this.toggle(0, '2'); }}
+                                                >
+                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
+                                                </NavLink>
 
-                                        </NavItem>
-                                    </Nav>
-                                    <TabContent activeTab={this.state.activeTab[0]}>
-                                        {this.tabPane()}
-                                    </TabContent>
-                                </Col>
-                            </Row>
+                                            </NavItem>
+                                        </Nav>
+                                        <TabContent activeTab={this.state.activeTab[0]}>
+                                            {this.tabPane()}
+                                        </TabContent>
+                                    </Col>
+                                </Row>
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     }
