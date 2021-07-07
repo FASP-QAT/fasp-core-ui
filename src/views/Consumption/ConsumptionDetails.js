@@ -139,7 +139,7 @@ export default class ConsumptionDetails extends React.Component {
             // error: 'Invalid value',
         });
 
-        let consumptionTypeDropdown = [i18n.t('static.report.actual'), i18n.t('static.consumption.forcast')];
+        let consumptionTypeDropdown = [i18n.t('static.consumption.actual'), i18n.t('static.consumption.forcast')];
         worksheet.dataValidations.add('C2:C100', {
             type: 'list',
             allowBlank: false,
