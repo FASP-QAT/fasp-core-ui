@@ -172,15 +172,16 @@ export default class WhatIfReportComponent extends React.Component {
             programSelect: "",
             showInventory: 0,
             showConsumption: 0,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showScenarioList: false,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
         }
 
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
@@ -2896,7 +2897,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                    amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3996,81 +3997,81 @@ export default class WhatIfReportComponent extends React.Component {
                                 isValid,
                                 setTouched
                             }) => (
-                                    <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
+                                <Form onSubmit={handleSubmit} noValidate name='whatIfForm'>
 
-                                        <Col md="12 pl-0">
-                                            <div className="d-md-flex">
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <div className="controls WhatifInputFeild">
+                                                <FormGroup className="">
+                                                    <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="scenarioId"
+                                                        id="scenarioId"
+                                                        bsSize="sm"
+                                                        valid={!errors.scenarioId && this.state.scenarioId != ''}
+                                                        invalid={touched.scenarioId && !!errors.scenarioId}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.scenarioId}
+                                                        onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
+                                                        <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                        <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
+                                                        <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
+                                                        <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
+                                                        <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                                </FormGroup>
+                                            </div>
+                                            <Input
+                                                type="hidden"
+                                                name="needPercentageValidation"
+                                                id="needPercentageValidation"
+                                                value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
+                                            />
+                                            <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
                                                 <div className="controls WhatifInputFeild">
-                                                    <FormGroup className="">
-                                                        <Label htmlFor="select">{i18n.t('static.whatIf.scenario')}</Label>
+                                                    <FormGroup className="tab-ml-1">
+                                                        <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
                                                         <Input
-                                                            type="select"
-                                                            name="scenarioId"
-                                                            id="scenarioId"
+                                                            type="text"
+                                                            name="percentage"
+                                                            id="percentage"
                                                             bsSize="sm"
-                                                            valid={!errors.scenarioId && this.state.scenarioId != ''}
-                                                            invalid={touched.scenarioId && !!errors.scenarioId}
+                                                            valid={!errors.percentage && this.state.percentage != ''}
+                                                            invalid={touched.percentage && !!errors.percentage}
                                                             onBlur={handleBlur}
-                                                            value={this.state.scenarioId}
+                                                            value={this.state.percentage}
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
-                                                            <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
-                                                            <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
-                                                            <option value="4">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</option>
-                                                            <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
-                                                            <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
                                                         </Input>
-                                                        <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.percentage}</FormFeedback>
                                                     </FormGroup>
                                                 </div>
-                                                <Input
-                                                    type="hidden"
-                                                    name="needPercentageValidation"
-                                                    id="needPercentageValidation"
-                                                    value={(this.state.scenarioId == 1 || this.state.scenarioId == 2 ? true : false)}
-                                                />
-                                                <div id="consumptionScenariosFields1" style={{ display: 'none' }}>
-                                                    <div className="controls WhatifInputFeild">
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="select">{i18n.t('static.whatIf.percentage')}</Label>
-                                                            <Input
-                                                                type="text"
-                                                                name="percentage"
-                                                                id="percentage"
-                                                                bsSize="sm"
-                                                                valid={!errors.percentage && this.state.percentage != ''}
-                                                                invalid={touched.percentage && !!errors.percentage}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.percentage}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                            </div>
+                                            <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
+                                                <div className="controls WhatifInputFeild">
+                                                    <FormGroup className="tab-ml-1">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
+                                                        <div className="controls edit">
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange}
+                                                                value={this.state.rangeValue}
+                                                                lang={pickerLang}
+                                                                //theme="light"
+                                                                onChange={this.handleRangeChange}
+                                                                onDismiss={this.handleRangeDissmis}
                                                             >
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.percentage}</FormFeedback>
-                                                        </FormGroup>
-                                                    </div>
+                                                                <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
                                                 </div>
-                                                <div id="consumptionScenariosFields2" style={{ display: 'none' }}>
-                                                    <div className="controls WhatifInputFeild">
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
-                                                            <div className="controls edit">
-                                                                <Picker
-                                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                    ref={this.pickRange}
-                                                                    value={this.state.rangeValue}
-                                                                    lang={pickerLang}
-                                                                    //theme="light"
-                                                                    onChange={this.handleRangeChange}
-                                                                    onDismiss={this.handleRangeDissmis}
-                                                                >
-                                                                    <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                                </Picker>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                    {/* <div className="controls WhatifInputFeild">
+                                                {/* <div className="controls WhatifInputFeild">
                                                         <FormGroup className="tab-ml-1">
                                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                             <DatePicker
@@ -4088,16 +4089,16 @@ export default class WhatIfReportComponent extends React.Component {
                                                             />
                                                         </FormGroup>
                                                     </div> */}
-                                                </div>
-                                                <FormGroup className="tab-ml-1 mt-4">
-                                                    <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            </div>
+                                            <FormGroup className="tab-ml-1 mt-4">
+                                                <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                     &nbsp;
                                                     </FormGroup>
-                                            </div>
-                                        </Col>
+                                        </div>
+                                    </Col>
 
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                     <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }}>{i18n.t('static.whatIf.scenarioList')}</span>
                     <Row className="pt-3 pb-3 scenarioListDiv" >
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -4150,7 +4151,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                     <thead>
                                         <tr>
-                                            <th className="BorderNoneSupplyPlan"></th>
+                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                             {
                                                 this.state.monthsArray.map(item => {
@@ -4167,7 +4168,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     <tbody>
 
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
@@ -4176,7 +4177,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                             {
                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -4189,7 +4190,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -4201,7 +4202,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -4224,7 +4225,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -4242,7 +4243,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                             {
@@ -4262,7 +4263,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -4280,7 +4281,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -4297,7 +4298,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -4314,7 +4315,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -4325,7 +4326,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -4343,7 +4344,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </tr>
 
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -4360,7 +4361,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -4377,7 +4378,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -4394,7 +4395,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                             {
                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -4403,7 +4404,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                             {
                                                 this.state.expiredStockArr.map(item1 => {
@@ -4420,7 +4421,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -4429,7 +4430,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -4438,7 +4439,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
@@ -4447,7 +4448,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         {/* <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                             {
                                                 this.state.minStockMoS.map(item1 => (
@@ -4456,7 +4457,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                             {
                                                 this.state.maxStockMoS.map(item1 => (
@@ -4465,7 +4466,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr> */}
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                             {
                                                 this.state.unmetDemand.map(item1 => (
@@ -4890,7 +4891,7 @@ export default class WhatIfReportComponent extends React.Component {
                             </div>
                             <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                 <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                 {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                             <div className="pt-4"></div>
@@ -5044,14 +5045,14 @@ export default class WhatIfReportComponent extends React.Component {
 
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map((sl,count) => {
+        shipmentList.map((sl, count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
-                var index=count;
+                var index = count;
                 this.setState({
-                    indexOfShipmentContainingBatch:index
+                    indexOfShipmentContainingBatch: index
                 })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
@@ -5106,7 +5107,7 @@ export default class WhatIfReportComponent extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
@@ -5165,52 +5166,54 @@ export default class WhatIfReportComponent extends React.Component {
                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                             </div>
-                            <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
-                                <ul className="legendcommitversion list-group">
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                    <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
-                                </ul>
-                            </FormGroup>
-                            <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
-                                <ul className="legendcommitversion list-group">
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
-                                    <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                </ul>
-                            </FormGroup>
-                            <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
-                                <ul className="legendcommitversion list-group">
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
-                                    {
-                                        this.state.paColors.map(item1 => (
-                                            <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
-                                        ))
-                                    }
-                                    <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                    <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                    <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
-                                    <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-                                </ul>
-                            </FormGroup>
-                            <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
-                                <ul className="legendcommitversion list-group">
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
-                                    <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
-                                    <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                    <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
-                                    <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
-                                    <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
-                                    <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
-                                    <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
-                                </ul>
-                            </FormGroup>
+
                         </div>
-                        <div className="animated fadeIn" style={{ display: this.state.display }}>
-                            {/* <Row>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="animated fadeIn" style={{ display: this.state.display }}>
+                                <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
+                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
+                                        {
+                                            this.state.paColors.map(item1 => (
+                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                            ))
+                                        }
+                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                        <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
+                                        <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                {/* <Row>
                                 <Col xs="12" md="12" className="mb-4">
                                     <Nav tabs>
                                         <NavItem>
@@ -5229,11 +5232,24 @@ export default class WhatIfReportComponent extends React.Component {
                                         </NavItem>
                                     </Nav>
                                     <TabContent activeTab={this.state.activeTab[0]}> */}
-                            {this.tabPane()}
-                            {/* </TabContent>
+                                {this.tabPane()}
+                                {/* </TabContent>
                                 </Col>
                             </Row> */}
+                            </div>
                         </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </CardBody>
                     <CardFooter className="pb-5">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -5241,17 +5257,7 @@ export default class WhatIfReportComponent extends React.Component {
                         <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                     </CardFooter>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         )
     }

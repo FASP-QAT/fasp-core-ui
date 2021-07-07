@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Table, ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, Label, Button, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -26,6 +26,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import MultiSelect from 'react-multi-select-component';
+import conversionFormula from '../../assets/img/conversionFormula.png';
+import conversionFormulaExample from '../../assets/img/conversionFormulaExample.png';
 
 
 
@@ -35,6 +37,8 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            artmisHistory: [],
+            tempNotes: '',
             originalQty: 0,
             filteredBudgetListByProgram: [],
             checkboxValue: true,
@@ -91,12 +95,17 @@ export default class ManualTagging extends Component {
             fundingSourceList: [],
             displaySubmitButton: false,
             countryId: '',
-            hasSelectAll: true
+            hasSelectAll: true,
+            artmisHistoryModal: false,
+            batchDetails: [],
+            table1Loader: false
+
         }
 
         this.filterData = this.filterData.bind(this);
         this.filterErpData = this.filterErpData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.formatLabelHistory = this.formatLabelHistory.bind(this);
         this.formatPlanningUnitLabel = this.formatPlanningUnitLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -128,7 +137,48 @@ export default class ManualTagging extends Component {
         this.filterProgramByCountry = this.filterProgramByCountry.bind(this);
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
         this.getShipmentDetailsByParentShipmentId = this.getShipmentDetailsByParentShipmentId.bind(this);
+        this.toggleDetailsModal = this.toggleDetailsModal.bind(this);
+        this.toggle = this.toggle.bind(this);
+        this.toggleArtmisHistoryModal = this.toggleArtmisHistoryModal.bind(this);
+        this.viewBatchData = this.viewBatchData.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
 
+    }
+
+    viewBatchData(event, row) {
+        console.log("event---", event);
+        console.log("row---", row.maxFilename);
+        console.log("row length---", row.shipmentList.length);
+        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+
+            this.setState({
+                batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
+            });
+        } else {
+            this.setState({
+                batchDetails: []
+            });
+        }
+        // batchDetails
+    }
+
+
+    toggleArtmisHistoryModal() {
+        this.setState({
+            artmisHistoryModal: !this.state.artmisHistoryModal,
+            batchDetails: []
+        })
+    }
+    toggleDetailsModal() {
+        this.setState({
+            modal: !this.state.modal
+        })
+    }
+
+    toggle() {
+        this.setState({
+            modal: !this.state.modal,
+        });
     }
     getShipmentDetailsByParentShipmentId(parentShipmentId) {
         ManualTaggingService.getShipmentDetailsByParentShipmentId(parentShipmentId)
@@ -137,7 +187,8 @@ export default class ManualTagging extends Component {
                 outputListAfterSearch.push(response.data)
                 this.setState({
                     outputListAfterSearch,
-                    originalQty: outputListAfterSearch[0].shipmentQty
+                    originalQty: outputListAfterSearch[0].shipmentQty,
+                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : "")
                 })
             }).catch(
                 error => {
@@ -214,7 +265,8 @@ export default class ManualTagging extends Component {
                 });
             } else {
                 this.setState({
-                    countryWisePrograms
+                    countryWisePrograms,
+                    planningUnits: []
                 });
             }
         }
@@ -278,7 +330,8 @@ export default class ManualTagging extends Component {
             originalQty: 0,
             message: i18n.t('static.actionCancelled'),
             color: "red",
-            planningUnitIdUpdated: ''
+            planningUnitIdUpdated: '',
+            table1Loader: false
         }, () => {
             this.hideSecondComponent();
             this.toggleLarge();
@@ -305,8 +358,14 @@ export default class ManualTagging extends Component {
         // let planningUnitId = this.state.planningUnitIdUpdated;
         ManualTaggingService.getNotLinkedShipmentListForManualTagging(programId1, 3)
             .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.shipmentId;
+                    var itemLabelB = b.shipmentId;
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    notLinkedShipments: response.data
+                    notLinkedShipments: listArray
                 });
             }).catch(
                 error => {
@@ -449,7 +508,7 @@ export default class ManualTagging extends Component {
             var col = ("H").concat(parseInt(y) + 1);
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-
+            var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -463,11 +522,13 @@ export default class ManualTagging extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.state.instance.setValueFromCoords(8, y, this.addCommas(Math.round(qty * (value != null && value != "" ? value : 1))), true);
+
+                    // `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
+                    // this.state.instance.setValueFromCoords(8, y, `=ROUND(G${parseInt(y) + 1}*H${parseInt(y) + 1},0)`, true);
                 }
 
             }
+            this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
         }
         // if (x == 0) {
         //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
@@ -476,9 +537,23 @@ export default class ManualTagging extends Component {
         // if (x == 9) {
 
         // }
-
+        if (x == 0) {
+            var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            console.log("checkboxValue---", checkboxValue);
+            if (checkboxValue == "true") {
+                console.log("jexcel instance---", this.state.instance);
+                this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
+            } else {
+                console.log("inside else---", checkboxValue);
+                this.state.instance.setValueFromCoords(7, y, "", true);
+                this.state.instance.setValueFromCoords(9, y, "", true);
+                var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                this.state.instance.setValueFromCoords(8, y, Math.round(qty), true);
+            }
+        }
         // //Active
         if (x != 10) {
+
             this.el.setValueFromCoords(10, y, 1, true);
         }
         this.displayButton();
@@ -491,20 +566,34 @@ export default class ManualTagging extends Component {
         this.el.setValueFromCoords(10, y, 1, true);
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[3]));
+            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+        }
+        elInstance.setValueFromCoords(10, y, 1, true);
+    }
+
     onPaste(instance, data) {
-        // var z = -1;
-        // for (var i = 0; i < data.length; i++) {
-        //     if (z != data[i].y) {
-        //         var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-        //         if (index == "" || index == null || index == undefined) {
-        //             (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-        //             (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
-        //             (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-        //             (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-        //             z = data[i].y;
-        //         }
-        //     }
-        // }
+        // console.log("DATA------->", data);
+        // // console.log("DATA------->1", parseFloat(data[0].value));
+
+
+        if (data.length == 1 && Object.keys(data[0])[2] == "value") {
+            (instance.jexcel).setValueFromCoords(7, data[0].y, parseFloat(data[0].value), true);
+        }
+        else {
+            for (var i = 0; i < data.length; i++) {
+                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+            }
+        }
+
+
+
+
     }
 
     dataChangeCheckbox(event) {
@@ -520,7 +609,10 @@ export default class ManualTagging extends Component {
                 originalQty: 0,
                 active4: true,
                 active5: false,
-                checkboxValue: false
+                checkboxValue: false,
+                tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         } else if (event.target.id == 'active5') {
             this.setState({
@@ -528,7 +620,10 @@ export default class ManualTagging extends Component {
                 selectedShipment: [],
                 active4: false,
                 active5: true,
-                checkboxValue: false
+                checkboxValue: false,
+                tempNotes: ''
+            }, () => {
+                this.displayButton();
             });
         }
     }
@@ -543,7 +638,8 @@ export default class ManualTagging extends Component {
                 outputList: [],
                 active1: true,
                 active2: false,
-                active3: false
+                active3: false,
+                tempNotes: ''
             }, () => {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
@@ -564,7 +660,8 @@ export default class ManualTagging extends Component {
                 outputList: [],
                 active2: true,
                 active1: false,
-                active3: false
+                active3: false,
+                tempNotes: ''
             }, () => {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
@@ -583,10 +680,12 @@ export default class ManualTagging extends Component {
                 planningUnitValues: [],
                 productCategoryValues: [],
                 planningUnits1: [],
+                planningUnits: [],
                 countryId: -1,
                 active3: true,
                 active1: false,
-                active2: false
+                active2: false,
+                tempNotes: ''
             }, () => {
                 // this.buildJExcel();
                 let realmId = AuthenticationService.getRealmId();
@@ -825,8 +924,8 @@ export default class ManualTagging extends Component {
     countryChange = (event) => {
         let planningUnits1 = this.state.planningUnits1;
         this.setState({
-            planningUnitValues:[],
-            productCategoryValues:[],
+            planningUnitValues: [],
+            productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
             countryId: event.target.value
         }, () => {
@@ -838,7 +937,8 @@ export default class ManualTagging extends Component {
 
     programChangeModal(event) {
         this.setState({
-            programId1: event.target.value
+            programId1: event.target.value,
+            planningUnits: []
         }, () => {
             this.getNotLinkedShipments();
             this.getPlanningUnitList();
@@ -863,32 +963,38 @@ export default class ManualTagging extends Component {
 
     displayButton() {
         var validation = this.checkValidation();
-        if (validation == true) {
-            var tableJson = this.state.instance.getJson(null, false);
-            let count = 0, qty = 0;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                if (this.state.active2) {
-                    count++;
-                    if (map1.get("0")) {
-                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
-                    }
-                }
-                else {
-                    if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                        qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
-                        count++;
-                    }
+
+        var tableJson = this.state.instance.getJson(null, false);
+        let count = 0, qty = 0;
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (this.state.active2) {
+                count++;
+                if (map1.get("0")) {
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
+            else {
+                if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
+                    console.log("value---", Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    count++;
+                }
+            }
+        }
+        console.log("qty---", qty);
+        if (validation == true) {
+
             this.setState({
-                displaySubmitButton: (count > 0 ? true : false),
+                displaySubmitButton: (count > 0 ? (this.state.active3 ? ((this.state.active4 || this.state.active5) ? true : false) : true) : false),
                 totalQuantity: this.addCommas(qty),
                 displayTotalQty: (count > 0 ? true : false)
             })
         } else {
             this.setState({
-                displaySubmitButton: false
+                displaySubmitButton: false,
+                totalQuantity: this.addCommas(qty),
+                displayTotalQty: (count > 0 ? true : false)
             })
         }
     }
@@ -1116,6 +1222,7 @@ export default class ManualTagging extends Component {
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             ManualTaggingService.getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0))
                 .then(response => {
+                    console.log("response.data------", response.data)
                     this.setState({
                         artmisList: response.data,
                         displayButton: false
@@ -1301,15 +1408,18 @@ export default class ManualTagging extends Component {
             fundingSourceId: -1,
             budgetId: -1
         })
-        let productCategoryIdList = this.state.productCategoryValues.map(ele => (ele.value).toString())
-        let planningUnitIdList = this.state.planningUnitValues.map(ele => (ele.value).toString());
+        let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
+        let planningUnitIdList = this.state.planningUnitValues.length == this.state.planningUnits1.length && this.state.planningUnitValues.length != 0 ? [] : (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
         var json = {
             countryId: countryId,
             productCategoryIdList: productCategoryIdList,
             planningUnitIdList: planningUnitIdList,
             linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
         }
-        if ((productCategoryIdList != null && productCategoryIdList != "") || (planningUnitIdList != null && planningUnitIdList != "")) {
+        console.log("length1---", this.state.planningUnitValues.length);
+        console.log("length2---", this.state.planningUnits1.length);
+        console.log("json---", json);
+        if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             ManualTaggingService.getShipmentListForManualTagging(json)
                 .then(response => {
                     this.setState({
@@ -1680,194 +1790,208 @@ export default class ManualTagging extends Component {
     }
 
     buildJExcelERP() {
-
-        let erpDataList = this.state.artmisList;
-        let erpDataArray = [];
-        let count = 0;
-        let qty = 0;
-        let convertedQty = 0;
-        // if (erpDataList.length > 0) {
-        for (var j = 0; j < erpDataList.length; j++) {
-            data = [];
-            if (this.state.active3) {
-                data[0] = 0;
-                data[1] = erpDataList[j].erpOrderId;
-                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
-                data[4] = this.formatDate(erpDataList[j].expectedDeliveryDate);
-                data[5] = erpDataList[j].erpStatus;
-                data[6] = this.addCommas(erpDataList[j].shipmentQty);
-                data[7] = '';
-                // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
-                data[8] = this.addCommas(erpDataList[j].shipmentQty);
-                data[9] = '';
-                data[10] = 0;
-                data[11] = erpDataList[j].orderNo;
-                data[12] = erpDataList[j].primeLineNo;
-                data[13] = erpDataList[j].erpPlanningUnit.id;
-
-            } else {
-                data[0] = erpDataList[j].active;
-                data[1] = erpDataList[j].erpOrderId;
-                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                data[3] = getLabelText(erpDataList[j].planningUnitLabel);
-                data[4] = this.formatDate(erpDataList[j].currentEstimatedDeliveryDate);
-                data[5] = erpDataList[j].status;
-                data[6] = this.addCommas(erpDataList[j].quantity);
-                let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? this.addCommas(erpDataList[j].conversionFactor) : '');
-                data[7] = (erpDataList[j].active ? conversionFactor : "");
-                convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = this.addCommas(Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity)));
-                data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
-                data[10] = 0;
-                data[11] = erpDataList[j].orderNo;
-                data[12] = erpDataList[j].primeLineNo;
-                data[13] = 0;
-                if (erpDataList[j].active) {
-                    qty = parseInt(qty) + convertedQty;
-                }
-            }
-            erpDataArray[count] = data;
-            count++;
-        }
         this.setState({
-            totalQuantity: this.addCommas(Math.round(qty)),
-            displayTotalQty: (qty > 0 ? true : false)
-        });
+            table1Loader: false
+        },
+            () => {
 
-        this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
-        var json = [];
-        var data = erpDataArray;
-        // var data = [];
+                let erpDataList = this.state.artmisList;
+                let erpDataArray = [];
+                let count = 0;
+                let qty = 0;
+                let convertedQty = 0;
+                // if (erpDataList.length > 0) {
+                for (var j = 0; j < erpDataList.length; j++) {
+                    data = [];
+                    if (this.state.active3) {
+                        data[0] = 0;
+                        data[1] = erpDataList[j].erpOrderId;
+                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                        data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
+                        data[4] = erpDataList[j].expectedDeliveryDate;
+                        data[5] = erpDataList[j].erpStatus;
+                        data[6] = erpDataList[j].shipmentQty;
+                        data[7] = '';
+                        // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
+                        data[8] = erpDataList[j].shipmentQty;
+                        data[9] = '';
+                        data[10] = 0;
+                        data[11] = erpDataList[j].orderNo;
+                        data[12] = erpDataList[j].primeLineNo;
+                        data[13] = erpDataList[j].erpPlanningUnit.id;
 
-        var options = {
-            data: data,
-            columnDrag: true,
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: i18n.t('static.mt.linkColumn'),
-                    type: 'checkbox',
-                },
-                {
-                    title: "erpOrderId",
-                    type: 'hidden',
-                },
-                {
-                    title: i18n.t('static.manualTagging.RONO'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpStatus'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpShipmentQty'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.conversionFactor'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.common.notes'),
-                    type: 'text',
-                },
-                {
-                    title: 'isChange',
-                    type: 'hidden'
-                },
-                {
-                    title: 'orderNo',
-                    type: 'hidden'
-                },
-                {
-                    title: 'primeLineNo',
-                    type: 'hidden'
-                },
-                {
-                    title: 'erpPlanningUnitId',
-                    type: 'hidden'
-                }
-            ],
-            // footers: [['Total','1','1','1','1',0,0,0,0]],
-            editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loadedERP,
-            pagination: localStorage.getItem("sesRecordCount"),
-            filters: true,
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onchange: this.changed,
-            updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
-                if (y != null) {
-                    var rowData = elInstance.getRowData(y);
-                    if (rowData[0]) {
-                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
                     } else {
-                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
+                        data[0] = erpDataList[j].active;
+                        data[1] = erpDataList[j].erpOrderId;
+                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                        data[3] = getLabelText(erpDataList[j].planningUnitLabel);
+                        data[4] = erpDataList[j].currentEstimatedDeliveryDate;
+                        data[5] = erpDataList[j].status;
+                        data[6] = erpDataList[j].quantity;
+                        let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
+                        data[7] = (erpDataList[j].active ? conversionFactor : "");
+                        convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
+                        data[8] = Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity))
+                        data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
+                        data[10] = 0;
+                        data[11] = erpDataList[j].orderNo;
+                        data[12] = erpDataList[j].primeLineNo;
+                        data[13] = 0;
+                        if (erpDataList[j].active) {
+                            qty = Number(qty) + convertedQty;
+                        }
                     }
+                    erpDataArray[count] = data;
+                    count++;
                 }
-            }.bind(this),
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowManualInsertRow: false,
-            parseFormulas: true,
-            onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+                this.setState({
+                    totalQuantity: this.addCommas(Math.round(qty)),
+                    displayTotalQty: (qty > 0 ? true : false)
+                });
 
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
+                this.el = jexcel(document.getElementById("tableDiv1"), '');
+                this.el.destroy();
+                var json = [];
+                var data = erpDataArray;
+                // var data = [];
 
-        };
-        var instance = jexcel(document.getElementById("tableDiv1"), options);
-        this.el = instance;
-        this.setState({
-            instance, loading: false,
-            buildJexcelRequired: true
-        })
-        // }
+                var options = {
+                    data: data,
+                    columnDrag: true,
+                    colHeaderClasses: ["Reqasterisk"],
+                    columns: [
+                        {
+                            title: i18n.t('static.mt.linkColumn'),
+                            type: 'checkbox',
+                        },
+                        {
+                            title: "erpOrderId",
+                            type: 'hidden',
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.RONO'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpPlanningUnit'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                            type: 'calendar',
+                            readOnly: true,
+                            options: { format: JEXCEL_DATE_FORMAT },
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpStatus'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpShipmentQty'),
+                            type: 'numeric',
+                            mask: '#,##', decimal: '.',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.conversionFactor'),
+                            type: 'numeric',
+                            mask: '#,##.0000',
+                            decimal: '.',
+                            textEditor: true,
+                            disabledMaskOnEdition: true
+
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
+                            type: 'numeric',
+                            mask: '#,##', decimal: '.',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.common.notes'),
+                            type: 'text',
+                        },
+                        {
+                            title: 'isChange',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'orderNo',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'primeLineNo',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'erpPlanningUnitId',
+                            type: 'hidden'
+                        }
+                    ],
+                    // footers: [['Total','1','1','1','1',0,0,0,0]],
+                    editable: true,
+                    text: {
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        show: '',
+                        entries: '',
+                    },
+                    onload: this.loadedERP,
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    filters: true,
+                    search: true,
+                    columnSorting: true,
+                    tableOverflow: true,
+                    wordWrap: true,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: 'top',
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    onchange: this.changed,
+                    updateTable: function (el, cell, x, y, source, value, id) {
+                        var elInstance = el.jexcel;
+                        if (y != null) {
+                            var rowData = elInstance.getRowData(y);
+                            if (rowData[0]) {
+                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                                cell.classList.remove('readonly');
+                            } else {
+                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                            }
+                        }
+                    }.bind(this),
+                    oneditionend: this.oneditionend,
+                    copyCompatibility: true,
+                    allowManualInsertRow: false,
+                    parseFormulas: true,
+                    onpaste: this.onPaste,
+                    // oneditionend: this.oneditionend,
+                    text: {
+                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        show: '',
+                        entries: '',
+                    },
+
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return [];
+                    }.bind(this),
+
+                };
+                var instance = jexcel(document.getElementById("tableDiv1"), options);
+                this.el = instance;
+                this.setState({
+                    instance, loading: false,
+                    buildJexcelRequired: true,
+                    table1Loader: true
+                })
+                // }
+            })
     }
 
     buildJExcel() {
@@ -1878,37 +2002,39 @@ export default class ManualTagging extends Component {
         for (var j = 0; j < manualTaggingList.length; j++) {
             data = [];
             if (this.state.active1) {
-                data[0] = manualTaggingList[j].shipmentId;
-                data[1] = manualTaggingList[j].shipmentTransId;
+                data[0] = manualTaggingList[j].shipmentId
+                data[1] = manualTaggingList[j].shipmentTransId
                 data[2] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[3] = manualTaggingList[j].expectedDeliveryDate
                 data[4] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[5] = manualTaggingList[j].procurementAgent.code;
+                data[5] = manualTaggingList[j].procurementAgent.code
                 data[6] = manualTaggingList[j].orderNo
-                data[7] = this.addCommas(manualTaggingList[j].shipmentQty);
+                data[7] = manualTaggingList[j].shipmentQty
                 data[8] = manualTaggingList[j].notes
             } else if (this.state.active2) {
-                let shipmentQty = (manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1));
-                data[0] = manualTaggingList[j].parentShipmentId;
-                data[1] = manualTaggingList[j].shipmentId;
-                data[2] = manualTaggingList[j].shipmentTransId;
-                data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+                let shipmentQty = manualTaggingList[j].shipmentQty;
+                data[0] = manualTaggingList[j].parentShipmentId
+                data[1] = manualTaggingList[j].shipmentId
+                data[2] = manualTaggingList[j].shipmentTransId
+                data[3] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[4] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
                 data[5] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                data[6] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
-                data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
-                data[8] = this.addCommas(Math.round(manualTaggingList[j].shipmentQty / (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
-                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
-                data[10] = this.addCommas(Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1)));
+                data[6] = manualTaggingList[j].expectedDeliveryDate
+                data[7] = manualTaggingList[j].erpStatus
+                data[8] = Math.round(manualTaggingList[j].shipmentQty)
+                data[9] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1)
+                data[10] = Math.round(shipmentQty * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1))
                 data[11] = manualTaggingList[j].notes
+                data[12] = manualTaggingList[j].orderNo
+                data[13] = manualTaggingList[j].primeLineNo
             }
             else {
-                data[0] = manualTaggingList[j].erpOrderId;
-                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
+                data[0] = manualTaggingList[j].erpOrderId
+                data[1] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
                 data[2] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
-                data[3] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+                data[3] = manualTaggingList[j].expectedDeliveryDate
                 data[4] = manualTaggingList[j].erpStatus
-                data[5] = this.addCommas(manualTaggingList[j].shipmentQty);
+                data[5] = manualTaggingList[j].shipmentQty
 
             }
             manualTaggingArray[count] = data;
@@ -1929,7 +2055,8 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.commit.qatshipmentId'),
-                        type: 'text',
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -1941,7 +2068,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                        type: 'text',
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.supplyPlan.mtshipmentStatus'),
@@ -1958,7 +2086,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.common.notes'),
@@ -1981,8 +2110,6 @@ export default class ManualTagging extends Component {
                 allowManualInsertColumn: false,
                 allowDeleteRow: false,
                 onselection: this.selected,
-
-
                 oneditionend: this.onedit,
                 copyCompatibility: true,
                 allowExport: false,
@@ -2005,11 +2132,13 @@ export default class ManualTagging extends Component {
                 columns: [
                     {
                         title: i18n.t('static.mt.parentShipmentId'),
-                        type: 'text',
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.mt.childShipmentId'),
-                        type: 'text',
+                        type: 'numeric'
+                        // mask: '#,##', decimal: '.'
                     },
                     {
                         title: "shipmentTransId",
@@ -2029,7 +2158,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                        type: 'text',
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2038,21 +2168,32 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##', decimal: '.'
                     },
                     {
                         title: i18n.t('static.manualTagging.conversionFactor'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##.0000', decimal: '.'
                     },
 
                     {
                         title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##', decimal: '.'
                     },
 
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
+                    },
+                    {
+                        title: "orderNo",
+                        type: 'hidden',
+                    },
+                    {
+                        title: "primeLineNo",
+                        type: 'hidden',
                     },
                 ],
                 editable: false,
@@ -2081,7 +2222,91 @@ export default class ManualTagging extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    return [];
+                    var items = [];
+                    if (y != null) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                // title: i18n.t('static.dashboard.linkShipment'),
+                                title: i18n.t('static.mt.viewArtmisHistory'),
+                                onclick: function () {
+                                    let orderNo = this.el.getValueFromCoords(12, y);
+                                    let primeLineNo = this.el.getValueFromCoords(13, y);
+                                    ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
+                                        .then(response => {
+
+                                            let responseData = response.data.sort(function (a, b) {
+                                                var dateA = new Date(a.receivedOn).getTime();
+                                                var dateB = new Date(b.receivedOn).getTime();
+                                                return dateA < dateB ? 1 : -1;
+                                            })
+                                            console.log("history---", response.data);
+                                            responseData = responseData.filter((responseData, index, self) =>
+                                                index === self.findIndex((t) => (
+                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                    && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
+                                                ))
+                                            )
+                                            console.log("history-2--", responseData);
+
+                                            responseData = responseData.sort(function (a, b) {
+                                                var dateA = a.erpOrderId;
+                                                var dateB = b.erpOrderId;
+                                                return dateA < dateB ? 1 : -1;
+                                            })
+                                            console.log("DATA---->3", responseData);
+
+                                            this.setState({
+                                                artmisHistory: responseData
+                                            }, () => {
+                                                // this.buildARTMISHistory();
+                                                this.toggleArtmisHistoryModal();
+                                            });
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
+                                }.bind(this)
+                            });
+                        }
+                    }
+
+                    return items;
                 }.bind(this),
             };
         }
@@ -2107,7 +2332,8 @@ export default class ManualTagging extends Component {
                     },
                     {
                         title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                        type: 'text',
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT },
                     },
                     {
                         title: i18n.t('static.manualTagging.erpStatus'),
@@ -2116,7 +2342,8 @@ export default class ManualTagging extends Component {
 
                     {
                         title: i18n.t('static.supplyPlan.shipmentQty'),
-                        type: 'text',
+                        type: 'numeric',
+                        mask: '#,##', decimal: '.'
                     },
                 ],
                 editable: false,
@@ -2185,6 +2412,7 @@ export default class ManualTagging extends Component {
                     buildJexcelRequired = false;
                 }
                 this.setState({
+                    tempNotes: (outputListAfterSearch[0].notes != null && outputListAfterSearch[0].notes != "" ? outputListAfterSearch[0].notes : ""),
                     originalQty: outputListAfterSearch[0].shipmentQty,
                     outputListAfterSearch,
                     buildJexcelRequired,
@@ -2220,7 +2448,7 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     selectedShipment: [],
                     roNoOrderNo: json,
-                    searchedValue: outputListAfterSearch[0].roNo,
+                    searchedValue: outputListAfterSearch[0].roNo
                     // planningUnitIdUpdated: outputListAfterSearch[0].erpPlanningUnit.id
                 }, () => {
                     this.filterProgramByCountry();
@@ -2260,6 +2488,8 @@ export default class ManualTagging extends Component {
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
+
+                        listArray = listArray.filter(c => (c.active == true))
                         this.setState({
                             planningUnits: listArray
                         }, () => {
@@ -2331,7 +2561,17 @@ export default class ManualTagging extends Component {
 
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
+            console.log("cell----", cell)
             return getLabelText(cell, this.state.lang);
+        } else {
+            return "";
+        }
+    }
+
+    formatLabelHistory(cell, row) {
+        if (cell != null && cell != "") {
+            console.log("cell----", cell)
+            return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
         }
@@ -2381,6 +2621,17 @@ export default class ManualTagging extends Component {
         if (cell != null && cell != "") {
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+            return dateMonthAsWord.toUpperCase();
+        } else {
+            return "";
+        }
+    }
+
+    formatExpiryDate(cell, row) {
+        if (cell != null && cell != "") {
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP_WITHOUT_DATE}`);
             return dateMonthAsWord;
         } else {
             return "";
@@ -2401,10 +2652,11 @@ export default class ManualTagging extends Component {
                 //     return "center" }
             },
             onSelect: (row, isSelect, rowIndex, e) => {
-                // console.log("my row---", row);
+                console.log("my row---", row);
                 this.setState({
                     originalQty: row.shipmentQty,
-                    finalShipmentId: row.shipmentId
+                    finalShipmentId: row.shipmentId,
+                    tempNotes: (row.notes != null && row.notes != "" ? row.notes : "")
                 });
             }
         };
@@ -2476,6 +2728,9 @@ export default class ManualTagging extends Component {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
+
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         const { planningUnits1 } = this.state;
         let planningUnitMultiList1 = planningUnits1.length > 0
             && planningUnits1.map((item, i) => {
@@ -2588,51 +2843,36 @@ export default class ManualTagging extends Component {
         const columns1 = [
             {
                 dataField: 'erpOrderId',
-                text: i18n.t('static.manualTagging.linkColumn'),
+                text: i18n.t('static.mt.viewBatchDetails'),
                 align: 'center',
-                hidden: true,
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>
+                    // )
+                    return (
+                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
+                    )
+                }
             },
+
             {
-                dataField: 'roNo',
-                text: i18n.t('static.manualTagging.RONO'),
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.manualTagging.procOrderNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
-                dataField: 'roPrimeLineNo',
-                text: i18n.t('static.manualTagging.ROPrimeline'),
+                dataField: 'erpPlanningUnit',
+                text: i18n.t('static.manualTagging.erpPlanningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                // formatter: this.formatLabel
+                formatter: this.formatLabelHistory
             },
+
             {
-                dataField: 'orderNo',
-                text: i18n.t('static.manualTagging.erpShipmentNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'primeLineNo',
-                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            //  {
-            //     dataField: 'orderType',
-            //     text: i18n.t('static.manualTagging.OrderType'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     // formatter: this.formatLabel
-            // },
-            {
-                dataField: 'currentEstimatedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
@@ -2640,78 +2880,57 @@ export default class ManualTagging extends Component {
                 formatter: this.formatDate
             },
             {
-                dataField: 'status',
+                dataField: 'erpStatus',
                 text: i18n.t('static.manualTagging.erpStatus'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
-
-            // {
-            //     dataField: 'planningUnitSkuCode',
-            //     text: i18n.t('static.manualTagging.planningUnitSKUCode'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     // formatter: this.formatLabel
-            // },
-            // {
-            //     dataField: 'planningUnitLabel',
-            //     text: i18n.t('static.planningUnit.planningUnitName'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.formatLabel
-            // },
-
-            // {
-            //     dataField: 'procurementUnitSkuCode',
-            //     text: i18n.t('static.manualTagging.procurementUnitSKUCode'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
-
-
-            // {
-            //     dataField: 'supplierName',
-            //     text: i18n.t('static.supplier.supplierName'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
-            // {
-            //     dataField: 'recipentCountry',
-            //     text: i18n.t('static.manualTagging.receipentCountry'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center'
-            // },
             {
-                dataField: 'quantity',
+                dataField: 'shipmentQty',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.manualTagging.erpShipmentQty'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.addCommas
+            },
+            {
+                dataField: 'totalCost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'receivedOn',
+                text: i18n.t('static.mt.dataReceivedOn'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatDate
             }
-            // {
-            //     dataField: 'price',
-            //     text: i18n.t('static.manualTagging.price'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.addCommas
-            // },
-            // {
-            //     dataField: 'shippingCost',
-            //     text: i18n.t('static.manualTagging.shippingCost'),
-            //     sort: true,
-            //     align: 'center',
-            //     headerAlign: 'center',
-            //     formatter: this.addCommas
-            // }
+
+        ];
+        const columns2 = [
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatExpiryDate
+            }
+
         ];
         const options = {
             hidePageListOnlyOnePage: true,
@@ -2755,17 +2974,24 @@ export default class ManualTagging extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
+                    <div className="Card-header-reporticon">
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleDetailsModal() }}><small className="supplyplanformulas">{i18n.t('static.mt.showDetails')}</small></span>
+                            </a>
+                        </div>
+                    </div>
                     <CardBody className="pb-lg-5">
                         {/* <Col md="10 ml-0"> */}
-                        <b><div className="col-md-12 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
+                        <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.masterDataSyncNote')}</span></div></b><br />
 
                         <div className="col-md-12 pl-0">
                             <Row>
 
                                 <FormGroup className="pl-3">
                                     {/* <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label> */}
-                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }} 
+                                    <FormGroup check inline style={{ 'marginLeft': '-52px' }}
                                     >
                                         <Input
                                             className="form-check-input"
@@ -2784,7 +3010,7 @@ export default class ManualTagging extends Component {
                                             {i18n.t('static.mt.notLinkedQAT')}
                                         </Label>
                                     </FormGroup>
-                                    <FormGroup check inline 
+                                    <FormGroup check inline
                                     >
                                         <Input
                                             className="form-check-input"
@@ -2858,7 +3084,7 @@ export default class ManualTagging extends Component {
                                                         value={this.state.countryId}
                                                         onChange={(e) => { this.countryChange(e); }}
                                                     >
-                                                        <option value="-1">{i18n.t('static.common.all')}</option>
+                                                        <option value="-1">{i18n.t('static.common.select')}</option>
                                                         {countries}
                                                     </Input>
                                                 </InputGroup>
@@ -2950,10 +3176,22 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop">
-                                <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                                 </div>
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
 
@@ -2964,7 +3202,7 @@ export default class ManualTagging extends Component {
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
-                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i></Button>
+                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
@@ -2985,7 +3223,7 @@ export default class ManualTagging extends Component {
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                                 // pagination={paginationFactory(options)}
                                                                 rowEvents={{
                                                                 }}
@@ -3173,7 +3411,7 @@ export default class ManualTagging extends Component {
                                                                         // keyField='erpOrderId'
                                                                         ref={n => this.node = n}
                                                                         selectRow={selectRow}
-                                                                        hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                        striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
 
                                                                         rowEvents={{
 
@@ -3267,8 +3505,20 @@ export default class ManualTagging extends Component {
 
                                             </div>
                                         </Col>
-                                        <div id="tableDiv1" className="RemoveStriped">
+                                        <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
                                         </div>
+                                        <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                    <div class="spinner-border blue ml-4" role="status">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                     </div><br />
                                 </ModalBody>
@@ -3278,7 +3528,9 @@ export default class ManualTagging extends Component {
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
 
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+                                    </Button>
+
                                 </ModalFooter>
                             </div>
                             <div style={{ display: this.state.loading1 ? "block" : "none" }}>
@@ -3294,19 +3546,213 @@ export default class ManualTagging extends Component {
                             </div>
                         </Modal>
                         {/* Consumption modal */}
+                        {/* Details modal start */}
+                        <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
+                            <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher">
+                                <strong className="TextWhite" >{i18n.t('static.mt.showDetails')}</strong>
+                            </ModalHeader>
+                            <ModalBody >
+                                <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
+                                    <ListGroupItem >
+                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.purposeOfEachScreen')}</ListGroupItemHeading>
+                                        <ListGroupItemText className="formulastext">
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedQAT") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab1DetailPurpose")}<br></br>
+                                            </p>
+
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.linked") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab2DetailPurpose")}<br></br>
+                                            </p>
+
+                                            <p><span className="formulastext-p">{i18n.t("static.mt.notLinkedERP") + " :"}</span><br></br>
+
+                                                {i18n.t("static.mt.tab3DetailPurpose")}<br></br>
+                                            </p>
+                                        </ListGroupItemText>
+                                    </ListGroupItem>
+                                    <ListGroupItem >
+                                        <ListGroupItemHeading className="formulasheading">{i18n.t('static.mt.reminders')}</ListGroupItemHeading>
+                                        <ListGroupItemText className="formulastext">
+                                            <ul className="list-group">
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders1")}
+
+                                                </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o  list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A")}
+                                                            <br />    <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A1")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A2")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2A3")}</p></li>
+                                                            </ol>
+                                                        </p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B")}
+                                                            <br />    <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B1")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2B2")}</p></li>
+                                                            </ol>
+                                                        </p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2C")}</p></li>
+                                                    </ol>
+                                                    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D")}
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "><img src={conversionFormula} className="formula-img-mr img-fluid" /></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D1a")}<b>{i18n.t("static.mt.reminders2D1b")}</b>{i18n.t("static.mt.reminders2D1c")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D2a")}<b>{i18n.t("static.mt.reminders2D2b")}</b>{i18n.t("static.mt.reminders2D2c")}</p></li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  ">
+                                                                    <p><b><u><span className="">{i18n.t("static.common.example") + ": "}</span></u></b>{i18n.t("static.mt.reminders2D3")}<br></br>
+
+                                                                    </p>
+
+                                                                </li>
+                                                            </ol>
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  "><img src={conversionFormulaExample} className="formula-img-mr img-fluid" /></li>
+                                                            </ol>
+
+                                                            <ol className="list-group list-groupMt">
+                                                                <li class="list-summery  ">
+                                                                    <Table id="mytable1" responsive className="table-fixed table-bordered text-center mt-2">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>{i18n.t("static.manualTagging.erpPlanningUnit")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.erpShipmentQty")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.conversionFactor")}</th>
+                                                                                <th>{i18n.t("static.manualTagging.convertedQATShipmentQty")}</th>
+                                                                                <th>{i18n.t("static.supplyPlan.qatProduct")}</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>{i18n.t("static.mt.reminders2D4a")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4b")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4c")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4d")}</td>
+                                                                                <td>{i18n.t("static.mt.reminders2D4e")}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </Table>
+                                                                </li>
+                                                            </ol>
+
+                                                        </p></li>
+                                                    </ol>
+                                                </p>
+                                                </li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders3A")}</p></li>
+                                                    </ol>
+                                                </p></li>
+                                                <li class="list-summery  "> <i class="fa fa-circle list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4")}
+                                                    <br />    <ol className="list-group list-groupMt">
+                                                        <li class="list-summery  "> <i class="fa fa-circle-o list-summer-iconMt " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders4A")}</p></li>
+                                                    </ol>
+                                                </p></li>
+                                            </ul>
+                                        </ListGroupItemText>
+                                    </ListGroupItem>
+                                </ListGroup>
+                            </ModalBody>
+                        </Modal>
+                        {/* Details modal end */}
+
+                        {/* ARTMIS history modal start */}
+                        <Modal isOpen={this.state.artmisHistoryModal}
+                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
+                            <div>
+                                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                    <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
+                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i></Button>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div>
+
+                                        <ToolkitProvider
+                                            keyField="optList"
+                                            data={this.state.artmisHistory}
+                                            columns={columns1}
+                                            search={{ searchFormatted: true }}
+                                            hover
+                                            filter={filterFactory()}
+                                        >
+                                            {
+                                                props => (
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification">
+                                                        {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </ToolkitProvider>
+                                        <br />
+                                        {this.state.batchDetails.length > 0 &&
+                                            <ToolkitProvider
+                                                keyField="optList"
+                                                data={this.state.batchDetails}
+                                                columns={columns2}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust ShipmentNotificationtable ">
+                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                            <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                // pagination={paginationFactory(options)}
+                                                                rowEvents={{
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider>}
+
+                                    </div><br />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleArtmisHistoryModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </div>
+
+                        </Modal>
+                        {/* ARTMIS history modal end */}
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

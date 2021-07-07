@@ -172,6 +172,7 @@ class EditSupplyPlanStatus extends Component {
             batchInfoInInventoryPopUp: [],
             problemCategoryList: [],
             ledgerForBatch: [],
+            showBatchSaveButton: false,
 
             program: {
                 programId: this.props.match.params.programId,
@@ -214,7 +215,9 @@ class EditSupplyPlanStatus extends Component {
             editable: false,
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
-            problemReportChanged: 0
+            problemReportChanged: 0,
+            problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -227,6 +230,7 @@ class EditSupplyPlanStatus extends Component {
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
         this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
+        this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -241,9 +245,37 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
         var elInstance = this.state.problemEl;
-        var rowData = elInstance.getRowData(y);
-        if (x != 22 && rowData[22] != 1) {
-            elInstance.setValueFromCoords(22, y, 1, true);
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        let problemList = this.state.problemList;
+        var rowData1 = elInstance.getRowData(y);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.problemReportId == rowData1[0]);
+        // console.log("problemList in changed method ***", problemList);
+        if (x == 10) {
+            if (problemList[0].problemStatus.id != value) {
+                // console.log("in if 1***");
+                elInstance.setValueFromCoords(20, y, true, true);
+            }
+            if (problemList[0].problemStatus.id == value) {
+                elInstance.setValueFromCoords(20, y, false, true);
+                // console.log("in if 2***");
+            }
+        }
+
+        if (x == 10 || x == 20) {
+            var rowData = elInstance.getRowData(y);
+            // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
+            // console.log("current problem status ***", rowData[10]);
+            // console.log("problemStatus on server ***", problemList[0].reviewed);
+            // console.log("current problem status ***", rowData[20]);
+            // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
+            // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+                // console.log("in if***");
+                elInstance.setValueFromCoords(22, y, 1, true);
+            } else {
+                // console.log("in else***");
+                elInstance.setValueFromCoords(22, y, 0, true);
+            }
         }
 
         if (x == 20) {
@@ -1612,7 +1644,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -2201,6 +2233,7 @@ class EditSupplyPlanStatus extends Component {
             };
             problemStatusRequest.onsuccess = function (e) {
                 var myResult = [];
+                var problemStatusJson = [];
                 myResult = problemStatusRequest.result;
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
@@ -2209,9 +2242,16 @@ class EditSupplyPlanStatus extends Component {
                         id: myResult[i].id
                     }
                     proList[i] = Json
+
+                    if (myResult[i].id == 1 || myResult[i].id == 3) {
+                        problemStatusJson.push({ label: getLabelText(myResult[i].label, lan), value: myResult[i].id });
+                    }
                 }
+
+
                 this.setState({
-                    problemStatusList: proList
+                    problemStatusList: proList,
+                    problemStatusValues: problemStatusJson
                 })
 
                 var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -2361,6 +2401,12 @@ class EditSupplyPlanStatus extends Component {
             && problemStatusList.map((item, i) => {
                 return ({ label: item.name, value: item.id })
 
+            }, this);
+
+        const { problemReviewedList } = this.state;
+        let problemReviewed = problemReviewedList.length > 0
+            && problemReviewedList.map((item, i) => {
+                return ({ label: item.name, value: item.id })
             }, this);
 
         let bar = {}
@@ -2667,7 +2713,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                                     <thead>
                                                         <tr>
-                                                            <th className="BorderNoneSupplyPlan"></th>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                                             {
                                                                 this.state.monthsArray.map(item => {
@@ -2684,7 +2730,7 @@ class EditSupplyPlanStatus extends Component {
                                                     <tbody>
 
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
@@ -2693,7 +2739,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                                             {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -2706,7 +2752,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -2718,7 +2764,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                                             {
                                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -2736,7 +2782,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -2748,7 +2794,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                                             {
@@ -2768,7 +2814,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -2786,7 +2832,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -2803,7 +2849,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -2820,7 +2866,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -2831,7 +2877,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                                             {
                                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -2849,7 +2895,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -2866,7 +2912,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -2883,7 +2929,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -2900,7 +2946,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                                             {
                                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -2909,7 +2955,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                                             {
                                                                 this.state.expiredStockArr.map(item1 => {
@@ -2926,7 +2972,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -2935,7 +2981,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -2944,7 +2990,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                                             {
                                                                 this.state.amcTotalData.map(item1 => (
@@ -2953,7 +2999,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         {/* <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                                             {
                                                                 this.state.minStockMoS.map(item1 => (
@@ -2962,7 +3008,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                                             {
                                                                 this.state.maxStockMoS.map(item1 => (
@@ -2971,7 +3017,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr> */}
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                                             {
                                                                 this.state.unmetDemand.map(item1 => (
@@ -3082,6 +3128,20 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </FormGroup>
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemReport.reviewed')}</Label>
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="reviewedStatusId"
+                                        id="reviewedStatusId"
+                                        options={problemReviewed && problemReviewed.length > 0 ? problemReviewed : []}
+                                        value={this.state.problemReviewedValues}
+                                        onChange={(e) => { this.handleProblemReviewedChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
                                 <div className="controls SelectField">
                                     <InputGroup>
@@ -3090,14 +3150,13 @@ class EditSupplyPlanStatus extends Component {
                                             name="reviewedStatusId" id="reviewedStatusId"
                                             onChange={this.fetchData}
                                         >
-                                            {/* <option value="0">Please select</option> */}
                                             <option value="0">No</option>
                                             <option value="1">Yes</option>
 
                                         </Input>
                                     </InputGroup>
                                 </div>
-                            </FormGroup>
+                            </FormGroup> */}
                         </div>
                     </Col>
                     <br />
@@ -3145,6 +3204,34 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    handleProblemReviewedChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemReviewedIds = event
+            problemReviewedIds = problemReviewedIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemReviewedValues: problemReviewedIds.map(ele => ele),
+                problemReviewedLabels: problemReviewedIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemReviewedValues===>", this.state.problemReviewedValues);
+                this.fetchData()
+            })
+        }
+    }
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
@@ -3180,7 +3267,8 @@ class EditSupplyPlanStatus extends Component {
             // let problemStatusId = ;
             let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
             console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
-            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            let reviewedStatusId = this.state.problemReviewedValues.map(ele => (ele.value));
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
             let problemTypeId = document.getElementById('problemTypeId').value;
@@ -3189,12 +3277,13 @@ class EditSupplyPlanStatus extends Component {
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                 problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
-                if (reviewedStatusId != -1) {
-                    if (reviewedStatusId == 0) {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
-                    } else {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
-                    }
+                if (reviewedStatusId != []) {
+                    problemReportFilterList = problemReportFilterList.filter(c => reviewedStatusId.includes(c.reviewed == true ? 1 : 0));
+                    // if (reviewedStatusId == 0) {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    // } else {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    // }
                 }
                 if (problemTypeId != -1) {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
@@ -3519,16 +3608,16 @@ class EditSupplyPlanStatus extends Component {
                 var criticalityId = rowData[16];
                 var problemStatusId = rowData[12];
                 if (criticalityId == 3) {
-                    console.log("In if");
+                    // console.log("In if");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
-                    console.log("cell classlist------------------>", cell.classList);
+                    // console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {
-                    console.log("In if 1");
+                    // console.log("In if 1");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1) {
-                    console.log("In if 2");
+                    // console.log("In if 2");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
@@ -3743,27 +3832,27 @@ class EditSupplyPlanStatus extends Component {
                                 render={
                                     ({
                                     }) => (
-                                            <Form name='simpleForm'>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input type="text"
-                                                                        name="programId"
-                                                                        id="programId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
-                                                                        disabled />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
+                                        <Form name='simpleForm'>
+                                            <Col md="12 pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input type="text"
+                                                                    name="programId"
+                                                                    id="programId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.program.label.label_en}
+                                                                    disabled />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                             {/* </CardBody> */}
                             <Row>
@@ -4336,6 +4425,7 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
@@ -4422,6 +4512,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
+                                    document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
@@ -4438,12 +4529,12 @@ class EditSupplyPlanStatus extends Component {
                                     isValid,
                                     setTouched
                                 }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody className="pt-lg-0">
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
+                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                        <CardBody className="pt-lg-0">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
 
-                                                        {/*  <FormGroup className="tab-ml-1">
+                                                    {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -4458,68 +4549,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                        <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
 
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
-                                                            <Input
-                                                                type="textarea"
-                                                                maxLength={65535}
-                                                                name="versionNotes"
-                                                                id="versionNotes"
-                                                                value={this.state.program.currentVersion.notes}
-                                                                bsSize="sm"
-                                                                valid={!errors.versionNotes}
-                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={!this.state.editable}
-                                                                required
-                                                            />
-                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-
-                                                        </FormGroup>
-
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="versionStatusId"
-                                                                id="versionStatusId"
-                                                                bsSize="sm"
-                                                                valid={!errors.versionStatusId}
-                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.currentVersion.versionStatus.id}
-                                                                disabled={!this.state.editable}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {statusList}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                        </FormGroup>
                                                         <Input
-                                                            type="hidden"
-                                                            name="needNotesValidation"
-                                                            id="needNotesValidation"
-                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                            type="textarea"
+                                                            maxLength={65535}
+                                                            name="versionNotes"
+                                                            id="versionNotes"
+                                                            value={this.state.program.currentVersion.notes}
+                                                            bsSize="sm"
+                                                            valid={!errors.versionNotes}
+                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={!this.state.editable}
+                                                            required
                                                         />
-                                                    </div>
-                                                </Col>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
 
-                                                    &nbsp;
-                                             </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
+                                                    </FormGroup>
+
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionStatusId"
+                                                            id="versionStatusId"
+                                                            bsSize="sm"
+                                                            valid={!errors.versionStatusId}
+                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.currentVersion.versionStatus.id}
+                                                            disabled={!this.state.editable}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {statusList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needNotesValidation"
+                                                        id="needNotesValidation"
+                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+
+                                                &nbsp;
+                                            </FormGroup>
+                                        </CardFooter>
+                                    </Form>
+                                )} />
                     </Card>
 
                 </Col>
@@ -4549,14 +4640,14 @@ class EditSupplyPlanStatus extends Component {
 
     showShipmentWithBatch(batchNo, expiryDate) {
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map((sl,count) => {
+        shipmentList.map((sl, count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
-                var index=count;
+                var index = count;
                 this.setState({
-                    indexOfShipmentContainingBatch:index
+                    indexOfShipmentContainingBatch: index
                 })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {

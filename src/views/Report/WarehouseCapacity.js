@@ -69,7 +69,8 @@ class warehouseCapacity extends Component {
             countryValues: [],
             countryLabels: [],
             loading: true,
-            programId: ''
+            programId: '',
+            programs: []
 
         };
         this.getCountrylist = this.getCountrylist.bind(this);
@@ -929,7 +930,7 @@ class warehouseCapacity extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.warehouseCapacity')}</strong> */}
 
@@ -1056,7 +1057,19 @@ class warehouseCapacity extends Component {
                                 </Form>
 
                                 <div className="werehousecapacitySearchposition">
-                                    <div id="tableDiv" className="jexcelremoveReadonlybackground"> </div>
+                                    <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    </div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {/*  <div className="row">
                                         <div className="col-md-12">
                                             {this.state.data.length > 0 &&
@@ -1105,17 +1118,6 @@ class warehouseCapacity extends Component {
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         );
     }

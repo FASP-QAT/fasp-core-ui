@@ -121,10 +121,11 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             batchInfoInInventoryPopUp: [],
-            ledgerForBatch: []
+            ledgerForBatch: [],
+            showBatchSaveButton: false
             // startDateFormat:curDate
         }
 
@@ -1256,7 +1257,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                                     <thead>
                                         <tr>
-                                            <th className="BorderNoneSupplyPlan"></th>
+                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                             {
                                                 this.state.monthsArray.map(item => {
@@ -1273,7 +1274,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tbody>
 
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
@@ -1282,7 +1283,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                             {
                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -1295,7 +1296,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -1307,7 +1308,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -1330,7 +1331,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
 
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -1347,7 +1348,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                             {
@@ -1367,7 +1368,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -1385,7 +1386,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
 
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -1402,7 +1403,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -1419,7 +1420,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="totalShipments">
-                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -1430,7 +1431,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                             {
                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -1448,7 +1449,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
 
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -1465,7 +1466,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -1482,7 +1483,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="erpShipments">
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                             {
                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -1499,7 +1500,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                             {
                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -1508,7 +1509,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                             {
                                                 this.state.expiredStockArr.map(item1 => {
@@ -1525,7 +1526,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -1534,7 +1535,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -1543,7 +1544,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
@@ -1552,7 +1553,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         {/* <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                             {
                                                 this.state.minStockMoS.map(item1 => (
@@ -1561,7 +1562,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                             {
                                                 this.state.maxStockMoS.map(item1 => (
@@ -1570,7 +1571,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr> */}
                                         <tr>
-                                            <td className="BorderNoneSupplyPlan"></td>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                             {
                                                 this.state.unmetDemand.map(item1 => (
@@ -2022,7 +2023,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </div>
                                 <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                                    {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 <div className="pt-4"></div>
@@ -2176,14 +2177,14 @@ export default class SupplyPlanComponent extends React.Component {
         localStorage.setItem("batchNo", "");
         localStorage.setItem("expiryDate", "");
         var shipmentList = this.state.allShipmentsList;
-        shipmentList.map((sl,count) => {
+        shipmentList.map((sl, count) => {
             var batchInfoList = sl.batchInfoList;
             var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
             if (bi.length > 0) {
                 var shipmentStatus = sl.shipmentStatus.id;
-                var index=count;
+                var index = count;
                 this.setState({
-                    indexOfShipmentContainingBatch:index
+                    indexOfShipmentContainingBatch: index
                 })
                 var date = "";
                 if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
@@ -3088,7 +3089,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                     totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                     monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                    amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                    amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                     minStockMoS.push(jsonList[0].minStockMoS)
                                     maxStockMoS.push(jsonList[0].maxStockMoS)
                                     unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3915,7 +3916,7 @@ export default class SupplyPlanComponent extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
@@ -3941,140 +3942,144 @@ export default class SupplyPlanComponent extends React.Component {
                             render={
                                 ({
                                 }) => (
-                                        <Form name='simpleForm'>
-                                            <div className=" pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
+                                    <Form name='simpleForm'>
+                                        <div className=" pl-0">
+                                            <div className="row">
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
 
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={this.state.startDate}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="programSelect"
-                                                                id="programSelect"
-                                                                bsSize="sm"
-                                                                options={this.state.programList}
-                                                                value={this.state.programSelect}
-                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="planningUnit"
-                                                                id="planningUnit"
-                                                                bsSize="sm"
-                                                                options={this.state.planningUnitList}
-                                                                value={this.state.planningUnit}
-                                                                onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
-                                                </div>
-                                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
-                                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
-                                                    </ul>
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={this.state.startDate}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
-                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
-                                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
-                                                    </ul>
+                                                <FormGroup className="col-md-4">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="programSelect"
+                                                            id="programSelect"
+                                                            bsSize="sm"
+                                                            options={this.state.programList}
+                                                            value={this.state.programSelect}
+                                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                        />
+                                                    </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
-                                                        {
-                                                            this.state.paColors.map(item1 => (
-                                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
-                                                            ))
-                                                        }
-                                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
-                                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
-                                                        <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
-                                                        <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-                                                    </ul>
+                                                <FormGroup className="col-md-4 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="planningUnit"
+                                                            id="planningUnit"
+                                                            bsSize="sm"
+                                                            options={this.state.planningUnitList}
+                                                            value={this.state.planningUnit}
+                                                            onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                                        />
+                                                    </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
-                                                    <ul className="legendcommitversion list-group">
-                                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
-                                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
-                                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
-                                                    </ul>
-                                                </FormGroup>
+                                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
-                                        </Form>
-                                    )} />
-                        <div className="animated fadeIn" style={{ display: this.state.display }}>
-                            <Row>
-                                <Col xs="12" md="12" className="mb-4  mt-3">
-                                    <Nav tabs>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '1'}
-                                                onClick={() => { this.toggle(0, '1'); }}
-                                            >{i18n.t('static.supplyPlan.currentSupplyPlan')} </NavLink>
-                                        </NavItem>
-                                        <NavItem>
-                                            <NavLink
-                                                active={this.state.activeTab[0] === '2'}
-                                                onClick={() => { this.toggle(0, '2'); }}
-                                            >
-                                                {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
-                                            </NavLink>
 
-                                        </NavItem>
-                                    </Nav>
-                                    <TabContent activeTab={this.state.activeTab[0]}>
-                                        {this.tabPane()}
-                                    </TabContent>
-                                </Col>
-                            </Row>
+                                        </div>
+                                    </Form>
+                                )} />
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="animated fadeIn" style={{ display: this.state.display }}>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li>
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
+                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
+                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
+                                        {
+                                            this.state.paColors.map(item1 => (
+                                                <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
+                                            ))
+                                        }
+                                        <li><span className="lightgreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.tbd')}</span></li>
+                                        <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
+                                        <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
+                                        <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                                        <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#cfcdc9" }}></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlanFormula.na')}</span></li>
+                                    </ul>
+                                </FormGroup>
+                                <Row>
+                                    <Col xs="12" md="12" className="mb-4  mt-3">
+                                        <Nav tabs>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '1'}
+                                                    onClick={() => { this.toggle(0, '1'); }}
+                                                >{i18n.t('static.supplyPlan.currentSupplyPlan')} </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '2'}
+                                                    onClick={() => { this.toggle(0, '2'); }}
+                                                >
+                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
+                                                </NavLink>
+
+                                            </NavItem>
+                                        </Nav>
+                                        <TabContent activeTab={this.state.activeTab[0]}>
+                                            {this.tabPane()}
+                                        </TabContent>
+                                    </Col>
+                                </Row>
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }} className="modalBackgroundSupplyPlan">
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     }
@@ -4820,7 +4825,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                             monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                            amcTotalData.push(jsonList[0].amc!=null?Math.round(Number(jsonList[0].amc)):"");
+                                            amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                             minStockMoS.push(jsonList[0].minStockMoS)
                                             maxStockMoS.push(jsonList[0].maxStockMoS)
                                             unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);

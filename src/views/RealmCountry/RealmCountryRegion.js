@@ -901,7 +901,18 @@ class RealmCountryRegion extends Component {
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" >
+                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </Col>
@@ -916,17 +927,7 @@ class RealmCountryRegion extends Component {
                         </CardFooter>
                     </Card>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     }

@@ -849,10 +849,11 @@ export default class ProgramOnboarding extends Component {
                                 </div>
 
                                 <br></br>
-                                <div id="stepOne">
+                                <div>
+                                    <div id="stepOne">
 
-                                    <StepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} getDependentLists={this.getDependentLists} items={this.state}></StepOne>
-                                    {/* <FormGroup>
+                                        <StepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} getDependentLists={this.getDependentLists} items={this.state}></StepOne>
+                                        {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                         <Input
@@ -867,12 +868,12 @@ export default class ProgramOnboarding extends Component {
                                         <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup> */}
-                                </div>
-                                <div id="stepTwo">
-                                    <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList} items={this.state} generateCountryCode={this.generateCountryCode}></StepTwo>
-                                    {/* getRegionList={this.getRegionList}  */}
-                                    {/* realmCountryList={this.state.realmCountryList} */}
-                                    {/* <FormGroup>
+                                    </div>
+                                    <div id="stepTwo">
+                                        <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList} items={this.state} generateCountryCode={this.generateCountryCode}></StepTwo>
+                                        {/* getRegionList={this.getRegionList}  */}
+                                        {/* realmCountryList={this.state.realmCountryList} */}
+                                        {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onChange={(e) => { this.dataChange(e); this.getRegionList(e) }}
@@ -910,11 +911,11 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
 
                                     </FormGroup> */}
-                                </div>
-                                <div id="stepFour">
-                                    <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} generateOrganisationCode={this.generateOrganisationCode}></StepFour>
+                                    </div>
+                                    <div id="stepFour">
+                                        <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state} generateOrganisationCode={this.generateOrganisationCode}></StepFour>
 
-                                    {/* <FormGroup>
+                                        {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             bsSize="sm"
@@ -934,10 +935,10 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
 
                                     </FormGroup> */}
-                                </div>
-                                <div id="stepFive">
-                                    <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
-                                    {/* <FormGroup className="col-md-4 pl-0">
+                                    </div>
+                                    <div id="stepFive">
+                                        <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
+                                        {/* <FormGroup className="col-md-4 pl-0">
                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             onChange={(e) => { this.updateFieldData(e) }}
@@ -951,7 +952,7 @@ export default class ProgramOnboarding extends Component {
                                         />
                                     </FormGroup> */}
 
-                                    {/* <FormGroup>
+                                        {/* <FormGroup>
 
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
                                         &nbsp;
@@ -959,10 +960,10 @@ export default class ProgramOnboarding extends Component {
                                         &nbsp;
 
                                     </FormGroup> */}
-                                </div>
-                                <div id="stepSix">
-                                    <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} Capitalize={this.Capitalize}></StepSix>
-                                    {/* <Row>
+                                    </div>
+                                    <div id="stepSix">
+                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} Capitalize={this.Capitalize}></StepSix>
+                                        {/* <Row>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                             <Input
@@ -1089,30 +1090,32 @@ export default class ProgramOnboarding extends Component {
                                         </FormGroup>
 
                                     </Row> */}
-                                </div>
-                                <div id="stepSeven">
-                                    <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
-                                    <FormGroup className="mt-2">
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        &nbsp;
+                                    </div>
+                                    <div id="stepSeven">
+                                        <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
+                                        <FormGroup className="mt-2">
+                                            <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                                        &nbsp;
+                                            &nbsp;
                                         <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
+                                            &nbsp;
                                     </FormGroup>
-                                </div>
-                            </CardBody></Card>
-                        <div style={{ display: this.state.loading ? "block" : "none" }}>
-                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                <div class="align-items-center">
-                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
-                                    <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardBody></Card>
+
                     </Col></Row></div>
 
 

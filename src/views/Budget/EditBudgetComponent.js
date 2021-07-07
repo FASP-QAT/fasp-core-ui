@@ -34,7 +34,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            // .matches(/^\d{0,15}(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         // .matches(/^[0-9]+([,\.][0-9]+)?/, i18n.t('static.program.validBudgetAmount')),
         budgetCode: Yup.string()
@@ -79,8 +80,8 @@ class EditBudgetComponent extends Component {
             loading: true,
             fundingSources: [],
             rangeValue: "",
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             // budget: this.props.location.state.budget,
             budget: {
                 label: {
@@ -220,9 +221,12 @@ class EditBudgetComponent extends Component {
 
                     var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
                     var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
+                    let budgetObj = response.data;
+                    budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                    console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
 
                     this.setState({
-                        budget: response.data, loading: false,
+                        budget: budgetObj, loading: false,
                         rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                     });
                 }
@@ -433,7 +437,7 @@ class EditBudgetComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -447,7 +451,7 @@ class EditBudgetComponent extends Component {
                                     budgetCode: this.state.budget.budgetCode,
                                     startDate: this.state.budget.startDate,
                                     stopDate: this.state.budget.stopDate,
-                                    fundingSourceId:this.state.budget.fundingSource.fundingSourceId
+                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -476,7 +480,9 @@ class EditBudgetComponent extends Component {
 
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     // budget.stopDate = new Date(stopDateString);
-                                    console.log("this.state.budget----->", budget);
+                                    console.log("check----->1", budget.budgetAmt);
+                                    budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
+                                    console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
@@ -546,233 +552,234 @@ class EditBudgetComponent extends Component {
                                         setFieldTouched,
                                         setFieldError
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
-                                                <CardBody>
+                                        <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
+                                                <FormGroup>
+                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
 
-                                                        <Input
-                                                            type="text"
-                                                            name="programId"
-                                                            id="programId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            valid={!errors.programId}
-                                                            invalid={touched.programId && !!errors.programId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                    <Input
+                                                        type="text"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        valid={!errors.programId}
+                                                        invalid={touched.programId && !!errors.programId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
 
-                                                            value={getLabelText(this.state.budget.program.label, this.state.lang)}
+                                                        value={getLabelText(this.state.budget.program.label, this.state.lang)}
+                                                    >
+                                                    </Input>
+
+                                                    <FormFeedback className="red">{errors.programId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+
+                                                    <Input
+                                                        type="select"
+                                                        name="fundingSourceId"
+                                                        id="fundingSourceId"
+                                                        bsSize="sm"
+                                                        valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
+                                                        invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                        value={this.state.budget.fundingSource.fundingSourceId}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {fundingSourceList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="budgetName"
+                                                        id="budget"
+                                                        bsSize="sm"
+                                                        valid={!errors.budgetName}
+                                                        invalid={touched.budgetName && !!errors.budgetName || this.state.budget.label.label_en == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.budget.label.label_en}
+
+                                                    />
+                                                    <FormFeedback className="red">{errors.budgetName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="budgetCode"
+                                                        id="budgetCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
+                                                        invalid={touched.budgetCode && !!errors.budgetCode || this.state.budget.budgetCode == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        maxLength={30}
+                                                        value={this.state.budget.budgetCode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="text"
+                                                        name="currencyId"
+                                                        id="currencyId"
+                                                        bsSize="sm"
+                                                        value={this.state.budget.currency.label.label_en}
+                                                        disabled
+                                                    >
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="conversionRateToUsd"
+                                                        id="conversionRateToUsd"
+                                                        bsSize="sm"
+                                                        value={this.state.budget.currency.conversionRateToUsd}
+                                                        disabled />
+                                                    <FormFeedback className="red">{errors.budget}</FormFeedback>
+                                                </FormGroup>
+
+
+
+
+
+                                                <FormGroup>
+                                                    <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
+
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="budgetAmt"
+                                                        id="budgetAmt"
+                                                        bsSize="sm"
+                                                        // valid={!errors.budgetAmt}
+                                                        // invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
+
+                                                        valid={!errors.budgetAmt}
+                                                        invalid={(touched.budgetAmt && !!errors.budgetAmt) || !!errors.budgetAmt}
+
+                                                        // valid={!errors.budgetAmt}
+                                                        // invalid={(touched.budgetAmt && !!errors.budgetAmt || !!errors.budgetAmt)}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        type="text"
+                                                        // placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                        value={this.state.budget.budgetAmt}
+                                                    />
+                                                    <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
+                                                </FormGroup>
+                                                {this.state.rangeValue != "" && <FormGroup>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
                                                         >
-                                                        </Input>
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>}
+                                                <FormGroup>
 
-                                                        <FormFeedback className="red">{errors.programId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
 
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="select"
-                                                            name="fundingSourceId"
-                                                            id="fundingSourceId"
-                                                            bsSize="sm"
-                                                            valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
-                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.budget.active === true}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
-                                                            value={this.state.budget.fundingSource.fundingSourceId}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {fundingSourceList}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="budgetName"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName || this.state.budget.label.label_en == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-
                                                         />
-                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budgetDisplayName')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="budgetCode"
-                                                            id="budgetCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetCode && this.state.budget.budgetCode != ''}
-                                                            invalid={touched.budgetCode && !!errors.budgetCode || this.state.budget.budgetCode == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            maxLength={30}
-                                                            value={this.state.budget.budgetCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.budgetCode}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="text"
-                                                            name="currencyId"
-                                                            id="currencyId"
-                                                            bsSize="sm"
-                                                            value={this.state.budget.currency.label.label_en}
-                                                            disabled
-                                                        >
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="conversionRateToUsd"
-                                                            id="conversionRateToUsd"
-                                                            bsSize="sm"
-                                                            value={this.state.budget.currency.conversionRateToUsd}
-                                                            disabled />
-                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
-                                                    </FormGroup>
-
-
-
-
-
-                                                    <FormGroup>
-                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="budgetAmt"
-                                                            id="budgetAmt"
-                                                            bsSize="sm"
-                                                            // valid={!errors.budgetAmt}
-                                                            // invalid={touched.budgetAmt && !!errors.budgetAmt || this.state.budget.budgetAmt == ''}
-
-                                                            valid={!errors.budgetAmt}
-                                                            invalid={(touched.budgetAmt && !!errors.budgetAmt) || !!errors.budgetAmt}
-
-                                                            // valid={!errors.budgetAmt}
-                                                            // invalid={(touched.budgetAmt && !!errors.budgetAmt || !!errors.budgetAmt)}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.budget.active === false}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="text"
-                                                            // placeholder={i18n.t('static.budget.budgetamountdesc')}
-                                                            value={this.state.budget.budgetAmt}
                                                         />
-                                                        <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    {this.state.rangeValue != "" && <FormGroup>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.budget.budgetrange')}</Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={rangeValue}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                    <Input
+                                                        value={this.state.budget.notes}
+                                                        name="notes"
+                                                        id="notes"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        // maxLength={600}
+                                                        type="textarea"
+                                                    />
+                                                    <FormFeedback className="red"></FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
                                                         </div>
-                                                    </FormGroup>}
-                                                    <FormGroup>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
 
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
-
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.budget.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.budget.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
-                                                        <Input
-                                                            value={this.state.budget.notes}
-                                                            name="notes"
-                                                            id="notes"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            // maxLength={600}
-                                                            type="textarea"
-                                                        />
-                                                        <FormFeedback className="red"></FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>

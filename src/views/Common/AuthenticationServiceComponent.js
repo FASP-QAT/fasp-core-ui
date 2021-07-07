@@ -42,7 +42,7 @@ export default class AuthenticationServiceComponent extends Component {
                 this.props.history.push(result)
             }
 
-        } else if (isSiteOnline()) {
+        } else if (localStorage.getItem("sessionType") === 'Online') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
             let basicAuthHeader = 'Bearer ' + decryptedToken
