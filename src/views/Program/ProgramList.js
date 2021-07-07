@@ -474,7 +474,7 @@ export default class ProgramList extends Component {
       data[3] = programList[j].programCode;
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
-      data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
+      // data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
       data[7] = programList[j].lastModifiedBy.username;
       data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 

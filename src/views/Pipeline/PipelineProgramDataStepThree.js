@@ -173,7 +173,9 @@ export default class PipelineProgramDataStepThree extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
-                    initialValues={{ healthAreaId: this.props.items.program.healthArea.id }}
+                    initialValues={{ 
+                        healthAreaId: this.props.items.program.healthAreaArray
+                    }}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         // console.log("in success--");

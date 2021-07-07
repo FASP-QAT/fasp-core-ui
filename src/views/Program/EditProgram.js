@@ -35,7 +35,7 @@ let initialValues = {
     shippedToArrivedByAirLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
     arrivedToDeliveredLeadTime: '',
-    healthAreaId: '',
+    healthAreaId: [],
     programNotes: '',
     regionId: [],
     uniqueCode: ''
@@ -257,9 +257,9 @@ export default class EditProgram extends Component {
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             console.log("program obj===>", response.data);
             var proObj=response.data;
-            var healthAreaArrayDummy=[];
-            healthAreaArrayDummy.push(response.data.healthArea.id);
-            proObj.healthAreaArray=healthAreaArrayDummy;
+            // var healthAreaArrayDummy=[];
+            // healthAreaArrayDummy.push(response.data.healthArea.id);
+            // proObj.healthAreaArray=healthAreaArrayDummy;
 
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
@@ -662,9 +662,11 @@ export default class EditProgram extends Component {
         }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;
-        } if (event.target.name == 'healthAreaId') {
-            program.healthArea.id = event.target.value;
-        } if (event.target.name == 'userId') {
+        } 
+        // if (event.target.name == 'healthAreaId') {
+        //     program.healthArea.id = event.target.value;
+        // } 
+        if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
         if (event.target.name === "active") {
@@ -778,7 +780,8 @@ export default class EditProgram extends Component {
                                     shippedToArrivedByAirLeadTime: this.state.program.shippedToArrivedByAirLeadTime,
                                     shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
-                                    healthAreaId: this.state.program.healthArea.id,
+                                    healthAreaId: this.state.program.healthAreaArray,
+                                    healthAreaArray:this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
                                     regionId: this.state.program.regionArray
@@ -1316,9 +1319,9 @@ export default class EditProgram extends Component {
             var uniqueCode = splitCode[3];
             
             var proObj=response.data;
-            var healthAreaArrayDummy=[];
-            healthAreaArrayDummy.push(response.data.healthArea.id);
-            proObj.healthAreaArray=healthAreaArrayDummy;
+            // var healthAreaArrayDummy=[];
+            // healthAreaArrayDummy.push(response.data.healthArea.id);
+            // proObj.healthAreaArray=healthAreaArrayDummy;
 
             this.setState({
                 program: proObj,
@@ -1339,7 +1342,8 @@ export default class EditProgram extends Component {
                 shippedToArrivedByAirLeadTime: this.state.program.shippedToArrivedByAirLeadTime,
                 shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
-                healthAreaId: this.state.program.healthArea.id,
+                // healthAreaId: this.state.program.healthArea.id,
+                healthAreaArray:this.state.program.healthAreaArray,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
                 uniqueCode: this.state.uniqueCode,

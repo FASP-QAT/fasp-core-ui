@@ -28,7 +28,7 @@ class ProcurementAgentService {
 
     addprocurementAgentPlanningUnitMapping(json) {
         console.log("json papu---", json);
-        return axios.put(`${API_URL}/api/procurementAgent/planningingUnit/`, json, {}
+        return axios.put(`${API_URL}/api/procurementAgent/planningUnit/`, json, {}
         );
     }
 
