@@ -6,6 +6,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container,Col, Row,Nav,NavItem,TabPane,NavLink } from 'reactstrap';
+import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
 import IdleTimer from 'react-idle-timer';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 import moment from 'moment';
@@ -694,13 +695,14 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
+      var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
       console.log("P*** Call indexed db methods0---------------------------")
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
       // this.checkIfLocalProgramVersionChanged();
       this.setState({
-        name
+        name:n.concat(name)
       });
     }
   }
@@ -987,13 +989,13 @@ class DefaultLayout extends Component {
           events={events}
         />
 
-        <AppHeader fixed className={this.state.activeTab[0]==='1'?"module1":"module2"}>
+        <AppHeader fixed >
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
-          <AppSidebar fixed display="lg">
+          <AppSidebar fixed display="lg" className={this.state.activeTab[0]==='1'?"module1":"module2"}>
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
@@ -2766,24 +2768,26 @@ class DefaultLayout extends Component {
                         <Nav tabs className="marginTopTabs" style={{flexDirection: "row",borderBottom:"none"}} >
                           <NavItem className="bgColourRemoveItem itemWhidth">
                             <NavLink
-                              className="bgColourRemoveLink"
+                              className="bgColourRemoveLink tab1"
                               active={this.state.activeTab[0] === '1'}
                               onClick={() => { this.toggle(0, '1'); }}
                               style={{border:"none"}}
                               title={"Supply Planning"}
                             >
                               <i class="nav-icon fa fa-line-chart"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i>
+                            
                             </NavLink>
                           </NavItem>
                           <NavItem className="bgColourRemoveItem itemWhidth">
                             <NavLink
-                            className="bgColourRemoveLink"
+                            className="bgColourRemoveLink tab2"
                               active={this.state.activeTab[0] === '2'}
                               onClick={() => { this.toggle(0, '2'); }}
                               style={{border:"none"}}
                               title={"Forecast Dataset Module"}
                             >
-                              <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i>
+                              {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
+                              <i class="nav-icon"><img src={imgforcastmoduletab} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
                             </NavLink>
                           </NavItem>
                         </Nav>

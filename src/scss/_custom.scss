@@ -4042,9 +4042,32 @@ color: #000000!important;
 
   }
 }
+//sidebar menu css mod2
 .module1{
-  background-color:#c4d2e4!important;
+  background-color:#009471!important;
 }
 .module2{
-  background-color:#d9ead3!important;
+  background-color:#215ebc!important;
+}
+.sidebar .nav-link .nav-icon {
+  color: #fff!important;
+}
+.sidebar .sidebar-minimizer {
+  background-color: #3a4248!important;
+}
+.sidebar .nav-link.tab1.active {
+  background: #009471!important;
+}
+.sidebar .nav-link.tab2 {
+  background: #215ebc!important;
+}
+.sidebar .nav-link.tab2.active {
+  background: #215ebc!important;
+}
+.sidebar .nav-link.tab1 {
+  background: #009471!important;
+}
+.sidebar .nav-dropdown-toggle::before {
+  background-image:url('/src/assets/img/menu-dropdown.png')!important;
+  height: 10px!important;
 }
