@@ -3529,7 +3529,7 @@ margin-left: -45px;
   padding-left: 17px;
 }
 .sidebar .nav-link.active {
-  color: #20a8d8!important;
+  color: #FFF!important;
   background: #3a4248;
 }
 .sidebar .nav-link.active :hover{
@@ -4043,10 +4043,10 @@ color: #000000!important;
   }
 }
 //sidebar menu css mod2
-.module1{
+.module2{
   background-color:#009471!important;
 }
-.module2{
+.module1{
   background-color:#215ebc!important;
 }
 .sidebar .nav-link .nav-icon {
@@ -4055,29 +4055,39 @@ color: #000000!important;
 .sidebar .sidebar-minimizer {
   background-color: #3a4248!important;
 }
-.sidebar .nav-link.tab1.active {
-  background: #009471!important;
-}
-.sidebar .nav-link.tab2 {
-  background: #215ebc!important;
-}
-.sidebar .nav-link.tab2.active {
-  background: #215ebc!important;
-}
+// .sidebar .nav-link.tab1.active {
+//   background: #009471!important;
+// }
 .sidebar .nav-link.tab1 {
-  background: #009471!important;
+  background: #3a4248!important;
+  border:1px solid #FFF!important;
+}
+// .sidebar .nav-link.tab2.active {
+//   background: #215ebc!important;
+// }
+.sidebar .nav-link.tab2 {
+  background: #3a4248!important;
+  border:1px solid #FFF!important;
 }
 .sidebar .nav-dropdown-toggle::before {
   background-image:url('/src/assets/img/menu-dropdown.png')!important;
   height: 10px!important;
 }
 
-.titleColorModule1{
+.titleColorModule2{
   color:#009471!important;
   text-align: justify;
 }
 
-.titleColorModule2{
+.titleColorModule1{
   color:#215ebc!important;
   text-align: justify;
+}
+
+.sidebar .nav-link .nav-icon .module1IconColour{
+  color:#215ebc!important;
+}
+
+.sidebar .nav-link .nav-icon .module2IconColour{
+  color:#009471!important;
 }
