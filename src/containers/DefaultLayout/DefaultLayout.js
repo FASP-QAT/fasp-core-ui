@@ -695,14 +695,14 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name) => {
     if (this.state.name !== name) {
-      var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
+      // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
       console.log("P*** Call indexed db methods0---------------------------")
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
       // this.checkIfLocalProgramVersionChanged();
       this.setState({
-        name:n.concat(name)
+        name
       });
     }
   }
@@ -991,7 +991,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} activeModule={this.state.activeTab[0]==='1'?1:2}/>
           </Suspense>
         </AppHeader>
         <div className="app-body">
