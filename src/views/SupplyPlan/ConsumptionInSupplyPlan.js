@@ -1386,12 +1386,34 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         if (map.get("2") == 2) {
                             actualFlag = false;
                         }
+
+                        let dataSourceId = '';
+                        let dataSourceLabel = '';
+                        if (map.get("3") == "14;15") {
+                            if (map.get("2") == 1) { //actual
+                                console.log("RESP------4 if actual");
+                                dataSourceId = 14;
+                                dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 14)[0].label
+                            } else { //forecast
+                                console.log("RESP------4 else forecast");
+                                dataSourceId = 15;
+                                dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 15)[0].label
+                            }
+                        } else {
+                            console.log("RESP------4 else");
+                            dataSourceId = map.get("3");
+                            dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                        }
+                        console.log("RESP------ dataSourceId", dataSourceId);
+                        console.log("RESP------2 dataSourceLabel", dataSourceLabel);
                         if (parseInt(map.get("12")) != -1) {
                             consumptionDataList[parseInt(map.get("12"))].consumptionDate = moment(map.get("0")).startOf('month').format("YYYY-MM-DD");
                             consumptionDataList[parseInt(map.get("12"))].region.id = map.get("1");
                             consumptionDataList[parseInt(map.get("12"))].region.label = (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label;
-                            consumptionDataList[parseInt(map.get("12"))].dataSource.id = map.get("3");
-                            consumptionDataList[parseInt(map.get("12"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label;
+                            // consumptionDataList[parseInt(map.get("12"))].dataSource.id = map.get("3");
+                            // consumptionDataList[parseInt(map.get("12"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label;
+                            consumptionDataList[parseInt(map.get("12"))].dataSource.id = dataSourceId;
+                            consumptionDataList[parseInt(map.get("12"))].dataSource.label = dataSourceLabel;
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("6");
@@ -1418,8 +1440,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var consumptionJson = {
                                 consumptionId: 0,
                                 dataSource: {
-                                    id: map.get("3"),
-                                    label: (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                                    // id: map.get("3"),
+                                    // label: (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                                    id: dataSourceId,
+                                    label: dataSourceLabel
                                 },
                                 region: {
                                     id: map.get("1"),
