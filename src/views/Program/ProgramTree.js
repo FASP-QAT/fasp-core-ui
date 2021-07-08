@@ -602,6 +602,7 @@ class Program extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     render() {
+        console.log("++++",this.state.prgList);
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -683,7 +684,7 @@ class Program extends Component {
                                                                                 <ul>
                                                                                     {
                                                                                         this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id)
-                                                                                            .filter(c => c.healthArea.id == item1.id).sort(function (a, b) {
+                                                                                            .filter(c=>c.healthAreaIdList.includes(item1.id)).sort(function (a, b) {
                                                                                                 a = getLabelText(a.program.label, this.state.lang).toLowerCase();
                                                                                                 b = getLabelText(b.program.label, this.state.lang).toLowerCase();
                                                                                                 return a < b ? -1 : a > b ? 1 : 0;
