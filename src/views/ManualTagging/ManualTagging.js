@@ -150,9 +150,15 @@ export default class ManualTagging extends Component {
         console.log("row---", row.maxFilename);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
-
+            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
+        
+            batchDetails.sort(function (a, b) {
+                var dateA = new Date(a.expiryDate).getTime();
+                var dateB = new Date(b.expiryDate).getTime();
+                return dateA > dateB ? 1 : -1;
+            })
             this.setState({
-                batchDetails: row.shipmentList.filter(c => (c.fileName === row.maxFilename))
+                batchDetails
             });
         } else {
             this.setState({
@@ -2929,6 +2935,14 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatExpiryDate
+            },
+            {
+                dataField: 'batchQty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
             }
 
         ];
