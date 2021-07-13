@@ -714,12 +714,22 @@ export default class SupplyPlanComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
+                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -742,12 +752,22 @@ export default class SupplyPlanComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
+                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -770,12 +790,22 @@ export default class SupplyPlanComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
+                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
 
             }
         }
@@ -897,12 +927,22 @@ export default class SupplyPlanComponent extends React.Component {
                         y = 80;
 
                     }
-                    doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                        align: 'left'
-                    })
+                    var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                    for (var i = 0; i < splitTitle.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        } else {
+                            y = y + 3
+                        }
+                    }
+                    if (splitTitle.length > 1) {
+                        y = y + (5 * (splitTitle.length - 1));
+                    }
                 }
             })
 
@@ -925,12 +965,22 @@ export default class SupplyPlanComponent extends React.Component {
                         y = 80;
 
                     }
-                    doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                        align: 'left'
-                    })
+                    var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                    for (var i = 0; i < splitTitle.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        } else {
+                            y = y + 3
+                        }
+                    }
+                    if (splitTitle.length > 1) {
+                        y = y + (5 * (splitTitle.length - 1));
+                    }
                 }
             })
 
@@ -953,12 +1003,22 @@ export default class SupplyPlanComponent extends React.Component {
                         y = 80;
 
                     }
-                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                    doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                         align: 'left'
                     })
-                    doc.text(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width / 5, y, {
-                        align: 'left'
-                    })
+                    var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                    for (var i = 0; i < splitTitle.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        } else {
+                            y = y + 3
+                        }
+                    }
+                    if (splitTitle.length > 1) {
+                        y = y + (5 * (splitTitle.length - 1));
+                    }
 
                 }
             }
