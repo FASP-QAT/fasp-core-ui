@@ -597,6 +597,7 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
+        console.log("problemList====>",problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -605,7 +606,7 @@ export default class ConsumptionDetails extends React.Component {
             data[1] = problemList[j].problemActionIndex
             data[2] = problemList[j].program.code
             data[3] = problemList[j].versionId
-            data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
+            data[4] = (problemList[j].region != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
