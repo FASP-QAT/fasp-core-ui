@@ -2768,7 +2768,7 @@ class DefaultLayout extends Component {
                         <Nav tabs className="marginTopTabs" style={{flexDirection: "row",borderBottom:"none"}} >
                           <NavItem className="bgColourRemoveItem itemWhidth">
                             <NavLink
-                              className="bgColourRemoveLink tab1"
+                              className="bgColourRemoveLink tab1 moduletab"
                               active={this.state.activeTab[0] === '1'}
                               onClick={() => { this.toggle(0, '1'); }}
                               style={{border:"none"}}
@@ -2780,7 +2780,7 @@ class DefaultLayout extends Component {
                           </NavItem>
                           <NavItem className="bgColourRemoveItem itemWhidth">
                             <NavLink
-                            className="bgColourRemoveLink tab2"
+                            className="bgColourRemoveLink tab2 moduletab"
                               active={this.state.activeTab[0] === '2'}
                               onClick={() => { this.toggle(0, '2'); }}
                               style={{border:"none"}}

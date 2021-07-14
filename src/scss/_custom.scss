@@ -4088,6 +4088,18 @@ color: #000000!important;
   color:#215ebc!important;
 }
 
-.sidebar .nav-link .nav-icon .module2IconColour{
-  color:#009471!important;
+// .sidebar .nav-link .nav-icon .module2IconColour{
+//   color:#009471!important;
+// }
+.sidebar .nav-link .nav-icon.module1IconColour {
+  color: #009471 !important;
+}
+@media (min-width: 992px){
+.sidebar-minimized .sidebar .nav-link.moduletab {
+    width: 49px !important;
+    background: #3a4248 !important;
+    color: #3a4248 !important;
+    height: 46px!important;
+}
+
 }
