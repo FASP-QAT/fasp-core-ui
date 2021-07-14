@@ -1915,12 +1915,22 @@ export default class WhatIfReportComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
+                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -1943,12 +1953,22 @@ export default class WhatIfReportComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                    for (var i = 0; i < splitTitle.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        } else {
+                            y = y + 3
+                        }
+                    }
+                    if (splitTitle.length > 1) {
+                        y = y + (5 * (splitTitle.length - 1));
+                    }
             }
         })
 
@@ -1971,12 +1991,22 @@ export default class WhatIfReportComponent extends React.Component {
                     y = 80;
 
                 }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 7, y, {
+                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
                     align: 'left'
                 })
-                doc.text(ele.notes, doc.internal.pageSize.width / 5, y, {
-                    align: 'left'
-                })
+                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                    for (var i = 0; i < splitTitle.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+                        } else {
+                            y = y + 3
+                        }
+                    }
+                    if (splitTitle.length > 1) {
+                        y = y + (5 * (splitTitle.length - 1));
+                    }
 
             }
         }
@@ -2386,8 +2416,8 @@ export default class WhatIfReportComponent extends React.Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
-            var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= m[0].startDate && moment(c.inventoryDate) <= m[17].endDate) && c.active == 1)
-            var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= m[0].startDate && moment(c.consumptionDate) <= m[17].endDate) && c.active == 1)
+            var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active == 1)
+            var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active == 1)
             var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
             this.setState({
                 allShipmentsList: programJson.shipmentList
@@ -4096,8 +4126,8 @@ export default class WhatIfReportComponent extends React.Component {
                                             </div>
                                             <FormGroup className="tab-ml-1 mt-4">
                                                 <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                    &nbsp;
-                                                    </FormGroup>
+                                                &nbsp;
+                                            </FormGroup>
                                         </div>
                                     </Col>
 

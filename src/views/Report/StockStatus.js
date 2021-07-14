@@ -1632,6 +1632,22 @@ class StockStatus extends Component {
                             labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
                             datasets: [
                               {
+                                label: i18n.t('static.supplyplan.exipredStock'),
+                                yAxisID: 'A',
+                                type: 'line',
+                                stack: 7,
+                                data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1,
+                                showLine: false,
+                                pointStyle: 'triangle',
+                                pointBackgroundColor: '#ED8944',
+                                pointBorderColor: '#212721',
+                                pointRadius: 10
+                      
+                            },
+                              {
                                 label: i18n.t('static.supplyPlan.delivered'),
                                 yAxisID: 'A',
                                 stack: 1,
@@ -2022,6 +2038,22 @@ class StockStatus extends Component {
 
               labels: filteredPlanningUnitData.map((item, index) => (this.dateFormatter(item.dt))),
               datasets: [
+                {
+                  label: i18n.t('static.supplyplan.exipredStock'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  stack: 7,
+                  data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                  fill: false,
+                  borderColor: 'rgb(75, 192, 192)',
+                  tension: 0.1,
+                  showLine: false,
+                  pointStyle: 'triangle',
+                  pointBackgroundColor: '#ED8944',
+                  pointBorderColor: '#212721',
+                  pointRadius: 10
+        
+              },
                 {
                   label: i18n.t('static.supplyPlan.delivered'),
                   yAxisID: 'A',
@@ -3174,6 +3206,22 @@ class StockStatus extends Component {
 
       labels: this.state.stockStatusList.map((item, index) => (this.dateFormatter(item.dt))),
       datasets: [
+        {
+          label: i18n.t('static.supplyplan.exipredStock'),
+          yAxisID: 'A',
+          type: 'line',
+          stack: 7,
+          data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+          showLine: false,
+          pointStyle: 'triangle',
+          pointBackgroundColor: '#ED8944',
+          pointBorderColor: '#212721',
+          pointRadius: 10
+
+      },
         {
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
