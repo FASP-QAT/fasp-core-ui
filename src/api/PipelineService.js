@@ -51,9 +51,14 @@ class PipelineService {
         );
     }
     getQatTempProgramregion(json) {
-        return axios.get(`${API_URL}/api/qatTem/regions/${json}`, {}
+        return axios.get(`${API_URL}/api/qatTemp/regions/${json}`, {}
         );
     }
+
+    // getQatTempProgramHealthArea(json) {
+    //     return axios.get(`${API_URL}/api/qatTemp/healthArea/${json}`, {}
+    //     );
+    // }
 
     addQatTempConsumption(json, pipelineId) {
         return axios.put(`${API_URL}/api/pipeline/consumption/${pipelineId}`, json, {}

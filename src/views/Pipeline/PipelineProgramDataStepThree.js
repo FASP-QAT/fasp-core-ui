@@ -10,6 +10,9 @@ import {
     Form, FormGroup, Label, Input,
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
 const initialValuesThree = {
     healthAreaId: ''
@@ -93,12 +96,19 @@ export default class PipelineProgramDataStepThree extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        var realmId=AuthenticationService.getRealmId();
+        var realmId = AuthenticationService.getRealmId();
         ProgramService.getHealthAreaList(realmId)
             .then(response => {
                 if (response.status == 200) {
+                    var json = response.data;
+                    var haList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = haList;
                     this.setState({
-                        healthAreaList: response.data
+                        healthAreaId: '',
+                        healthAreaList: listArray
                     })
                 } else {
                     this.setState({
@@ -148,22 +158,24 @@ export default class PipelineProgramDataStepThree extends Component {
     }
 
     render() {
-        const { healthAreaList } = this.state;
-        let realmHealthArea = healthAreaList.length > 0
-            && healthAreaList.map((item, i) => {
-                return (
-                    <option key={i} value={item.healthAreaId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { healthAreaList } = this.state;
+        // let realmHealthArea = healthAreaList.length > 0
+        //     && healthAreaList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.healthAreaId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
-                    initialValues={{ healthAreaId: this.props.items.program.healthArea.id }}
+                    initialValues={{ 
+                        healthAreaId: this.props.items.program.healthAreaArray
+                    }}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         // console.log("in success--");
@@ -181,36 +193,40 @@ export default class PipelineProgramDataStepThree extends Component {
                             handleSubmit,
                             isSubmitting,
                             isValid,
-                            setTouched
+                            setTouched,
+                            setFieldValue
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
-                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                            onBlur={handleBlur}
-                                            bsSize="sm"
-                                            type="select"
-                                            name="healthAreaId"
-                                            id="healthAreaId"
-                                            className="col-md-4"
-                                            value={this.props.items.program.healthArea.id}
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmHealthArea}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllThree(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.healthAreaId && this.props.items.program.healthAreaArray.length != 0 },
+                                            { 'is-invalid': (touched.healthAreaId && !!errors.healthAreaId) }
+                                        )}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("healthAreaId", e);
+                                            this.props.updateFieldDataHealthArea(e);
+                                        }}
+                                        onBlur={handleBlur}
+                                        bsSize="sm"
+                                        multi
+                                        name="healthAreaId"
+                                        id="healthAreaId"
+                                        options={this.state.healthAreaList}
+                                        value={this.props.items.program.healthAreaArray}
+                                    />
+                                    <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllThree(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
 
             </>
 
