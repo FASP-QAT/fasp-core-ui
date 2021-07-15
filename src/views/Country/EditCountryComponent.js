@@ -977,7 +977,7 @@ export default class UpdateCountryComponent extends Component {
                 {/* <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} /> */}
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
@@ -1065,7 +1065,7 @@ export default class UpdateCountryComponent extends Component {
                                         setTouched
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm' autocomplete="off">
-                                                <CardBody className="pt-2 pb-0">
+                                                <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -1215,6 +1215,17 @@ export default class UpdateCountryComponent extends Component {
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -1230,17 +1241,7 @@ export default class UpdateCountryComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

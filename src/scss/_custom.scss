@@ -3744,7 +3744,7 @@ margin-left: -45px;
 .clone {
 	// position:absolute;
 	top:0;
-	left:0;
+	left:23px;
 	// pointer-events:none;
 }
 
@@ -4578,3 +4578,41 @@ color: #000000!important;
   color:#215ebc!important;
   text-align: justify;
 }
+
+.clone1{
+left:0;
+z-index:999;
+}
+
+.consumptionDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 262px)!important;
+  overflow: scroll !important;
+}
+
+.inventoryDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 230px)!important;
+  overflow: scroll !important;
+}
+
+.shipmentDataEntryTable .jexcel_content{
+  max-height: calc(100vh - 213px)!important;
+  overflow: scroll !important;
+}
+
+.jexcel > tbody > tr > td.readonly > input[type="checkbox"], .jexcel > tbody > tr > td.readonly > input[type="radio"] {
+  pointer-events: none;
+  opacity: unset !important;
+}
+//multiselect css
+.rmsc {
+  --rmsc-h: 27px!important;
+  --rmsc-main: #8ad4ee!important;
+  --rmsc-hover: #f1f3f5;
+  --rmsc-selected: #e2e6ea;
+  --rmsc-border: #e4e7ea!important;
+  --rmsc-gray: #697069!important;
+  --rmsc-bg: #fff;
+  --rmsc-p: 10px;
+  --rmsc-radius: 0.2rem!important;
+  color: #697069!important;
+  }

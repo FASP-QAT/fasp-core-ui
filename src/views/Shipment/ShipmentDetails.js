@@ -51,9 +51,9 @@ export default class ShipmentDetails extends React.Component {
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
             shipmentTypeIds: [1],
-            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             programId: "",
             planningUnitId: "",
             currencyList: [],
@@ -62,6 +62,7 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentList: [],
             budgetList: [],
             shipmentStatusList: [],
+            showBatchSaveButton: false
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -92,11 +93,11 @@ export default class ShipmentDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
-            { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
             { header: i18n.t('static.report.id'), key: 'name', width: 25 },
-            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
             { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
-            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'yyyy-dd-mm' } },
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
             { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
             { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
@@ -143,6 +144,22 @@ export default class ShipmentDetails extends React.Component {
             // errorStyle: 'error',
             // error: 'Invalid value',
         });
+
+        // worksheet.dataValidations.add('E2:E100', {
+        //     type: 'date',
+        //     // operator: 'greaterThan',
+        //     showErrorMessage: true,
+        //     formulae: [new Date('3021-01-01')],
+        //     allowBlank: false,
+        //     prompt: 'Format (YYYY-MM-DD)',
+        //     // errorStyle: 'error',
+        //     // errorTitle: 'Invalid Value',
+        //     // error: 'Invalid Value'
+        // });
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('E' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+        }
 
         let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
         worksheet.dataValidations.add('F2:F100', {
@@ -922,7 +939,7 @@ export default class ShipmentDetails extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     {checkOnline === 'Online' &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
@@ -938,7 +955,7 @@ export default class ShipmentDetails extends React.Component {
                             </div>
                         </div>
                     }
-                    <CardBody className="pb-lg-5 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Formik
                             render={
                                 ({
@@ -1021,10 +1038,21 @@ export default class ShipmentDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="shipmentconsumptionSearchMarginTop">
+                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
-                            <div className="table-responsive" id="shipmentsDetailsTableDiv">
+                            <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1066,7 +1094,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             <Button id="shipmentDetailsPopCancelButton" size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
@@ -1080,17 +1108,7 @@ export default class ShipmentDetails extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

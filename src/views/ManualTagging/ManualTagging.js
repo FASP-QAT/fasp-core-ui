@@ -97,7 +97,8 @@ export default class ManualTagging extends Component {
             countryId: '',
             hasSelectAll: true,
             artmisHistoryModal: false,
-            batchDetails: []
+            batchDetails: [],
+            table1Loader: false
 
         }
 
@@ -146,11 +147,18 @@ export default class ManualTagging extends Component {
 
     viewBatchData(event, row) {
         console.log("event---", event);
-        console.log("row---", row);
+        console.log("row---", row.maxFilename);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
+        
+            batchDetails.sort(function (a, b) {
+                var dateA = new Date(a.expiryDate).getTime();
+                var dateB = new Date(b.expiryDate).getTime();
+                return dateA > dateB ? 1 : -1;
+            })
             this.setState({
-                batchDetails: row.shipmentList
+                batchDetails
             });
         } else {
             this.setState({
@@ -328,7 +336,8 @@ export default class ManualTagging extends Component {
             originalQty: 0,
             message: i18n.t('static.actionCancelled'),
             color: "red",
-            planningUnitIdUpdated: ''
+            planningUnitIdUpdated: '',
+            table1Loader: false
         }, () => {
             this.hideSecondComponent();
             this.toggleLarge();
@@ -968,13 +977,13 @@ export default class ManualTagging extends Component {
             if (this.state.active2) {
                 count++;
                 if (map1.get("0")) {
-                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 }
             }
             else {
                 if (parseInt(map1.get("10")) === 1 && map1.get("0")) {
-                    console.log("value---", parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
-                    qty = parseInt(qty) + parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                    console.log("value---", Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    qty = Number(qty) + Number(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
             }
@@ -1787,202 +1796,208 @@ export default class ManualTagging extends Component {
     }
 
     buildJExcelERP() {
-
-        let erpDataList = this.state.artmisList;
-        let erpDataArray = [];
-        let count = 0;
-        let qty = 0;
-        let convertedQty = 0;
-        // if (erpDataList.length > 0) {
-        for (var j = 0; j < erpDataList.length; j++) {
-            data = [];
-            if (this.state.active3) {
-                data[0] = 0;
-                data[1] = erpDataList[j].erpOrderId;
-                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
-                data[4] = erpDataList[j].expectedDeliveryDate;
-                data[5] = erpDataList[j].erpStatus;
-                data[6] = erpDataList[j].shipmentQty;
-                data[7] = '';
-                // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
-                data[8] = erpDataList[j].shipmentQty;
-                data[9] = '';
-                data[10] = 0;
-                data[11] = erpDataList[j].orderNo;
-                data[12] = erpDataList[j].primeLineNo;
-                data[13] = erpDataList[j].erpPlanningUnit.id;
-
-            } else {
-                data[0] = erpDataList[j].active;
-                data[1] = erpDataList[j].erpOrderId;
-                data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
-                data[3] = getLabelText(erpDataList[j].planningUnitLabel);
-                data[4] = erpDataList[j].currentEstimatedDeliveryDate;
-                data[5] = erpDataList[j].status;
-                data[6] = erpDataList[j].quantity;
-                let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
-                data[7] = (erpDataList[j].active ? conversionFactor : "");
-                convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
-                data[8] = Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity))
-                data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
-                data[10] = 0;
-                data[11] = erpDataList[j].orderNo;
-                data[12] = erpDataList[j].primeLineNo;
-                data[13] = 0;
-                if (erpDataList[j].active) {
-                    qty = parseInt(qty) + convertedQty;
-                }
-            }
-            erpDataArray[count] = data;
-            count++;
-        }
         this.setState({
-            totalQuantity: this.addCommas(Math.round(qty)),
-            displayTotalQty: (qty > 0 ? true : false)
-        });
+            table1Loader: false
+        },
+            () => {
 
-        this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
-        var json = [];
-        var data = erpDataArray;
-        // var data = [];
+                let erpDataList = this.state.artmisList;
+                let erpDataArray = [];
+                let count = 0;
+                let qty = 0;
+                let convertedQty = 0;
+                // if (erpDataList.length > 0) {
+                for (var j = 0; j < erpDataList.length; j++) {
+                    data = [];
+                    if (this.state.active3) {
+                        data[0] = 0;
+                        data[1] = erpDataList[j].erpOrderId;
+                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                        data[3] = getLabelText(erpDataList[j].erpPlanningUnit.label);
+                        data[4] = erpDataList[j].expectedDeliveryDate;
+                        data[5] = erpDataList[j].erpStatus;
+                        data[6] = erpDataList[j].shipmentQty;
+                        data[7] = '';
+                        // let convertedQty = this.addCommas(erpDataList[j].shipmentQty * 1);
+                        data[8] = erpDataList[j].shipmentQty;
+                        data[9] = '';
+                        data[10] = 0;
+                        data[11] = erpDataList[j].orderNo;
+                        data[12] = erpDataList[j].primeLineNo;
+                        data[13] = erpDataList[j].erpPlanningUnit.id;
 
-        var options = {
-            data: data,
-            columnDrag: true,
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: i18n.t('static.mt.linkColumn'),
-                    type: 'checkbox',
-                },
-                {
-                    title: "erpOrderId",
-                    type: 'hidden',
-                },
-                {
-                    title: i18n.t('static.manualTagging.RONO'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
-                    type: 'calendar',
-                    readOnly: true,
-                    options: { format: JEXCEL_DATE_FORMAT },
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpStatus'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpShipmentQty'),
-                    type: 'numeric',
-                    mask: '#,##', decimal: '.',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.conversionFactor'),
-                    type: 'numeric',
-                    mask: '#,##.0000',
-                    decimal: '.',
-                    textEditor: true,
-                    disabledMaskOnEdition: true
-
-                },
-                {
-                    title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    type: 'numeric',
-                    mask: '#,##', decimal: '.',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.common.notes'),
-                    type: 'text',
-                },
-                {
-                    title: 'isChange',
-                    type: 'hidden'
-                },
-                {
-                    title: 'orderNo',
-                    type: 'hidden'
-                },
-                {
-                    title: 'primeLineNo',
-                    type: 'hidden'
-                },
-                {
-                    title: 'erpPlanningUnitId',
-                    type: 'hidden'
-                }
-            ],
-            // footers: [['Total','1','1','1','1',0,0,0,0]],
-            editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loadedERP,
-            pagination: localStorage.getItem("sesRecordCount"),
-            filters: true,
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onchange: this.changed,
-            updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
-                if (y != null) {
-                    var rowData = elInstance.getRowData(y);
-                    if (rowData[0]) {
-                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
                     } else {
-                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
+                        data[0] = erpDataList[j].active;
+                        data[1] = erpDataList[j].erpOrderId;
+                        data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
+                        data[3] = getLabelText(erpDataList[j].planningUnitLabel);
+                        data[4] = erpDataList[j].currentEstimatedDeliveryDate;
+                        data[5] = erpDataList[j].status;
+                        data[6] = erpDataList[j].quantity;
+                        let conversionFactor = (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : '');
+                        data[7] = (erpDataList[j].active ? conversionFactor : "");
+                        convertedQty = erpDataList[j].quantity * (erpDataList[j].conversionFactor != null && erpDataList[j].conversionFactor != "" ? erpDataList[j].conversionFactor : 1);
+                        data[8] = Math.round((erpDataList[j].active ? convertedQty : erpDataList[j].quantity))
+                        data[9] = (erpDataList[j].active ? erpDataList[j].notes : "");
+                        data[10] = 0;
+                        data[11] = erpDataList[j].orderNo;
+                        data[12] = erpDataList[j].primeLineNo;
+                        data[13] = 0;
+                        if (erpDataList[j].active) {
+                            qty = Number(qty) + convertedQty;
+                        }
                     }
+                    erpDataArray[count] = data;
+                    count++;
                 }
-            }.bind(this),
-            oneditionend: this.oneditionend,
-            copyCompatibility: true,
-            allowManualInsertRow: false,
-            parseFormulas: true,
-            onpaste: this.onPaste,
-            // oneditionend: this.oneditionend,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+                this.setState({
+                    totalQuantity: this.addCommas(Math.round(qty)),
+                    displayTotalQty: (qty > 0 ? true : false)
+                });
 
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
+                this.el = jexcel(document.getElementById("tableDiv1"), '');
+                this.el.destroy();
+                var json = [];
+                var data = erpDataArray;
+                // var data = [];
 
-        };
-        var instance = jexcel(document.getElementById("tableDiv1"), options);
-        this.el = instance;
-        this.setState({
-            instance, loading: false,
-            buildJexcelRequired: true
-        })
-        // }
+                var options = {
+                    data: data,
+                    columnDrag: true,
+                    colHeaderClasses: ["Reqasterisk"],
+                    columns: [
+                        {
+                            title: i18n.t('static.mt.linkColumn'),
+                            type: 'checkbox',
+                        },
+                        {
+                            title: "erpOrderId",
+                            type: 'hidden',
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.RONO'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpPlanningUnit'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
+                            type: 'calendar',
+                            readOnly: true,
+                            options: { format: JEXCEL_DATE_FORMAT },
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpStatus'),
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.erpShipmentQty'),
+                            type: 'numeric',
+                            mask: '#,##', decimal: '.',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.conversionFactor'),
+                            type: 'numeric',
+                            mask: '#,##.0000',
+                            decimal: '.',
+                            textEditor: true,
+                            disabledMaskOnEdition: true
+
+                        },
+                        {
+                            title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
+                            type: 'numeric',
+                            mask: '#,##', decimal: '.',
+                            readOnly: true
+                        },
+                        {
+                            title: i18n.t('static.common.notes'),
+                            type: 'text',
+                        },
+                        {
+                            title: 'isChange',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'orderNo',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'primeLineNo',
+                            type: 'hidden'
+                        },
+                        {
+                            title: 'erpPlanningUnitId',
+                            type: 'hidden'
+                        }
+                    ],
+                    // footers: [['Total','1','1','1','1',0,0,0,0]],
+                    editable: true,
+                    text: {
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        show: '',
+                        entries: '',
+                    },
+                    onload: this.loadedERP,
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    filters: true,
+                    search: true,
+                    columnSorting: true,
+                    tableOverflow: true,
+                    wordWrap: true,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: 'top',
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    onchange: this.changed,
+                    updateTable: function (el, cell, x, y, source, value, id) {
+                        var elInstance = el.jexcel;
+                        if (y != null) {
+                            var rowData = elInstance.getRowData(y);
+                            if (rowData[0]) {
+                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                                cell.classList.remove('readonly');
+                            } else {
+                                var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                                cell.classList.add('readonly');
+                            }
+                        }
+                    }.bind(this),
+                    oneditionend: this.oneditionend,
+                    copyCompatibility: true,
+                    allowManualInsertRow: false,
+                    parseFormulas: true,
+                    onpaste: this.onPaste,
+                    // oneditionend: this.oneditionend,
+                    text: {
+                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                        show: '',
+                        entries: '',
+                    },
+
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return [];
+                    }.bind(this),
+
+                };
+                var instance = jexcel(document.getElementById("tableDiv1"), options);
+                this.el = instance;
+                this.setState({
+                    instance, loading: false,
+                    buildJexcelRequired: true,
+                    table1Loader: true
+                })
+                // }
+            })
     }
 
     buildJExcel() {
@@ -2226,23 +2241,18 @@ export default class ManualTagging extends Component {
                                         .then(response => {
 
                                             let responseData = response.data.sort(function (a, b) {
-                                                var dateA = new Date(a.date).getTime();
-                                                var dateB = new Date(b.date).getTime();
-                                                return dateA > dateB ? 1 : -1;
+                                                var dateA = new Date(a.receivedOn).getTime();
+                                                var dateB = new Date(b.receivedOn).getTime();
+                                                return dateA < dateB ? 1 : -1;
                                             })
+                                            console.log("history---", response.data);
                                             responseData = responseData.filter((responseData, index, self) =>
                                                 index === self.findIndex((t) => (
-                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.expectedDeliveryDate === responseData.expectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                    t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
                                                     && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
                                                 ))
                                             )
-
-                                            responseData = responseData.sort(function (a, b) {
-                                                var dateA = new Date(a.date).getTime();
-                                                var dateB = new Date(b.date).getTime();
-                                                return dateA < dateB ? 1 : -1;
-                                            })
-                                            console.log("DATA---->2", responseData);
+                                            console.log("history-2--", responseData);
 
                                             responseData = responseData.sort(function (a, b) {
                                                 var dateA = a.erpOrderId;
@@ -2724,6 +2734,9 @@ export default class ManualTagging extends Component {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
+
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         const { planningUnits1 } = this.state;
         let planningUnitMultiList1 = planningUnits1.length > 0
             && planningUnits1.map((item, i) => {
@@ -2847,6 +2860,7 @@ export default class ManualTagging extends Component {
                     )
                 }
             },
+
             {
                 dataField: 'procurementAgentOrderNo',
                 text: i18n.t('static.manualTagging.procOrderNo'),
@@ -2864,7 +2878,7 @@ export default class ManualTagging extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
@@ -2921,6 +2935,14 @@ export default class ManualTagging extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatExpiryDate
+            },
+            {
+                dataField: 'batchQty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
             }
 
         ];
@@ -2966,7 +2988,7 @@ export default class ManualTagging extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <a className="card-header-action">
@@ -3168,10 +3190,22 @@ export default class ManualTagging extends Component {
                                     </FormGroup>}
                             </Row>
 
-                            <div className="ReportSearchMarginTop">
+                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                                 </div>
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
 
@@ -3182,7 +3216,7 @@ export default class ManualTagging extends Component {
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
-                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i></Button>
+                                    <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
@@ -3485,8 +3519,20 @@ export default class ManualTagging extends Component {
 
                                             </div>
                                         </Col>
-                                        <div id="tableDiv1" className="RemoveStriped">
+                                        <div id="tableDiv1" className="RemoveStriped" style={{ display: this.state.table1Loader ? "block" : "none" }}>
                                         </div>
+                                        <div style={{ display: this.state.table1Loader ? "none" : "block" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                    <div class="spinner-border blue ml-4" role="status">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                     </div><br />
                                 </ModalBody>
@@ -3496,7 +3542,9 @@ export default class ManualTagging extends Component {
 
                                     {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
 
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+                                    </Button>
+
                                 </ModalFooter>
                             </div>
                             <div style={{ display: this.state.loading1 ? "block" : "none" }}>
@@ -3718,17 +3766,7 @@ export default class ManualTagging extends Component {
                         {/* ARTMIS history modal end */}
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

@@ -539,7 +539,7 @@ class AddTracerCategoryComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
@@ -623,7 +623,7 @@ class AddTracerCategoryComponent extends Component {
                                         handleReset
                                     }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='tracerCategoryForm' autocomplete="off">
-                                                <CardBody>
+                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -666,6 +666,17 @@ class AddTracerCategoryComponent extends Component {
                                                     </FormGroup>
 
                                                 </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                            <div class="spinner-border blue ml-4" role="status">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -682,17 +693,7 @@ class AddTracerCategoryComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

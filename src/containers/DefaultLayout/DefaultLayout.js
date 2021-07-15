@@ -709,10 +709,16 @@ class DefaultLayout extends Component {
 
   }
 
-  displayHeaderTitle = (name) => {
+  displayHeaderTitle = (name,url) => {
     if (this.state.name !== name) {
-      // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
-      console.log("P*** Call indexed db methods0---------------------------")
+      if (AuthenticationService.checkTypeOfSession(url)) {
+        this.setState({
+          url:""
+        })
+      }else{
+          localStorage.setItem("sessionChanged", 1)
+          this.props.history.push(`/login/static.message.sessionChange`);
+      }
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
@@ -793,7 +799,7 @@ class DefaultLayout extends Component {
   }
 
   getNotificationCount() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
       ManualTaggingService.getNotificationCount()
         .then(response => {
@@ -2891,9 +2897,9 @@ class DefaultLayout extends Component {
                         exact={route.exact}
                         name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
-                          AuthenticationService.authenticatedRoute(route.path) ?
+                          AuthenticationService.authenticatedRoute(route.path,this.state.url) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '')} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '',route.path)} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
@@ -2908,7 +2914,7 @@ class DefaultLayout extends Component {
           </main>
           <AppAside fixed>
             <Suspense fallback={this.loading()}>
-              <DefaultAside />
+              {/* <DefaultAside /> */}
             </Suspense>
           </AppAside>
         </div>

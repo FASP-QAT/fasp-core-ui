@@ -401,9 +401,9 @@ class ShipmentGlobalView extends Component {
             table1Body: [],
             table1Headers: [],
             viewby: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: []
 
@@ -1902,7 +1902,7 @@ class ShipmentGlobalView extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
                         {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
@@ -2146,142 +2146,145 @@ class ShipmentGlobalView extends Component {
                                     </div>
                                 </div>
                             </Form>
-                            <Col md="12 pl-0">
-                                <div className="row grid-divider">
-                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    {this.state.countryShipmentSplitList.length > 0 &&
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas1" data={bar} options={options} />
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12 pl-0">
+                                    <div className="row grid-divider">
+                                        {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        {this.state.countryShipmentSplitList.length > 0 &&
+                                            <div className="col-md-6">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    <Bar id="cool-canvas1" data={bar} options={options} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                    {/* </div> */}
-                                    {/* <div className="col-md-6 p-0 grapg-margin " > */}
-                                    {this.state.dateSplitList.length > 0 &&
-                                        <div className="col-md-6">
-                                            <div className="chart-wrapper chart-graph-report">
-                                                {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
+                                        }
+                                        {/* </div> */}
+                                        {/* <div className="col-md-6 p-0 grapg-margin " > */}
+                                        {this.state.dateSplitList.length > 0 &&
+                                            <div className="col-md-6">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
-                                    {/* </div> */}
-                                    {/* <Col md="12 pl-0"> */}
-                                    {/* <div className="chart-wrapper">
+                                        }
+                                        {/* </div> */}
+                                        {/* <Col md="12 pl-0"> */}
+                                        {/* <div className="chart-wrapper">
                                         <Bar id="cool-canvas" data={chartData} options={options} />
                                     </div> */}
-                                    {/* </Col> */}
-                                </div>
-                            </Col>
-                            <Col md="12 pl-0">
-                                <div className="globalviwe-scroll">
+                                        {/* </Col> */}
+                                    </div>
+                                </Col>
+                                <Col md="12 pl-0">
+                                    <div className="globalviwe-scroll">
 
-                                    <div className="row">
-                                        <div className="col-md-12">
+                                        <div className="row">
+                                            <div className="col-md-12">
 
-                                            {/* table1 */}
-                                            {this.state.table1Body.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                                                {/* table1 */}
+                                                {this.state.table1Body.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                                        <thead>
-                                                            <tr>
+                                                            <thead>
+                                                                <tr>
+                                                                    {
+                                                                        this.state.table1Headers.map((item, idx) =>
+                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '350px' }}>
+                                                                                {this.state.table1Headers[idx]}
+                                                                            </th>
+                                                                        )
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+
                                                                 {
-                                                                    this.state.table1Headers.map((item, idx) =>
-                                                                        <th id="addr0" key={idx} className="text-center" style={{ width: '350px' }}>
-                                                                            {this.state.table1Headers[idx]}
-                                                                        </th>
-                                                                    )
-                                                                }
-                                                            </tr>
-                                                        </thead>
+                                                                    this.state.table1Body.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{getLabelText(this.state.table1Body[idx].country.label, this.state.lang)}</td>
 
-                                                        <tbody>
+                                                                            {
+                                                                                this.state.table1Body[idx].amount.map((item, idx1) =>
+                                                                                    <td id="addr1" key={idx1}>
+                                                                                        {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                    </td>
+                                                                                )
+                                                                            }
 
-                                                            {
-                                                                this.state.table1Body.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{getLabelText(this.state.table1Body[idx].country.label, this.state.lang)}</td>
+                                                                        </tr>
+                                                                    )}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                }
 
-                                                                        {
-                                                                            this.state.table1Body[idx].amount.map((item, idx1) =>
-                                                                                <td id="addr1" key={idx1}>
-                                                                                    {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                </td>
-                                                                            )
-                                                                        }
+                                                {/* table2 */}
 
-                                                                    </tr>
-                                                                )}
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
-                                            }
+                                                {this.state.shipmentList.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                            {/* table2 */}
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
+                                                                    <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
+                                                                    {
+                                                                        this.state.viewby == 1 &&
+                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                    }
+                                                                    {
+                                                                        this.state.viewby != 1 &&
+                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
+                                                                    }
 
-                                            {this.state.shipmentList.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
+                                                                </tr>
+                                                            </thead>
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
-                                                                <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
-                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
+                                                            <tbody>
                                                                 {
-                                                                    this.state.viewby == 1 &&
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                }
-                                                                {
-                                                                    this.state.viewby != 1 &&
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
-                                                                }
+                                                                    this.state.shipmentList.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
+                                                                            <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
+                                                                            <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
+                                                                        </tr>
+                                                                    )}
 
-                                                                <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
-                                                            </tr>
-                                                        </thead>
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                }
 
-                                                        <tbody>
-                                                            {
-                                                                this.state.shipmentList.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                        <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
-                                                                        <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    </tr>
-                                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
-                                            }
+                                        <div class="spinner-border blue ml-4" role="status">
 
                                         </div>
                                     </div>
                                 </div>
-                            </Col>
+                            </div>
 
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div >
         );
     }
 }

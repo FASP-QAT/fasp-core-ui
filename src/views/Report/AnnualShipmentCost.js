@@ -64,9 +64,9 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             outPutList: [],
             message: '',
             programId: '',
@@ -196,7 +196,9 @@ class AnnualShipmentCost extends Component {
                                     shipmentList = programJson.shipmentList;
                                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
-                                        var planningUnitId = p.value
+                                        console.log("P+++++++++++", p);
+                                        var planningUnitId = p.value;
+                                        var planningUnitLabel = p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
                                         if (reportbaseValue == 1) {
@@ -249,7 +251,7 @@ class AnnualShipmentCost extends Component {
                                                         'fundingsource': fundingSource.fundingSourceCode,
                                                         'procurementAgent': procurementAgent.procurementAgentCode,
                                                         'PLANNING_UNIT_ID': planningUnitId,
-                                                        'planningUnit': list[0].planningUnit.label.label_en
+                                                        'planningUnit': planningUnitLabel
 
                                                     };
                                                     var monthstartfrom = this.state.rangeValue.from.month
@@ -1517,7 +1519,7 @@ class AnnualShipmentCost extends Component {
                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
@@ -1733,7 +1735,7 @@ class AnnualShipmentCost extends Component {
                                 </Form>
                                 <Col md="12 pl-0">
 
-                                    <div className="row">
+                                    <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                                         <div className="col-md-12 p-0" id="div_id">
                                             {this.state.outPutList.length > 0 &&
                                                 // {true &&
@@ -1744,6 +1746,17 @@ class AnnualShipmentCost extends Component {
 
                                         </div>
                                     </div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Col>
 
 
@@ -1752,17 +1765,6 @@ class AnnualShipmentCost extends Component {
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

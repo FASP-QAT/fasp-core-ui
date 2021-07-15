@@ -234,9 +234,9 @@ class ShipmentSummery extends Component {
             shipmentDetailsMonthList: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: '',
@@ -359,7 +359,8 @@ class ShipmentSummery extends Component {
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes != null && re[item].notes != '' && re[item].notes != "") ? re[item].notes.replaceAll('#', ' ').replaceAll(' ', '%20') : '')
+
             ]))
         }
         for (var i = 0; i < B.length; i++) {
@@ -534,7 +535,7 @@ class ShipmentSummery extends Component {
         data = this.state.shipmentDetailsList.map(
             ele => [
                 getLabelText(ele.planningUnit.label, this.state.lang),
-                this.formatter(ele.shipmentId),
+                ele.shipmentId,
                 ele.emergencyOrder,
                 ele.erpOrder == true ? true : false,
                 ele.localProcurement,
@@ -834,8 +835,6 @@ class ShipmentSummery extends Component {
                 {
                     title: i18n.t('static.report.id'),
                     type: 'numeric',
-                    mask: '#,##.00',
-                    decimal: '.',
                     // readOnly: true
                 },
                 {
@@ -1593,158 +1592,228 @@ class ShipmentSummery extends Component {
                             for (var k = 0; k < myResult.length; k++) {
                                 var planningUnitObj = {
                                     id: myResult[k].planningUnitId,
-                                    multiplier: myResult[k].multiplier
+                                    multiplier: myResult[k].multiplier,
+                                    label: myResult[k].label,
+                                    forecastingUnit: myResult[k].forecastingUnit
                                 }
                                 planningList[k] = planningUnitObj
                             }
+                            var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var paOs = paTransaction.objectStore('procurementAgent');
+                            var paRequest = paOs.getAll();
+                            var procurementAgentList = [];
 
-                            console.log("planningList------>", planningList);
-
-                            for (let i = 0; i < planningUnitFilter.length; i++) {
-                                let multiplier = 0;
-                                for (let j = 0; j < planningList.length; j++) {
-                                    if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
-                                        multiplier = planningList[j].multiplier;
-                                        j = planningList.length;
-                                    }
-                                }
-
-                                let json = {
-                                    "shipmentId": planningUnitFilter[i].shipmentId,
-                                    "planningUnit": planningUnitFilter[i].planningUnit,
-                                    "forecastingUnit": planningUnitFilter[i].planningUnit.forecastingUnit,
-                                    "multiplier": multiplier,
-                                    "procurementAgent": planningUnitFilter[i].procurementAgent,
-                                    "fundingSource": planningUnitFilter[i].fundingSource,
-                                    "shipmentStatus": planningUnitFilter[i].shipmentStatus,
-                                    "shipmentQty": planningUnitFilter[i].shipmentQty,
-                                    "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
-                                    "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
-                                    "notes": planningUnitFilter[i].notes,
-                                    "emergencyOrder": planningUnitFilter[i].emergencyOrder,
-                                    "erpFlag": planningUnitFilter[i].erpFlag,
-                                    "localProcurement": planningUnitFilter[i].localProcurement,
-                                    "orderNo": planningUnitFilter[i].orderNo,
-                                    "budget": planningUnitFilter[i].budget,
-                                    // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
-                                    // "programCode": programJson.programCode
-                                }
-                                data.push(json);
-                            }
-
-                            data = myFundingSourceIds.length > 0 ? data.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : data;
-                            data = myBudgetIds.length > 0 ? data.filter(b => myBudgetIds.includes(b.budget.id)) : data;
-
-                            data = data.sort(function (a, b) {
-                                return parseInt(a.shipmentId) - parseInt(b.shipmentId);
-                            })
-
-                            console.log("data***", data);
-                            ///////////--------------------------- table one content
-                            var shipmentDetailsFundingSourceList = []
-                            const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
-                            console.log('fundingSourceIds', fundingSourceIds)
-                            fundingSourceIds.map(ele => {
-                                var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
-                                console.log('fundingSourceList', fundingSourceList)
-                                var cost = 0;
-                                var quantity = 0;
-                                console.log('fundingSourceList', fundingSourceList)
-                                fundingSourceList.map(c => {
-                                    cost = cost + Number(c.productCost) + Number(c.freightCost)
-                                    quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
+                            paRequest.onerror = function (event) {
+                                // Handle errors!
+                                this.setState({
+                                    loading: false
                                 })
-                                var json = {
-                                    "fundingSource": fundingSourceList[0].fundingSource,
-                                    "orderCount": fundingSourceList.length,
-                                    "cost": cost,
-                                    "quantity": quantity
-                                }
-                                shipmentDetailsFundingSourceList.push(json)
-                            })
-                            console.log("data ofline----->", data);
-                            console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
+                            };
 
-                            var shipmentDetailsMonthList = [];
-                            var monthstartfrom = this.state.rangeValue.from.month
-                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                var monthlydata = [];
-                                console.log(programJson)
-                                for (var month = monthstartfrom; month <= 12; month++) {
-                                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                    console.log(dtstr, ' ', enddtStr)
-                                    var dt = dtstr
-                                    var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
 
-                                    shiplist = myFundingSourceIds.length > 0 ? shiplist.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : shiplist;
-                                    shiplist = myBudgetIds.length > 0 ? shiplist.filter(b => myBudgetIds.includes(b.budget.id)) : shiplist;
-                                    console.log("shipList***", shiplist);
+                            paRequest.onsuccess = function (e) {
+                                var paResult = [];
+                                paResult = paRequest.result;
 
-                                    var onholdCost = 0
-                                    var plannedCost = 0
-                                    var receivedCost = 0
-                                    var shippedCost = 0
-                                    var submittedCost = 0
-                                    var approvedCost = 0
-                                    var arrivedCost = 0
-                                    var submittedCost = 0
-                                    shiplist.map(ele => {
-                                        console.log(ele)
-                                        if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                            plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
-                                            //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                            submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                            approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
-                                            shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                            arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                            receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                            onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                                var bOs = bTransaction.objectStore('budget');
+                                var bRequest = bOs.getAll();
+
+                                bRequest.onerror = function (event) {
+                                    // Handle errors!
+                                    this.setState({
+                                        loading: false
+                                    })
+                                };
+
+
+                                bRequest.onsuccess = function (e) {
+                                    var bResult = [];
+                                    bResult = bRequest.result;
+                                    console.log("planningList------>", planningList);
+
+                                    for (let i = 0; i < planningUnitFilter.length; i++) {
+                                        let multiplier = 0;
+                                        for (let j = 0; j < planningList.length; j++) {
+                                            if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
+                                                multiplier = planningList[j].multiplier;
+                                                j = planningList.length;
+                                            }
                                         }
+                                        var planningUnit = planningList.filter(c => c.id == planningUnitFilter[i].planningUnit.id);
+                                        var procurementAgent = paResult.filter(c => c.procurementAgentId == planningUnitFilter[i].procurementAgent.id);
+                                        if (procurementAgent.length > 0) {
+                                            var simplePAObject = {
+                                                id: procurementAgent[0].procurementAgentId,
+                                                label: procurementAgent[0].label,
+                                                code: procurementAgent[0].procurementAgentCode
+                                            }
+                                        }
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[i].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var budget = [];
+                                        if (planningUnitFilter[i].budget.id > 0) {
+                                            var budget = bResult.filter(c => c.budgetId == planningUnitFilter[i].budget.id);
+                                            if (budget.length > 0) {
+                                                var simpleBObject = {
+                                                    id: budget[0].budgetId,
+                                                    label: budget[0].label,
+                                                    code: budget[0].budgetCode
+                                                }
+                                            }
+                                        }
+                                        let json = {
+                                            "shipmentId": planningUnitFilter[i].shipmentId,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0] : planningUnitFilter[i].planningUnit,
+                                            "forecastingUnit": planningUnit.length > 0 ? planningUnit[0].forecastingUnit : planningUnitFilter[i].planningUnit.forecastingUnit,
+                                            "multiplier": multiplier,
+                                            "procurementAgent": procurementAgent.length > 0 ? simplePAObject : planningUnitFilter[i].procurementAgent,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[i].fundingSource,
+                                            "shipmentStatus": planningUnitFilter[i].shipmentStatus,
+                                            "shipmentQty": planningUnitFilter[i].shipmentQty,
+                                            "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
+                                            "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
+                                            "notes": planningUnitFilter[i].notes,
+                                            "emergencyOrder": planningUnitFilter[i].emergencyOrder,
+                                            "erpFlag": planningUnitFilter[i].erpFlag,
+                                            "localProcurement": planningUnitFilter[i].localProcurement,
+                                            "orderNo": planningUnitFilter[i].orderNo,
+                                            "budget": budget.length > 0 ? simpleBObject : planningUnitFilter[i].budget,
+                                            // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
+                                            // "programCode": programJson.programCode
+                                        }
+                                        data.push(json);
+                                    }
+
+                                    data = myFundingSourceIds.length > 0 ? data.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : data;
+                                    data = myBudgetIds.length > 0 ? data.filter(b => myBudgetIds.includes(b.budget.id)) : data;
+
+                                    data = data.sort(function (a, b) {
+                                        return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                                     })
 
-                                    let json = {
-                                        "dt": new Date(from, month - 1),
-                                        "approvedCost": approvedCost,
-                                        "arrivedCost": arrivedCost,
-                                        "onholdCost": onholdCost,
-                                        "plannedCost": plannedCost,
-                                        "receivedCost": receivedCost,
-                                        "shippedCost": shippedCost,
-                                        "submittedCost": submittedCost
-                                    }
-                                    shipmentDetailsMonthList.push(json)
-                                    if (month == this.state.rangeValue.to.month && from == to) {
-                                        console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
-                                        this.setState({
-                                            shipmentDetailsList: data,
-                                            shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
-                                            shipmentDetailsMonthList: shipmentDetailsMonthList,
-                                            message: '',
-                                            viewById: viewById, loading: false
-                                        }, () => {
-                                            this.buildJExcel();
+                                    console.log("data***", data);
+                                    ///////////--------------------------- table one content
+                                    var shipmentDetailsFundingSourceList = []
+                                    const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
+                                    console.log('fundingSourceIds', fundingSourceIds)
+                                    fundingSourceIds.map(ele => {
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == ele);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        var cost = 0;
+                                        var quantity = 0;
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        fundingSourceList.map(c => {
+                                            cost = cost + Number(c.productCost) + Number(c.freightCost)
+                                            quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
                                         })
-                                        return;
+                                        var json = {
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : fundingSourceList[0].fundingSource,
+                                            "orderCount": fundingSourceList.length,
+                                            "cost": cost,
+                                            "quantity": quantity
+                                        }
+                                        shipmentDetailsFundingSourceList.push(json)
+                                    })
+                                    console.log("data ofline----->", data);
+                                    console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
+
+                                    var shipmentDetailsMonthList = [];
+                                    var monthstartfrom = this.state.rangeValue.from.month
+                                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                        var monthlydata = [];
+                                        console.log(programJson)
+                                        for (var month = monthstartfrom; month <= 12; month++) {
+                                            var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                            var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                                            console.log(dtstr, ' ', enddtStr)
+                                            var dt = dtstr
+                                            var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+
+                                            shiplist = myFundingSourceIds.length > 0 ? shiplist.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : shiplist;
+                                            shiplist = myBudgetIds.length > 0 ? shiplist.filter(b => myBudgetIds.includes(b.budget.id)) : shiplist;
+                                            console.log("shipList***", shiplist);
+
+                                            var onholdCost = 0
+                                            var plannedCost = 0
+                                            var receivedCost = 0
+                                            var shippedCost = 0
+                                            var submittedCost = 0
+                                            var approvedCost = 0
+                                            var arrivedCost = 0
+                                            var submittedCost = 0
+                                            shiplist.map(ele => {
+                                                console.log(ele)
+                                                if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                                    plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
+                                                    //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                                    submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                                    approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
+                                                    shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                                    arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                                    receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                }
+                                            })
+
+                                            let json = {
+                                                "dt": new Date(from, month - 1),
+                                                "approvedCost": approvedCost,
+                                                "arrivedCost": arrivedCost,
+                                                "onholdCost": onholdCost,
+                                                "plannedCost": plannedCost,
+                                                "receivedCost": receivedCost,
+                                                "shippedCost": shippedCost,
+                                                "submittedCost": submittedCost
+                                            }
+                                            shipmentDetailsMonthList.push(json)
+                                            if (month == this.state.rangeValue.to.month && from == to) {
+                                                console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
+                                                this.setState({
+                                                    shipmentDetailsList: data,
+                                                    shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
+                                                    shipmentDetailsMonthList: shipmentDetailsMonthList,
+                                                    message: '',
+                                                    viewById: viewById, loading: false
+                                                }, () => {
+                                                    this.buildJExcel();
+                                                })
+                                                return;
+                                            }
+
+                                        }
+                                        monthstartfrom = 1
+
                                     }
 
-                                }
-                                monthstartfrom = 1
 
-                            }
-
-
+                                }.bind(this)
+                            }.bind(this);
                         }.bind(this)
-                    }.bind(this);
+                    }.bind(this)
                 }.bind(this)
             } else {
                 this.setState({ loading: true })
@@ -2232,7 +2301,7 @@ class ShipmentSummery extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
 
@@ -2413,41 +2482,41 @@ class ShipmentSummery extends Component {
                                         {/* </Col> */}
                                     </div>
                                 </Form>
-
-                                <Col md="12 pl-0">
-                                    <div className="row">
-                                        {
-                                            this.state.shipmentDetailsMonthList.length > 0
-                                            &&
-                                            <div className="col-md-12 p-0">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        <Bar id="cool-canvas" data={bar} options={options} />
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            {
+                                                this.state.shipmentDetailsMonthList.length > 0
+                                                &&
+                                                <div className="col-md-12 p-0">
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                {/* <div className="col-md-12">
+                                                    {/* <div className="col-md-12">
                                                         <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
 
                                                     </div> */}
-                                            </div>
-                                        }
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    {/* <tbody>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-md-12 pl-0 pr-0">
+                                                {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -2461,51 +2530,53 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody> */}
-                                                    <tbody>
-                                                        {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                            this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
-                                                                <tr id="addr0" key={idx} >
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>
-                                                            )}
-                                                    </tbody>
+                                                        <tbody>
+                                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                                this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
+                                                                    <tr id="addr0" key={idx} >
+                                                                        <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    </tr>
+                                                                )}
+                                                        </tbody>
 
-                                                </Table>}
+                                                    </Table>}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                </Col>
-                                <Col md="12 pl-0">
-                                    <div className="row">
-                                        <FormGroup className="col-md-10 mt-3 ">
-                                            <ul className="legendcommitversion list-group">
-                                                {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
-                                            </ul>
-                                        </FormGroup>
-                                        <div className="ShipmentSummeryReportMarginTop" id="mytable2">
-                                            <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId")!=null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
+                                    </Col>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-10 mt-3 ">
+                                                <ul className="legendcommitversion list-group">
+                                                    {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
+                                                </ul>
+                                            </FormGroup>
+                                            <div className="ShipmentSummeryReportMarginTop" id="mytable2">
+                                                <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
                                             </div>
                                         </div>
                                     </div>
-                                </Col>
+                                </div>
                             </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         );
     }

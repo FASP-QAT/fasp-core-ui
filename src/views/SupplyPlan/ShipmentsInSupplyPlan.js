@@ -86,7 +86,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     (instance.jexcel).setValueFromCoords(24, data[i].y, -1, true);
                     (instance.jexcel).setValueFromCoords(25, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(26, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(27, data[i].y, "", true);
                     (instance.jexcel).setValueFromCoords(28, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(29, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(30, data[i].y, true, true);
@@ -394,7 +393,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             budgetList: budgetList,
                                             shipmentStatusList: shipmentStatusList
                                         }, () => {
-                                            this.props.updateState("currencyList", currencyList);                                            
+                                            this.props.updateState("currencyList", currencyList);
                                             this.props.updateState("dataSourceList", dataSourceList);
                                             this.props.updateState("fundingSourceList", fundingSourceList);
                                             this.props.updateState("procurementAgentList", procurementAgentList);
@@ -445,7 +444,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             } else {
                                                 index = shipmentList[i].index;
                                             }
-                                            if (this.props.items.indexOfShipmentContainingBatch != undefined && this.props.items.indexOfShipmentContainingBatch >= 0 && index == this.props.items.indexOfShipmentContainingBatch && (shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentList[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)) {
+                                            if (this.props.items.indexOfShipmentContainingBatch != undefined && this.props.items.indexOfShipmentContainingBatch >= 0 && index == this.props.items.indexOfShipmentContainingBatch) {
                                                 yForBatch = i;
                                             }
                                             this.setState({
@@ -602,7 +601,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
-                                                { type: 'text', title: i18n.t('static.program.notes'), width: 200 },
+                                                { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0 },
                                                 { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0 },
@@ -817,7 +816,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // Add shipment batch info
                                                     var expectedDeliveryDate = moment(rowData[4]).add(1, 'months').format("YYYY-MM-DD");
                                                     var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                                    if ((rowData[3] == DELIVERED_SHIPMENT_STATUS || rowData[3] == SHIPPED_SHIPMENT_STATUS || rowData[3] == ARRIVED_SHIPMENT_STATUS) && rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
+                                                    if (rowData[4] != "" && rowData[4] != null && rowData[4] != undefined && rowData[4] != "Invalid date" && obj.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") > 0) {
                                                         items.push({
                                                             title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                                             onclick: function () {
@@ -869,6 +868,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         var shipmentDates = rowData[27];
                                                                         var shipmentStatus = rowData[3];
                                                                         var emergencyOrder = rowData[11];
+                                                                        var erpFlag = rowData[22];
                                                                         var expectedDeliveryDate = shipmentDates.expectedDeliveryDate;
                                                                         var expectedPlannedDate = "";
                                                                         var expectedSubmittedDate = "";
@@ -881,20 +881,22 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                         var shippedDate = shipmentDates.shippedDate;
                                                                         var arrivedDate = shipmentDates.arrivedDate;
                                                                         var receivedDate = shipmentDates.receivedDate;
-                                                                        if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                            receivedDate = null;
-                                                                        }
-                                                                        if (shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                            arrivedDate = null;
-                                                                        }
-                                                                        if (shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                            shippedDate = null;
-                                                                        }
-                                                                        if (shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                            approvedDate = null;
-                                                                        }
-                                                                        if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
-                                                                            submittedDate = null;
+                                                                        if (erpFlag.toString() == "false") {
+                                                                            if (shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                                receivedDate = null;
+                                                                            }
+                                                                            if (shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                                arrivedDate = null;
+                                                                            }
+                                                                            if (shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                                shippedDate = null;
+                                                                            }
+                                                                            if (shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                                approvedDate = null;
+                                                                            }
+                                                                            if (shipmentStatus != SUBMITTED_SHIPMENT_STATUS && shipmentStatus != APPROVED_SHIPMENT_STATUS && shipmentStatus != SHIPPED_SHIPMENT_STATUS && shipmentStatus != ARRIVED_SHIPMENT_STATUS && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
+                                                                                submittedDate = null;
+                                                                            }
                                                                         }
                                                                         var addLeadTimes = 0;
                                                                         if (rowData[7].toString() == "true") {
@@ -1040,6 +1042,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             allowExport: false,
                                                                             onchange: this.shipmentDatesChanged,
                                                                             editable: tableEditable,
+                                                                            onbeforepaste: function (obj, data, x, y) {
+                                                                                return false;
+                                                                            },
                                                                             contextMenu: function (obj, x, y, e) {
                                                                                 var items = [];
                                                                                 return items;
@@ -1559,6 +1564,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     batchDetailsClicked(obj, x, y, shipmentEditable, autoPopup) {
+        this.props.updateState("showBatchSaveButton", shipmentEditable);
         this.props.updateState("loading", true);
         if (this.props.shipmentPage == "shipmentDataEntry") {
             this.props.updateState("shipmentModalTitle", i18n.t("static.dataEntry.batchDetails"));
@@ -1873,6 +1879,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var elInstance = instance.jexcel;
         var rowData = elInstance.getRowData(y);
         var planningUnitId = rowData[2];
+        if (planningUnitId == "" || planningUnitId == undefined || planningUnitId == null) {
+            elInstance.setValueFromCoords(2, y, document.getElementById("planningUnitId").value, true);
+        }
         this.props.updateState("shipmentError", "");
         this.props.updateState("noFundsBudgetError", "");
         if ((x == 4 || x == 6 || x == 5 || x == 7) && rowData[23] == "") {
@@ -1888,7 +1897,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 4) {
-            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -1937,7 +1946,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             })
                         })
                     if (bd.batch.autoGenerated.toString() == "true") {
-                        batchDetails[b].batch.expiryDate = moment(minCreatedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                        var expDate = moment(minCreatedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                        batchDetails[b].batch.expiryDate = expDate;
+                        var batchInfoList = this.props.items.programJson.batchInfoList.filter(c => c.batchNo == batchDetails[b].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expDate).startOf('month').format("YYYY-MM"));
+                        var batchId = 0;
+                        if (batchInfoList.length > 0) {
+                            batchId = batchInfoList[0].batchId;
+                        }
+                        batchDetails[b].batch.batchId = batchId;
                     }
                     batchDetails[b].batch.createdDate = moment(minCreatedDate).format("YYYY-MM-DD");
                 }
@@ -2030,7 +2046,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(31, y, 1, true);
             }
 
-            var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+            var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
             if (validation == false) {
             } else {
                 if (rowData[3] == DELIVERED_SHIPMENT_STATUS) {
@@ -2500,7 +2516,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
                 if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
@@ -2573,7 +2589,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
                     valid = false;
                 }
-                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance);
+                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 } else {
@@ -3144,7 +3160,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     },
                     productCost: productCost.toString().replaceAll("\,", ""),
                     shipmentId: 0,
-                    batchInfoList:[]
+                    batchInfoList: []
                 }
                 shipmentListAfterUpdate.push(shipmentJson);
             }
@@ -3241,7 +3257,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
 
-                var validation = checkValidtion("date", "E", y, rowData[4], elInstance);
+                var validation = checkValidtion("dateWithInvalidForShipment", "E", y, rowData[4], elInstance, "", "", "", 4);
                 if (validation == false) {
                     valid = false;
                 } else {
@@ -3323,25 +3339,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                 var shipmentStatus = elInstance.getRowData(y)[3];
                 if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
-                    if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
-                        var totalShipmentQty = (rowData[26]);
-                        var adjustedOrderQty = elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                        adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
-                        var col = ("K").concat(parseInt(y) + 1);
+                    // if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
+                    var totalShipmentQty = (rowData[26]);
+                    var adjustedOrderQty = elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                    adjustedOrderQty = adjustedOrderQty.toString().replaceAll("\,", "");
+                    var col = ("K").concat(parseInt(y) + 1);
 
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
-                        inValid("K", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
-                        if (totalShipmentQty != 0 && totalShipmentQty > adjustedOrderQty) {
-                            valid = false;
-                            elInstance.setValueFromCoords(31, y, 1, true);
-                            this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
-                            this.props.hideSecondComponent();
-                        } else {
-                            positiveValidation("K", y, elInstance);
-                        }
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.supplyPlan.batchNumberMissing'));
+                    inValid("K", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                    if (totalShipmentQty != 0 && totalShipmentQty > adjustedOrderQty) {
+                        valid = false;
+                        elInstance.setValueFromCoords(31, y, 1, true);
+                        this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
+                        this.props.hideSecondComponent();
+                    } else {
+                        positiveValidation("K", y, elInstance);
                     }
+                    // }
                 }
             } else {
                 valid = false;
@@ -3355,6 +3371,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
             }
         } else if (negativeBudget == 0) {
+            return valid;
+        } else {
             return valid;
         }
     }

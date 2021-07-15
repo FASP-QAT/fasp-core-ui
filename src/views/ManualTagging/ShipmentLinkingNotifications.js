@@ -73,8 +73,15 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("row---", row);
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
+        
+            batchDetails.sort(function (a, b) {
+                var dateA = new Date(a.expiryDate).getTime();
+                var dateB = new Date(b.expiryDate).getTime();
+                return dateA > dateB ? 1 : -1;
+            })
             this.setState({
-                batchDetails: row.shipmentList
+                batchDetails
             });
         } else {
             this.setState({
@@ -956,23 +963,18 @@ export default class ShipmentLinkingNotifications extends Component {
                                         console.log("DATA---->1", response.data);
 
                                         let responseData = response.data.sort(function (a, b) {
-                                            var dateA = new Date(a.date).getTime();
-                                            var dateB = new Date(b.date).getTime();
-                                            return dateA > dateB ? 1 : -1;
+                                            var dateA = new Date(a.receivedOn).getTime();
+                                            var dateB = new Date(b.receivedOn).getTime();
+                                            return dateA < dateB ? 1 : -1;
                                         })
+                                        console.log("history---", response.data);
                                         responseData = responseData.filter((responseData, index, self) =>
                                             index === self.findIndex((t) => (
-                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.expectedDeliveryDate === responseData.expectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
                                                 && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
                                             ))
                                         )
-
-                                        responseData = responseData.sort(function (a, b) {
-                                            var dateA = new Date(a.date).getTime();
-                                            var dateB = new Date(b.date).getTime();
-                                            return dateA < dateB ? 1 : -1;
-                                        })
-                                        console.log("DATA---->2", responseData);
+                                        console.log("history-2--", responseData);
 
                                         responseData = responseData.sort(function (a, b) {
                                             var dateA = a.erpOrderId;
@@ -1142,10 +1144,23 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("RESP------>y2", y2);
         console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
 
-        if (y1 == 0 && y2 != 0) {
+
+        // if (y1 == 0 && y2 != 0) {
+        //     console.log("RESP------>Header");
+        // } else {
+        //     console.log("RESP------>Not");
+        //     this.setState({
+        //         programId: instance.getValueFromCoords(2, y1)
+        //     }, () => {
+        //         document.getElementById("addressed").value = 0;
+        //         this.getPlanningUnitList();
+        //     })
+        // }
+        let typeofColumn = instance.selectedHeader;
+        if (typeof typeofColumn === 'string') {
             console.log("RESP------>Header");
         } else {
-            console.log("RESP------>Not");
+            console.log("RESP------>not Header");
             this.setState({
                 programId: instance.getValueFromCoords(2, y1)
             }, () => {
@@ -1457,7 +1472,7 @@ export default class ShipmentLinkingNotifications extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
@@ -1541,6 +1556,15 @@ export default class ShipmentLinkingNotifications extends Component {
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatExpiryDate
+            },
+
+            {
+                dataField: 'batchQty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
             }
 
         ];
@@ -1564,13 +1588,15 @@ export default class ShipmentLinkingNotifications extends Component {
 
             }, this);
 
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <CardBody className="pb-lg-5">
                         {/* Consumption modal */}
                         <Modal isOpen={this.state.manualTag}
@@ -1725,12 +1751,25 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                             </Row>
-                            <div className="ReportSearchMarginTop">
+                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="RemoveStriped">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
                                         </div> */}
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                         </div>
 
@@ -1741,21 +1780,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             &nbsp;
-                                {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                         </FormGroup>
                     </CardFooter>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

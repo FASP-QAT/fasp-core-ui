@@ -929,13 +929,24 @@ class RealmCountry extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                <div>
                     <Card>
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" >
+                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </Col>
@@ -950,17 +961,7 @@ class RealmCountry extends Component {
                         </CardFooter>
                     </Card>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     }
