@@ -498,6 +498,9 @@ class AuthenticationService {
                 case "/morbidity/scenarioOne":
                 case "/morbidity/scenarioTwo":
                 case "/morbidity/scenarioThree":
+                case "/demographic/scenarioThree":
+                case "/demographic/scenarioTwo":
+                case "/demographic/scenarioOne":
                     if (bfunction.includes("ROLE_BF_ADD_USER")) {
                         return true;
                     }

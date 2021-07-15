@@ -237,6 +237,10 @@ const MorbidityScenarioOne = React.lazy(() => import('../../Samples/MorbiditySce
 const MorbidityScenarioTwo = React.lazy(() => import('../../Samples/MorbidityScenarioTwo'));
 const MorbidityScenarioThree = React.lazy(() => import('../../Samples/MorbidityScenarioThree'));
 
+const DemographicScenarioOne = React.lazy(() => import('../../Samples/DemographicScenarioOne'));
+const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
+const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
+
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -248,6 +252,10 @@ const routes = [
   { path: '/morbidity/scenarioOne',name:'Scenario One', component: MorbidityScenarioOne },
   { path: '/morbidity/scenarioTwo',name:'Morbidity Scenario Two', component: MorbidityScenarioTwo },
   { path: '/morbidity/scenarioThree',name:'Morbidity Scenario Three', component: MorbidityScenarioThree },
+
+  { path: '/demographic/scenarioOne',name:'Demographic Scenario One', component: DemographicScenarioOne },
+  { path: '/demographic/scenarioTwo',name:'Demographic Scenario Two', component: DemographicScenarioTwo },
+  { path: '/demographic/scenarioThree',name:'Demographic Scenario Three', component: DemographicScenarioThree },
 
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
