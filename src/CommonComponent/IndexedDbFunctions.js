@@ -145,6 +145,14 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('programQPLDetails')){
             storeOS = db1.createObjectStore('programQPLDetails', { keyPath: 'id', autoIncrement: true });
         }
+        // Forecasting Module
+        if (!db1.objectStoreNames.contains('forecastDataset')) {
+            storeOS = db1.createObjectStore('forecastDataset', { keyPath: 'id' });
+        }
+        console.log("indexed db 2----------------------")
+        if (!db1.objectStoreNames.contains('downloadedForecastDataset')) {
+            storeOS = db1.createObjectStore('downloadedForecastDataset', { keyPath: 'id' });
+        }
         console.log("indexed db completed----------------------")
         
     };

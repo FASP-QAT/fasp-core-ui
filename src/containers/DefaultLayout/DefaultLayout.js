@@ -276,6 +276,9 @@ const DemographicScenarioOne = React.lazy(() => import('../../Samples/Demographi
 const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
 const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
 
+// Forecasting module
+const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/myTree', name: "Tree", component: BasicPrimitiveTreeDemo },
@@ -641,6 +644,8 @@ const routes = [
   { path: '/demographic/scenarioOne', name: 'Demographic Scenario One', component: DemographicScenarioOne },
   { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
+  { path: '/dataset/loadDataset', name: i18n.t('static.dashboard.downloadprogram'), component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
 ];
 
 class DefaultLayout extends Component {
@@ -2253,7 +2258,7 @@ class DefaultLayout extends Component {
                         children: [
                           {
                             name: "Load Dataset",
-                            url: '/report/stockStatusAcrossPlanningUnits',
+                            url: '/dataset/loadDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 
