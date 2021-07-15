@@ -43,6 +43,10 @@ const AddOrganisation = React.lazy(() => import('../../views/Organisation/AddOrg
 const OrganisationList = React.lazy(() => import('../../views/Organisation/OrganisationList'));
 const EditOrganisation = React.lazy(() => import('../../views/Organisation/EditOrganisation'));
 
+const AddOrganisationType = React.lazy(() => import('../../views/OrganisationType/AddOrganisationType'));
+const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationType/OrganisationTypeList'));
+const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
+
 const AddSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/EditSubFundingSourceComponent'));
@@ -348,6 +352,12 @@ const routes = [
   { path: '/organisation/listOrganisation', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationHead.organisation', component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: 'static.breadcrum.edit', entityname: 'static.organisationHead.organisation', component: EditOrganisation },
 
+  { path: '/organisationType/addOrganisationType', name: 'static.breadcrum.add', entityname: 'static.organisationTypeHead.organisation', component: AddOrganisationType },
+  // { path: '/organisationType/listOrganisationType/:message', component: OrganisationList },
+  { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationTypeHead.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationTypeHead.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationTypeHead.organisationType', component: EditOrganisationType },
+
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -540,7 +550,7 @@ const routes = [
   { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
-  { path: '/report/shipmentSummery/:message',exact:true,name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
+  { path: '/report/shipmentSummery/:message', exact: true, name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
@@ -690,15 +700,15 @@ class DefaultLayout extends Component {
 
   }
 
-  displayHeaderTitle = (name,url) => {
+  displayHeaderTitle = (name, url) => {
     if (this.state.name !== name) {
       if (AuthenticationService.checkTypeOfSession(url)) {
         this.setState({
-          url:""
+          url: ""
         })
-      }else{
-          localStorage.setItem("sessionChanged", 1)
-          this.props.history.push(`/login/static.message.sessionChange`);
+      } else {
+        localStorage.setItem("sessionChanged", 1)
+        this.props.history.push(`/login/static.message.sessionChange`);
       }
       this.getProgramData();
       this.getNotificationCount();
@@ -1193,6 +1203,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.organisationHead.organisation'),
                             url: '/organisation/listOrganisation',
+                            icon: 'fa fa-building',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.organisationTypeHead.organisationType'),
+                            url: '/organisationType/listOrganisationType',
                             icon: 'fa fa-building',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
                           },
@@ -2679,9 +2695,9 @@ class DefaultLayout extends Component {
                         exact={route.exact}
                         name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
-                          AuthenticationService.authenticatedRoute(route.path,this.state.url) ?
+                          AuthenticationService.authenticatedRoute(route.path, this.state.url) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '',route.path)} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '', route.path)} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )

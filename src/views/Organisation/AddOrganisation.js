@@ -21,7 +21,9 @@ let initialValues = {
     realmId: '',
     realmCountryId: [],
     organisationCode: '',
-    organisationName: ''
+    organisationName: '',
+    organisationTypeId: '',
+    organisationTypeList: []
 }
 
 const validationSchema = function (values) {
@@ -39,7 +41,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.displayName'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         realmCountryId: Yup.string()
-            .required(i18n.t('static.program.validcountrytext'))
+            .required(i18n.t('static.program.validcountrytext')),
+        organisationTypeId: Yup.string()
+            .required(i18n.t('static.organisationType.organisationTypetext'))
     })
 }
 
@@ -80,12 +84,17 @@ export default class AddOrganisationComponent extends Component {
                     id: ""
                 },
                 realmCountryArray: [],
-                organisationCode: ''
+                organisationCode: '',
+                organisationType: {
+                    id: ''
+                },
             },
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
             realmCountryList: [],
             selCountries: [],
+            organisationTypeList: [],
+            organisationTypeId: '',
             message: '',
             loading: true,
         }
@@ -229,6 +238,8 @@ export default class AddOrganisationComponent extends Component {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
             organisation.organisationCode = event.target.value.toUpperCase();
+        } else if (event.target.name === "organisationTypeId") {
+            organisation.organisationType.id = event.target.value
         } else if (event.target.name === "realmId") {
             organisation.realm.id = event.target.value
         }
@@ -245,7 +256,8 @@ export default class AddOrganisationComponent extends Component {
             realmId: true,
             organisationName: true,
             organisationCode: true,
-            realmCountryId: true
+            realmCountryId: true,
+            organisationTypeId: true
         }
         )
         this.validateForm(errors)
@@ -542,6 +554,14 @@ export default class AddOrganisationComponent extends Component {
                 )
             }, this);
 
+        const { organisationTypeList } = this.state;
+        let organisationTypes = organisationTypeList.length > 0
+            && organisationTypeList.map((item, i) => {
+                return (
+                    <option key={i} value={item.organisationTypeId}>{item.label.label_en}</option>
+                )
+            }, this);
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -559,7 +579,8 @@ export default class AddOrganisationComponent extends Component {
                                     organisationName: this.state.organisation.label.label_en,
                                     organisationCode: this.state.organisation.organisationCode,
                                     realmId: this.state.organisation.realm.id,
-                                    realmCountryId: this.state.realmCountryId
+                                    realmCountryId: this.state.realmCountryId,
+                                    organisationTypeId: this.state.organisation.organisationType.id,
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -679,6 +700,26 @@ export default class AddOrganisationComponent extends Component {
                                                         // value={this.state.organisation.realmCountryArray}
                                                         />
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="organisationTypeId">{i18n.t('static.organisationType.organisationType')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="organisationTypeId"
+                                                            id="organisationTypeId"
+                                                            bsSize="sm"
+                                                            valid={!errors.organisationTypeId && this.state.organisationType.id != ''}
+                                                            invalid={touched.organisationTypeId && !!errors.organisationTypeId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.organisationType.id}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {/* {dataSourceTypes} */}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.organisationTypeId}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
