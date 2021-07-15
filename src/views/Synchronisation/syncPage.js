@@ -3653,6 +3653,7 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
+                  f.region != null &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
