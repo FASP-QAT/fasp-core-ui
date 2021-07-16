@@ -620,7 +620,7 @@ class Program extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
