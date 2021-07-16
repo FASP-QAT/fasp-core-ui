@@ -21,6 +21,8 @@ import moment from "moment"
 import { Online } from "react-detect-offline";
 import { Prompt } from 'react-router'
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 const entityname = i18n.t('static.dashboard.shipmentdetails');
 
@@ -49,9 +51,18 @@ export default class ShipmentDetails extends React.Component {
             shipmentModalTitle: "",
             shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
             shipmentTypeIds: [1],
-            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            programId: "",
+            planningUnitId: "",
+            currencyList: [],
+            dataSourceList: [],
+            fundingSourceList: [],
+            procurementAgentList: [],
+            budgetList: [],
+            shipmentStatusList: [],
+            showBatchSaveButton: false
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -68,7 +79,374 @@ export default class ShipmentDetails extends React.Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.openBatchPopUp = this.openBatchPopUp.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
     }
+
+
+    exportCSV() {
+
+        //Create workbook and worksheet
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(i18n.t('static.supplyplan.shipmentDataEntry'));
+
+        //Add Header Row
+
+        worksheet.columns = [
+            { header: i18n.t('static.common.active'), key: 'string', width: 25 },
+            { header: i18n.t('static.report.id'), key: 'name', width: 25 },
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
+            { header: i18n.t('static.shipmentDataEntry.shipmentStatus'), key: 'name', width: 25 },
+            { header: i18n.t('static.common.receivedate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
+            { header: i18n.t('static.supplyPlan.shipmentMode'), key: 'name', width: 40 },
+            { header: i18n.t('static.procurementagent.procurementagent'), key: 'name', width: 40 },
+            { header: i18n.t('static.shipmentDataEntry.localProcurement'), key: 'name', width: 32 },
+            { header: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), key: 'name', width: 32 },
+            { header: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.adjustesOrderQty'), key: 'name', width: 12 },
+            { header: i18n.t('static.supplyPlan.emergencyOrder'), key: 'name', width: 25 },
+            { header: i18n.t('static.subfundingsource.fundingsource'), key: 'string', width: 25 },
+
+            { header: i18n.t('static.dashboard.budget'), key: 'string', width: 25 },
+            { header: i18n.t('static.dashboard.currency'), key: 'string', width: 25 },
+            { header: i18n.t('static.supplyPlan.pricePerPlanningUnit'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.productcost'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.freightcost'), key: 'string', width: 25 },
+            { header: i18n.t('static.shipment.totalCost'), key: 'string', width: 25 },
+
+            { header: i18n.t('static.datasource.datasource'), key: 'string', width: 25 },
+            { header: i18n.t('static.program.notes'), key: 'string', width: 25 },
+
+
+        ];
+
+        //Header Color
+        worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
+            // console.log('ROW--------->' + colNumber + ' = ' + cell.value);
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFFF00' },
+                bgColor: { argb: 'FF0000FF' },
+                // font: { bold: true }
+            }
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+
+
+        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let activeDropdown = ["True", "False"];
+        worksheet.dataValidations.add('A2:A100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${activeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        // worksheet.dataValidations.add('E2:E100', {
+        //     type: 'date',
+        //     // operator: 'greaterThan',
+        //     showErrorMessage: true,
+        //     formulae: [new Date('3021-01-01')],
+        //     allowBlank: false,
+        //     prompt: 'Format (YYYY-MM-DD)',
+        //     // errorStyle: 'error',
+        //     // errorTitle: 'Invalid Value',
+        //     // error: 'Invalid Value'
+        // });
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('E' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+        }
+
+        let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
+        worksheet.dataValidations.add('F2:F100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${shipmentModeDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        // let isLocalProcurementAgentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let isLocalProcurementAgentDropdown = ["True", "False"];
+        worksheet.dataValidations.add('H2:H100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${isLocalProcurementAgentDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        // let emergencyShipmentDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
+        let emergencyShipmentDropdown = ["True", "False"];
+        worksheet.dataValidations.add('L2:L100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${emergencyShipmentDropdown.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        let dataSourceVar = [];
+        let datasourceList = this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+
+        for (let i = 0; i < datasourceList.length; i++) {
+            dataSourceVar.push(datasourceList[i].name);
+        }
+
+        worksheet.dataValidations.add('T2:T100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${dataSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+        //currency
+
+        let currencyVar = [];
+        let currencyList = this.state.currencyList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < currencyList.length; i++) {
+            currencyVar.push(currencyList[i].name);
+        }
+
+        worksheet.dataValidations.add('O2:O100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${currencyVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let fundingSourceVar = [];
+        let fundingSourceList = this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < fundingSourceList.length; i++) {
+            fundingSourceVar.push(fundingSourceList[i].name);
+        }
+
+        worksheet.dataValidations.add('M2:M100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${fundingSourceVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let procurementAgentVar = [];
+        let procurementAgentList = this.state.procurementAgentList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < procurementAgentList.length; i++) {
+            procurementAgentVar.push(procurementAgentList[i].name);
+        }
+
+        worksheet.dataValidations.add('G2:G100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${procurementAgentVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let budgetVar = [];
+        let budgetList = this.state.budgetList.slice(1).filter(c => c.active.toString() == "true").sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+        for (let i = 0; i < budgetList.length; i++) {
+            budgetVar.push(budgetList[i].name);
+        }
+
+        worksheet.dataValidations.add('N2:N100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${budgetVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+        let shipmentStatusVar = [];
+        let shipmentStatusList = this.state.shipmentStatusList.filter(c => c.active.toString() == "true");
+        for (let i = 0; i < shipmentStatusList.length; i++) {
+            shipmentStatusVar.push(shipmentStatusList[i].name);
+        }
+
+        worksheet.dataValidations.add('D2:D100', {
+            type: 'list',
+            allowBlank: false,
+            formulae: [`"${shipmentStatusVar.join(",")}"`],
+            showErrorMessage: true,
+            // errorStyle: 'error',
+            // error: 'Invalid value',
+        });
+
+
+
+        //Validations
+
+        worksheet.dataValidations.add('K2:K100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        worksheet.dataValidations.add('P2:P100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        worksheet.dataValidations.add('R2:R100', {
+            type: 'whole',
+            operator: 'greaterThan',
+            showErrorMessage: true,
+            formulae: [-1],
+            // errorStyle: 'error',
+            // errorTitle: 'Invalid Value',
+            // error: 'Invalid Value'
+        });
+
+        //Locked gray color fill
+
+        for (let i = 0; i < 100; i++) {
+            worksheet.getCell('B' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('C' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('J' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('Q' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+            worksheet.getCell('S' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+        }
+
+        //Protection
+
+        worksheet.protect();
+        worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('N').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('O').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('P').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('R').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('T').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        worksheet.getColumn('U').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+
+        // Generate Excel File with given name
+
+        workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, i18n.t('static.supplyplan.shipmentDataEntry') + '.xlsx');
+        })
+
+    }
+
 
     show() {
     }
@@ -376,9 +754,7 @@ export default class ShipmentDetails extends React.Component {
                 localStorage.setItem("sesPlanningUnitId", planningUnitId);
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
-                    console.log("In if");
                     if ((this.state.shipmentTypeIds).includes(1)) {
-                        console.log("in if 1")
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
                         if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
@@ -420,7 +796,6 @@ export default class ShipmentDetails extends React.Component {
                         this.setState({
                             shipmentListUnFiltered: shipmentListUnFiltered
                         })
-                        console.log("ShowBatchInfoList+++",programJson.batchInfoList);
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == (value != "" && value != undefined ? value.value : 0) && c.active.toString() == "true");
                         if (this.state.shipmentTypeIds.length == 1 && (this.state.shipmentTypeIds).includes(1)) {
                             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false");
@@ -435,7 +810,7 @@ export default class ShipmentDetails extends React.Component {
                             shipmentListUnFiltered: shipmentListUnFiltered,
                             shipmentList: shipmentList,
                             showShipments: 1,
-                            programPlanningUnitForPrice:programPlanningUnit
+                            programPlanningUnitForPrice: programPlanningUnit
                         })
                         this.refs.shipmentChild.showShipmentData();
                     }.bind(this)
@@ -504,6 +879,12 @@ export default class ShipmentDetails extends React.Component {
         }
     }
 
+    openBatchPopUp() {
+        this.setState({
+            batchInfo: true,
+        });
+    }
+
     actionCanceled() {
         var cont = false;
         if (this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1) {
@@ -558,95 +939,98 @@ export default class ShipmentDetails extends React.Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
                 <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h5>
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     {checkOnline === 'Online' &&
                         <div className="Card-header-addicon problemListMarginTop">
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                            <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
+                                        }
+                                        {/* <a href={`${API_URL}/file/shipmentDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
                                         {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>
                             </div>
                         </div>
                     }
-                    <CardBody className="pb-lg-5 pt-lg-2">
+                    <CardBody className="pb-lg-5 pt-lg-0">
                         <Formik
                             render={
                                 ({
                                 }) => (
-                                        <Form name='simpleForm'>
-                                            <div className=" pl-0">
-                                                <div className="row">
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
+                                    <Form name='simpleForm'>
+                                        <div className=" pl-0">
+                                            <div className="row">
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
 
-                                                            <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange}
-                                                                value={rangeValue}
-                                                                lang={pickerLang}
-                                                                //theme="light"
-                                                                onChange={this.handleRangeChange}
-                                                                onDismiss={this.handleRangeDissmis}
-                                                            >
-                                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                            </Picker>
-                                                        </div>
+                                                        <Picker
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            ref={this.pickRange}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
 
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="programSelect"
-                                                                id="programSelect"
-                                                                bsSize="sm"
-                                                                options={this.state.programList}
-                                                                value={this.state.programSelect}
-                                                                onChange={(e) => { this.getPlanningUnitList(e); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="planningUnit"
-                                                                id="planningUnit"
-                                                                bsSize="sm"
-                                                                options={this.state.planningUnitList}
-                                                                value={this.state.planningUnit}
-                                                                onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-3 ">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.shipmentType')}</Label>
-                                                        <div className="controls ">
-                                                            <Select
-                                                                name="shipmentType"
-                                                                id="shipmentType"
-                                                                bsSize="sm"
-                                                                multi
-                                                                options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
-                                                                value={this.state.shipmentType}
-                                                                onChange={(e) => { this.updateDataType(e); }}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    {/* {this.state.shipmentChangedFlag == 1 && <FormGroup check inline>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="programSelect"
+                                                            id="programSelect"
+                                                            bsSize="sm"
+                                                            options={this.state.programList}
+                                                            value={this.state.programSelect}
+                                                            onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="planningUnit"
+                                                            id="planningUnit"
+                                                            bsSize="sm"
+                                                            options={this.state.planningUnitList}
+                                                            value={this.state.planningUnit}
+                                                            onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3 ">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.shipmentType')}</Label>
+                                                    <div className="controls ">
+                                                        <Select
+                                                            name="shipmentType"
+                                                            id="shipmentType"
+                                                            bsSize="sm"
+                                                            multi
+                                                            options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
+                                                            value={this.state.shipmentType}
+                                                            onChange={(e) => { this.updateDataType(e); }}
+                                                        />
+                                                    </div>
+                                                </FormGroup>
+                                                {/* {this.state.shipmentChangedFlag == 1 && <FormGroup check inline>
                                                         <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.shipmentChild.showOnlyErrors} />
                                                         <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
                                                     </FormGroup>} */}
-                                                    <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
-                                                    <input type="hidden" id="programId" name="programId" value={this.state.programId} />
-                                                </div>
+                                                <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
+                                                <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
-                                        </Form>
-                                    )} />
+                                        </div>
+                                    </Form>
+                                )} />
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
@@ -654,10 +1038,21 @@ export default class ShipmentDetails extends React.Component {
                             </ul>
                         </div>
 
-                        <div className="shipmentconsumptionSearchMarginTop">
-                            <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} />
-                            <div className="table-responsive" id="shipmentsDetailsTableDiv">
+                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
+                            <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
                                 <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -699,7 +1094,7 @@ export default class ShipmentDetails extends React.Component {
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             <Button id="shipmentDetailsPopCancelButton" size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {<Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
+                            {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
@@ -713,17 +1108,7 @@ export default class ShipmentDetails extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Shipments modal */}
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

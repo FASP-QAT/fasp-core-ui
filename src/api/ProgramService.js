@@ -169,8 +169,18 @@ class ProgramService {
         );
     }
 
+    getPlanningUnitByProgramTracerCategory(programId, json) {
+        return axios.post(`${API_URL}/api/program/${programId}/tracerCategory/planningUnit`, json, {}
+        );
+    }
+
     getLatestVersionForProgram(programId) {
         return axios.get(`${API_URL}/api/programData/getLatestVersionForProgram/${programId}`, {}
+        );
+    }
+
+    getLastModifiedDateForProgram(programId, versionId) {
+        return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
         );
     }
 

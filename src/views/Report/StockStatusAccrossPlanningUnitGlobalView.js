@@ -190,8 +190,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       selData: [],
       tracerCategories: [],
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       loading: true,
       programLstFiltered: []
 
@@ -1172,7 +1172,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.StockStatusAccrossPlanningUnitGlobalView')}</strong> */}
             {this.state.data.length > 0 && <div className="card-header-actions">
@@ -1346,7 +1346,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                   <div className="row">
 
                   </div>
-                  <div className="row">
+                  <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="col-md-12">
                       <div className="table-responsive ">
 
@@ -1388,6 +1388,18 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
                     </div>
                   </div>
+                  <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                      <div class="align-items-center">
+                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                        <div class="spinner-border blue ml-4" role="status">
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </Col>
 
@@ -1395,17 +1407,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
 
       </div>
     );

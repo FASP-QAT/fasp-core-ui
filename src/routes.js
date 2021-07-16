@@ -2,7 +2,7 @@ import React from 'react';
 import i18n from './i18n';
 
 const BasicPrimitiveTreeDemo = React.lazy(() => import('./views/BasicPrimitiveTree/BasicPrimitiveTreeDemo'));
-const DragNDrop= React.lazy(() => import('../../Samples/DragNDropTwo'));
+const DragNDrop = React.lazy(() => import('../../Samples/DragNDropTwo'));
 
 const AddInventory = React.lazy(() => import('./views/Inventory/AddInventory'));
 const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComponent'));
@@ -241,21 +241,23 @@ const DemographicScenarioOne = React.lazy(() => import('../../Samples/Demographi
 const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
 const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
 
+// Forecasting module
+const LoadDatasetComponent = React.lazy(() => import('./views/Dataset/LoadDatasetComponent'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  
+
   { path: '/myTree', name: i18n.t('static.dashboard.consumptiondetails'), component: BasicPrimitiveTreeDemo },
   { path: '/myTree2', name: i18n.t('static.dashboard.consumptiondetails'), component: DragNDrop },
-  { path: '/morbidity/scenarioOne',name:'Scenario One', component: MorbidityScenarioOne },
-  { path: '/morbidity/scenarioTwo',name:'Morbidity Scenario Two', component: MorbidityScenarioTwo },
-  { path: '/morbidity/scenarioThree',name:'Morbidity Scenario Three', component: MorbidityScenarioThree },
+  { path: '/morbidity/scenarioOne', name: 'Scenario One', component: MorbidityScenarioOne },
+  { path: '/morbidity/scenarioTwo', name: 'Morbidity Scenario Two', component: MorbidityScenarioTwo },
+  { path: '/morbidity/scenarioThree', name: 'Morbidity Scenario Three', component: MorbidityScenarioThree },
 
-  { path: '/demographic/scenarioOne',name:'Demographic Scenario One', component: DemographicScenarioOne },
-  { path: '/demographic/scenarioTwo',name:'Demographic Scenario Two', component: DemographicScenarioTwo },
-  { path: '/demographic/scenarioThree',name:'Demographic Scenario Three', component: DemographicScenarioThree },
+  { path: '/demographic/scenarioOne', name: 'Demographic Scenario One', component: DemographicScenarioOne },
+  { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
+  { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
 
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: i18n.t('static.dashboard.shipmentdetails'), component: ShipmentList },
@@ -349,7 +351,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  
+
   { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
@@ -597,5 +599,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
 ];
 export default routes;

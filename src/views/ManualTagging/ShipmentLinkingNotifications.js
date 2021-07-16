@@ -5,7 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 import i18n from '../../i18n';
 import ProgramService from '../../api/ProgramService.js';
@@ -24,12 +24,14 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 
 
 
-const entityname = i18n.t('static.dashboard.manualTagging');
+const entityname = i18n.t('static.mt.shipmentLinkingNotification');
 export default class ShipmentLinkingNotifications extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            batchDetails: [],
+            notificationSummary: [],
             color: '',
             message: '',
             loading: true,
@@ -58,8 +60,35 @@ export default class ShipmentLinkingNotifications extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.filterData1 = this.filterData1.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
+        // this.buildARTMISHistory = this.buildARTMISHistory.bind(this);
         this.getPlanningUnitArray = this.getPlanningUnitArray.bind(this);
+        this.getNotificationSummary = this.getNotificationSummary.bind(this);
+        this.buildNotificationSummaryJExcel = this.buildNotificationSummaryJExcel.bind(this);
+        this.viewBatchData = this.viewBatchData.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
+    }
+
+    viewBatchData(event, row) {
+        console.log("event---", event);
+        console.log("row---", row);
+        console.log("row length---", row.shipmentList.length);
+        if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
+            var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
+        
+            batchDetails.sort(function (a, b) {
+                var dateA = new Date(a.expiryDate).getTime();
+                var dateB = new Date(b.expiryDate).getTime();
+                return dateA > dateB ? 1 : -1;
+            })
+            this.setState({
+                batchDetails
+            });
+        } else {
+            this.setState({
+                batchDetails: []
+            });
+        }
+        // batchDetails
     }
 
     getPlanningUnitArray() {
@@ -79,17 +108,24 @@ export default class ShipmentLinkingNotifications extends Component {
 
     displayButton() {
         var validation = this.checkValidation();
-        if (validation == true) {
-            var tableJson = this.el.getJson(null, false);
-            let count = 0;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
-                    count++;
-                }
+        var tableJson = this.el.getJson(null, false);
+        let count = 0;
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (parseInt(map1.get("13")) === 1 && map1.get("0")) {
+                count++;
             }
+        }
+        console.log("count---", count);
+        console.log("validation---", validation)
+        if (validation == true) {
+
             this.setState({
                 displaySubmitButton: (count > 0 ? true : false)
+            })
+        } else {
+            this.setState({
+                displaySubmitButton: false
             })
         }
     }
@@ -101,13 +137,13 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.actionCancelled'))
     }
     updateDetails() {
         document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
 
-        this.setState({ loading1: true })
+        this.setState({ loading: true })
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
@@ -126,7 +162,8 @@ export default class ShipmentLinkingNotifications extends Component {
                             id: parseInt(map1.get("17"))
                         },
                         shipmentQty: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        programId: programId
+                        programId: programId,
+                        shipmentId: (map1.get("3") === '' ? null : map1.get("3"))
                     }
                     changedmtList.push(json);
                 }
@@ -134,7 +171,7 @@ export default class ShipmentLinkingNotifications extends Component {
             console.log("FINAL SUBMIT changedmtList---", changedmtList);
             ManualTaggingService.updateNotification(changedmtList)
                 .then(response => {
-                    document.getElementById('div2').style.display = 'block';
+                    // document.getElementById('div2').style.display = 'block';
                     this.setState({
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: 'green',
@@ -145,7 +182,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         () => {
                             this.hideSecondComponent();
                             this.filterData(this.state.planningUnitIds);
-
+                            this.getNotificationSummary();
                         })
 
                 }).catch(
@@ -156,6 +193,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                 color: 'red',
                                 loading: false,
                                 loading1: false
+                            }, () => {
+                                this.hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -174,6 +213,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
@@ -182,6 +223,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
@@ -190,6 +233,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                         loading: false,
                                         loading1: false,
                                         color: 'red',
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }
@@ -212,23 +257,33 @@ export default class ShipmentLinkingNotifications extends Component {
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 var value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 value = value.replace(/,/g, "");
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
+                var notificationType = this.el.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (notificationType == 2) {
+                    if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        console.log("------------------1----------------------")
                         valid = false;
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
+                        // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                        if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            console.log("------------------2----------------------")
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                            console.log("------------------3----------------------")
+                        }
 
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    console.log("------------------4----------------------")
                 }
 
             }
@@ -247,20 +302,24 @@ export default class ShipmentLinkingNotifications extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                console.log("------------------5----------------------")
             } else {
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    console.log("------------------6----------------------")
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    this.el.setValueFromCoords(11, y, this.addCommas(qty * (value != null && value != "" ? value : 1)), true);
+                    console.log("------------------7----------------------")
+
                 }
 
             }
+            var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            this.el.setValueFromCoords(11, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
         }
 
         // if (x == 9) {
@@ -273,8 +332,13 @@ export default class ShipmentLinkingNotifications extends Component {
             if (x == 0) {
                 value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 if (value === "false") {
+                    this.el.setValueFromCoords(10, y, "", true);
+                    this.el.setValueFromCoords(12, y, "", true);
+                    var qty = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    this.el.setValueFromCoords(11, y, Math.round(qty), true);
                     this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
                     this.el.setComments(("K").concat(parseInt(y) + 1), "");
+                    console.log("------------------8----------------------")
                 }
             }
         }
@@ -288,20 +352,27 @@ export default class ShipmentLinkingNotifications extends Component {
         this.el.setValueFromCoords(13, y, 1, true);
     }.bind(this);
 
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[3]));
+            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        }
+        elInstance.setValueFromCoords(13, y, 1, true);
+    }
+
+
     onPaste(instance, data) {
-        // var z = -1;
-        // for (var i = 0; i < data.length; i++) {
-        //     if (z != data[i].y) {
-        //         var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
-        //         if (index == "" || index == null || index == undefined) {
-        //             (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.realmCountry.realm.label.label_en + "-" + this.state.realmCountry.country.label.label_en, true);
-        //             (instance.jexcel).setValueFromCoords(5, data[i].y, this.props.match.params.realmCountryId, true);
-        //             (instance.jexcel).setValueFromCoords(6, data[i].y, 0, true);
-        //             (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
-        //             z = data[i].y;
-        //         }
-        //     }
-        // }
+        if (data.length == 1 && Object.keys(data[0])[2] == "value") {
+            (instance.jexcel).setValueFromCoords(10, data[0].y, parseFloat(data[0].value), true);
+        }
+        else {
+            for (var i = 0; i < data.length; i++) {
+                (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+            }
+        }
     }
 
     programChange(event) {
@@ -331,9 +402,14 @@ export default class ShipmentLinkingNotifications extends Component {
 
     }
 
-
+    componentDidMount() {
+        this.hideFirstComponent();
+        this.getProgramList();
+        this.getNotificationSummary();
+    }
 
     filterData = (planningUnitIds) => {
+        document.getElementById('div2').style.display = 'block';
         var programId = this.state.programId;
         var addressed = document.getElementById("addressed").value;
 
@@ -371,7 +447,10 @@ export default class ShipmentLinkingNotifications extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -387,19 +466,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
+                                            color: 'red',
                                             loading: false
+                                        }, () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                 }
@@ -494,7 +582,10 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
+                            color: 'red',
                             loading: false
+                        }, () => {
+                            this.hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -510,19 +601,28 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
+                                    color: 'red',
                                     loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                         }
@@ -532,104 +632,104 @@ export default class ShipmentLinkingNotifications extends Component {
     }
 
 
-    buildARTMISHistory() {
-        let artmisHistoryList = this.state.artmisHistory;
-        let artmisHistoryArray = [];
-        let count = 0;
-        this.el = jexcel(document.getElementById("tableDiv1"), '');
-        this.el.destroy();
-        var json = [];
-        var data = artmisHistoryArray;
+    // buildARTMISHistory() {
+    //     let artmisHistoryList = this.state.artmisHistory;
+    //     let artmisHistoryArray = [];
+    //     let count = 0;
+    //     this.el = jexcel(document.getElementById("tableDiv2"), '');
+    //     this.el.destroy();
+    //     var json = [];
+    //     var data = artmisHistoryArray;
 
-        var options = {
-            data: data,
-            columnDrag: true,
-            colWidths: [40, 30, 40, 45, 30, 30, 35, 25, 35],
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
+    //     var options = {
+    //         data: data,
+    //         columnDrag: true,
+    //         colWidths: [40, 30, 40, 45, 30, 30, 35, 25, 35],
+    //         colHeaderClasses: ["Reqasterisk"],
+    //         columns: [
 
-                {
-                    title: i18n.t('static.mt.roNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.roPrimeLineNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.orderNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.mt.primeLineNo'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
+    //             {
+    //                 title: i18n.t('static.mt.roNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.roPrimeLineNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.orderNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.mt.primeLineNo'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
 
-                    title: i18n.t('static.manualTagging.erpPlanningUnit'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.manualTagging.erpStatus'),
-                    type: 'text',
-                    readOnly: true
-                },
+    //                 title: i18n.t('static.manualTagging.erpPlanningUnit'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: i18n.t('static.manualTagging.erpStatus'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
 
-                {
-                    title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: "Received On",
-                    type: 'text',
-                    readOnly: true
-                },
-            ],
-            editable: true,
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loadedERP,
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
-        };
+    //             {
+    //                 title: i18n.t('static.supplyPlan.shipmentQty'),
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //             {
+    //                 title: "Received On",
+    //                 type: 'text',
+    //                 readOnly: true
+    //             },
+    //         ],
+    //         editable: true,
+    //         text: {
+    //             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+    //             show: '',
+    //             entries: '',
+    //         },
+    //         onload: this.loadedERP,
+    //         pagination: localStorage.getItem("sesRecordCount"),
+    //         search: true,
+    //         columnSorting: true,
+    //         tableOverflow: true,
+    //         wordWrap: true,
+    //         allowInsertColumn: false,
+    //         allowManualInsertColumn: false,
+    //         allowDeleteRow: false,
+    //         // onselection: this.selected,
+    //         copyCompatibility: true,
+    //         allowExport: false,
+    //         paginationOptions: JEXCEL_PAGINATION_OPTION,
+    //         position: 'top',
+    //         filters: true,
+    //         license: JEXCEL_PRO_KEY,
+    //         contextMenu: function (obj, x, y, e) {
+    //             return [];
+    //         }.bind(this),
+    //     };
 
 
-        var instance = jexcel(document.getElementById("tableDiv1"), options);
-        this.el = instance;
-        this.setState({
-            instance, loading: false
-        })
-    }
+    //     var instance = jexcel(document.getElementById("tableDiv2"), options);
+    //     this.el = instance;
+    //     this.setState({
+    //         instance, loading: false
+    //     })
+    // }
 
     buildJExcel() {
         let manualTaggingList = this.state.outputList;
@@ -646,21 +746,22 @@ export default class ShipmentLinkingNotifications extends Component {
             data[4] = manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo + " | " + manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo;
             data[5] = getLabelText(manualTaggingList[j].erpPlanningUnit.label, this.state.lang)
             data[6] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-            data[7] = this.formatDate(manualTaggingList[j].expectedDeliveryDate);
+            data[7] = manualTaggingList[j].expectedDeliveryDate;
             // data[7] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
             data[8] = manualTaggingList[j].erpStatus
-            data[9] = this.addCommas(Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty));
+            console.log("conversion factor---", manualTaggingList[j].conversionFactor);
+            data[9] = Math.round(manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty);
             if ((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2)) {
-                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? this.addCommas(manualTaggingList[j].conversionFactor) : 1);
+                data[10] = (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].conversionFactor) : 1);
             } else {
                 data[10] = ""
             }
-            data[11] = this.addCommas(Math.round(manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
+            data[11] = Math.round((manualTaggingList[j].addressed && manualTaggingList[j].notificationType.id == 2 ? (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty) * (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? manualTaggingList[j].conversionFactor : 1) : (manualTaggingList[j].conversionFactor != null && manualTaggingList[j].conversionFactor != "" ? (manualTaggingList[j].shipmentQty / manualTaggingList[j].conversionFactor) : manualTaggingList[j].shipmentQty)));
             data[12] = manualTaggingList[j].notes
             data[13] = 0
             data[14] = manualTaggingList[j].orderNo
             data[15] = manualTaggingList[j].primeLineNo
-            
+
             data[16] = manualTaggingList[j].notificationId
             data[17] = manualTaggingList[j].notificationType.id;
 
@@ -691,12 +792,14 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 {
                     title: i18n.t('static.mt.parentShipmentId'),
-                    type: 'text',
+                    type: 'numeric',
+                    // mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.mt.childShipmentId'),
-                    type: 'text',
+                    type: 'numeric',
+                    // mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -716,8 +819,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 },
                 {
                     title: i18n.t('static.manualTagging.currentEstimetedDeliveryDate'),
-                    type: 'text',
-                    readOnly: true
+                    type: 'calendar',
+                    readOnly: true,
+                    options: { format: JEXCEL_DATE_FORMAT },
                 },
                 {
                     title: i18n.t('static.manualTagging.erpStatus'),
@@ -727,17 +831,24 @@ export default class ShipmentLinkingNotifications extends Component {
 
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.manualTagging.conversionFactor'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.0000',
+                    decimal: '.',
+                    textEditor: true,
+                    disabledMaskOnEdition: true
+
                 },
 
                 {
                     title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##', decimal: '.',
                     readOnly: true
                 },
 
@@ -781,7 +892,7 @@ export default class ShipmentLinkingNotifications extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -808,9 +919,14 @@ export default class ShipmentLinkingNotifications extends Component {
 
                         cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
-
-                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
+                        if (rowData[0]) {
+                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.remove('readonly');
+                        }
+                        else {
+                            cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                            cell.classList.add('readonly');
+                        }
 
                         cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
@@ -824,8 +940,9 @@ export default class ShipmentLinkingNotifications extends Component {
             onfilter: function (el) {
                 el.jexcel.updateTable();
             },
-            oneditionend: this.onedit,
+            oneditionend: this.oneditionend,
             copyCompatibility: true,
+            onpaste: this.onPaste,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -836,20 +953,39 @@ export default class ShipmentLinkingNotifications extends Component {
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            // title: i18n.t('static.dashboard.linkShipment'),
                             title: i18n.t('static.mt.viewArtmisHistory'),
                             onclick: function () {
-                                var outputListAfterSearch = [];
+                                console.log("my order no.---", this.el.getValueFromCoords(14, y));
                                 let orderNo = this.el.getValueFromCoords(14, y);
                                 let primeLineNo = this.el.getValueFromCoords(15, y);
-                                // this.buildARTMISHistory();
-                                // this.toggleLarge();
                                 ManualTaggingService.getARTMISHistory(orderNo, primeLineNo)
                                     .then(response => {
+                                        console.log("DATA---->1", response.data);
+
+                                        let responseData = response.data.sort(function (a, b) {
+                                            var dateA = new Date(a.receivedOn).getTime();
+                                            var dateB = new Date(b.receivedOn).getTime();
+                                            return dateA < dateB ? 1 : -1;
+                                        })
+                                        console.log("history---", response.data);
+                                        responseData = responseData.filter((responseData, index, self) =>
+                                            index === self.findIndex((t) => (
+                                                t.procurementAgentOrderNo === responseData.procurementAgentOrderNo && t.erpPlanningUnit.id === responseData.erpPlanningUnit.id && t.calculatedExpectedDeliveryDate === responseData.calculatedExpectedDeliveryDate && t.erpStatus === responseData.erpStatus && t.shipmentQty === responseData.shipmentQty && t.totalCost === responseData.totalCost
+                                                && (t.shipmentList.length > 1 || (t.shipmentList.length == 1 && t.shipmentList[0].batchNo != null)) == (responseData.shipmentList.length > 1 || (responseData.shipmentList.length == 1 && responseData.shipmentList[0].batchNo != null))
+                                            ))
+                                        )
+                                        console.log("history-2--", responseData);
+
+                                        responseData = responseData.sort(function (a, b) {
+                                            var dateA = a.erpOrderId;
+                                            var dateB = b.erpOrderId;
+                                            return dateA < dateB ? 1 : -1;
+                                        })
+                                        console.log("DATA---->3", responseData);
+
                                         this.setState({
-                                            artmisHistory: response.data
+                                            artmisHistory: responseData
                                         }, () => {
-                                            // this.buildARTMISHistory();
                                             this.toggleLarge();
                                         });
                                     }).catch(
@@ -857,7 +993,10 @@ export default class ShipmentLinkingNotifications extends Component {
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
+                                                    color: 'red',
                                                     loading: false
+                                                }, () => {
+                                                    this.hideSecondComponent();
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -873,19 +1012,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
+                                                            color: 'red',
                                                             loading: false
+                                                        }, () => {
+                                                            this.hideSecondComponent();
                                                         });
                                                         break;
                                                 }
@@ -908,21 +1056,244 @@ export default class ShipmentLinkingNotifications extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+    buildNotificationSummaryJExcel() {
+        let notificationSummaryList = this.state.notificationSummary;
+        let notificationSummaryArray = [];
+        let count = 0;
+
+        for (var j = 0; j < notificationSummaryList.length; j++) {
+            data = [];
+
+            data[0] = getLabelText(notificationSummaryList[j].label);
+            data[1] = notificationSummaryList[j].notificationCount;
+            data[2] = notificationSummaryList[j].programId;
+
+            notificationSummaryArray[count] = data;
+            count++;
+        }
+
+        this.el = jexcel(document.getElementById("tableDiv1"), '');
+        this.el.destroy();
+        var json = [];
+        var data = notificationSummaryArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [10, 10],
+            columns: [
+
+                {
+                    title: i18n.t('static.program.programName'),
+                    type: 'text',
+                    readOnly: true
+                },
+
+                {
+                    title: i18n.t('static.mt.notificationCount'),
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
+                    readOnly: true
+                },
+                {
+                    title: "programId",
+                    type: 'hidden',
+                }
+            ],
+            editable: false,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded1,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            // onchange: this.changed,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        };
+
+
+        var instance = jexcel(document.getElementById("tableDiv1"), options);
+        this.el = instance;
+        this.setState({
+            instance, loading: false
+        })
+    }
+    selected = function (instance, x1, y1, x2, y2, origin) {
+        var instance = (instance).jexcel;
+        console.log("RESP------>x1", x1);
+        console.log("RESP------>y1", y1);
+        console.log("RESP------>x2", x2);
+        console.log("RESP------>y2", y2);
+        console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
+
+
+        // if (y1 == 0 && y2 != 0) {
+        //     console.log("RESP------>Header");
+        // } else {
+        //     console.log("RESP------>Not");
+        //     this.setState({
+        //         programId: instance.getValueFromCoords(2, y1)
+        //     }, () => {
+        //         document.getElementById("addressed").value = 0;
+        //         this.getPlanningUnitList();
+        //     })
+        // }
+        let typeofColumn = instance.selectedHeader;
+        if (typeof typeofColumn === 'string') {
+            console.log("RESP------>Header");
+        } else {
+            console.log("RESP------>not Header");
+            this.setState({
+                programId: instance.getValueFromCoords(2, y1)
+            }, () => {
+                document.getElementById("addressed").value = 0;
+                this.getPlanningUnitList();
+            })
+        }
+
+        // if ((x == 0 && value != 0) || (y == 0)) {
+        // // console.log("HEADER SELECTION--------------------------");
+        // } else {
+        // var instance = (instance).jexcel;
+        // console.log("selected instance---", instance)
+        // console.log("selected cell---", cell)
+        // console.log("selected x---", x)
+        // console.log("selected y---", y)
+        // console.log("selected value---", value)
+        // // console.log("selected program---", this.el);
+        // console.log("selected program id---", instance.getValueFromCoords(2, x))
+        // if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
+        // this.setState({
+        // programId: instance.getValueFromCoords(2, x)
+        // }, () => {
+        // this.getPlanningUnitList();
+        // })
+        // }
+        // }
+
+    }.bind(this)
+
+    loaded1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+        console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        var asterisk = document.getElementsByClassName("resizable")[2];
+
         var tr = asterisk.firstChild;
         tr.children[10].classList.add('AsteriskTheadtrTd');
     }
 
-    componentDidMount() {
-        this.hideFirstComponent();
-        this.getProgramList();
+
+
+
+    getNotificationSummary() {
+        ManualTaggingService.getNotificationSummary()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("notification summary---", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        notificationSummary: listArray,
+                        loading: false
+                    }, () => {
+                        this.buildNotificationSummaryJExcel();
+                    })
+
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode,
+                        color: 'red',
+                        loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            color: 'red',
+                            loading: false
+                        }, () => {
+                            this.hideSecondComponent();
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: 'red',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: 'red',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    color: 'red',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     toggleLarge() {
         this.setState({
             manualTag: !this.state.manualTag,
+            batchDetails: []
         })
     }
 
@@ -959,7 +1330,10 @@ export default class ShipmentLinkingNotifications extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
+                                color: 'red',
                                 loading: false
+                            }, () => {
+                                this.hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -975,19 +1349,28 @@ export default class ShipmentLinkingNotifications extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
+                                        color: 'red',
                                         loading: false
+                                    }, () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }
@@ -1012,11 +1395,23 @@ export default class ShipmentLinkingNotifications extends Component {
             // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
             var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP}`);
+            return dateMonthAsWord.toUpperCase();
+        } else {
+            return "";
+        }
+    }
+
+    formatExpiryDate(cell, row) {
+        if (cell != null && cell != "") {
+            // var modifiedDate = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var date = moment(cell).format(`${STRING_TO_DATE_FORMAT}`);
+            var dateMonthAsWord = moment(date).format(`${DATE_FORMAT_CAP_WITHOUT_DATE}`);
             return dateMonthAsWord;
         } else {
             return "";
         }
     }
+    // DATE_FORMAT_CAP_WITHOUT_DATE
 
     addCommas(cell, row) {
         cell += '';
@@ -1047,38 +1442,26 @@ export default class ShipmentLinkingNotifications extends Component {
             </span>
         );
         const columns1 = [
+            {
+                dataField: 'erpOrderId',
+                text: i18n.t('static.mt.viewBatchDetails'),
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    // return (<i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i>)
+                    return (
+                        ((row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) ? <i className="fa fa-eye eyeIconFontSize" title={i18n.t('static.mt.viewBatchDetails')} onClick={(event) => this.viewBatchData(event, row)} ></i> : "")
+                    )
+                }
+            },
 
             {
-                dataField: 'roNo',
-                text: i18n.t('static.manualTagging.RONO'),
+                dataField: 'procurementAgentOrderNo',
+                text: i18n.t('static.manualTagging.procOrderNo'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
-            {
-                dataField: 'roPrimeLineNo',
-                text: i18n.t('static.manualTagging.ROPrimeline'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-            {
-                dataField: 'orderNo',
-                text: i18n.t('static.manualTagging.erpShipmentNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'primeLineNo',
-                text: i18n.t('static.manualTagging.erpShipmentLineNo'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                // formatter: this.formatLabel
-            },
-
             {
                 dataField: 'erpPlanningUnit',
                 text: "ERP Planning Unit",
@@ -1089,7 +1472,7 @@ export default class ShipmentLinkingNotifications extends Component {
             },
 
             {
-                dataField: 'expectedDeliveryDate',
+                dataField: 'calculatedExpectedDeliveryDate',
                 text: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                 sort: true,
                 align: 'center',
@@ -1107,6 +1490,15 @@ export default class ShipmentLinkingNotifications extends Component {
                 dataField: 'shipmentQty',
                 // text: i18n.t('static.shipment.qty'),
                 text: i18n.t('static.manualTagging.erpShipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            },
+            {
+                dataField: 'totalCost',
+                // text: i18n.t('static.shipment.qty'),
+                text: i18n.t('static.shipment.totalCost'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1149,6 +1541,35 @@ export default class ShipmentLinkingNotifications extends Component {
             }]
         }
 
+        const columns2 = [
+            {
+                dataField: 'batchNo',
+                text: i18n.t('static.supplyPlan.batchId'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'expiryDate',
+                text: i18n.t('static.supplyPlan.expiryDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatExpiryDate
+            },
+
+            {
+                dataField: 'batchQty',
+                text: i18n.t('static.supplyPlan.shipmentQty'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.addCommas
+            }
+
+        ];
+
+
 
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
@@ -1167,13 +1588,15 @@ export default class ShipmentLinkingNotifications extends Component {
 
             }, this);
 
+        planningUnitMultiList = Array.from(planningUnitMultiList);
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <CardBody className="pb-lg-5">
                         {/* Consumption modal */}
                         <Modal isOpen={this.state.manualTag}
@@ -1181,11 +1604,12 @@ export default class ShipmentLinkingNotifications extends Component {
                             {/* <div style={{ display: this.state.loading1 ? "none" : "block" }}> */}
                             <div>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                    <strong>ERP Order History</strong>
+                                    <strong>{i18n.t('static.mt.erpHistoryTitle')}</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
                                     <div>
+                                        {/* <div> */}
 
                                         <ToolkitProvider
                                             keyField="optList"
@@ -1197,12 +1621,12 @@ export default class ShipmentLinkingNotifications extends Component {
                                         >
                                             {
                                                 props => (
-                                                    <div className="TableCust FortablewidthMannualtaggingtable2 ">
+                                                    <div className="TableCust FortablewidthMannualtaggingtable3 reactTableNotification ">
                                                         {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                                     <SearchBar {...props.searchProps} />
                                                     <ClearSearchButton {...props.searchProps} />
                                                 </div> */}
-                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                        <BootstrapTable striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
                                                             }}
@@ -1212,8 +1636,38 @@ export default class ShipmentLinkingNotifications extends Component {
                                                 )
                                             }
                                         </ToolkitProvider>
+                                    </div>
+                                    <br />
 
-                                    </div><br />
+                                    {this.state.batchDetails.length > 0 &&
+                                        <div>
+                                            <ToolkitProvider
+                                                keyField="optList"
+                                                data={this.state.batchDetails}
+                                                columns={columns2}
+                                                search={{ searchFormatted: true }}
+                                                hover
+                                                filter={filterFactory()}
+                                            >
+                                                {
+                                                    props => (
+                                                        <div className="TableCust ShipmentNotificationtable">
+                                                            {/* <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                    <SearchBar {...props.searchProps} />
+                                                    <ClearSearchButton {...props.searchProps} />
+                                                </div> */}
+                                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                                // pagination={paginationFactory(options)}
+                                                                rowEvents={{
+                                                                }}
+                                                                {...props.baseProps}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            </ToolkitProvider></div>}
+
+                                    <br />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleLarge()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -1232,6 +1686,10 @@ export default class ShipmentLinkingNotifications extends Component {
                             </div> */}
                         </Modal>
                         {/* Consumption modal */}
+                        <div className="col-md-12 pl-0">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable">
+                            </div>
+                        </div>
                         <div className="col-md-12 pl-0">
                             <Row>
 
@@ -1293,12 +1751,25 @@ export default class ShipmentLinkingNotifications extends Component {
                                     </div>
                                 </FormGroup>
                             </Row>
-                            <div className="ReportSearchMarginTop">
+                            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                                 <div id="tableDiv" className="RemoveStriped">
                                 </div>
                                 {/* <div id="tableDiv1" className="jexcelremoveReadonlybackground">
                                         </div> */}
                             </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                         </div>
 
@@ -1308,22 +1779,12 @@ export default class ShipmentLinkingNotifications extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                &nbsp;
-                                {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            &nbsp;
+                            {this.state.displaySubmitButton && <Button type="submit" size="md" color="success" onClick={this.updateDetails} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                         </FormGroup>
                     </CardFooter>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

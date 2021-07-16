@@ -67,9 +67,9 @@ class ProcurementAgentExport extends Component {
             fundingSourceLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: ''
@@ -1226,12 +1226,29 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
+                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == planningUnitFilter[j].procurementAgent.id);
+                                        if (procurementAgent.length > 0) {
+                                            var simplePAObject = {
+                                                id: procurementAgent[0].procurementAgentId,
+                                                label: procurementAgent[0].label,
+                                                code: procurementAgent[0].procurementAgentCode
+                                            }
+                                        }
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[j].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
                                         let json = {
                                             "active": true,
                                             "shipmentId": planningUnitFilter[j].shipmentId,
-                                            "procurementAgent": planningUnitFilter[j].procurementAgent,
-                                            "fundingSource": planningUnitFilter[j].fundingSource,
-                                            "planningUnit": planningUnitFilter[j].planningUnit,
+                                            "procurementAgent": procurementAgent.length > 0 ? simplePAObject : planningUnitFilter[j].procurementAgent,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
@@ -1533,11 +1550,20 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
+                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[j].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
                                         let json = {
                                             "active": true,
                                             "shipmentId": planningUnitFilter[j].shipmentId,
-                                            "fundingSource": planningUnitFilter[j].fundingSource,
-                                            "planningUnit": planningUnitFilter[j].planningUnit,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[j].fundingSource,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                             "qty": planningUnitFilter[j].shipmentQty,
                                             "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                             "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
@@ -1831,10 +1857,11 @@ class ProcurementAgentExport extends Component {
                                     } else {
                                         freight = seaFreight;
                                     }
+                                    var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
                                     let json = {
                                         "active": true,
                                         "shipmentId": planningUnitFilter[j].shipmentId,
-                                        "planningUnit": planningUnitFilter[j].planningUnit,
+                                        "planningUnit": planningUnit.length > 0 ? planningUnit[0].planningUnit : planningUnitFilter[j].planningUnit,
                                         "qty": planningUnitFilter[j].shipmentQty,
                                         "productCost": planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd,
                                         "freightCost": planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd,
@@ -2479,7 +2506,7 @@ class ProcurementAgentExport extends Component {
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <SupplyPlanFormulas ref="formulaeChild" />
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
                         {/* <div className="card-header-actions">
@@ -2685,23 +2712,23 @@ class ProcurementAgentExport extends Component {
 
                             </div>
                         </div>
-                        <div className="ReportSearchMarginTop">
+                        <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

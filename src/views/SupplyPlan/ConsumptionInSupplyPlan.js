@@ -165,6 +165,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     realmCountryPlanningUnitList: realmCountryPlanningUnitList
+                }, () => {
+                    this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
                 })
 
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -197,6 +199,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         dataSourceList: dataSourceList
+                    }, () => {
+                        this.props.updateState("dataSourceList", dataSourceList);
                     })
                     if (this.state.consumptionEl != "" && this.state.consumptionEl != undefined) {
                         this.state.consumptionEl.destroy();
@@ -313,8 +317,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
-                            { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100,readOnly:!consumptionEditable },
+                            { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
+                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0 },
                             { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0 },
@@ -744,7 +748,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
         if (x == 0 || x == 10) {
-            var valid = checkValidtion("date", "A", y, rowData[0], elInstance);
+            var valid = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
             if (valid == true) {
                 if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && rowData[10].toString() == "true" && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM")) {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
@@ -783,9 +787,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     positiveValidation("F", y, elInstance)
                 }
-                if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
-                    this.batchDetailsClicked(elInstance, x, y, "", true);
-                }
+                // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
+                //     this.batchDetailsClicked(elInstance, x, y, "", true);
+                // }
             }
         }
 
@@ -840,9 +844,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                 } else {
                     positiveValidation("C", y, elInstance);
-                    if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
-                        this.batchDetailsClicked(elInstance, x, y, "", true);
-                    }
+                    // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "" && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) > 0) {
+                    //     this.batchDetailsClicked(elInstance, x, y, "", true);
+                    // }
                 }
             }
             if (rowData[2] == 2) {
@@ -1185,7 +1189,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         }
 
                         var rowData = elInstance.getRowData(y);
-                        var validation = checkValidtion("date", "A", y, rowData[0], elInstance);
+                        var validation = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
                         console.log("A-------------------->", validation);
                         if (validation == false) {
                             console.log("A--------------------> in if");
@@ -1372,12 +1376,34 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         if (map.get("2") == 2) {
                             actualFlag = false;
                         }
+
+                        let dataSourceId = '';
+                        let dataSourceLabel = '';
+                        if (map.get("3") == "14;15") {
+                            if (map.get("2") == 1) { //actual
+                                console.log("RESP------4 if actual");
+                                dataSourceId = 14;
+                                dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 14)[0].label
+                            } else { //forecast
+                                console.log("RESP------4 else forecast");
+                                dataSourceId = 15;
+                                dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 15)[0].label
+                            }
+                        } else {
+                            console.log("RESP------4 else");
+                            dataSourceId = map.get("3");
+                            dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                        }
+                        console.log("RESP------ dataSourceId", dataSourceId);
+                        console.log("RESP------2 dataSourceLabel", dataSourceLabel);
                         if (parseInt(map.get("12")) != -1) {
                             consumptionDataList[parseInt(map.get("12"))].consumptionDate = moment(map.get("0")).startOf('month').format("YYYY-MM-DD");
                             consumptionDataList[parseInt(map.get("12"))].region.id = map.get("1");
                             consumptionDataList[parseInt(map.get("12"))].region.label = (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label;
-                            consumptionDataList[parseInt(map.get("12"))].dataSource.id = map.get("3");
-                            consumptionDataList[parseInt(map.get("12"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label;
+                            // consumptionDataList[parseInt(map.get("12"))].dataSource.id = map.get("3");
+                            // consumptionDataList[parseInt(map.get("12"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label;
+                            consumptionDataList[parseInt(map.get("12"))].dataSource.id = dataSourceId;
+                            consumptionDataList[parseInt(map.get("12"))].dataSource.label = dataSourceLabel;
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("6");
@@ -1404,8 +1430,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             var consumptionJson = {
                                 consumptionId: 0,
                                 dataSource: {
-                                    id: map.get("3"),
-                                    label: (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                                    // id: map.get("3"),
+                                    // label: (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
+                                    id: dataSourceId,
+                                    label: dataSourceLabel
                                 },
                                 region: {
                                     id: map.get("1"),

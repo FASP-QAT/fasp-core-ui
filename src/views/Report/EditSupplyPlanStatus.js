@@ -172,6 +172,7 @@ class EditSupplyPlanStatus extends Component {
             batchInfoInInventoryPopUp: [],
             problemCategoryList: [],
             ledgerForBatch: [],
+            showBatchSaveButton: false,
 
             program: {
                 programId: this.props.match.params.programId,
@@ -214,7 +215,9 @@ class EditSupplyPlanStatus extends Component {
             editable: false,
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
-            problemReportChanged: 0
+            problemReportChanged: 0,
+            problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
+            problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }]
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
@@ -227,6 +230,7 @@ class EditSupplyPlanStatus extends Component {
         this.toggleTransView = this.toggleTransView.bind(this);
         this.updateState = this.updateState.bind(this);
         this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
+        this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -241,9 +245,37 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
         var elInstance = this.state.problemEl;
-        var rowData = elInstance.getRowData(y);
-        if (x != 22 && rowData[22] != 1) {
-            elInstance.setValueFromCoords(22, y, 1, true);
+        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        let problemList = this.state.problemList;
+        var rowData1 = elInstance.getRowData(y);
+        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.problemReportId == rowData1[0]);
+        // console.log("problemList in changed method ***", problemList);
+        if (x == 10) {
+            if (problemList[0].problemStatus.id != value) {
+                // console.log("in if 1***");
+                elInstance.setValueFromCoords(20, y, true, true);
+            }
+            if (problemList[0].problemStatus.id == value) {
+                elInstance.setValueFromCoords(20, y, false, true);
+                // console.log("in if 2***");
+            }
+        }
+
+        if (x == 10 || x == 20) {
+            var rowData = elInstance.getRowData(y);
+            // console.log("problemStatus on server ***", problemList[0].problemStatus.id);
+            // console.log("current problem status ***", rowData[10]);
+            // console.log("problemStatus on server ***", problemList[0].reviewed);
+            // console.log("current problem status ***", rowData[20]);
+            // console.log("condition1***", problemList[0].problemStatus.id != rowData[10]);
+            // console.log("condition2***", problemList[0].reviewed.toString() != rowData[20].toString());
+            if ((problemList[0].problemStatus.id != rowData[10]) || (problemList[0].reviewed.toString() != rowData[20].toString())) {
+                // console.log("in if***");
+                elInstance.setValueFromCoords(22, y, 1, true);
+            } else {
+                // console.log("in else***");
+                elInstance.setValueFromCoords(22, y, 0, true);
+            }
         }
 
         if (x == 20) {
@@ -533,9 +565,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.consumptionChild != undefined) {
                                 this.refs.consumptionChild.showConsumptionData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -653,9 +685,9 @@ class EditSupplyPlanStatus extends Component {
                         }, () => {
                             if (this.refs.inventoryChild != undefined) {
                                 this.refs.inventoryChild.showInventoryData();
-                            }else{
+                            } else {
                                 this.setState({
-                                    loading:false
+                                    loading: false
                                 })
                             }
                         })
@@ -825,9 +857,9 @@ class EditSupplyPlanStatus extends Component {
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
-                                            }else{
+                                            } else {
                                                 this.setState({
-                                                    loading:false
+                                                    loading: false
                                                 })
                                             }
                                         })
@@ -1192,7 +1224,7 @@ class EditSupplyPlanStatus extends Component {
                         }
                         this.setState({
                             supplyPlanDataForAllTransDate: supplyPlanData,
-                            allShipmentsList:programJson.shipmentList
+                            allShipmentsList: programJson.shipmentList
                         })
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
@@ -1612,7 +1644,7 @@ class EditSupplyPlanStatus extends Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                amcTotalData.push(Math.round(parseFloat(jsonList[0].amc)))
+                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -1630,47 +1662,60 @@ class EditSupplyPlanStatus extends Component {
                                 var sstd = {}
                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                 var compare = (m[n].startDate >= currentMonth);
-                                var stockInHand = jsonList[0].closingBalance;
-                                var amc = Math.round(parseFloat(jsonList[0].amc));
-                                if (compare && parseInt(stockInHand) <= parseInt(amc * parseInt(minStockMoSQty))) {
-                                    var suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
-                                    if (suggestedOrd <= 0) {
-                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                        var isEmergencyOrder = 0;
-                                        if (expectedDeliveryDate >= currentMonth) {
-                                            isEmergencyOrder = 0;
+                                // var stockInHand = jsonList[0].closingBalance;
+                                var amc = Math.round(Number(jsonList[0].amc));
+                                var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
+                                var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
+                                var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
+                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
+                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
+                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+
+                                var suggestShipment = false;
+                                var useMax = false;
+                                if (compare) {
+                                    if (Number(amc) == 0) {
+                                        suggestShipment = false;
+                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && (Number(mosForMonth2) > Number(minStockMoSQty) || Number(mosForMonth3) > Number(minStockMoSQty))) {
+                                        suggestShipment = false;
+                                    } else if (Number(mosForMonth1) != 0 && Number(mosForMonth1) < Number(minStockMoSQty) && Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                        suggestShipment = true;
+                                        useMax = true;
+                                    } else if (Number(mosForMonth1) == 0) {
+                                        suggestShipment = true;
+                                        if (Number(mosForMonth2) < Number(minStockMoSQty) && Number(mosForMonth3) < Number(minStockMoSQty)) {
+                                            useMax = true;
                                         } else {
-                                            isEmergencyOrder = 1;
+                                            useMax = false;
                                         }
-                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
-                                    } else {
-                                        var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                            parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                            parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                        var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                        var isEmergencyOrder = 0;
-                                        if (expectedDeliveryDate >= currentMonth) {
-                                            isEmergencyOrder = 0;
-                                        } else {
-                                            isEmergencyOrder = 1;
-                                        }
-                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
                                     }
                                 } else {
-                                    var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                        parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                        parseFloat(programJson.arrivedToDeliveredLeadTime);
-                                    var expectedDeliveryDate = moment(m[n].startDate).subtract(parseInt(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
-                                    var isEmergencyOrder = 0;
-                                    if (expectedDeliveryDate >= currentMonth) {
-                                        isEmergencyOrder = 0;
+                                    suggestShipment = false;
+                                }
+                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
+                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
+                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
+                                var isEmergencyOrder = 0;
+                                if (expectedDeliveryDate >= currentMonth) {
+                                    isEmergencyOrder = 0;
+                                } else {
+                                    isEmergencyOrder = 1;
+                                }
+                                if (suggestShipment) {
+                                    var suggestedOrd = 0;
+                                    if (useMax) {
+                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                     } else {
-                                        isEmergencyOrder = 1;
+                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                     }
-                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder };
+                                    if (suggestedOrd <= 0) {
+                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                    } else {
+                                        sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                    }
+                                } else {
+                                    sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                 }
                                 suggestedShipmentsTotalData.push(sstd);
 
@@ -2201,6 +2246,7 @@ class EditSupplyPlanStatus extends Component {
             };
             problemStatusRequest.onsuccess = function (e) {
                 var myResult = [];
+                var problemStatusJson = [];
                 myResult = problemStatusRequest.result;
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
@@ -2209,9 +2255,16 @@ class EditSupplyPlanStatus extends Component {
                         id: myResult[i].id
                     }
                     proList[i] = Json
+
+                    if (myResult[i].id == 1 || myResult[i].id == 3) {
+                        problemStatusJson.push({ label: getLabelText(myResult[i].label, lan), value: myResult[i].id });
+                    }
                 }
+
+
                 this.setState({
-                    problemStatusList: proList
+                    problemStatusList: proList,
+                    problemStatusValues: problemStatusJson
                 })
 
                 var problemCategoryTransaction = db1.transaction(['problemCategory'], 'readwrite');
@@ -2363,6 +2416,12 @@ class EditSupplyPlanStatus extends Component {
 
             }, this);
 
+        const { problemReviewedList } = this.state;
+        let problemReviewed = problemReviewedList.length > 0
+            && problemReviewedList.map((item, i) => {
+                return ({ label: item.name, value: item.id })
+            }, this);
+
         let bar = {}
         if (this.state.jsonArrForGraph.length > 0)
             bar = {
@@ -2445,7 +2504,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                     }, {
@@ -2462,7 +2521,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
                     },
@@ -2480,7 +2539,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                     },
@@ -2500,7 +2559,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         showInLegend: true,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         yValueFormatString: "$#,##0",
                         lineTension: 0,
                         data: this.state.jsonArrForGraph.map((item, index) => (item.minMos))
@@ -2521,7 +2580,7 @@ class EditSupplyPlanStatus extends Component {
                         },
                         lineTension: 0,
                         pointStyle: 'line',
-                        pointRadius:0,
+                        pointRadius: 0,
                         showInLegend: true,
                         yValueFormatString: "$#,##0",
                         data: this.state.jsonArrForGraph.map((item, index) => (item.maxMos))
@@ -2667,7 +2726,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Table className="table-bordered text-center mt-2 overflowhide" bordered size="sm" options={this.options}>
                                                     <thead>
                                                         <tr>
-                                                            <th className="BorderNoneSupplyPlan"></th>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                             <th className="supplyplanTdWidth sticky-col first-col clone"></th>
                                                             {
                                                                 this.state.monthsArray.map(item => {
@@ -2684,7 +2743,7 @@ class EditSupplyPlanStatus extends Component {
                                                     <tbody>
 
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
@@ -2693,7 +2752,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyPlan.consumption')}</b></td>
                                                             {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
@@ -2706,7 +2765,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionTotalShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalShipments()}>
                                                                 {this.state.showTotalShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
@@ -2718,7 +2777,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}</td>
                                                             {
                                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
@@ -2736,7 +2795,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionManualShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualEntryShipments')}</td>
@@ -2748,7 +2807,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                                             {
@@ -2768,7 +2827,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedShipmentsTotalData.map(item1 => {
@@ -2786,7 +2845,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedShipmentsTotalData.map(item1 => {
@@ -2803,7 +2862,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="manualShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedShipmentsTotalData.map(item1 => {
@@ -2820,7 +2879,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="totalShipments">
-                                                            <td className="BorderNoneSupplyPlan" onClick={() => this.toggleAccordionErpShipments()}>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                             </td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.erpShipments')}</td>
@@ -2831,7 +2890,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
                                                             {
                                                                 this.state.deliveredErpShipmentsTotalData.map(item1 => {
@@ -2849,7 +2908,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
 
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                                             {
                                                                 this.state.shippedErpShipmentsTotalData.map(item1 => {
@@ -2866,7 +2925,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                                             {
                                                                 this.state.orderedErpShipmentsTotalData.map(item1 => {
@@ -2883,7 +2942,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr className="erpShipments">
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
                                                             {
                                                                 this.state.plannedErpShipmentsTotalData.map(item1 => {
@@ -2900,7 +2959,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                                             {
                                                                 this.state.inventoryTotalData.map((item1, count) => {
@@ -2909,7 +2968,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
                                                             {
                                                                 this.state.expiredStockArr.map(item1 => {
@@ -2926,7 +2985,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr bgcolor='#d9d9d9'>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
@@ -2935,7 +2994,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
@@ -2944,7 +3003,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
                                                             {
                                                                 this.state.amcTotalData.map(item1 => (
@@ -2953,7 +3012,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         {/* <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.minStockMos')}</td>
                                                             {
                                                                 this.state.minStockMoS.map(item1 => (
@@ -2962,7 +3021,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.maxStockMos')}</td>
                                                             {
                                                                 this.state.maxStockMoS.map(item1 => (
@@ -2971,7 +3030,7 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr> */}
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan"></td>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                                             {
                                                                 this.state.unmetDemand.map(item1 => (
@@ -3082,6 +3141,20 @@ class EditSupplyPlanStatus extends Component {
                                 </div>
                             </FormGroup>
                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.problemReport.reviewed')}</Label>
+                                {/* <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span> */}
+                                <div className="controls problemListSelectField">
+                                    <MultiSelect
+                                        name="reviewedStatusId"
+                                        id="reviewedStatusId"
+                                        options={problemReviewed && problemReviewed.length > 0 ? problemReviewed : []}
+                                        value={this.state.problemReviewedValues}
+                                        onChange={(e) => { this.handleProblemReviewedChange(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlanReview.review')}</Label>
                                 <div className="controls SelectField">
                                     <InputGroup>
@@ -3090,14 +3163,13 @@ class EditSupplyPlanStatus extends Component {
                                             name="reviewedStatusId" id="reviewedStatusId"
                                             onChange={this.fetchData}
                                         >
-                                            {/* <option value="0">Please select</option> */}
                                             <option value="0">No</option>
                                             <option value="1">Yes</option>
 
                                         </Input>
                                     </InputGroup>
                                 </div>
-                            </FormGroup>
+                            </FormGroup> */}
                         </div>
                     </Col>
                     <br />
@@ -3145,6 +3217,34 @@ class EditSupplyPlanStatus extends Component {
             })
         }
     }
+    handleProblemReviewedChange = (event) => {
+        var cont = false;
+        if (this.state.problemReportChanged == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log('***', event)
+            var problemReviewedIds = event
+            problemReviewedIds = problemReviewedIds.sort(function (a, b) {
+                return parseInt(a.value) - parseInt(b.value);
+            })
+            this.setState({
+                problemReviewedValues: problemReviewedIds.map(ele => ele),
+                problemReviewedLabels: problemReviewedIds.map(ele => ele.label),
+                problemReportChanged: 0
+            }, () => {
+                console.log("problemReviewedValues===>", this.state.problemReviewedValues);
+                this.fetchData()
+            })
+        }
+    }
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
@@ -3180,7 +3280,8 @@ class EditSupplyPlanStatus extends Component {
             // let problemStatusId = ;
             let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
             console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
-            let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
+            let reviewedStatusId = this.state.problemReviewedValues.map(ele => (ele.value));
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
             let problemTypeId = document.getElementById('problemTypeId').value;
@@ -3189,12 +3290,13 @@ class EditSupplyPlanStatus extends Component {
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                 problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
-                if (reviewedStatusId != -1) {
-                    if (reviewedStatusId == 0) {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
-                    } else {
-                        problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
-                    }
+                if (reviewedStatusId != []) {
+                    problemReportFilterList = problemReportFilterList.filter(c => reviewedStatusId.includes(c.reviewed == true ? 1 : 0));
+                    // if (reviewedStatusId == 0) {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == false);
+                    // } else {
+                    //     problemReportFilterList = problemReportFilterList.filter(c => c.reviewed == true);
+                    // }
                 }
                 if (problemTypeId != -1) {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
@@ -3519,16 +3621,16 @@ class EditSupplyPlanStatus extends Component {
                 var criticalityId = rowData[16];
                 var problemStatusId = rowData[12];
                 if (criticalityId == 3) {
-                    console.log("In if");
+                    // console.log("In if");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
-                    console.log("cell classlist------------------>", cell.classList);
+                    // console.log("cell classlist------------------>", cell.classList);
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {
-                    console.log("In if 1");
+                    // console.log("In if 1");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('mediumCriticality');
                 } else if (criticalityId == 1) {
-                    console.log("In if 2");
+                    // console.log("In if 2");
                     var cell = elInstance.getCell(("T").concat(parseInt(y) + 1))
                     cell.classList.add('lowCriticality');
                     // }
@@ -3743,27 +3845,27 @@ class EditSupplyPlanStatus extends Component {
                                 render={
                                     ({
                                     }) => (
-                                            <Form name='simpleForm'>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input type="text"
-                                                                        name="programId"
-                                                                        id="programId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
-                                                                        disabled />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
+                                        <Form name='simpleForm'>
+                                            <Col md="12 pl-0">
+                                                <div className="row">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input type="text"
+                                                                    name="programId"
+                                                                    id="programId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.program.label.label_en}
+                                                                    disabled />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                             {/* </CardBody> */}
                             <Row>
@@ -4036,7 +4138,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={item.balance!=0?"hoverTd":""} onClick={() => item.balance!=0?this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }):""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -4044,7 +4146,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).length > 0 &&
+                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                         <>
                                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                                 <thead>
@@ -4057,7 +4159,7 @@ class EditSupplyPlanStatus extends Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {this.state.batchInfoInInventoryPopUp.filter(c=>c.qty>0).map(item => (
+                                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                         <tr>
                                                             <td>{item.batchNo}</td>
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
@@ -4183,7 +4285,7 @@ class EditSupplyPlanStatus extends Component {
                             </ModalHeader>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <ModalBody>
-                                    <span style={{float:"right"}}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
+                                    <span style={{ float: "right" }}><b>{i18n.t("static.supplyPlan.batchInfoNote")}</b></span>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
@@ -4198,7 +4300,7 @@ class EditSupplyPlanStatus extends Component {
                                             {
                                                 this.state.expiredStockDetails.map(item => (
                                                     <tr>
-                                                        <td  className="hoverTd" onClick={()=>this.showShipmentWithBatch(item.batchNo,item.expiryDate)}>{item.batchNo}</td>
+                                                        <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
@@ -4238,7 +4340,7 @@ class EditSupplyPlanStatus extends Component {
                                                 </thead>
                                                 <tbody>
                                                     {
-                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item=>(
+                                                        ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
@@ -4336,6 +4438,7 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validate={validate(validationSchema)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                document.getElementById("submitButton").disabled = true;
                                 var elInstance = this.state.problemEl;
                                 var json = elInstance.getJson();
                                 // console.log("problemList===>", json);
@@ -4422,6 +4525,7 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         );
                                 } else {
+                                    document.getElementById("submitButton").disabled = false;
                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                 }
 
@@ -4438,12 +4542,12 @@ class EditSupplyPlanStatus extends Component {
                                     isValid,
                                     setTouched
                                 }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
-                                            <CardBody className="pt-lg-0">
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
+                                    <Form onSubmit={handleSubmit} noValidate name='supplyplanForm'>
+                                        <CardBody className="pt-lg-0">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
 
-                                                        {/*  <FormGroup className="tab-ml-1">
+                                                    {/*  <FormGroup className="tab-ml-1">
                                                         <Label for="programName">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="programId"
@@ -4458,68 +4562,68 @@ class EditSupplyPlanStatus extends Component {
                                                             disabled />
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup> */}
-                                                        <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-3">
 
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
 
-                                                            <Input
-                                                                type="textarea"
-                                                                maxLength={65535}
-                                                                name="versionNotes"
-                                                                id="versionNotes"
-                                                                value={this.state.program.currentVersion.notes}
-                                                                bsSize="sm"
-                                                                valid={!errors.versionNotes}
-                                                                invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={!this.state.editable}
-                                                                required
-                                                            />
-                                                            <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
-
-                                                        </FormGroup>
-
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="versionStatusId"
-                                                                id="versionStatusId"
-                                                                bsSize="sm"
-                                                                valid={!errors.versionStatusId}
-                                                                invalid={touched.versionStatusId && !!errors.versionStatusId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.currentVersion.versionStatus.id}
-                                                                disabled={!this.state.editable}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {statusList}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
-                                                        </FormGroup>
                                                         <Input
-                                                            type="hidden"
-                                                            name="needNotesValidation"
-                                                            id="needNotesValidation"
-                                                            value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                            type="textarea"
+                                                            maxLength={65535}
+                                                            name="versionNotes"
+                                                            id="versionNotes"
+                                                            value={this.state.program.currentVersion.notes}
+                                                            bsSize="sm"
+                                                            valid={!errors.versionNotes}
+                                                            invalid={touched.versionNotes && !!errors.versionNotes || this.state.program.currentVersion.versionStatus.id == 3 ? this.state.program.currentVersion.notes == '' : false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={!this.state.editable}
+                                                            required
                                                         />
-                                                    </div>
-                                                </Col>
-                                            </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    {this.state.editable && <Button type="submit" size="md" color="success" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                    {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
-                                                    <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <FormFeedback className="red">{errors.versionNotes}</FormFeedback>
 
-                                                    &nbsp;
-                                             </FormGroup>
-                                            </CardFooter>
-                                        </Form>
-                                    )} />
+                                                    </FormGroup>
+
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="versionStatusId">{i18n.t('static.common.status')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionStatusId"
+                                                            id="versionStatusId"
+                                                            bsSize="sm"
+                                                            valid={!errors.versionStatusId}
+                                                            invalid={touched.versionStatusId && !!errors.versionStatusId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.currentVersion.versionStatus.id}
+                                                            disabled={!this.state.editable}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {statusList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.versionStatusId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="needNotesValidation"
+                                                        id="needNotesValidation"
+                                                        value={(this.state.program.currentVersion.versionStatus.id == 3 ? true : false)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </CardBody>
+                                        <CardFooter>
+                                            <FormGroup>
+                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+
+                                                &nbsp;
+                                            </FormGroup>
+                                        </CardFooter>
+                                    </Form>
+                                )} />
                     </Card>
 
                 </Col>
@@ -4547,39 +4651,43 @@ class EditSupplyPlanStatus extends Component {
         console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
-    showShipmentWithBatch(batchNo,expiryDate){
-        var shipmentList=this.state.allShipmentsList;
-        shipmentList.map(sl=>{
-            var batchInfoList=sl.batchInfoList;
-            var bi=batchInfoList.filter(c=>c.batch.batchNo==batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(expiryDate).format("YYYY-MM"));
-            if(bi.length>0) {
-                var shipmentStatus=sl.shipmentStatus.id;
-                var date="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date"){
-                    date=moment(sl.receivedDate).format("YYYY-MM-DD");
-                }else{
-                    date=moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
+    showShipmentWithBatch(batchNo, expiryDate) {
+        var shipmentList = this.state.allShipmentsList;
+        shipmentList.map((sl, count) => {
+            var batchInfoList = sl.batchInfoList;
+            var bi = batchInfoList.filter(c => c.batch.batchNo == batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+            if (bi.length > 0) {
+                var shipmentStatus = sl.shipmentStatus.id;
+                var index = count;
+                this.setState({
+                    indexOfShipmentContainingBatch: index
+                })
+                var date = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.receivedDate != "" && sl.receivedDate != null && sl.receivedDate != undefined && sl.receivedDate != "Invalid date") {
+                    date = moment(sl.receivedDate).format("YYYY-MM-DD");
+                } else {
+                    date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
                 // Open toggleLarge
-                var supplyPlanType="";
-                if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false){
+                var supplyPlanType = "";
+                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
                     supplyPlanType = 'deliveredShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'shippedShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == false){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
-                }else if(shipmentStatus==DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true){
+                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
-                }else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true){
+                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'shippedErpShipments'
-                }else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)  && sl.erpFlag == true){
+                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
-                if(supplyPlanType!=""){
+                if (supplyPlanType != "") {
                     this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
                 }
             }

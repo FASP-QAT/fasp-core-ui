@@ -24,18 +24,38 @@ export default class ContainerTwo extends Component {
         this.onAddButtonClick = this.onAddButtonClick.bind(this);
         this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
         this.onHighlightChanged = this.onHighlightChanged.bind(this);
-        this.onCursoChanged=this.onCursoChanged.bind(this);
+        this.onCursoChanged = this.onCursoChanged.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
+        this.addDataChange = this.addDataChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+        this.addNode = this.addNode.bind(this);
+        this.toggleModal = this.toggleModal.bind(this);
+
         this.state = {
             modalOpen: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
             items: TreeData.node_data,
-            currentItemConfig: {}
+            currentItemConfig: {},
+            newItemConfig: {}
         }
+    }
+    addDataChange(event) {
+        // console.log("event---", document.getElementsByName('nodeValueType').text);
+        let { newItemConfig } = this.state;
+        if (event.target.name === "nodeTitle") {
+            newItemConfig.title = event.target.value;
+        }
+        if (event.target.name === "nodeValueType") {
+            var skillsSelect = document.getElementById("nodeValueType");
+            console.log("skillsSelect---",skillsSelect)
+            var selectedText = skillsSelect.options[skillsSelect.selectedIndex].text;
+            newItemConfig.valueTypeId = event.target.value;
+            newItemConfig.valueTypeDesc = selectedText;
+        }
+        this.setState({ newItemConfig });
     }
     dataChange(event) {
         // alert("hi");
@@ -195,16 +215,41 @@ export default class ContainerTwo extends Component {
         }
     };
 
+    addNode(currentItemConfig) {
+        const { items } = this.state;
+        const { newItemConfig } = this.state;
+        console.log("newItemConfig---", newItemConfig)
+        var newItem = {
+            id: parseInt(items.length + 1),
+            parent: currentItemConfig.id,
+            title: newItemConfig.title,
+            description: newItemConfig.valueTypeDesc
+            // image: "/react/photos/z.png"
+        };
+
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: newItem.id
+        }, () => {
+            this.toggleModal();
+        });
+    }
+    toggleModal() {
+        this.setState({
+            modalOpen: !this.state.modalOpen,
+            newItemConfig: {}
+        });
+    }
     updateNodeInfoInJson(currentItemConfig) {
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
         nodes[findNodeIndex].title = currentItemConfig.title;
         nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
-            items: nodes,
-            modalOpen: false,
+            items: nodes
         }, () => {
             console.log("updated tree data+++", this.state);
+            this.toggleModal();
         });
     }
 
@@ -289,8 +334,9 @@ export default class ContainerTwo extends Component {
                         onClick={(event) => {
                             event.stopPropagation();
                             this.setState({
-                                modalOpen: true,
                                 currentItemConfig: itemConfig,
+                            }, () => {
+                                this.toggleModal();
                             })
                         }}>
                         <FontAwesomeIcon icon={faEdit} />
@@ -298,7 +344,12 @@ export default class ContainerTwo extends Component {
                     <button key="1" className="StyledButton"
                         onClick={(event) => {
                             event.stopPropagation();
-                            this.onAddButtonClick(itemConfig);
+                            this.setState({
+                                currentItemConfig: itemConfig,
+                            }, () => {
+                                this.toggleModal();
+                            })
+                            // this.onAddButtonClick(itemConfig);
                         }}>
                         <FontAwesomeIcon icon={faPlus} />
                     </button>
@@ -357,7 +408,7 @@ export default class ContainerTwo extends Component {
                                     <DndProvider backend={HTML5Backend}>
                                         <div className="placeholder" style={{ clear: 'both' }} >
                                             {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged}/>
+                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                         </div>
                                     </DndProvider>
                                     {/* modal start---------------- */}
@@ -365,25 +416,28 @@ export default class ContainerTwo extends Component {
                                         className={'modal-md '} >
                                         <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                             <strong>Edit Node</strong>
-                                            <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                                            <Button size="md" onClick={() => this.toggleModal()} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                                         </ModalHeader>
                                         <ModalBody>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     name="nodeTitle"
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    value={this.state.currentItemConfig.title}></Input>
+                                                    // onChange={(e) => { this.dataChange(e) }}
+                                                    onChange={(e) => { this.addDataChange(e) }}
+                                                    value={this.state.newItemConfig.title}></Input>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
+                                                    id="nodeValueType"
                                                     name="nodeValueType"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    // onChange={(e) => { this.dataChange(e) }}
+                                                    onChange={(e) => { this.addDataChange(e) }}
                                                     required
-                                                    value={this.state.currentItemConfig.valueType}
+                                                    value={this.state.newItemConfig.valueTypeId}
                                                 >
                                                     <option value="-1">Nothing Selected</option>
                                                     <option value="1">Percentage</option>
@@ -394,8 +448,9 @@ export default class ContainerTwo extends Component {
                                             </FormGroup>
                                         </ModalBody>
                                         <ModalFooter>
-                                            <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="submit" size="md" onClick={(e) => { this.addNode(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Add</Button>
+                                            {/* <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Update</Button> */}
+                                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.toggleModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         </ModalFooter>
                                     </Modal>
                                     {/* ------------------modal end */}

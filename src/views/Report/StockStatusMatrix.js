@@ -31,6 +31,7 @@ import 'antd/dist/antd.css';
 import MultiSelect from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
+import TracerCategoryService from '../../api/TracerCategoryService';
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -64,10 +65,14 @@ export default class StockStatusMatrix extends React.Component {
       includePlanningShipments: true,
       years: [],
       pulst: [],
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+      planningUnitList: [],
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true,
@@ -83,6 +88,174 @@ export default class StockStatusMatrix extends React.Component {
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
 
+  }
+
+  getTracerCategoryList() {
+    let programId = document.getElementById("programId").value;
+    let versionId = document.getElementById("versionId").value;
+
+    this.setState({
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+    }, () => {
+      if (programId > 0 && versionId != 0) {
+        localStorage.setItem("sesVersionIdReport", versionId);
+        if (versionId.includes('Local')) {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              var proList = []
+
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+
+                  proList.push(myResult[i].planningUnit)
+                }
+              }
+              console.log('proList', proList)
+              this.setState({ programPlanningUnitList: myResult })
+              var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
+              var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
+              var planningunitRequest1 = planningunitOs1.getAll();
+              //  var pllist = []
+              planningunitRequest1.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest1.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest1.result;
+                var flList = []
+                console.log(myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                  for (var j = 0; j < proList.length; j++) {
+                    if (myResult[i].planningUnitId == proList[j].id) {
+                      console.log(myResult[i].planningUnitId, proList[j].id)
+
+                      flList.push(myResult[i].forecastingUnit)
+                      planningList.push(myResult[i])
+                    }
+                  }
+                }
+                console.log('flList', flList)
+
+                var tcList = [];
+                flList.filter(function (item) {
+                  var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                  if (i <= -1 && item.tracerCategory.id != 0) {
+                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                  }
+                  return null;
+                });
+
+                console.log('tcList', tcList)
+                var lang = this.state.lang;
+                this.setState({
+                  tracerCategories: tcList.sort(function (a, b) {
+                    a = getLabelText(a.label, lang).toLowerCase();
+                    b = getLabelText(b.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitList: planningList
+                }, () => {
+                  this.filterData();
+                })
+
+
+
+              }.bind(this);
+
+            }.bind(this);
+          }.bind(this)
+
+
+        }
+        else {
+
+
+          let realmId = AuthenticationService.getRealmId();
+          TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+
+            if (response.status == 200) {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              this.setState({
+                tracerCategories: listArray,
+              }, () => {
+                this.filterData();
+              })
+            }
+
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
+        }
+
+      } else {
+        // this.setState({
+        //   message: i18n.t('static.common.selectProgram'),
+        //   productCategories: [],
+        //   tracerCategories: []
+        // })
+        this.filterData();
+      }
+    })
   }
 
   makeText = m => {
@@ -202,14 +375,18 @@ export default class StockStatusMatrix extends React.Component {
     let programId = document.getElementById("programId").value;
     // let programId = this.state.programId;
     let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())//this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    console.log("planningUnitIds------>", planningUnitIds);
     let versionId = document.getElementById("versionId").value;
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
     // let versionId = this.state.versionId;
     let includePlannedShipments = document.getElementById("includePlanningShipments").value
-    if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0) {
+    if (this.state.planningUnitValues.length > 0 && programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
+      // if (programId > 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
 
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
         var data = [];
+        var data1 = [];
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -234,13 +411,14 @@ export default class StockStatusMatrix extends React.Component {
           planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
             myResult1 = e.target.result;
-            console.log(myResult1)
+            console.log("RESP------>0", planningUnitIds)
+            console.log("RESP------>1", myResult1)
             var plunit1 = []
             planningUnitIds.map(planningUnitId => {
               plunit = [...plunit, ...(myResult1.filter(c => c.planningUnitId == planningUnitId))]
 
             })
-            console.log(plunit)
+            console.log("RESP------>2", plunit)
           }.bind(this)
           var transaction = db1.transaction(['programData'], 'readwrite');
           var programTransaction = transaction.objectStore('programData');
@@ -290,6 +468,7 @@ export default class StockStatusMatrix extends React.Component {
                 }
                 console.log(monthlydata)
                 var json = {
+                  tracerCategoryId: this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId)[0].forecastingUnit.tracerCategory.id,
                   planningUnit: pu.planningUnit,
                   unit: plunit.filter(c => c.planningUnitId == planningUnitId)[0].unit,
                   reorderFrequency: pu.reorderFrequencyInMonths,
@@ -311,10 +490,26 @@ export default class StockStatusMatrix extends React.Component {
                 data.push(json)
 
               }
-              this.setState({
-                selData: data,
-                message: '', loading: false
-              }, () => { this.filterDataAsperstatus() })
+
+            })
+            console.log("RESP------>3", data);
+
+            let tracerCategoryValues = this.state.tracerCategoryValues;
+            console.log("RESP------>31", tracerCategoryValues);
+            for (let i = 0; i < data.length; i++) {
+              for (let j = 0; j < tracerCategoryValues.length; j++) {
+                if (tracerCategoryValues[j].value == data[i].tracerCategoryId) {
+                  data1.push(data[i]);
+                }
+              }
+            }
+
+            this.setState({
+              selData: data1,
+              message: '', loading: false
+            }, () => {
+              this.filterDataAsperstatus();
+              console.log("RESP------>4", this.state.selData);
             })
           }.bind(this)
 
@@ -349,7 +544,7 @@ export default class StockStatusMatrix extends React.Component {
           "stopDate": endDate,
           "planningUnitIds": planningUnitIds,
           "includePlannedShipments": includePlannedShipments,
-
+          "tracerCategoryIds": tracercategory
         }
 
 
@@ -442,14 +637,17 @@ export default class StockStatusMatrix extends React.Component {
 
       }
     } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
     } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+      this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [], tracerCategories: [], tracerCategoryValues: [], tracerCategoryLabels: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
 
-    } else {
+    }
+    else if (this.state.tracerCategoryValues.length == 0) {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [] });
+    }
+    else if (this.state.planningUnitValues.length == 0) {
       this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), selData: [], data: [] });
-
     }
   }
 
@@ -841,14 +1039,16 @@ export default class StockStatusMatrix extends React.Component {
               versions: versionList,
               versionId: localStorage.getItem("sesVersionIdReport")
             }, () => {
-              this.getPlanningUnit();
+              // this.getPlanningUnit();
+              this.getTracerCategoryList();
             })
           } else {
             this.setState({
               versions: versionList,
               versionId: versionList[0].versionId
             }, () => {
-              this.getPlanningUnit();
+              // this.getPlanningUnit();
+              this.getTracerCategoryList();
             })
           }
         } else {
@@ -856,7 +1056,8 @@ export default class StockStatusMatrix extends React.Component {
             versions: versionList,
             versionId: versionList[0].versionId
           }, () => {
-            this.getPlanningUnit();
+            // this.getPlanningUnit();
+            this.getTracerCategoryList();
           })
         }
 
@@ -870,145 +1071,185 @@ export default class StockStatusMatrix extends React.Component {
 
   }
 
-
+  handleTracerCategoryChange = (tracerCategoryIds) => {
+    tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      tracerCategoryValues: tracerCategoryIds.map(ele => ele),
+      tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
+    }, () => {
+      this.getPlanningUnit();
+      this.filterData();
+    })
+  }
 
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
 
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
+    if (this.state.tracerCategoryValues.length > 0) {
 
-      if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
-      } else {
-        localStorage.setItem("sesVersionIdReport", versionId);
-        if (versionId.includes('Local')) {
-          const lan = 'en';
-          var db1;
-          var storeOS;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            var planningList = []
-            planningunitRequest.onerror = function (event) {
-              // Handle errors!
-            };
-            planningunitRequest.onsuccess = function (e) {
-              var myResult = [];
-              myResult = planningunitRequest.result;
-              var programId = (document.getElementById("programId").value).split("_")[0];
-              var proList = []
-              console.log(myResult)
-              for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active == true) {
+      this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+      }, () => {
 
-                  proList[i] = myResult[i]
+        if (versionId == 0) {
+          this.setState({ message: i18n.t('static.program.validversion'), selData: [], data: [] });
+        } else {
+          localStorage.setItem("sesVersionIdReport", versionId);
+          if (versionId.includes('Local')) {
+            const lan = 'en';
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+              db1 = e.target.result;
+              var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+              var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+              var planningunitRequest = planningunitOs.getAll();
+              var planningList = []
+              planningunitRequest.onerror = function (event) {
+                // Handle errors!
+              };
+              planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                var proList = []
+                console.log(myResult)
+                let incrmental = 0;
+                for (var i = 0; i < myResult.length; i++) {
+                  if (myResult[i].program.id == programId && myResult[i].active == true) {
+
+                    let tempTCId = this.state.planningUnitList.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0].forecastingUnit.tracerCategory.id;
+
+                    let tempPUObj = myResult[i];
+                    tempPUObj["tracerCategoryId"] = tempTCId;
+                    // proList[i] = myResult[i];
+
+                    proList[incrmental] = tempPUObj;
+                    incrmental = incrmental + 1;
+                    // console.log("Log-------->", tempTCId);
+                  }
                 }
-              }
-              var lang = this.state.lang;
+
+                let tracerCategoryValues = this.state.tracerCategoryValues.map((item, i) => {
+                  return ({ tracerCategoryId: item.value })
+                }, this);
+
+
+                // console.log("Log--------> ******** ", tracerCategoryValues);
+                console.log("Log--------> ******** 00", proList);
+                console.log("Log--------> ******** -00", proList.length);
+
+                let data1 = [];
+                for (let i = 0; i < proList.length; i++) {
+                  for (let j = 0; j < tracerCategoryValues.length; j++) {
+                    console.log("Log--------> ******** 11", proList[i]);
+                    console.log("Log--------> ******** 22", i);
+                    if (tracerCategoryValues[j].tracerCategoryId == proList[i].tracerCategoryId) {
+                      data1.push(proList[i]);
+                    }
+                  }
+                }
+
+
+                var lang = this.state.lang;
+                this.setState({
+                  planningUnits: data1.sort(function (a, b) {
+                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  }),
+                  planningUnitValues: data1.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                  }, this),
+                  planningUnitLabels: data1.map((item, i) => {
+                    return (getLabelText(item.planningUnit.label, this.state.lang))
+                  }, this),
+                  message: ''
+                }, () => {
+                  this.filterData();
+                })
+              }.bind(this);
+            }.bind(this)
+
+
+          }
+          else {
+            // AuthenticationService.setupAxiosInterceptors();
+
+            //let productCategoryId = document.getElementById("productCategoryId").value;
+            ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
+              console.log('**' + JSON.stringify(response.data))
               this.setState({
-                planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                  return a < b ? -1 : a > b ? 1 : 0;
-                }), message: ''
+                planningUnits: response.data,
+                planningUnitValues: response.data.map((item, i) => {
+                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+                }, this),
+                planningUnitLabels: response.data.map((item, i) => {
+                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                }, this),
+                message: ''
               }, () => {
                 this.filterData();
               })
-            }.bind(this);
-          }.bind(this)
-
-
-        }
-        else {
-          // AuthenticationService.setupAxiosInterceptors();
-
-          //let productCategoryId = document.getElementById("productCategoryId").value;
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
-            this.setState({
-              planningUnits: response.data, message: ''
-            }, () => {
-              this.filterData();
-            })
-          }).catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-              })
-              if (error.message === "Network Error") {
+            }).catch(
+              error => {
                 this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
+                  planningUnits: [],
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
                 }
               }
-            }
-          );
-          // .catch(
-          //   error => {
-          //     this.setState({
-          //       planningUnits: [],
-          //     })
-          //     if (error.message === "Network Error") {
-          //       this.setState({ message: error.message });
-          //     } else {
-          //       switch (error.response ? error.response.status : "") {
-          //         case 500:
-          //         case 401:
-          //         case 404:
-          //         case 406:
-          //         case 412:
-          //           this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }) });
-          //           break;
-          //         default:
-          //           this.setState({ message: 'static.unkownError' });
-          //           break;
-          //       }
-          //     }
-          //   }
-          // );
+            );
+          }
         }
-      }
-    });
-
+      });
+    } else {
+      this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), selData: [], data: [] });
+    }
   }
 
   componentDidMount() {
@@ -1045,13 +1286,15 @@ export default class StockStatusMatrix extends React.Component {
         versionId: event.target.value
       }, () => {
         localStorage.setItem("sesVersionIdReport", this.state.versionId);
-        this.filterData();
+        this.getTracerCategoryList();
+        // this.filterData();
       })
     } else {
       this.setState({
         versionId: event.target.value
       }, () => {
-        this.getPlanningUnit();
+        // this.getPlanningUnit();
+        this.getTracerCategoryList();
       })
     }
 
@@ -1085,6 +1328,9 @@ export default class StockStatusMatrix extends React.Component {
     csvRow.push('')
     this.state.planningUnitLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    this.state.tracerCategoryLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -1167,8 +1413,11 @@ export default class StockStatusMatrix extends React.Component {
             align: 'left'
           })
 
-          var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+          var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 200, planningText)
 
         }
 
@@ -1211,7 +1460,7 @@ export default class StockStatusMatrix extends React.Component {
     let data;
     data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")]);
 
-    var startY = 180 + (this.state.planningUnitValues.length * 3)
+    var startY = 230 + (this.state.planningUnitValues.length * 3)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
@@ -1326,6 +1575,7 @@ export default class StockStatusMatrix extends React.Component {
         )
       }, this);
 
+    const { tracerCategories } = this.state;
 
     let columns = [
       {
@@ -1510,7 +1760,7 @@ export default class StockStatusMatrix extends React.Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1582,6 +1832,26 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
+                  <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                  <div className="controls">
+
+                    <MultiSelect
+                      name="tracerCategoryId"
+                      id="tracerCategoryId"
+                      bsSize="sm"
+                      value={this.state.tracerCategoryValues}
+                      onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                      options=
+                      {tracerCategories.length > 0 ?
+                        tracerCategories.map((item, i) => {
+                          return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+
+                        }, this) : []} />
+                  </div>
+                </FormGroup>
+
+                <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                   <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                   <div className="controls">
@@ -1594,6 +1864,7 @@ export default class StockStatusMatrix extends React.Component {
                       onChange={(e) => { this.handlePlanningUnitChange(e) }}
                       options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                     />     </div></FormGroup>
+
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                   <div className="controls ">
@@ -1650,9 +1921,9 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
               </div>
             </div>
-            <div class="TableCust">
+            <div class="TableCust" style={{ display: this.state.loading ? "none" : "block" }}>
               {this.state.data.length > 0 &&
-                <Table striped bordered hover responsive="md" style={{ width: "100%" }}>
+                <Table striped bordered responsive="md" style={{ width: "100%" }}>
                   <thead>
                     <tr>
                       <th rowSpan="2" className="text-center" style={{ width: "20%" }}>{i18n.t('static.planningunit.planningunit')}</th>
@@ -1706,19 +1977,20 @@ export default class StockStatusMatrix extends React.Component {
 
 
             </div>
-          </CardBody>
-        </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-              <div class="spinner-border blue ml-4" role="status">
+                  <div class="spinner-border blue ml-4" role="status">
 
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
+
 
 
       </div>)

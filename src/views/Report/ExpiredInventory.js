@@ -69,9 +69,9 @@ export default class ExpiredInventory extends Component {
             programs: [],
             versions: [],
             planningUnits: [],
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
             versionId: '',
@@ -612,7 +612,7 @@ export default class ExpiredInventory extends Component {
                     programRequest.onsuccess = function (e) {
                         console.log("2----", programRequest)
                         this.setState({
-                            localProgramId:programRequest.result.id
+                            localProgramId: programRequest.result.id
                         })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1043,14 +1043,14 @@ export default class ExpiredInventory extends Component {
             console.log("+++in y==1")
             this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
         }
-        if(y==2){
+        if (y == 2) {
             let versionId = document.getElementById("versionId").value;
-        if (versionId.includes('Local')) {
-            localStorage.setItem("batchNo",rowData[2]);
-            localStorage.setItem("expiryDate",rowData[6]);
-            window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+            if (versionId.includes('Local')) {
+                localStorage.setItem("batchNo", rowData[2]);
+                localStorage.setItem("expiryDate", rowData[6]);
+                window.open(window.location.origin + `/#/supplyPlan/${this.state.localProgramId}/${rowData[8]}/${rowData[2]}/${rowData[6]}`);
+            }
         }
-    }
     }.bind(this);
 
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
@@ -1374,11 +1374,23 @@ export default class ExpiredInventory extends Component {
 
                             </div>
                         </div>
-                        {this.state.outPutList.length>0 && <span style={{float:"left"}}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
-                        <div className="">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground">
+                        {this.state.outPutList.length > 0 && <span style={{ float: "left" }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"}>
                             </div>
                         </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </CardBody>
                 </Card>
                 <Modal isOpen={this.state.expiredStockModal}
@@ -1434,17 +1446,7 @@ export default class ExpiredInventory extends Component {
                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledExpiredStock()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }

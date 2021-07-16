@@ -6,12 +6,17 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
+    console.log("###Started with calculations of supply plan", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+    console.log("###ProgramId", programId);
+    console.log("###Planning unit Id", planningUnitId);
+    console.log("###Planning unit list", planningUnitList);
+    console.log("###Planning unit list", minimumDate);
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
             problemListChild.qatProblemActions(programId, "loading", true);
         } else {
-            props.fetchData(1);
+            props.fetchData(1, programId);
         }
         // }
     } else {
@@ -71,7 +76,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         regionListFiltered = regionList;
 
                         // Filtering program planning unit based on program Id and active is true
-                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active == true);
+                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active.toString() == "true");
                         // Filter planning unit list for single planning unit
                         if (planningUnitId != 0) {
                             programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
@@ -93,9 +98,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             // Loop across filtered planning unit
                             for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
                                 // Getting max data entry date
-                                var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
-                                var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
-                                var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
+                                var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                 let invmax = moment.max(inventoryListForMax.map(d => moment(d.inventoryDate)))
                                 let shipmax = moment.max(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                 let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
@@ -112,7 +117,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
                                 var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
                                 // Adding months in past for all the calculations
-                                var lastDataEntryDate = moment(maxDate).add(programPlanningUnitList[ppL].monthsInPastForAmc, 'months').format("YYYY-MM-DD");
+                                var lastDataEntryDate = moment(maxDate).add((programPlanningUnitList[ppL].monthsInPastForAmc), 'months').format("YYYY-MM-DD");
+                                var lastDate = lastDataEntryDate;
+                                var dateAfterFiveYrs = moment(Date.now()).add(60, 'months').format("YYYY-MM-DD");
+                                if (moment(dateAfterFiveYrs).format("YYYY-MM-DD") > moment(lastDataEntryDate).format("YYYY-MM-DD")) {
+                                    lastDataEntryDate = dateAfterFiveYrs;
+                                }
+
                                 // Filtering supply plan data for excluding the selected planning units
                                 supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
                                 // Looping till the max data entry date
@@ -226,9 +237,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         openingBalanceWps = 0;
                                     }
 
+                                    if (moment(startDate).format("YYYY-MM-DD") > moment(lastDate).format("YYYY-MM-DD") && openingBalance == 0 && openingBalanceWps == 0) {
+                                        lastDataEntryDate = startDate;
+                                    }
                                     // Shipments part
                                     // Getting shipments list for planning unit
-                                    var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active == true && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true);
+                                    var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                                     // Getting shipment list for a month
                                     var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
                                     var shipmentTotalQty = 0;
@@ -318,7 +332,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                         batchId: bd.batchId,
                                                         batchNo: bd.batchNo,
                                                         expiryDate: bd.expiryDate,
-                                                        createdDate:bd.createdDate,
+                                                        createdDate: bd.createdDate,
                                                         autoGenerated: bd.autoGenerated,
                                                         openingBalance: 0,
                                                         openingBalanceWps: 0,
@@ -348,14 +362,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-                                    console.log("Trans Date+++",startDate)
-                                    for(var b=0;b<myArray.length;b++){
-                                        console.log("MyArray[b]+++",myArray[b])
-                                    }
+                                    console.log("Trans Date+++", startDate)
 
                                     // Inventory part
                                     // Filtering inventory for planning unit and that particular month
-                                    var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                    var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                     var actualStockCount = 0;
                                     var adjustmentQty = 0;
                                     var regionsReportingActualInventory = 0;
@@ -389,7 +400,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                                 batchId: bd.batchId,
                                                                 batchNo: bd.batchNo,
                                                                 expiryDate: bd.expiryDate,
-                                                                createdDate:bd.createdDate,
+                                                                createdDate: bd.createdDate,
                                                                 autoGenerated: bd.autoGenerated,
                                                                 openingBalance: 0,
                                                                 openingBalanceWps: 0,
@@ -428,7 +439,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                                 batchId: bd.batchId,
                                                                 batchNo: bd.batchNo,
                                                                 expiryDate: bd.expiryDate,
-                                                                createdDate:bd.createdDate,
+                                                                createdDate: bd.createdDate,
                                                                 autoGenerated: bd.autoGenerated,
                                                                 openingBalance: 0,
                                                                 openingBalanceWps: 0,
@@ -456,7 +467,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     // Consumption part
                                     // Filtering consumption list for that month, that planning unit
-                                    var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                    var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                     var actualConsumptionQty = 0;
                                     var forecastedConsumptionQty = 0;
                                     var regionsReportingActualConsumption = [];
@@ -507,7 +518,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                             batchId: bd.batchId,
                                                             batchNo: bd.batchNo,
                                                             expiryDate: bd.expiryDate,
-                                                            createdDate:bd.createdDate,
+                                                            createdDate: bd.createdDate,
                                                             autoGenerated: bd.autoGenerated,
                                                             openingBalance: 0,
                                                             openingBalanceWps: 0,
@@ -825,7 +836,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var regionsReportingActualConsumptionAmc = []
                                         var noOfRegionsReportingActualConsumptionAmc = []
 
-                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active == true);
+                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
                                         for (var c = 0; c < amcFilter.length; c++) {
                                             if (amcFilter[c].actualFlag.toString() == "true") {
                                                 actualConsumptionQtyAmc += Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
@@ -852,7 +863,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-                                    var amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                    var amc = "";
+                                    if (totalMonths == 0) {
+                                        amc = null;
+                                    } else {
+                                        amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                    }
 
 
                                     // Calculations for Min stock
@@ -918,9 +934,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                     var mos = "";
-                                    if (closingBalance != 0 && amc != 0) {
+                                    if (closingBalance != 0 && amc != 0 && amc != null) {
                                         mos = Number(closingBalance / amc).toFixed(4);
-                                    } else if (amc == 0) {
+                                    } else if (amc == 0 || amc == null) {
                                         mos = null;
                                     } else {
                                         mos = 0;
@@ -978,7 +994,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         } catch (err) {
                             console.log("@@@ in error in calculate")
-                            props.fetchData(1)
+                            props.fetchData(1, programId)
                         }
                         programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                         programJsonForStoringTheResult.supplyPlan = supplyPlanData;
@@ -993,6 +1009,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                             var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
                             programQPLDetailsRequest1.onsuccess = function (event) {
+                                console.log("### completed calculations", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                 if (page == "consumption") {
                                     props.updateState("message", i18n.t('static.message.consumptionSaved'));
                                     props.updateState("color", 'green');
@@ -1000,6 +1017,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.consumptionPage != "consumptionDataEntry") {
                                         props.toggleLarge('Consumption');
                                         if (props.consumptionPage != "supplyPlanCompare") {
+                                            props.updateState("programJson", programJsonForStoringTheResult);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1022,6 +1040,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         }
                                         props.toggleLarge('Adjustments');
                                         if (props.inventoryPage != "supplyPlanCompare") {
+                                            props.updateState("programJson", programJsonForStoringTheResult);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1046,6 +1065,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.shipmentPage != "shipmentDataEntry") {
                                         props.toggleLarge('shipments');
                                         if (props.shipmentPage != "supplyPlanCompare") {
+                                            props.updateState("programJson", programJsonForStoringTheResult);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1057,6 +1077,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.updateState("loading", false);
                                     props.hideFirstComponent()
                                 } else if (page == "whatIf") {
+                                    props.updateState("programJson", programJsonForStoringTheResult);
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("loading", false);
                                 } else if (page == "supplyPlan") {
@@ -1075,7 +1096,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
                                         problemListChild.qatProblemActions(programId, "loading", true);
                                     } else {
-                                        props.fetchData(1)
+                                        props.fetchData(1, programId)
                                     }
                                     // }
                                 }

@@ -302,9 +302,9 @@ class ShipmentGlobalDemandView extends Component {
             table1Headers: [],
             show: false,
             message: '',
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programLst: []
         };
@@ -2234,14 +2234,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#6a82a8',
+                backgroundColor: '#205493',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#dee7f8',
+                backgroundColor: '#a7c6ed',
                 borderWidth: 0,
             }
             ]
@@ -2259,13 +2259,13 @@ class ShipmentGlobalDemandView extends Component {
                 //     '#ED5626',
                 //     '#3fe488'],
                 backgroundColor: [
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9',
-                    '#118b70', '#EDB944', '#F48521', '#ED5626', '#cfcdc9'
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
                 ],
                 legend: {
                     position: 'bottom'
@@ -2293,7 +2293,7 @@ class ShipmentGlobalDemandView extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
                         {(this.state.fundingSourceSplit.length > 0 || this.state.planningUnitSplit.length > 0 || this.state.procurementAgentSplit.length > 0) &&
                             <div className="card-header-actions">
@@ -2562,39 +2562,40 @@ class ShipmentGlobalDemandView extends Component {
                                     {/* </Col> */}
                                 </div>
                             </Form>
-                            <Col md="12 pl-0  ">
-                                <div className="row grid-divider ">
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12 pl-0  ">
+                                    <div className="row grid-divider ">
+                                        {
+                                            this.state.planningUnitSplit.length > 0 &&
+                                            <Col md="8 pl-0">
+                                                <div className="chart-wrapper shipmentOverviewgraphheight" >
+                                                    <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
+                                                </div>
+                                            </Col>
+                                        }
+                                        {
+                                            this.state.fundingSourceSplit.length > 0 &&
+                                            <Col md="4 pl-0">
+                                                <div className="chart-wrapper">
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    /><br />
+                                                </div>
+                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                            </Col>
+                                        }
+                                    </div>
+
+
+                                </Col>
+                                <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
                                     {
                                         this.state.planningUnitSplit.length > 0 &&
-                                        <Col md="8 pl-0">
-                                            <div className="chart-wrapper shipmentOverviewgraphheight" >
-                                                <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
-                                            </div>
-                                        </Col>
+                                        <div className="chart-wrapper shipmentOverviewgraphheight">
+                                            <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
+                                        </div>
                                     }
-                                    {
-                                        this.state.fundingSourceSplit.length > 0 &&
-                                        <Col md="4 pl-0">
-                                            <div className="chart-wrapper">
-                                                <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
-                                                /><br />
-                                            </div>
-                                            <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
-                                        </Col>
-                                    }
-                                </div>
-
-
-                            </Col>
-                            <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
-                                {
-                                    this.state.planningUnitSplit.length > 0 &&
-                                    <div className="chart-wrapper shipmentOverviewgraphheight">
-                                        <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
-                                    </div>
-                                }
-                            </Col>
-                            {/* {
+                                </Col>
+                                {/* {
                                 this.state.procurementAgentSplit.length > 0 &&
                                 <Col md="12 pl-0">
                                     <div className="col-md-12 p-0">
@@ -2607,79 +2608,82 @@ class ShipmentGlobalDemandView extends Component {
                                 </Col>
                             } */}
 
-                            <Col md="12 pl-0 pb-lg-1">
-                                <div className="globalviwe-scroll">
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            {this.state.procurementAgentSplit.length > 0 &&
-                                                <div className="table-responsive ">
-                                                    <Table id="mytable1" responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
+                                <Col md="12 pl-0 pb-lg-1">
+                                    <div className="globalviwe-scroll">
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                {this.state.procurementAgentSplit.length > 0 &&
+                                                    <div className="table-responsive ">
+                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
-                                                                <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
-                                                                <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
-                                                            </tr>
-                                                            <tr>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
+                                                                    <th colSpan={this.state.table1Headers.length} align='center'>{i18n.t('static.report.procurementAgentName')}</th>
+                                                                    <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    {
+                                                                        this.state.table1Headers.map((item, idx) =>
+                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
+                                                                                {this.state.table1Headers[idx]}
+                                                                            </th>
+                                                                        )
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+
                                                                 {
-                                                                    this.state.table1Headers.map((item, idx) =>
-                                                                        <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
-                                                                            {this.state.table1Headers[idx]}
-                                                                        </th>
-                                                                    )
-                                                                }
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-
-                                                            {
-                                                                this.state.procurementAgentSplit.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
-                                                                        {
-                                                                            Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
-                                                                                <td id="addr1" key={idx1}>
-                                                                                    {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                </td>
-                                                                            )
-                                                                        }
-                                                                        <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    this.state.procurementAgentSplit.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
+                                                                            {
+                                                                                Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
+                                                                                    <td id="addr1" key={idx1}>
+                                                                                        {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                    </td>
+                                                                                )
+                                                                            }
+                                                                            <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
 
 
-                                                                    </tr>
-                                                                )}
+                                                                        </tr>
+                                                                    )}
 
-                                                        </tbody>
-                                                    </Table>
+                                                            </tbody>
+                                                        </Table>
 
-                                                </div>
+                                                    </div>
 
 
 
-                                            }
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                        <div class="spinner-border blue ml-4" role="status">
 
                                         </div>
                                     </div>
                                 </div>
-                            </Col>
+                            </div>
+
 
                         </div>
 
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div >
         );

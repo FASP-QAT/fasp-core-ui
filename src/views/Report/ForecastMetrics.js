@@ -57,6 +57,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
+import TracerCategoryService from '../../api/TracerCategoryService';
 import MultiSelect from "react-multi-select-component";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -153,12 +154,14 @@ class ForecastMetrics extends Component {
       programLabels: [],
       message: '',
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 2 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+      rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       loading: true,
-      programLst: []
-
+      programLst: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+      tracerCategories: [],
 
 
     };
@@ -181,6 +184,7 @@ class ForecastMetrics extends Component {
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
     this.filterProgram = this.filterProgram.bind(this)
+    this.filterTracerCategory = this.filterTracerCategory.bind(this);
   }
 
   makeText = m => {
@@ -228,6 +232,9 @@ class ForecastMetrics extends Component {
     csvRow.push('')
     this.state.planningUnitLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    this.state.tracerCategoryLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
     csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
 
@@ -368,6 +375,22 @@ class ForecastMetrics extends Component {
       console.log(y)
     }
 
+
+    let tracerCategoryText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+    y = y + 10;
+    for (var i = 0; i < tracerCategoryText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, tracerCategoryText[i]);
+      y = y + 10;
+      console.log(y)
+    }
+
+
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
       align: 'left'
     })
@@ -424,10 +447,19 @@ class ForecastMetrics extends Component {
     return (row.forecastError > 50) ? 'background-red' : '';
   }
 
+  handleTracerCategoryChange = (tracerCategoryIds) => {
+    tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      tracerCategoryValues: tracerCategoryIds.map(ele => ele),
+      tracerCategoryLabels: tracerCategoryIds.map(ele => ele.label)
+    }, () => {
 
-
-
-
+      // this.filterData()
+      this.getPlanningUnit();
+    })
+  }
 
   handleChange(countrysId) {
     countrysId = countrysId.sort(function (a, b) {
@@ -435,7 +467,13 @@ class ForecastMetrics extends Component {
     })
     this.setState({
       countryValues: countrysId.map(ele => ele),
-      countryLabels: countrysId.map(ele => ele.label)
+      countryLabels: countrysId.map(ele => ele.label),
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
     }, () => {
       this.filterProgram();
       // this.filterData()
@@ -487,14 +525,111 @@ class ForecastMetrics extends Component {
     })
     this.setState({
       programValues: programIds.map(ele => ele),
-      programLabels: programIds.map(ele => ele.label)
+      programLabels: programIds.map(ele => ele.label),
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
     }, () => {
+      this.filterTracerCategory(programIds);
       this.getPlanningUnit();
       this.filterData()
     })
 
   }
 
+  filterTracerCategory(programIds) {
+
+    this.setState({
+      tracerCategories: [],
+      tracerCategoryValues: [],
+      tracerCategoryLabels: [],
+    }, () => {
+      if (programIds.length > 0) {
+        var programIdsValue = [];
+        for (var i = 0; i < programIds.length; i++) {
+          programIdsValue.push(programIds[i].value);
+        }
+        // console.log("programids=====>", programIdsValue);
+        let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
+        TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
+          .then(response => {
+            console.log("tc respons==>", response.data);
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              tracerCategories: listArray
+            }, () => {
+              this.filterData()
+            });
+          }).catch(
+            error => {
+              this.setState({
+                tracerCategories: []
+              }, () => {
+                this.filterData()
+              });
+              if (error.message === "Network Error") {
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
+
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      tracerCategories: [],
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    }, () => {
+                      this.filterData()
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      tracerCategories: [],
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                      loading: false
+                    }, () => {
+                      this.filterData()
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      tracerCategories: [],
+                      message: 'static.unkownError',
+                      loading: false
+                    }, () => {
+                      this.filterData()
+                    });
+                    break;
+                }
+              }
+            }
+          );
+        if (programIdsValue.length == 0) {
+          this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] });
+        } else {
+          this.setState({ message: '' });
+        }
+      }
+    })
+  }
 
   handlePlanningUnitChange(planningUnitIds) {
     console.log(planningUnitIds)
@@ -638,14 +773,15 @@ class ForecastMetrics extends Component {
   filterData() {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
     let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
     let monthInCalc = document.getElementById("viewById").value;
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-    if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
+    if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0 && this.state.tracerCategoryValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
-        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc, "useApprovedSupplyPlanOnly": useApprovedVersion
+        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc, "useApprovedSupplyPlanOnly": useApprovedVersion, "tracerCategoryIds": tracercategory,
 
       }
       // AuthenticationService.setupAxiosInterceptors();
@@ -733,13 +869,46 @@ class ForecastMetrics extends Component {
       //   }
       // );
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] }, () => {
+      this.setState({
+        message: i18n.t('static.program.validcountrytext'),
+        consumptions: [],
+        programValues: [],
+        programLabels: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+        tracerCategories: [],
+        tracerCategoryValues: [],
+        tracerCategoryLabels: [],
+      }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
       });
 
     } else if (this.state.programValues.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] }, () => {
+      this.setState({
+        message: i18n.t('static.common.selectProgram'),
+        consumptions: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+        tracerCategories: [],
+        tracerCategoryValues: [],
+        tracerCategoryLabels: [],
+
+      }, () => {
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+      });
+
+    } else if (this.state.tracerCategoryValues.length == 0) {
+      this.setState({
+        message: i18n.t('static.tracercategory.tracercategoryText'),
+        consumptions: [],
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: [],
+      }, () => {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
       });
@@ -885,67 +1054,87 @@ class ForecastMetrics extends Component {
 
   }
   getPlanningUnit() {
-    let programValues = this.state.programValues;
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
-      if (programValues.length > 0) {
-        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
-          .then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-              planningUnits: listArray,
-            })
-          }).catch(
-            error => {
-              if (error.message === "Network Error") {
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
+    if (this.state.tracerCategoryValues.length > 0) {
+
+      let programValues = this.state.programValues;
+      this.setState({
+        planningUnits: [],
+        planningUnitValues: [],
+        planningUnitLabels: []
+      }, () => {
+        if (programValues.length > 0) {
+          let inputjson = {
+            tracerCategoryIds: this.state.tracerCategoryValues.map(ele => (ele.value).toString()),
+            programIds: programValues.map(ele => (ele.value))
+          }
+          PlanningUnitService.getPlanningUnitByProgramIdsAndTracerCategorieIds(inputjson)
+            .then(response => {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              console.log("resp---->", listArray);
+              this.setState({
+                planningUnits: listArray,
+                planningUnitValues: listArray.map((item, i) => {
+                  return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                }, this),
+                planningUnitLabels: listArray.map((item, i) => {
+                  return (getLabelText(item.label, this.state.lang))
+                }, this),
+                message: ''
+              }, () => {
+                this.filterData();
+              })
+            }).catch(
+              error => {
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: error.response.data.messageCode,
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
                 }
               }
-            }
-          );
-      }
-    })
-
+            );
+        }
+      })
+    } else {
+      this.filterData();
+    }
   }
 
   getPrograms() {
@@ -1209,6 +1398,8 @@ class ForecastMetrics extends Component {
         )
       }, this);
 
+    const { tracerCategories } = this.state;
+
     const columns = [
       {
         dataField: 'program.label',
@@ -1308,7 +1499,7 @@ class ForecastMetrics extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <h5 className="red">{i18n.t(this.state.message)}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
-        <Card style={{ display: this.state.loading ? "none" : "block" }}>
+        <Card>
           <div className="Card-header-reporticon">
             <div className="card-header-actions">
               <a className="card-header-action">
@@ -1414,6 +1605,27 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                      <div className="controls">
+
+                        <MultiSelect
+                          name="tracerCategoryId"
+                          id="tracerCategoryId"
+                          bsSize="sm"
+                          value={this.state.tracerCategoryValues}
+                          onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          options=
+                          {tracerCategories.length > 0 ?
+                            tracerCategories.map((item, i) => {
+                              return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+
+                            }, this) : []} />
+
+                      </div>
+                    </FormGroup>
+
 
                     <FormGroup className="col-sm-3" id="hideDiv">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
@@ -1432,6 +1644,7 @@ class ForecastMetrics extends Component {
 
                       </div>
                     </FormGroup>
+
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
                       <div className="controls ">
@@ -1496,23 +1709,23 @@ class ForecastMetrics extends Component {
                 </div>
               </Col> */}
 
-            <div className="ReportSearchMarginTop">
+            <div className="ReportSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
               <div id="tableDiv" className="jexcelremoveReadonlybackground">
+              </div>
+            </div>
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                <div class="align-items-center">
+                  <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                  <div class="spinner-border blue ml-4" role="status">
+
+                  </div>
+                </div>
               </div>
             </div>
           </CardBody>
         </Card>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
 
 
       </div>

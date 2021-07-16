@@ -1,5 +1,7 @@
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Pie, HorizontalBar } from 'react-chartjs-2';
+import FundingSourceService from '../../api/FundingSourceService';
+import BudgetService from '../../api/BudgetService';
 import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import {
@@ -27,6 +29,7 @@ import {
     CardColumns,
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
+
 import Select from 'react-select';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import paginationFactory from 'react-bootstrap-table2-paginator'
@@ -43,7 +46,8 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -57,6 +61,12 @@ import ProgramService from '../../api/ProgramService';
 import MultiSelect from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { filter } from 'jszip';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { red } from '@material-ui/core/colors';
+
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -224,12 +234,21 @@ class ShipmentSummery extends Component {
             shipmentDetailsMonthList: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 2 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             programId: '',
-            versionId: ''
+            versionId: '',
+            fundingSources: [],
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
+
+            budgets: [],
+            budgetValues: [],
+            budgetLabels: [],
+
+            filteredBudgetList: []
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -237,7 +256,11 @@ class ShipmentSummery extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-
+        this.getFundingSourceList = this.getFundingSourceList.bind(this);
+        this.getBudgetList = this.getBudgetList.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
+        this.loaded = this.loaded.bind(this);
+        this.selected = this.selected.bind(this);
     }
 
 
@@ -278,6 +301,12 @@ class ShipmentSummery extends Component {
         this.state.planningUnitLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
+        this.state.fundingSourceLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        this.state.budgetLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.budgetHead.budget') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.display') + '  :  ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
@@ -303,7 +332,9 @@ class ShipmentSummery extends Component {
         i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20'), i18n.t('static.report.erpOrder').replaceAll(' ', '%20'),
         i18n.t('static.report.localprocurement').replaceAll(' ', '%20'), i18n.t('static.report.orderNo').replaceAll(' ', '%20').replaceAll('#', '%23'),
         (i18n.t('static.report.procurementAgentName')).replaceAll(' ', '%20'),
-        (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
+        (i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'),
+        (i18n.t('static.budgetHead.budget')).replaceAll(' ', '%20'),
+        (i18n.t('static.common.status')).replaceAll(' ', '%20'), (i18n.t('static.report.qty')).replaceAll(' ', '%20'),
         (i18n.t('static.report.expectedReceiveddate')).replaceAll(' ', '%20'), (i18n.t('static.report.productCost')).replaceAll(' ', '%20'), (i18n.t('static.report.freightCost')).replaceAll(' ', '%20'),
         (i18n.t('static.report.totalCost')).replaceAll(' ', '%20'), (i18n.t('static.program.notes')).replaceAll(' ', '%20')])]
 
@@ -314,15 +345,22 @@ class ShipmentSummery extends Component {
         for (var item = 0; item < re.length; item++) {
             //console.log(item,'===>',re[item])
             B.push(this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].shipmentId,
-            re[item].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20') : '',
-            re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
-            re[item].localProcurement == true ? i18n.t('static.report.localprocurement').replaceAll(' ', '%20') : '',
-            re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'), (re[item].fundingSource.code).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            // re[item].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder').replaceAll(' ', '%20') : '',
+            re[item].emergencyOrder,
+            // re[item].erpOrder == true ? i18n.t('static.report.erpOrder').replaceAll(' ', '%20') : '',
+            re[item].erpOrder == true ? true : false,
+            // re[item].localProcurement == true ? i18n.t('static.report.localprocurement').replaceAll(' ', '%20') : '',
+            re[item].localProcurement,
+            re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'),
+            (re[item].fundingSource.code).replaceAll(' ', '%20'),
+            (re[item].budget.code).replaceAll(' ', '%20'),
+            (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),
-            ((re[item].notes).replaceAll('#', ' ')).replaceAll(' ', '%20')
+            ((re[item].notes != null && re[item].notes != '' && re[item].notes != "") ? re[item].notes.replaceAll('#', ' ').replaceAll(' ', '%20') : '')
+
             ]))
         }
         for (var i = 0; i < B.length; i++) {
@@ -393,8 +431,15 @@ class ShipmentSummery extends Component {
                     doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
+                    var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText)
+
+                    var budgetText = doc.splitTextToSize((i18n.t('static.budgetHead.budget') + ' : ' + this.state.budgetLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 190, budgetText)
+
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+                    doc.text(doc.internal.pageSize.width / 8, 210, planningText)
+
 
 
                 }
@@ -419,7 +464,7 @@ class ShipmentSummery extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 100;
         var aspectwidth1 = (width - h1);
-        let startY = 170 + (this.state.planningUnitLabels.length * 3)
+        let startY = 210 + (this.state.planningUnitLabels.length * 3)
         doc.addImage(canvasImg, 'png', 50, startY, 750, 260, 'CANVAS');
 
         //Table1
@@ -445,29 +490,82 @@ class ShipmentSummery extends Component {
         doc.autoTable(content1);
 
         //Table2
-        let content2 = {
+
+
+        // let content2 = {
+        //     margin: { top: 80, bottom: 100 },
+        //     startY: doc.autoTableEndPosY() + 50,
+        //     pageBreak: 'auto',
+        //     styles: { lineWidth: 1, fontSize: 8, cellWidth: 46, halign: 'center' },
+        //     columnStyles: {
+        //         0: { cellWidth: 104.89 },
+        //     },
+        //     html: '#shipmentDetailsListTableDiv',
+
+        //     didDrawCell: function (data) {
+        //         if (data.column.index === 15 && data.cell.section === 'body') {
+        //             var td = data.cell.raw;
+        //             var img = td.getElementsByTagName('img')[0];
+        //             var dim = data.cell.height - data.cell.padding('vertical');
+        //             var textPos = data.cell.textPos;
+        //             doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+        //         }
+        //     }
+        // };
+
+        let headerTable2 = []
+        headerTable2.push(i18n.t('static.report.planningUnit/ForecastingUnit'));
+        headerTable2.push(i18n.t('static.report.id'));
+        headerTable2.push(i18n.t('static.supplyPlan.consideAsEmergencyOrder'));
+        headerTable2.push(i18n.t('static.report.erpOrder'));
+        headerTable2.push(i18n.t('static.report.localprocurement'));
+        headerTable2.push(i18n.t('static.report.orderNo'));
+        headerTable2.push(i18n.t('static.report.procurementAgentName'));
+        headerTable2.push(i18n.t('static.budget.fundingsource'));
+        headerTable2.push(i18n.t('static.dashboard.budget'));
+        headerTable2.push(i18n.t('static.common.status'));
+        headerTable2.push(i18n.t('static.report.qty'));
+        headerTable2.push(i18n.t('static.report.expectedReceiveddate'));
+        headerTable2.push(i18n.t('static.report.productCost'));
+        headerTable2.push(i18n.t('static.report.freightCost'));
+        headerTable2.push(i18n.t('static.report.totalCost'));
+        headerTable2.push(i18n.t('static.program.notes'));
+
+        let data;
+        data = this.state.shipmentDetailsList.map(
+            ele => [
+                getLabelText(ele.planningUnit.label, this.state.lang),
+                ele.shipmentId,
+                ele.emergencyOrder,
+                ele.erpOrder == true ? true : false,
+                ele.localProcurement,
+                ele.orderNo != null ? ele.orderNo : '',
+                ele.procurementAgent.code,
+                ele.fundingSource.code,
+                ele.budget.code,
+                getLabelText(ele.shipmentStatus.label, this.state.lang),
+                this.state.viewById == 1 ? (this.formatter(ele.shipmentQty)) : (this.formatter(Number(ele.shipmentQty) * ele.multiplier)),
+                moment(ele.expectedDeliveryDate).format('YYYY-MM-DD'),
+                ele.productCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                ele.freightCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                ele.totalCost.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                ele.notes
+            ]);
+
+        // var startYTable2 = 180 + (this.state.planningUnitValues.length * 3)
+        let contentTable2 = {
             margin: { top: 80, bottom: 100 },
-            startY: doc.autoTableEndPosY() + 50,
+            startY: 200,
             pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 46, halign: 'center' },
+            head: [headerTable2],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             columnStyles: {
-                0: { cellWidth: 104.89 },
+                0: { cellWidth: 100 },
+                15: { cellWidth: 110 },
             },
-            html: '#mytable2',
-
-            didDrawCell: function (data) {
-                if (data.column.index === 15 && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var img = td.getElementsByTagName('img')[0];
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
-                }
-            }
         };
-
-        doc.autoTable(content2);
-
+        doc.autoTable(contentTable2);
 
         addHeaders(doc)
         addFooters(doc)
@@ -479,6 +577,427 @@ class ShipmentSummery extends Component {
         doc.save('canvas.pdf');*/
     }
 
+    getFundingSourceList() {
+        const { fundingSources } = this.state
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            FundingSourceService.getFundingSourceListAll()
+                .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSources: listArray
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSources: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            var db3;
+            var fSourceResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var fSourceTransaction = db3.transaction(['fundingSource'], 'readwrite');
+                var fSourceOs = fSourceTransaction.objectStore('fundingSource');
+                var fSourceRequest = fSourceOs.getAll();
+                fSourceRequest.onerror = function (event) {
+                    //handel error
+                }.bind(this);
+                fSourceRequest.onsuccess = function (event) {
+
+                    fSourceResult = fSourceRequest.result;
+                    console.log("funding source list offline--->", fSourceResult);
+                    this.setState({
+                        fundingSources: fSourceResult.sort(function (a, b) {
+                            a = a.fundingSourceCode.toLowerCase();
+                            b = b.fundingSourceCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+
+                }.bind(this)
+
+            }.bind(this)
+
+
+        }
+
+    }
+
+    getBudgetList() {
+        const { budgets } = this.state
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            BudgetService.getBudgetList()
+                .then(response => {
+                    var listArray = response.data.filter(b => b.program.id == this.state.programId);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.budgetCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.budgetCode.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    var budgetValuesFromProps = [];
+                    var budgetLabelsFromProps = [];
+                    if (this.props.match.params.budgetId != '' && this.props.match.params.budgetId != undefined) {
+                        budgetValuesFromProps.push({
+                            label: this.props.match.params.budgetCode,
+                            value: parseInt(this.props.match.params.budgetId),
+                        });
+                        budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+                    }
+                    console.log("budgetValuesFromProps online===>", budgetValuesFromProps);
+                    this.setState({
+                        budgetValues: budgetValuesFromProps,
+                        budgetLabels: budgetLabelsFromProps,
+                        budgets: listArray,
+                        filteredBudgetList: listArray
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            budgets: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.fundingsource.fundingsource') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            var db3;
+            var fSourceResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var fSourceTransaction = db3.transaction(['budget'], 'readwrite');
+                var fSourceOs = fSourceTransaction.objectStore('budget');
+                var fSourceRequest = fSourceOs.getAll();
+                fSourceRequest.onerror = function (event) {
+                    //handel error
+                }.bind(this);
+                fSourceRequest.onsuccess = function (event) {
+
+                    var budgetValuesFromProps = [];
+                    var budgetLabelsFromProps = [];
+                    if (this.props.match.params.budgetId != '' && this.props.match.params.budgetId != undefined) {
+                        budgetValuesFromProps.push({
+                            label: this.props.match.params.budgetCode,
+                            value: parseInt(this.props.match.params.budgetId),
+                        });
+                        budgetLabelsFromProps.push(this.props.match.params.budgetCode);
+                    }
+                    console.log("budgetValuesFromProps offline===>", budgetValuesFromProps);
+
+                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == this.state.programId);
+                    console.log("budget list offline--->", fSourceResult);
+                    this.setState({
+                        budgetValues: budgetValuesFromProps,
+                        budgetLabels: budgetLabelsFromProps,
+                        budgets: fSourceResult.sort(function (a, b) {
+                            a = a.budgetCode.toLowerCase();
+                            b = b.budgetCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        filteredBudgetList: fSourceResult.sort(function (a, b) {
+                            a = a.budgetCode.toLowerCase();
+                            b = b.budgetCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+
+                }.bind(this)
+
+            }.bind(this)
+        }
+
+    }
+
+    handleFundingSourceChange = (fundingSourceIds) => {
+        console.log("fundingSourceIds+++", fundingSourceIds);
+        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        var fundingSourceIdsArray = [];
+        fundingSourceIds.map(fm => {
+            fundingSourceIdsArray.push(parseInt(fm.value));
+        });
+        var budgetList = fundingSourceIdsArray.length > 0 ? this.state.budgets.filter(b => fundingSourceIdsArray.includes(parseInt(b.fundingSource.fundingSourceId))) : this.state.budgets;
+        console.log("budgetListFiltered+++", budgetList);
+        this.setState({
+            budgetValues: [],
+            budgetLabels: [],
+            fundingSourceValues: fundingSourceIds.map(ele => ele),
+            fundingSourceLabels: fundingSourceIds.map(ele => ele.label),
+            filteredBudgetList: budgetList
+        }, () => {
+            this.fetchData()
+        })
+    }
+
+    handleBudgetChange = (budgetIds) => {
+        console.log("budgetIds", budgetIds);
+        budgetIds = budgetIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            budgetValues: budgetIds.map(ele => ele),
+            budgetLabels: budgetIds.map(ele => ele.label)
+        }, () => {
+            this.fetchData()
+        })
+    }
+
+    buildJExcel() {
+
+        let shipmentDetailsList = this.state.shipmentDetailsList;
+        let shipmentDetailsListArray = [];
+        let count = 0;
+        for (var j = 0; j < shipmentDetailsList.length; j++) {
+            data = [];
+            data[0] = getLabelText(shipmentDetailsList[j].planningUnit.label, this.state.lang)
+            data[1] = shipmentDetailsList[j].shipmentId
+            // data[2] = shipmentDetailsList[j].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder') : ''
+            data[2] = shipmentDetailsList[j].emergencyOrder;
+            // data[3] = shipmentDetailsList[j].erpOrder == true ? i18n.t('static.report.erpOrder') : '';
+            data[3] = shipmentDetailsList[j].erpFlag;
+            // data[4] = shipmentDetailsList[j].localProcurement == true ? i18n.t('static.report.localprocurement') : '';
+            data[4] = shipmentDetailsList[j].localProcurement;
+            data[5] = shipmentDetailsList[j].orderNo != null ? shipmentDetailsList[j].orderNo : '';
+            data[6] = shipmentDetailsList[j].procurementAgent.code;
+            data[7] = shipmentDetailsList[j].fundingSource.code;
+            data[8] = shipmentDetailsList[j].budget.code;
+            data[9] = getLabelText(shipmentDetailsList[j].shipmentStatus.label, this.state.lang);
+            data[10] = this.state.viewById == 1 ? (shipmentDetailsList[j].shipmentQty) : (Number(shipmentDetailsList[j].shipmentQty) * shipmentDetailsList[j].multiplier);
+            data[11] = moment(shipmentDetailsList[j].expectedDeliveryDate).format('YYYY-MM-DD');
+            data[12] = shipmentDetailsList[j].productCost.toFixed(2);
+            data[13] = shipmentDetailsList[j].freightCost.toFixed(2);
+            data[14] = shipmentDetailsList[j].totalCost.toFixed(2);
+            data[15] = shipmentDetailsList[j].notes;
+            data[16] = shipmentDetailsList[j].planningUnit.id;
+
+            shipmentDetailsListArray[count] = data;
+            count++;
+        }
+
+        this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = shipmentDetailsListArray;
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.report.planningUnit/ForecastingUnit'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.id'),
+                    type: 'numeric',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.supplyPlan.consideAsEmergencyOrder'),
+                    type: 'hidden',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.erpOrder'),
+                    type: 'checkbox',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.localprocurement'),
+                    type: 'checkbox',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.orderNo'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.procurementAgentName'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.budget.fundingsource'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.dashboard.budget'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.status'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.qty'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    decimal: '.',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.expectedReceiveddate'),
+                    type: 'calendar',
+                    // readOnly: true
+                    options: {
+                        format: JEXCEL_DATE_FORMAT,
+                    }
+                },
+                {
+                    title: i18n.t('static.report.productCost'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    decimal: '.',
+                    // readOnly: true
+                },
+                {
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    decimal: '.',
+                    title: i18n.t('static.report.freightCost'),
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.totalCost'),
+                    type: 'numeric',
+                    mask: '#,##.00',
+                    decimal: '.',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: 'Planning Unit Id',
+                    type: 'hidden',
+                    // readOnly: true
+                },
+
+            ],
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            filters: true,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            // oneditionend: this.onedit,
+            // columnResize:true,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        };
+        var shipmentDetailsEl = jexcel(document.getElementById("shipmentDetailsListTableDiv"), options);
+        this.el = shipmentDetailsEl;
+        this.setState({
+            shipmentDetailsEl: shipmentDetailsEl, loading: false
+        })
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        for (var j = 0; j < json.length; j++) {
+            var colArr = ['A', 'B', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+            var rowData = elInstance.getRowData(j);
+            var emergencyOrder = rowData[2];
+            if (emergencyOrder) {
+                // console.log("hi*** there")
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', '#FF0000');
+                }
+            }
+        }
+    }
+
+    selected = function (instance, cell, x, y, value) {
+        if ((x == 0 && value != 0) || (y == 0)) {
+            // console.log("HEADER SELECTION--------------------------");
+        } else {
+            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+            let versionId = document.getElementById("versionId").value;
+            let programId = document.getElementById("programId").value;
+            let userId = AuthenticationService.getLoggedInUserId();
+
+            if (versionId.includes('Local')) {
+                var planningUnitId = this.el.getValueFromCoords(16, x);
+                var rangeValue = this.state.rangeValue;
+                var programIdd = programId + '_v' + versionId.split(' ')[0] + '_uId_' + userId;
+                console.log("proId***", programIdd);
+                console.log("p***", planningUnitId);
+                console.log("rangeVlaue***", this.state.rangeValue);
+                localStorage.setItem('sesRangeValue', JSON.stringify(rangeValue));
+                window.open(window.location.origin + `/#/shipment/shipmentDetails/${programIdd}/${versionId}/${planningUnitId}`);
+            }
+            // }
+        }
+    }
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
@@ -619,6 +1138,7 @@ class ShipmentSummery extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
+                        this.getBudgetList();
                     })
                 } else {
                     this.setState({
@@ -921,6 +1441,8 @@ class ShipmentSummery extends Component {
 
     componentDidMount() {
         this.getPrograms();
+        this.getFundingSourceList();
+        // this.getBudgetList();
     }
 
     setProgramId(event) {
@@ -930,6 +1452,7 @@ class ShipmentSummery extends Component {
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
             this.filterVersion();
+            this.getBudgetList();
         })
     }
 
@@ -969,17 +1492,33 @@ class ShipmentSummery extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
-        console.log("versionId----", versionId);
-        console.log("programId----", programId);
-        console.log("planningUnitIds---", planningUnitIds);
+        let myFundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value));
+        let myBudgetIds = this.state.budgetValues.length == this.state.budgets.length ? [] : this.state.budgetValues.map(ele => (ele.value));
+
+
+        console.log("versionId++++", versionId);
+        console.log("programId++++", programId);
+        console.log("planningUnitIds++++", planningUnitIds);
+        console.log("fundingSourceIds++++", myFundingSourceIds);
+        console.log("budgetIds++++", myBudgetIds);
 
 
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
 
             if (versionId.includes('Local')) {
+
                 this.setState({ loading: true })
+                //////////////////------------------------table two content
+
                 planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value));
                 console.log("planninuit ids====>", planningUnitIds);
+
+                myFundingSourceIds = this.state.fundingSourceValues.map(ele => (ele.value));
+                console.log("fundingSource ids====>", myFundingSourceIds);
+
+                myBudgetIds = this.state.budgetValues.map(ele => (ele.value));
+                console.log("budget ids====>", myBudgetIds);
+
                 var db1;
                 var storeOS;
                 getDatabase();
@@ -1013,6 +1552,8 @@ class ShipmentSummery extends Component {
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
+
+
                         console.log("shipmentList------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true") && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
                         // const activeFilter = shipmentList;
@@ -1020,6 +1561,8 @@ class ShipmentSummery extends Component {
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
                         let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >= moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <= moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >= moment(startDate).format('YYYY-MM-DD') && c.receivedDate <= moment(endDate).format('YYYY-MM-DD')))
                         console.log('dateFilter', dateFilter)
+
+
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
@@ -1049,148 +1592,228 @@ class ShipmentSummery extends Component {
                             for (var k = 0; k < myResult.length; k++) {
                                 var planningUnitObj = {
                                     id: myResult[k].planningUnitId,
-                                    multiplier: myResult[k].multiplier
+                                    multiplier: myResult[k].multiplier,
+                                    label: myResult[k].label,
+                                    forecastingUnit: myResult[k].forecastingUnit
                                 }
                                 planningList[k] = planningUnitObj
                             }
+                            var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var paOs = paTransaction.objectStore('procurementAgent');
+                            var paRequest = paOs.getAll();
+                            var procurementAgentList = [];
 
-                            console.log("planningList------>", planningList);
-
-
-
-
-                            for (let i = 0; i < planningUnitFilter.length; i++) {
-                                let multiplier = 0;
-                                for (let j = 0; j < planningList.length; j++) {
-                                    if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
-                                        multiplier = planningList[j].multiplier;
-                                        j = planningList.length;
-                                    }
-                                }
-
-                                let json = {
-                                    "shipmentId": planningUnitFilter[i].shipmentId,
-                                    "planningUnit": planningUnitFilter[i].planningUnit,
-                                    "forecastingUnit": planningUnitFilter[i].planningUnit.forecastingUnit,
-                                    "multiplier": multiplier,
-                                    "procurementAgent": planningUnitFilter[i].procurementAgent,
-                                    "fundingSource": planningUnitFilter[i].fundingSource,
-                                    "shipmentStatus": planningUnitFilter[i].shipmentStatus,
-                                    "shipmentQty": planningUnitFilter[i].shipmentQty,
-                                    "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
-                                    "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
-                                    "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
-                                    "notes": planningUnitFilter[i].notes,
-                                    "emergencyOrder": planningUnitFilter[i].emergencyOrder,
-                                    "erpFlag": planningUnitFilter[i].erpFlag,
-                                    "localProcurement": planningUnitFilter[i].localProcurement,
-                                    "orderNo": planningUnitFilter[i].orderNo
-                                }
-                                data.push(json);
-
-
-
-                            }
-                            data = data.sort(function (a, b) {
-                                return parseInt(a.shipmentId) - parseInt(b.shipmentId);
-                            })
-                            var shipmentDetailsFundingSourceList = []
-                            const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
-                            console.log('fundingSourceIds', fundingSourceIds)
-                            fundingSourceIds.map(ele => {
-                                var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
-                                console.log('fundingSourceList', fundingSourceList)
-                                var cost = 0;
-                                var quantity = 0;
-                                console.log('fundingSourceList', fundingSourceList)
-                                fundingSourceList.map(c => {
-                                    cost = cost + Number(c.productCost) + Number(c.freightCost)
-                                    quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
+                            paRequest.onerror = function (event) {
+                                // Handle errors!
+                                this.setState({
+                                    loading: false
                                 })
-                                var json = {
-                                    "fundingSource": fundingSourceList[0].fundingSource,
-                                    "orderCount": fundingSourceList.length,
-                                    "cost": cost,
-                                    "quantity": quantity
-                                }
-                                shipmentDetailsFundingSourceList.push(json)
-                            })
-                            console.log("data ofline----->", data);
-                            console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
+                            };
 
-                            var shipmentDetailsMonthList = [];
-                            var monthstartfrom = this.state.rangeValue.from.month
-                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                                var monthlydata = [];
-                                console.log(programJson)
-                                for (var month = monthstartfrom; month <= 12; month++) {
-                                    var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                                    var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                    console.log(dtstr, ' ', enddtStr)
-                                    var dt = dtstr
-                                    var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
 
-                                    var onholdCost = 0
-                                    var plannedCost = 0
-                                    var receivedCost = 0
-                                    var shippedCost = 0
-                                    var submittedCost = 0
-                                    var approvedCost = 0
-                                    var arrivedCost = 0
-                                    var submittedCost = 0
-                                    shiplist.map(ele => {
-                                        console.log(ele)
-                                        if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                            plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
-                                            //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                            submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                            approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
-                                            shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                            arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                            receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
-                                        } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                            onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                            paRequest.onsuccess = function (e) {
+                                var paResult = [];
+                                paResult = paRequest.result;
+
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                                var bOs = bTransaction.objectStore('budget');
+                                var bRequest = bOs.getAll();
+
+                                bRequest.onerror = function (event) {
+                                    // Handle errors!
+                                    this.setState({
+                                        loading: false
+                                    })
+                                };
+
+
+                                bRequest.onsuccess = function (e) {
+                                    var bResult = [];
+                                    bResult = bRequest.result;
+                                    console.log("planningList------>", planningList);
+
+                                    for (let i = 0; i < planningUnitFilter.length; i++) {
+                                        let multiplier = 0;
+                                        for (let j = 0; j < planningList.length; j++) {
+                                            if (planningUnitFilter[i].planningUnit.id == planningList[j].id) {
+                                                multiplier = planningList[j].multiplier;
+                                                j = planningList.length;
+                                            }
                                         }
+                                        var planningUnit = planningList.filter(c => c.id == planningUnitFilter[i].planningUnit.id);
+                                        var procurementAgent = paResult.filter(c => c.procurementAgentId == planningUnitFilter[i].procurementAgent.id);
+                                        if (procurementAgent.length > 0) {
+                                            var simplePAObject = {
+                                                id: procurementAgent[0].procurementAgentId,
+                                                label: procurementAgent[0].label,
+                                                code: procurementAgent[0].procurementAgentCode
+                                            }
+                                        }
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[i].fundingSource.id);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var budget = [];
+                                        if (planningUnitFilter[i].budget.id > 0) {
+                                            var budget = bResult.filter(c => c.budgetId == planningUnitFilter[i].budget.id);
+                                            if (budget.length > 0) {
+                                                var simpleBObject = {
+                                                    id: budget[0].budgetId,
+                                                    label: budget[0].label,
+                                                    code: budget[0].budgetCode
+                                                }
+                                            }
+                                        }
+                                        let json = {
+                                            "shipmentId": planningUnitFilter[i].shipmentId,
+                                            "planningUnit": planningUnit.length > 0 ? planningUnit[0] : planningUnitFilter[i].planningUnit,
+                                            "forecastingUnit": planningUnit.length > 0 ? planningUnit[0].forecastingUnit : planningUnitFilter[i].planningUnit.forecastingUnit,
+                                            "multiplier": multiplier,
+                                            "procurementAgent": procurementAgent.length > 0 ? simplePAObject : planningUnitFilter[i].procurementAgent,
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : planningUnitFilter[i].fundingSource,
+                                            "shipmentStatus": planningUnitFilter[i].shipmentStatus,
+                                            "shipmentQty": planningUnitFilter[i].shipmentQty,
+                                            "expectedDeliveryDate": planningUnitFilter[i].receivedDate == null || planningUnitFilter[i].receivedDate == '' ? planningUnitFilter[i].expectedDeliveryDate : planningUnitFilter[i].receivedDate,
+                                            "productCost": planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "freightCost": planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd,
+                                            "totalCost": (planningUnitFilter[i].productCost * planningUnitFilter[i].currency.conversionRateToUsd) + (planningUnitFilter[i].freightCost * planningUnitFilter[i].currency.conversionRateToUsd),
+                                            "notes": planningUnitFilter[i].notes,
+                                            "emergencyOrder": planningUnitFilter[i].emergencyOrder,
+                                            "erpFlag": planningUnitFilter[i].erpFlag,
+                                            "localProcurement": planningUnitFilter[i].localProcurement,
+                                            "orderNo": planningUnitFilter[i].orderNo,
+                                            "budget": budget.length > 0 ? simpleBObject : planningUnitFilter[i].budget,
+                                            // took program code in josn just for shipmnet details screen when local version is selected by user and user what to naviget to shipment datat entry screen
+                                            // "programCode": programJson.programCode
+                                        }
+                                        data.push(json);
+                                    }
+
+                                    data = myFundingSourceIds.length > 0 ? data.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : data;
+                                    data = myBudgetIds.length > 0 ? data.filter(b => myBudgetIds.includes(b.budget.id)) : data;
+
+                                    data = data.sort(function (a, b) {
+                                        return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                                     })
 
-                                    let json = {
-                                        "dt": new Date(from, month - 1),
-                                        "approvedCost": approvedCost,
-                                        "arrivedCost": arrivedCost,
-                                        "onholdCost": onholdCost,
-                                        "plannedCost": plannedCost,
-                                        "receivedCost": receivedCost,
-                                        "shippedCost": shippedCost,
-                                        "submittedCost": submittedCost
-                                    }
-                                    shipmentDetailsMonthList.push(json)
-                                    if (month == this.state.rangeValue.to.month && from == to) {
-                                        console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
-                                        this.setState({
-                                            shipmentDetailsList: data,
-                                            shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
-                                            shipmentDetailsMonthList: shipmentDetailsMonthList,
-                                            message: '',
-                                            viewById: viewById, loading: false
+                                    console.log("data***", data);
+                                    ///////////--------------------------- table one content
+                                    var shipmentDetailsFundingSourceList = []
+                                    const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
+                                    console.log('fundingSourceIds', fundingSourceIds)
+                                    fundingSourceIds.map(ele => {
+                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == ele);
+                                        if (fundingSource.length > 0) {
+                                            var simpleFSObject = {
+                                                id: fundingSource[0].fundingSourceId,
+                                                label: fundingSource[0].label,
+                                                code: fundingSource[0].fundingSourceCode
+                                            }
+                                        }
+                                        var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        var cost = 0;
+                                        var quantity = 0;
+                                        console.log('fundingSourceList', fundingSourceList)
+                                        fundingSourceList.map(c => {
+                                            cost = cost + Number(c.productCost) + Number(c.freightCost)
+                                            quantity = quantity + (viewById == 1 ? Number(c.shipmentQty) : (Number(c.shipmentQty) * c.multiplier))
                                         })
-                                        return;
+                                        var json = {
+                                            "fundingSource": fundingSource.length > 0 ? simpleFSObject : fundingSourceList[0].fundingSource,
+                                            "orderCount": fundingSourceList.length,
+                                            "cost": cost,
+                                            "quantity": quantity
+                                        }
+                                        shipmentDetailsFundingSourceList.push(json)
+                                    })
+                                    console.log("data ofline----->", data);
+                                    console.log("shipmentDetailsFundingSourceList ofline----->", shipmentDetailsFundingSourceList);
+
+                                    var shipmentDetailsMonthList = [];
+                                    var monthstartfrom = this.state.rangeValue.from.month
+                                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                        var monthlydata = [];
+                                        console.log(programJson)
+                                        for (var month = monthstartfrom; month <= 12; month++) {
+                                            var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
+                                            var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
+                                            console.log(dtstr, ' ', enddtStr)
+                                            var dt = dtstr
+                                            var shiplist = planningUnitFilter.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
+
+                                            shiplist = myFundingSourceIds.length > 0 ? shiplist.filter(f => myFundingSourceIds.includes(f.fundingSource.id)) : shiplist;
+                                            shiplist = myBudgetIds.length > 0 ? shiplist.filter(b => myBudgetIds.includes(b.budget.id)) : shiplist;
+                                            console.log("shipList***", shiplist);
+
+                                            var onholdCost = 0
+                                            var plannedCost = 0
+                                            var receivedCost = 0
+                                            var shippedCost = 0
+                                            var submittedCost = 0
+                                            var approvedCost = 0
+                                            var arrivedCost = 0
+                                            var submittedCost = 0
+                                            shiplist.map(ele => {
+                                                console.log(ele)
+                                                if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                                    plannedCost = plannedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DRAFT_SHIPMENT_STATUS) {
+                                                    //  plannedCost=plannedCost+(ele.sortproductCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                                    submittedCost = submittedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                                    approvedCost = approvedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS) {
+                                                    shippedCost = shippedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                                    arrivedCost = arrivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                                    receivedCost = receivedCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                } else if (ele.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    onholdCost = onholdCost + (ele.productCost * ele.currency.conversionRateToUsd) + (ele.freightCost * ele.currency.conversionRateToUsd)
+                                                }
+                                            })
+
+                                            let json = {
+                                                "dt": new Date(from, month - 1),
+                                                "approvedCost": approvedCost,
+                                                "arrivedCost": arrivedCost,
+                                                "onholdCost": onholdCost,
+                                                "plannedCost": plannedCost,
+                                                "receivedCost": receivedCost,
+                                                "shippedCost": shippedCost,
+                                                "submittedCost": submittedCost
+                                            }
+                                            shipmentDetailsMonthList.push(json)
+                                            if (month == this.state.rangeValue.to.month && from == to) {
+                                                console.log('shipmentDetailsMonthList', shipmentDetailsMonthList)
+                                                this.setState({
+                                                    shipmentDetailsList: data,
+                                                    shipmentDetailsFundingSourceList: shipmentDetailsFundingSourceList,
+                                                    shipmentDetailsMonthList: shipmentDetailsMonthList,
+                                                    message: '',
+                                                    viewById: viewById, loading: false
+                                                }, () => {
+                                                    this.buildJExcel();
+                                                })
+                                                return;
+                                            }
+
+                                        }
+                                        monthstartfrom = 1
+
                                     }
 
-                                }
-                                monthstartfrom = 1
 
-                            }
-
-
+                                }.bind(this)
+                            }.bind(this);
                         }.bind(this)
-                    }.bind(this);
+                    }.bind(this)
                 }.bind(this)
             } else {
                 this.setState({ loading: true })
@@ -1200,6 +1823,8 @@ class ShipmentSummery extends Component {
                     startDate: startDate,
                     stopDate: endDate,
                     planningUnitIds: planningUnitIds,
+                    fundingSourceIds: myFundingSourceIds,
+                    budgetIds: myBudgetIds,
                     reportView: viewById
                 }
 
@@ -1216,6 +1841,8 @@ class ShipmentSummery extends Component {
                             viewById: viewById,
                             message: '',
                             loading: false
+                        }, () => {
+                            this.buildJExcel();
                         }
                         )
                     }).catch(
@@ -1288,13 +1915,24 @@ class ShipmentSummery extends Component {
 
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
+            this.setState(
+                { message: i18n.t('static.common.selectProgram'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
+                    this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
+                    this.el.destroy();
+                });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
+            this.setState({ message: i18n.t('static.program.validversion'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
+                this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
+                this.el.destroy();
+            });
 
         } else if (this.state.planningUnitValues.length == 0) {
-            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] });
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], shipmentDetailsList: [], shipmentDetailsFundingSourceList: [], shipmentDetailsMonthList: [] }, () => {
+                this.el = jexcel(document.getElementById("shipmentDetailsListTableDiv"), '');
+                this.el.destroy();
+
+            });
         }
     }
 
@@ -1372,8 +2010,9 @@ class ShipmentSummery extends Component {
 
             }, this);
 
+        const { fundingSources } = this.state;
+        const { filteredBudgetList } = this.state;
         const { rangeValue } = this.state;
-
         var viewById = this.state.viewById;
 
         const backgroundColor = [
@@ -1662,7 +2301,7 @@ class ShipmentSummery extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
-                <Card style={{ display: this.state.loading ? "none" : "block" }}>
+                <Card>
                     <div className="Card-header-reporticon">
 
 
@@ -1670,15 +2309,10 @@ class ShipmentSummery extends Component {
                             this.state.shipmentDetailsMonthList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
-
                                     {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
-
- 
  {({ toPdf }) =>
  <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
-
  }
  </Pdf>*/}
                                 </a>
@@ -1800,51 +2434,89 @@ class ShipmentSummery extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+
+                                            <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="fundingSourceId"
+                                                        id="fundingSourceId"
+                                                        bsSize="md"
+                                                        value={this.state.fundingSourceValues}
+                                                        onChange={(e) => { this.handleFundingSourceChange(e) }}
+                                                        options={fundingSources.length > 0
+                                                            && fundingSources.map((item, i) => {
+                                                                return (
+                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                )
+                                                            }, this)}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>
+
+                                            {this.state.filteredBudgetList.length > 0 && <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budgetHead.budget')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="budgetId"
+                                                        id="budgetId"
+                                                        bsSize="md"
+                                                        value={this.state.budgetValues}
+                                                        onChange={(e) => { this.handleBudgetChange(e) }}
+                                                        options={filteredBudgetList.length > 0
+                                                            && filteredBudgetList.map((item, i) => {
+                                                                return (
+                                                                    { label: item.budgetCode, value: item.budgetId }
+                                                                )
+                                                            }, this)}
+                                                    />
+
+                                                </div>
+                                            </FormGroup>}
+
+
                                         </div>
                                         {/* </Col> */}
                                     </div>
                                 </Form>
-
-                                <Col md="12 pl-0">
-                                    <div className="row">
-                                        {
-                                            this.state.shipmentDetailsMonthList.length > 0
-                                            &&
-                                            <div className="col-md-12 p-0">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                                        {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                        <Bar id="cool-canvas" data={bar} options={options} />
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            {
+                                                this.state.shipmentDetailsMonthList.length > 0
+                                                &&
+                                                <div className="col-md-12 p-0">
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                            {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                            <Bar id="cool-canvas" data={bar} options={options} />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                {/* <div className="col-md-12">
+                                                    {/* <div className="col-md-12">
                                                         <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" style={{ 'marginTop': '7px' }} onClick={this.toggledata}>
                                                             {this.state.show ? 'Hide Data' : 'Show Data'}
                                                         </button>
 
                                                     </div> */}
-                                            </div>
-                                        }
-
-
-
-
-                                    </div>
-
-
-                                    <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
-                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                <Table id="mytable1" responsive className="table-bordered table-striped table-hover  text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                            <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    {/* <tbody>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-md-12 pl-0 pr-0">
+                                                {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -1858,140 +2530,53 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody> */}
-                                                    <tbody>
-                                                        {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                            this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
-                                                                <tr id="addr0" key={idx} >
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>
-                                                            )}
-                                                    </tbody>
+                                                        <tbody>
+                                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                                this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
+                                                                    <tr id="addr0" key={idx} >
+                                                                        <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                        <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    </tr>
+                                                                )}
+                                                        </tbody>
 
-                                                </Table>}
+                                                    </Table>}
+                                            </div>
+                                        </div>
+
+                                    </Col>
+                                    <Col md="12 pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-10 mt-3 ">
+                                                <ul className="legendcommitversion list-group">
+                                                    {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
+                                                </ul>
+                                            </FormGroup>
+                                            <div className="ShipmentSummeryReportMarginTop" id="mytable2">
+                                                <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
                                         </div>
                                     </div>
-
-
-                                    <div className="row ">
-                                        <div className="col-md-12 pl-0 pr-0 mb-2">
-                                            {this.state.shipmentDetailsList.length > 0 &&
-                                                <Table id="mytable2" responsive className="table-striped table-hover table-bordered text-center mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.planningUnit/ForecastingUnit')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.id')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.supplyPlan.consideAsEmergencyOrder')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.erpOrder')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.localprocurement')}</th>
-                                                            <th style={{ 'width': '87px', 'text-align': 'center' }}>{i18n.t('static.report.orderNo')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.procurementAgentName')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.common.status')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.qty')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.expectedReceiveddate')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.productCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.freightCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.report.totalCost')}</th>
-                                                            <th style={{ 'text-align': 'center' }}>{i18n.t('static.program.notes')}</th>
-                                                        </tr>
-
-                                                    </thead>
-
-                                                    {/* <tbody>
-                                                        <tr>
-                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td style={{ 'width': '87px' }}>01</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>Global Fund</td>
-                                                            <td>Received</td>
-                                                            <td style={{ 'text-align': 'right' }}>2,000</td>
-                                                            <td>Apr-25-2020</td>
-                                                            <td style={{ 'text-align': 'right' }}>3,400,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>340,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>3,740,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>1</td>
-                                                            <td></td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>02</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>Global Fund</td>
-                                                            <td>Ordered</td>
-                                                            <td style={{ 'text-align': 'right' }}>3,000</td>
-                                                            <td>Sep-25-2020</td>
-                                                            <td style={{ 'text-align': 'right' }}>5,100,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>510,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>5,610,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>1.5</td>
-                                                            <td></td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td style={{ 'text-align': 'left' }}>Ceftriaxone 1 gm Powder Vial, 10 Vials</td>
-                                                            <td>03</td>
-                                                            <td>PEPFAR</td>
-                                                            <td>GHSC-PSM</td>
-                                                            <td>Planned</td>
-                                                            <td style={{ 'text-align': 'right' }}>4,000</td>
-                                                            <td>Nov-25-2020</td>
-                                                            <td style={{ 'text-align': 'right' }}>6,800,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>680,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>7,480,000</td>
-                                                            <td style={{ 'text-align': 'right' }}>2</td>
-                                                            <td></td>
-                                                        </tr>
-                                                    </tbody> */}
-
-                                                    <tbody>
-                                                        {this.state.shipmentDetailsList.length > 0 &&
-                                                            this.state.shipmentDetailsList.map((item, idx) =>
-                                                                <tr id="addr0" key={idx} >
-                                                                    <td style={{ 'text-align': 'left' }}>{getLabelText(this.state.shipmentDetailsList[idx].planningUnit.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].shipmentId}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].emergencyOrder == true ? i18n.t('static.supplyPlan.consideAsEmergencyOrder') : '')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].erpOrder == true ? i18n.t('static.report.erpOrder') : '')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].localProcurement == true ? i18n.t('static.report.localprocurement') : '')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(this.state.shipmentDetailsList[idx].orderNo != null ? this.state.shipmentDetailsList[idx].orderNo : '')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].procurementAgent.code}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsList[idx].fundingSource.code}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsList[idx].shipmentStatus.label, this.state.lang)}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{viewById == 1 ? (this.state.shipmentDetailsList[idx].shipmentQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (Number(this.state.shipmentDetailsList[idx].shipmentQty) * this.state.shipmentDetailsList[idx].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{moment(this.state.shipmentDetailsList[idx].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY')}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].productCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    {/* <td style={{ 'text-align': 'right' }}>{viewById == 1 ? (parseFloat(this.state.data[idx].productCost+this.state.data[idx].freightCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : (parseFloat((this.state.data[idx].productCost+this.state.data[idx].freightCost) * this.state.data[idx].multiplier).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
-                                                                    <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsList[idx].totalCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    <td style={{ 'text-align': 'left' }}>{this.state.shipmentDetailsList[idx].notes}</td>
-                                                                </tr>
-                                                            )}
-                                                    </tbody>
-
-
-                                                </Table>}
-                                        </div>
-                                    </div>
-
-                                </Col>
+                                </div>
                             </div>
                         </div>
                     </CardBody>
                 </Card>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                        <div class="align-items-center">
-                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                            <div class="spinner-border blue ml-4" role="status">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div >
         );
     }

@@ -31,7 +31,7 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
-class Program extends Component {
+class LoadDatasetComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -629,7 +629,7 @@ class Program extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded.'} </span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -663,7 +663,7 @@ class Program extends Component {
                                         <ul className="tree">
                                             <li>
                                                 <input type="checkbox" id="c1" />
-                                                <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label>
+                                                <label className="tree_label" htmlFor="c1">{'Dataset'}</label>
                                                 <ul>
                                                     {
                                                         this.state.countryList.map(item => (
@@ -945,8 +945,8 @@ class Program extends Component {
                                                 onClick: () => {
                                                     console.log("D-------------------->Yes clicked");
                                                     console.log("D--------------> in download program")
-                                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                                    var transactionForSavingData = db1.transaction(['forecastDataset'], 'readwrite');
+                                                    var programSaveData = transactionForSavingData.objectStore('forecastDataset');
                                                     for (var r = 0; r < json.length; r++) {
                                                         json[r].actionList = [];
                                                         // json[r].openCount = 0;
@@ -975,8 +975,8 @@ class Program extends Component {
 
                                                     }
                                                     transactionForSavingData.oncomplete = function (event) {
-                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedForecastDataset'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedForecastDataset');
                                                         for (var r = 0; r < json.length; r++) {
                                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1052,8 +1052,8 @@ class Program extends Component {
                                 }
                                 if (downloadProgram) {
                                     console.log("D--------------> in download program")
-                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                    var transactionForSavingData = db1.transaction(['forecastDataset'], 'readwrite');
+                                    var programSaveData = transactionForSavingData.objectStore('forecastDataset');
                                     for (var r = 0; r < json.length; r++) {
                                         json[r].actionList = [];
                                         // json[r].openCount = 0;
@@ -1082,8 +1082,8 @@ class Program extends Component {
 
                                     }
                                     transactionForSavingData.oncomplete = function (event) {
-                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedForecastDataset'], 'readwrite');
+                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedForecastDataset');
                                         for (var r = 0; r < json.length; r++) {
                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1208,4 +1208,4 @@ class Program extends Component {
     }
 }
 
-export default Program;
+export default LoadDatasetComponent;
