@@ -462,19 +462,26 @@ export default class ProgramList extends Component {
 
   buildJExcel() {
     let programList = this.state.selProgram;
-    // console.log("programList---->", programList);
+    console.log("programList---->", programList);
+    console.log("healthAreaList---->", programList.healthAreaList);
     let programArray = [];
+    
     let count = 0;
 
     for (var j = 0; j < programList.length; j++) {
       data = [];
+      let healthAreaLabels=programList[j].healthAreaList;
+      let haValues=[];
+      healthAreaLabels.map(c=>{
+        haValues.push(getLabelText(c.label,this.state.lang));
+      })
       data[0] = programList[j].programId
       data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
       data[2] = getLabelText(programList[j].label, this.state.lang)
       data[3] = programList[j].programCode;
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
-      // data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
+      data[6] = haValues.toString();
       data[7] = programList[j].lastModifiedBy.username;
       data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
