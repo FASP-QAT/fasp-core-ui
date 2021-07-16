@@ -629,7 +629,7 @@ class LoadDatasetComponent extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded.'} </span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -663,7 +663,7 @@ class LoadDatasetComponent extends Component {
                                         <ul className="tree">
                                             <li>
                                                 <input type="checkbox" id="c1" />
-                                                <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label>
+                                                <label className="tree_label" htmlFor="c1">{'Dataset'}</label>
                                                 <ul>
                                                     {
                                                         this.state.countryList.map(item => (

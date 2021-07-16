@@ -644,7 +644,7 @@ const routes = [
   { path: '/demographic/scenarioOne', name: 'Demographic Scenario One', component: DemographicScenarioOne },
   { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
-  { path: '/dataset/loadDataset', name: i18n.t('static.dashboard.downloadprogram'), component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
 ];
 
