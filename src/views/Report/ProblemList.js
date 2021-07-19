@@ -610,7 +610,7 @@ export default class ConsumptionDetails extends React.Component {
             data[1] = problemList[j].problemActionIndex
             data[2] = problemList[j].program.code
             data[3] = problemList[j].versionId
-            data[4] = (problemList[j].region != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
+            data[4] = (problemList[j].region != null && problemList[j].region.id != 0) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
