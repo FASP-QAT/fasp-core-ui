@@ -13,11 +13,14 @@ import TreeData from './TreeData';
 import CardBody from 'reactstrap/lib/CardBody';
 import CardFooter from 'reactstrap/lib/CardFooter';
 import Provider from '../Samples/Provider';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+
 
 const ItemTypes = {
     NODE: 'node'
 }
-
+// const [tabIndex, setTabIndex] = useState(0);
 const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
     const opacity = isDragging ? 0.4 : 1
     let itemTitleColor = Colors.RoyalBlue;
@@ -420,7 +423,6 @@ export default class DemographicScenarioOne extends Component {
 
 
     render() {
-        // console.log("this.state+++", this.state);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
@@ -467,7 +469,6 @@ export default class DemographicScenarioOne extends Component {
             }
             console.log("level json***", treeLevelItems);
         }
-
         const config = {
             ...this.state,
             // pageFitMode: PageFitMode.Enabled,
@@ -537,309 +538,322 @@ export default class DemographicScenarioOne extends Component {
             }]
         }
         return <div className="animated fadeIn">
-            <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0">
-                        <CardBody>
-                            <div className="container">
-                                <div class="sample">
-                                    {/* <h3>DragNDrop Tree.</h3> */}
-                                    {/* <DndProvider backend={HTML5Backend} > */}
-                                    <Provider>
-                                        <div className="placeholder" style={{ clear: 'both' }} >
-                                            {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+            <Tabs defaultIndex={1} onSelect={index => console.log(index)}>
+                <TabList>
+                    <Tab>Dataset Data</Tab>
+                    <Tab>Trees</Tab>
+                    <Tab>Forecast Output</Tab>
+                </TabList>
+                <TabPanel>hi 1</TabPanel>
+                <TabPanel>
+                    <div>
+                        <Row>
+                            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                                <Card className="mb-lg-0">
+                                    <CardBody>
+                                        <div className="container">
+                                            <div class="sample">
+                                                {/* <h3>DragNDrop Tree.</h3> */}
+                                                {/* <DndProvider backend={HTML5Backend} > */}
+                                                <Provider>
+                                                    <div className="placeholder" style={{ clear: 'both' }} >
+                                                        {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
+                                                        <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                    </div>
+                                                </Provider>
+                                                {/* </DndProvider> */}
+                                            </div>
+
                                         </div>
-                                    </Provider>
-                                    {/* </DndProvider> */}
-                                </div>
+                                        <h6>{this.state.nodeDetail}</h6>
+                                    </CardBody>
+                                    <CardFooter>
+                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                                    </CardFooter>
+                                </Card></Col></Row>
+                        {/* Add Modal start------------------- */}
+                        <Modal isOpen={this.state.openAddNodeModal}
+                            className={'modal-md '} >
+                            <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                <strong>Add Node</strong>
+                                <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                            </ModalHeader>
+                            <ModalBody>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        name="nodeTitle"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                    ></Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Scaling</Label>
+                                    <Input
+                                        type="select"
+                                        name="scaling"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Linear growth of 1%</option>
+                                        <option value="2">Constant</option>
+                                        <option value="3">Linear growth of 1.5%</option>
+                                        <option value="4">Linear growth of 0.76%</option>
 
-                            </div>
-                            <h6>{this.state.nodeDetail}</h6>
-                        </CardBody>
-                        <CardFooter>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                        </CardFooter>
-                    </Card></Col></Row>
-            {/* Add Modal start------------------- */}
-            <Modal isOpen={this.state.openAddNodeModal}
-                className={'modal-md '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Scaling</Label>
-                        <Input
-                            type="select"
-                            name="scaling"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Linear growth of 1%</option>
-                            <option value="2">Constant</option>
-                            <option value="3">Linear growth of 1.5%</option>
-                            <option value="4">Linear growth of 0.76%</option>
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        type="select"
+                                        name="nodeType"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Regular node</option>
+                                        <option value="2">Dosage Set</option>
+                                        <option value="3">PU conversion</option>
 
-                        </Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="nodeType"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Regular node</option>
-                            <option value="2">Dosage Set</option>
-                            <option value="3">PU conversion</option>
-
-                        </Input>
-                    </FormGroup>
-                    {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
-                        <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="dosageSet"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Condoms</option>
+                                    </Input>
+                                </FormGroup>
+                                {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
+                                    <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        type="select"
+                                        name="dosageSet"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Condoms</option>
 
 
-                        </Input>
-                    </FormGroup>}
-                    {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
-                        <Label htmlFor="currencyId">Node Value Type</Label>
-                        <Input
-                            type="select"
-                            name="nodeValueType"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Percentage</option>
-                            <option value="2">Derived value</option>
-                            {/*<option value="3">Use Expression (y=mx+c)</option>
+                                    </Input>
+                                </FormGroup>}
+                                {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
+                                    <Label htmlFor="currencyId">Node Value Type</Label>
+                                    <Input
+                                        type="select"
+                                        name="nodeValueType"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Percentage</option>
+                                        <option value="2">Derived value</option>
+                                        {/*<option value="3">Use Expression (y=mx+c)</option>
                             <option value="4">Forecasting Unit</option> */}
-                        </Input>
-                    </FormGroup>}
-                    {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="percentage"
-                                onChange={(e) => { this.dataChange(e) }}
-                            ></Input>
-                        </FormGroup>
-                    }
-                    {this.state.currentItemConfig.nodeType == 2 &&
-                        <>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">Forecasting Unit</Label>
-                                <Input
-                                    type="select"
-                                    name="forecastingUnit"
-                                    bsSize="sm"
-                                    onChange={(e) => { this.dataChange(e) }}
-                                    required
-                                >
-                                    <option value="-1">Nothing Selected</option>
-                                    <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
-                                </Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="fuPerApplication"
-                                    onChange={(e) => { this.dataChange(e) }}
-                                ></Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="noOfTimesPerDay"
-                                    onChange={(e) => { this.dataChange(e) }}
-                                ></Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="noOfDaysPerMonth"
-                                    onChange={(e) => { this.dataChange(e) }}
-                                ></Input>
-                            </FormGroup>
-                        </>
-                    }
-                </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.addNode() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </Modal>
-            {/* Add Modal end------------------------ */}
+                                    </Input>
+                                </FormGroup>}
+                                {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            name="percentage"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                        ></Input>
+                                    </FormGroup>
+                                }
+                                {this.state.currentItemConfig.nodeType == 2 &&
+                                    <>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">Forecasting Unit</Label>
+                                            <Input
+                                                type="select"
+                                                name="forecastingUnit"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                                required
+                                            >
+                                                <option value="-1">Nothing Selected</option>
+                                                <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
+                                            </Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="fuPerApplication"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="noOfTimesPerDay"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="noOfDaysPerMonth"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                            ></Input>
+                                        </FormGroup>
+                                    </>
+                                }
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button type="submit" size="md" onClick={(e) => { this.addNode() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </Modal>
+                        {/* Add Modal end------------------------ */}
 
-            {/* edit modal start---------------------- */}
-            <Modal isOpen={this.state.openEditNodeModal}
-                className={'modal-md '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openEditNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Scaling</Label>
-                        <Input
-                            type="select"
-                            name="scaling"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.currentItemConfig.scaling}
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Linear growth of 1%</option>
-                            <option value="2">Constant</option>
-                            <option value="3">Linear growth of 1.5%</option>
-                            <option value="4">Linear growth of 0.76%</option>
-                        </Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="nodeType"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.currentItemConfig.nodeType}
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Regular node</option>
-                            <option value="2">Dosage Set</option>
-                            <option value="3">PU conversion</option>
+                        {/* edit modal start---------------------- */}
+                        <Modal isOpen={this.state.openEditNodeModal}
+                            className={'modal-md '} >
+                            <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                                <strong>Edit Node</strong>
+                                <Button size="md" onClick={() => this.setState({ openEditNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                            </ModalHeader>
+                            <ModalBody>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        name="nodeTitle"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={this.state.currentItemConfig.title}
+                                    ></Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Scaling</Label>
+                                    <Input
+                                        type="select"
+                                        name="scaling"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.currentItemConfig.scaling}
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Linear growth of 1%</option>
+                                        <option value="2">Constant</option>
+                                        <option value="3">Linear growth of 1.5%</option>
+                                        <option value="4">Linear growth of 0.76%</option>
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        type="select"
+                                        name="nodeType"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.currentItemConfig.nodeType}
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Regular node</option>
+                                        <option value="2">Dosage Set</option>
+                                        <option value="3">PU conversion</option>
 
-                        </Input>
-                    </FormGroup>
-                    {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
-                        <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="dosageSet"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.currentItemConfig.dosageSet.dosageSetId}
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Condoms</option>
+                                    </Input>
+                                </FormGroup>
+                                {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
+                                    <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        type="select"
+                                        name="dosageSet"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.currentItemConfig.dosageSet.dosageSetId}
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Condoms</option>
 
 
-                        </Input>
-                    </FormGroup>}
-                    {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
-                        <Label htmlFor="currencyId">Node Value Type</Label>
-                        <Input
-                            type="select"
-                            name="nodeValueType"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.currentItemConfig.nodeValueType}
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Percentage</option>
-                            <option value="2">Derived value</option>
-                            {/*<option value="3">Use Expression (y=mx+c)</option>
+                                    </Input>
+                                </FormGroup>}
+                                {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
+                                    <Label htmlFor="currencyId">Node Value Type</Label>
+                                    <Input
+                                        type="select"
+                                        name="nodeValueType"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.currentItemConfig.nodeValueType}
+                                    >
+                                        <option value="-1">Nothing Selected</option>
+                                        <option value="1">Percentage</option>
+                                        <option value="2">Derived value</option>
+                                        {/*<option value="3">Use Expression (y=mx+c)</option>
                             <option value="4">Forecasting Unit</option> */}
-                        </Input>
-                    </FormGroup>}
+                                    </Input>
+                                </FormGroup>}
 
-                    {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="percentage"
-                                onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.currentItemConfig.nodePercentage}
-                            ></Input>
-                        </FormGroup>
-                    }
-                    {this.state.currentItemConfig.nodeType == 2 &&
-                        <> <FormGroup>
-                            <Label htmlFor="currencyId">Forecasting Unit</Label>
-                            <Input
-                                type="select"
-                                name="nodeValueType"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.dosageSet.dosage.forecastingUnit.id}
+                                {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            name="percentage"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            value={this.state.currentItemConfig.nodePercentage}
+                                        ></Input>
+                                    </FormGroup>
+                                }
+                                {this.state.currentItemConfig.nodeType == 2 &&
+                                    <> <FormGroup>
+                                        <Label htmlFor="currencyId">Forecasting Unit</Label>
+                                        <Input
+                                            type="select"
+                                            name="nodeValueType"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            required
+                                            value={this.state.currentItemConfig.dosageSet.dosage.forecastingUnit.id}
 
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
-                            </Input>
-                        </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="fuPerApplication"
-                                    // onChange={(e) => { this.dataChange(e) }}
-                                    value={this.state.currentItemConfig.dosageSet.dosage.fuPerApplication}
-                                ></Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="noOfTimesPerDay"
-                                    // onChange={(e) => { this.dataChange(e) }}
-                                    value={this.state.currentItemConfig.dosageSet.dosage.noOfTimesPerDay}
-                                ></Input>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
-                                <Input type="text"
-                                    name="noOfDaysPerMonth"
-                                    // onChange={(e) => { this.dataChange(e) }}
-                                    value={this.state.currentItemConfig.dosageSet.dosage.noOfDaysPerMonth}
-                                ></Input>
-                            </FormGroup>
-                        </>
+                                        >
+                                            <option value="-1">Nothing Selected</option>
+                                            <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
+                                        </Input>
+                                    </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="fuPerApplication"
+                                                // onChange={(e) => { this.dataChange(e) }}
+                                                value={this.state.currentItemConfig.dosageSet.dosage.fuPerApplication}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="noOfTimesPerDay"
+                                                // onChange={(e) => { this.dataChange(e) }}
+                                                value={this.state.currentItemConfig.dosageSet.dosage.noOfTimesPerDay}
+                                            ></Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                name="noOfDaysPerMonth"
+                                                // onChange={(e) => { this.dataChange(e) }}
+                                                value={this.state.currentItemConfig.dosageSet.dosage.noOfDaysPerMonth}
+                                            ></Input>
+                                        </FormGroup>
+                                    </>
 
-                    }
+                                }
 
-                </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.editNode(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openEditNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </Modal>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button type="submit" size="md" onClick={(e) => { this.editNode(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openEditNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            </ModalFooter>
+                        </Modal>
+                    </div>
+                </TabPanel>
+                <TabPanel>hi 2</TabPanel>
+            </Tabs>
         </div>
     }
 }

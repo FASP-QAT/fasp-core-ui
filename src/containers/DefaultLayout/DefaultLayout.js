@@ -2227,7 +2227,7 @@ class DefaultLayout extends Component {
                       {
                         name: 'Demographic Tree',
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER1')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER')) ? false : true) },
                         children: [
                           {
                             name: 'Scenario 1',
