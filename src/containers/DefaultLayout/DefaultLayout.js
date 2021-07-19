@@ -278,6 +278,7 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 
 // Forecasting module
 const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
+const DeleteDatasetComponent = React.lazy(() => import('../../views/Dataset/DeleteDatasetComponent'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -646,6 +647,7 @@ const routes = [
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent }
 ];
 
 class DefaultLayout extends Component {
@@ -2264,8 +2266,8 @@ class DefaultLayout extends Component {
 
                           },
                           {
-                            name: "Load Cosmption",
-                            url: '/report/stockStatusAcrossPlanningUnits',
+                            name: "Delete Forecast Dataset",
+                            url: '/dataset/deleteDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 

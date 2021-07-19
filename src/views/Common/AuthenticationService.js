@@ -1263,6 +1263,7 @@ class AuthenticationService {
                         break;
 
                     case "/dataset/loadDataset":
+                        case "/dataset/deleteDataset":
                         // if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                         return true;
                         // }
