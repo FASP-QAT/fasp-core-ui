@@ -352,11 +352,11 @@ const routes = [
   { path: '/organisation/listOrganisation', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationHead.organisation', component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: 'static.breadcrum.edit', entityname: 'static.organisationHead.organisation', component: EditOrganisation },
 
-  { path: '/organisationType/addOrganisationType', name: 'static.breadcrum.add', entityname: 'static.organisationTypeHead.organisation', component: AddOrganisationType },
+  { path: '/organisationType/addOrganisationType', name: 'static.breadcrum.add', entityname: 'static.organisationType.organisationType', component: AddOrganisationType },
   // { path: '/organisationType/listOrganisationType/:message', component: OrganisationList },
-  { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationTypeHead.organisationType', component: OrganisationTypeList },
-  { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationTypeHead.organisationType', component: OrganisationTypeList },
-  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationTypeHead.organisationType', component: EditOrganisationType },
+  { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationType.organisationType', component: EditOrganisationType },
 
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
@@ -1156,7 +1156,7 @@ class DefaultLayout extends Component {
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
                         attributes: {
                           hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
@@ -1207,10 +1207,10 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
                           },
                           {
-                            name: i18n.t('static.organisationTypeHead.organisationType'),
+                            name: i18n.t('static.organisationType.organisationType'),
                             url: '/organisationType/listOrganisationType',
                             icon: 'fa fa-building',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),

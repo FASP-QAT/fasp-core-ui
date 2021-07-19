@@ -6,7 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { lang } from "moment";
-import OrganisationTypeService from "../../api/OrganisationService";
+import OrganisationTypeService from "../../api/OrganisationTypeService";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -27,7 +27,7 @@ const validationSchema = function (values) {
         organisationTypeName: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.organisation.organisationtext')),
+            .required(i18n.t('static.organisationType.organisationTypetext')),
     })
 }
 
@@ -61,7 +61,7 @@ export default class EditOrganisationTypeComponent extends Component {
         this.state = {
             realms: [],
             // organisation: this.props.location.state.organisation,
-            organisation: {
+            organisationType: {
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -410,7 +410,7 @@ export default class EditOrganisationTypeComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationTypeName">{i18n.t('static.organisationType.organisationTypename')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="organisationTypeName">{i18n.t('static.organisationType.organisationTypeName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationTypeName" valid={!errors.organisationTypeName}

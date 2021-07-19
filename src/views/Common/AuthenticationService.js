@@ -789,18 +789,18 @@ class AuthenticationService {
                         }
                         break;
                     case "/organisationType/addOrganisationType":
-                        if (bfunction.includes("ROLE_BF_ADD_ORGANIZATION")) {
+                        if (bfunction.includes("ROLE_BF_ADD_ORGANIZATION_TYPE")) {
                             return true;
                         }
                         break;
                     case "/organisationType/editOrganisationType/:organisationTypeId":
-                        if (bfunction.includes("ROLE_BF_EDIT_ORGANIZATION")) {
+                        if (bfunction.includes("ROLE_BF_EDIT_ORGANIZATION_TYPE")) {
                             return true;
                         }
                         break;
                     case "/organisationType/listOrganisationType":
                     case "/organisationType/listOrganisationType/:color/:message":
-                        if (bfunction.includes("ROLE_BF_LIST_ORGANIZATION")) {
+                        if (bfunction.includes("ROLE_BF_LIST_ORGANIZATION_TYPE")) {
                             return true;
                         }
                         break;

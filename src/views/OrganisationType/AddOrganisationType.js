@@ -243,7 +243,7 @@ export default class AddOrganisationTypeComponent extends Component {
                                 // initialValues={initialValues}
                                 enableReinitialize={true}
                                 initialValues={{
-                                    organisationName: this.state.organisationType.label.label_en,
+                                    organisationTypeName: this.state.organisationType.label.label_en,
                                     realmId: this.state.organisationType.realm.id,
                                 }}
                                 validate={validate(validationSchema)}
@@ -331,7 +331,7 @@ export default class AddOrganisationTypeComponent extends Component {
                                                             value={this.state.organisationType.realm.id}
                                                             valid={!errors.realmId && this.state.organisationType.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             type="select" name="realmId" id="realmId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -341,10 +341,10 @@ export default class AddOrganisationTypeComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationTypeName">{i18n.t('static.organisationType.organisationTypename')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="organisationTypeName">{i18n.t('static.organisationType.organisationTypeName')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationTypeName && this.state.organisationType.label.label_en != ''}
+                                                            type="text" name="organisationTypeName" valid={!errors.organisationTypeName && this.state.organisationType.label.label_en != ''}
                                                             invalid={touched.organisationTypeName && !!errors.organisationTypeName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
@@ -395,8 +395,11 @@ export default class AddOrganisationTypeComponent extends Component {
     resetClicked() {
         let { organisationType } = this.state
 
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            organisationType.realm.id = ''
+        }
+
         organisationType.label.label_en = ''
-        organisationType.realm.id = ''        
 
         this.setState({
             organisationType
