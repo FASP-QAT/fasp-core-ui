@@ -3651,7 +3651,7 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
-                  f.region != null &&
+                  f.region != null && f.region.id !=0 &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
@@ -3711,7 +3711,7 @@ export default class syncPage extends Component {
           data[1] = 1; //B
           data[2] = mergedProblemListData[cd].program.code; //C
           data[3] = 1; //D
-          data[4] = (mergedProblemListData[cd].region != null) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''; //E
+          data[4] = (mergedProblemListData[cd].region != null && mergedProblemListData[cd].region.id != 0) ? (getLabelText(mergedProblemListData[cd].region.label, this.state.lang)) : ''; //E
           data[5] = getLabelText(mergedProblemListData[cd].planningUnit.label, this.state.lang); //F
           data[6] = (mergedProblemListData[cd].dt != null) ? (moment(mergedProblemListData[cd].dt).format('MMM-YY')) : ''; //G
           data[7] = moment(mergedProblemListData[cd].createdDate).format('MMM-YY'); //H
