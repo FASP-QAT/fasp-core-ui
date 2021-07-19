@@ -1267,6 +1267,89 @@ class AuthenticationService {
                         // if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                         return true;
                         // }
+                    case "/forecastProgram/addForecastProgram":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastProgram/editForecastProgram/:forecastProgramId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastProgram/listForecastProgram":
+                    case "/forecastProgram/listForecastProgram/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastMethod/addForecastMethod":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastMethod/editForecastMethod/:forecastMethodId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastMethod/listForecastMethod":
+                    case "/forecastMethod/listForecastMethod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/usagePeriod/addUsagePeriod":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/usagePeriod/editUsagePeriod/:usagePeriodId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/usagePeriod/listUsagePeriod":
+                    case "/usagePeriod/listUsagePeriod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/scaleUpType/addscaleUpType":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/scaleUpType/editscaleUpType/:scaleUpTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/scaleUpType/listscaleUpType":
+                    case "/scaleUpType/listscaleUpType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/equivalancyUnit/addEquivalancyUnit":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/equivalancyUnit/listEquivalancyUnit":
+                    case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
                         break;
                     default:
                         console.log("default case");

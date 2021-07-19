@@ -245,6 +245,28 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 const LoadDatasetComponent = React.lazy(() => import('./views/Dataset/LoadDatasetComponent'));
 const DeleteDatasetComponent = React.lazy(() => import('./views/Dataset/DeleteDatasetComponent'));
 
+const AddForecastProgram = React.lazy(() => import('./views/ForecastProgram/AddForecastProgram'));
+const ForecastProgramList = React.lazy(() => import('./views/ForecastProgram/ForecastProgramList'));
+const EditForecastProgram = React.lazy(() => import('./views/ForecastProgram/EditForecastProgram'));
+
+const AddForecastMethod = React.lazy(() => import('./views/ForecastMethod/AddForecastMethod'));
+const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
+const EditForecastMethod = React.lazy(() => import('./views/ForecastMethod/EditForecastMethod'));
+
+const AddUsagePeriod = React.lazy(() => import('./views/UsagePeriod/AddUsagePeriod'));
+const UsagePeriodList = React.lazy(() => import('./views/UsagePeriod/UsagePeriodList'));
+const EditUsagePeriod = React.lazy(() => import('./views/UsagePeriod/EditUsagePeriod'));
+
+const AddScaleUpType = React.lazy(() => import('./views/ScaleUpType/AddScaleUpType'));
+const ScaleUpTypeList = React.lazy(() => import('./views/ScaleUpType/ScaleUpTypeList'));
+const EditScaleUpType = React.lazy(() => import('./views/ScaleUpType/EditScaleUpType'));
+
+const AddEquivalancyUnit = React.lazy(() => import('./views/EquivalancyUnit/AddEquivalancyUnit'));
+const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
+const EditEquivalancyUnit = React.lazy(() => import('./views/EquivalancyUnit/EditEquivalancyUnit'));
+
+
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -602,6 +624,36 @@ const routes = [
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
-  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent }
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
+
+  { path: '/forecastProgram/addForecastProgram', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddForecastProgram },
+  // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/forecastProgram/listForecastProgram/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ForecastProgramList },
+  { path: '/forecastProgram/listForecastProgram', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ForecastProgramList },
+  { path: '/forecastProgram/editForecastProgram/:forecastProgramId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditForecastProgram },
+
+  { path: '/forecastMethod/addForecastMethod', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddForecastMethod },
+  // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ForecastMethodList },
+  { path: '/forecastMethod/editForecastMethod/:forecastMethodId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditForecastMethod },
+
+  { path: '/usagePeriod/addUsagePeriod', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddUsagePeriod },
+  // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: UsagePeriodList },
+  { path: '/usagePeriod/editUsagePeriod/:usagePeriodId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditUsagePeriod },
+
+  { path: '/scaleUpType/addscaleUpType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddScaleUpType },
+  // { path: '/scaleUpType/listScaleUpType/:message', component: ScaleUpTypeList },
+  { path: '/scaleUpType/listscaleUpType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ScaleUpTypeList },
+  { path: '/scaleUpType/listscaleUpType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: ScaleUpTypeList },
+  { path: '/scaleUpType/editscaleUpType/:scaleUpTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditScaleUpType },
+
+  { path: '/equivalancyUnit/addEquivalancyUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddEquivalancyUnit },
+  // { path: '/equivalancyUnit/listEquivalancyUnit/:message', component: HealthAreaList },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditEquivalancyUnit },
 ];
 export default routes;

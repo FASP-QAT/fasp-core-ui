@@ -279,6 +279,25 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 // Forecasting module
 const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
 const DeleteDatasetComponent = React.lazy(() => import('../../views/Dataset/DeleteDatasetComponent'));
+const AddForecastProgram = React.lazy(() => import('../../views/ForecastProgram/AddForecastProgram'));
+const ForecastProgramList = React.lazy(() => import('../../views/ForecastProgram/ForecastProgramList'));
+const EditForecastProgram = React.lazy(() => import('../../views/ForecastProgram/EditForecastProgram'));
+
+const AddForecastMethod = React.lazy(() => import('../../views/ForecastMethod/AddForecastMethod'));
+const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
+const EditForecastMethod = React.lazy(() => import('../../views/ForecastMethod/EditForecastMethod'));
+
+const AddUsagePeriod = React.lazy(() => import('../../views/UsagePeriod/AddUsagePeriod'));
+const UsagePeriodList = React.lazy(() => import('../../views/UsagePeriod/UsagePeriodList'));
+const EditUsagePeriod = React.lazy(() => import('../../views/UsagePeriod/EditUsagePeriod'));
+
+const AddScaleUpType = React.lazy(() => import('../../views/ScaleUpType/AddScaleUpType'));
+const ScaleUpTypeList = React.lazy(() => import('../../views/ScaleUpType/ScaleUpTypeList'));
+const EditScaleUpType = React.lazy(() => import('../../views/ScaleUpType/EditScaleUpType'));
+
+const AddEquivalancyUnit = React.lazy(() => import('../../views/EquivalancyUnit/AddEquivalancyUnit'));
+const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
+const EditEquivalancyUnit = React.lazy(() => import('../../views/EquivalancyUnit/EditEquivalancyUnit'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -647,7 +666,32 @@ const routes = [
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
-  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent }
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
+
+  { path: '/forecastProgram/addForecastProgram', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddForecastProgram },
+  { path: '/forecastProgram/listForecastProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ForecastProgramList },
+  { path: '/forecastProgram/listForecastProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ForecastProgramList },
+  { path: '/forecastProgram/editForecastProgram/:forecastProgramId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditForecastProgram },
+
+  { path: '/forecastMethod/addForecastMethod', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddForecastMethod },
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ForecastMethodList },
+  { path: '/forecastMethod/editForecastMethod/:forecastMethodId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditForecastMethod },
+
+  { path: '/usagePeriod/addUsagePeriod', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddUsagePeriod },
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: UsagePeriodList },
+  { path: '/usagePeriod/editUsagePeriod/:usagePeriodId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditUsagePeriod },
+
+  { path: '/scaleUpType/addscaleUpType', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddScaleUpType },
+  { path: '/scaleUpType/listscaleUpType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ScaleUpTypeList },
+  { path: '/scaleUpType/listscaleUpType', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ScaleUpTypeList },
+  { path: '/scaleUpType/editscaleUpType/:scaleUpTypeId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditScaleUpType },
+
+  { path: '/equivalancyUnit/addEquivalancyUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddEquivalancyUnit },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditEquivalancyUnit },
 ];
 
 class DefaultLayout extends Component {
@@ -716,15 +760,15 @@ class DefaultLayout extends Component {
 
   }
 
-  displayHeaderTitle = (name,url) => {
+  displayHeaderTitle = (name, url) => {
     if (this.state.name !== name) {
       if (AuthenticationService.checkTypeOfSession(url)) {
         this.setState({
-          url:""
+          url: ""
         })
-      }else{
-          localStorage.setItem("sessionChanged", 1)
-          this.props.history.push(`/login/static.message.sessionChange`);
+      } else {
+        localStorage.setItem("sessionChanged", 1)
+        this.props.history.push(`/login/static.message.sessionChange`);
       }
       this.getProgramData();
       this.getNotificationCount();
@@ -1315,6 +1359,46 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-map',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') ? false : true) }
                           },
+
+                          {
+                            name: i18n.t('static.forecastProgram.forecastProgram'),
+                            url: '/forecastProgram/listForecastProgram',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
+
+                          {
+                            name: i18n.t('static.forecastMethod.forecastMethod'),
+                            url: '/forecastMethod/listForecastMethod',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
+
+                          {
+                            name: i18n.t('static.usagePeriod.usagePeriod'),
+                            url: '/usagePeriod/listUsagePeriod',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
+
+                          {
+                            name: i18n.t('static.scaleUpType.scaleUpType'),
+                            url: '/scaleUpType/listscaleUpType',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
+
+                          {
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                            url: '/equivalancyUnit/listEquivalancyUnit',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
                           // {
 
                           //   name: 'Product Category',
@@ -2229,7 +2313,7 @@ class DefaultLayout extends Component {
                       {
                         name: 'Demographic Tree',
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER1')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER')) ? false : true) },
                         children: [
                           {
                             name: 'Scenario 1',
@@ -2904,9 +2988,9 @@ class DefaultLayout extends Component {
                         exact={route.exact}
                         name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
-                          AuthenticationService.authenticatedRoute(route.path,this.state.url) ?
+                          AuthenticationService.authenticatedRoute(route.path, this.state.url) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '',route.path)} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '', route.path)} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )
