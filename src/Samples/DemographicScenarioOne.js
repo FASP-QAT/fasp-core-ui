@@ -15,845 +15,254 @@ import CardFooter from 'reactstrap/lib/CardFooter';
 import Provider from '../Samples/Provider';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import jexcel from 'jexcel-pro';
+import "../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../node_modules/jsuites/dist/jsuites.css";
+import moment from 'moment';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../CommonComponent/JExcelCommonFunctions.js'
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../Constants';
+import AuthenticationService from '../views/Common/AuthenticationService';
+import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
 
 
-const ItemTypes = {
-    NODE: 'node'
-}
-// const [tabIndex, setTabIndex] = useState(0);
-const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
-    const opacity = isDragging ? 0.4 : 1
-    let itemTitleColor = Colors.RoyalBlue;
-    if (isOver) {
-        if (canDrop) {
-            itemTitleColor = "green";
-        } else {
-            itemTitleColor = "red";
-        }
-    }
 
-    return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
-            <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
-                <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
-            </div>
-            {itemConfig.nodeType == 1 &&
-                <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{(itemConfig.nodePercentage != '' ? itemConfig.nodePercentage + "% = " : '') + Math.round(itemConfig.nodeValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-            }
-            {itemConfig.nodeType == 2 &&
-                <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.dosageSet.dosage.forecastingUnit.label.label_en + " " + itemConfig.dosageSet.dosage.noOfTimesPerDay + "/day " + itemConfig.dosageSet.dosage.noOfDaysPerMonth + "/ month =" + itemConfig.dosageSet.dosage.totalQuantity}</div>
-            }
-            {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
-        </div>
-    ))
-}
-
-const NodeDragSource = DragSource(
-    ItemTypes.NODE,
-    {
-        beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
-        endDrag(props, monitor) {
-            const { onMoveItem } = props;
-            const item = monitor.getItem()
-            const dropResult = monitor.getDropResult()
-            if (dropResult) {
-                onMoveItem(dropResult.id, item.id);
-            }
-        },
-    },
-    (connect, monitor) => ({
-        connectDragSource: connect.dragSource(),
-        isDragging: monitor.isDragging(),
-    }),
-)(Node);
-const NodeDragDropSource = DropTarget(
-    ItemTypes.NODE,
-    {
-        drop: ({ itemConfig }) => ({ id: itemConfig.id }),
-        canDrop: ({ canDropItem, itemConfig }, monitor) => {
-            const { id } = monitor.getItem();
-            return canDropItem(itemConfig.id, id);
-        },
-    },
-    (connect, monitor) => ({
-        connectDropTarget: connect.dropTarget(),
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-    }),
-)(NodeDragSource);
 
 export default class DemographicScenarioOne extends Component {
     constructor() {
         super();
-        this.onRemoveItem = this.onRemoveItem.bind(this);
-        this.canDropItem = this.canDropItem.bind(this);
-        this.onMoveItem = this.onMoveItem.bind(this);
-
-        this.onAddButtonClick = this.onAddButtonClick.bind(this);
-        this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
-        this.onHighlightChanged = this.onHighlightChanged.bind(this);
-        this.onCursoChanged = this.onCursoChanged.bind(this);
-        this.resetTree = this.resetTree.bind(this);
-        this.dataChange = this.dataChange.bind(this);
-        this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
-        this.onEditButtonClick = this.onEditButtonClick.bind(this);
-        this.editNode = this.editNode.bind(this);
+        // this.onRemoveItem = this.onRemoveItem.bind(this);
+        // this.canDropItem = this.canDropItem.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
         this.state = {
-            openAddNodeModal: false,
-            openEditNodeModal: false,
-            title: '',
-            cursorItem: 0,
-            highlightItem: 0,
-            nodeDetail: '',
-            items: TreeData.demographic_scenario_one,
-            currentItemConfig: {
-                nodeType: -1,
-                nodeValueType: -1,
-                dosageSet: {
-                    dosageSetId: '-1',
-                    dosage: {
-                        forecastingUnit: { id: '-1' },
-                        fuPerApplication: '',
-                        noOfTimesPerDay: '',
-                        chronic: '',
-                        noOfDaysPerMonth: ''
-                    }
-                }
-            }
-        }
-    }
-    resetTree() {
-        // console.log("in reset>>>", TreeData.demographic_scenario_one);
-        window.location.reload();
-    }
-    dataChange(event) {
-        // alert("hi");
-        let { currentItemConfig } = this.state;
-        if (event.target.name === "nodeTitle") {
-            currentItemConfig.title = event.target.value;
-        }
-        if (event.target.name === "nodeValueType") {
-            currentItemConfig.nodeValueType = event.target.value;
-        }
-        if (event.target.name === "nodeType") {
-            currentItemConfig.nodeType = event.target.value;
-        }
-        if (event.target.name === "percentage") {
-            currentItemConfig.nodePercentage = event.target.value;
-        }
-        // if (event.target.name === "dosage") {
-        //     currentItemConfig.dosage = event.target.value;
-        // }
-        if (event.target.name === "dosageSet") {
-            currentItemConfig.dosageSet.dosageSetId = event.target.value;
-        }
-        if (event.target.name === "scaling") {
-            currentItemConfig.scaling = event.target.value;
-        }
-        if (event.target.name === "forecastingUnit") {
-            currentItemConfig.dosageSet.dosage.forecastingUnit.id = event.target.value;
-        }
-        if (event.target.name === "fuPerApplication") {
-            currentItemConfig.dosageSet.dosage.fuPerApplication = event.target.value;
-        }
-        if (event.target.name === "noOfTimesPerDay") {
-            currentItemConfig.dosageSet.dosage.noOfTimesPerDay = event.target.value;
-        }
-        if (event.target.name === "noOfDaysPerMonth") {
-            currentItemConfig.dosageSet.dosage.noOfDaysPerMonth = event.target.value;
-        }
-        this.setState({ currentItemConfig: currentItemConfig });
-    }
-    onAddButtonClick(itemConfig) {
-        this.setState({ openAddNodeModal: true, openEditNodeModal: false, clickedParnetNodeId: itemConfig.id, clickedParnetNodeValue: itemConfig.nodeValue });
-
-    }
-    addNode() {
-        const { items } = this.state;
-        var calculateValue = parseInt(this.state.clickedParnetNodeValue) * this.state.currentItemConfig.nodePercentage / 100;
-        // console.log(">>>", parseInt(this.state.clickedParnetNodeValue));
-        // console.log(">>>", this.state.currentItemConfig.nodePercentage / 100);
-        var newItem = {
-            id: parseInt(items.length + 1),
-            parent: this.state.clickedParnetNodeId,
-            title: this.state.currentItemConfig.title,
-            nodePercentage: this.state.currentItemConfig.nodePercentage,
-            nodeValue: calculateValue,
-            nodeType: this.state.currentItemConfig.nodeType,
-            description: "",
-            itemTitleColor: Colors.White,
-            titleTextColor: Colors.Black,
-            // dosage: this.state.currentItemConfig.dosage,
-
-            nodeValueColor: this.state.currentItemConfig.nodeType == 2 ? Colors.White : Colors.Black,
-            nodeBackgroundColor: this.state.currentItemConfig.nodeType == 2 ? Colors.Black : Colors.White,
-            borderColor: this.state.currentItemConfig.nodeType == 2 ? Colors.White : Colors.Black,
-
-            dosageSet: {
-                dosageSetId: this.state.currentItemConfig.dosageSet.dosageSetId,
-                label: {
-                    id: '123',
-                    label_en: 'Condoms'
-                },
-                dosage: {
-                    forecastingUnit: {
-                        id: this.state.currentItemConfig.dosageSet.dosage.forecastingUnit.id,
-                        label: {
-                            id: '456',
-                            label_en: 'Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom'
-                        }
-                    },
-                    fuPerApplication: this.state.currentItemConfig.dosageSet.dosage.fuPerApplication,
-                    noOfTimesPerDay: this.state.currentItemConfig.dosageSet.dosage.noOfTimesPerDay,
-                    chronic: false,
-                    noOfDaysPerMonth: this.state.currentItemConfig.dosageSet.dosage.noOfDaysPerMonth,
-                    totalQuantity: parseInt(this.state.currentItemConfig.dosageSet.dosage.noOfDaysPerMonth) * parseInt(this.state.clickedParnetNodeValue)
-
-                }
+            treeEl: '',
+            treeObj: [{
+                forecastDatasetName: 'AGO-CON-MOH',
+                forecastMethod: 'Morbidity',
+                treeName: 'Angola Morbiity Tree',
+                scenarioName: 'High',
+                status: 'Active',
+                createdDate: '2021-07-21',
+                createdBy: 'Anchal C',
+                lastModifiedDate: '2021-07-21',
+                lastModifiedBy: 'Anchal C'
             },
-            scaling: this.state.currentItemConfig.scaling,
-
-            nodeValueType: this.state.currentItemConfig.nodeValueType
-        };
-
-        this.setState({
-            items: [...items, newItem],
-            cursorItem: newItem.id,
-            openAddNodeModal: false,
-            currentItemConfig: { nodeType: -1, nodeValueType: -1 }
-        });
-    }
-
-    onEditButtonClick(item) {
-        // console.log("***", item);
-        this.setState({
-            openAddNodeModal: false,
-            currentItemConfig: {
-                id: item.id,
-                parent: item.parent,
-                title: item.title,
-                nodePercentage: item.nodePercentage,
-                nodeValue: item.nodeValue,
-                nodeType: item.nodeType,
-                nodeValueType: item.nodeValueType,
-                description: "",
-                // dosage: item.dosage,
-                dosageSet: {
-                    dosageSetId: item.dosageSet.dosageSetId,
-                    dosage: {
-                        forecastingUnit: {
-                            id: item.dosageSet.dosage.forecastingUnit.id
-                        },
-                        fuPerApplication: item.dosageSet.dosage.fuPerApplication,
-                        noOfTimesPerDay: item.dosageSet.dosage.noOfTimesPerDay,
-                        chronic: item.dosageSet.dosage.chronic,
-                        noOfDaysPerMonth: item.dosageSet.dosage.noOfDaysPerMonth
-                    }
-                },
-                scaling: item.scaling,
+            {
+                forecastDatasetName: 'AGO-CON-MOH',
+                forecastMethod: 'Morbidity',
+                treeName: 'Angola Morbiity Tree',
+                scenarioName: 'Medium',
+                status: 'Active',
+                createdDate: '2021-07-21',
+                createdBy: 'Anchal C',
+                lastModifiedDate: '2021-07-21',
+                lastModifiedBy: 'Anchal C'
             },
-            openEditNodeModal: true,
-        });
-    }
-    editNode(currentItemConfig) {
-        var nodes = this.state.items;
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex].nodePercentage = currentItemConfig.nodePercentage;
-        nodes[findNodeIndex].dosage = currentItemConfig.dosage;
-
-        if (currentItemConfig.parent != null) {
-            var parent_Node = nodes.filter(c => c.id == currentItemConfig.parent);
-            var parentNodeValue = parseInt(parent_Node[0].nodeValue);
-            var calculateValue = parentNodeValue * currentItemConfig.nodePercentage / 100;
-            nodes[findNodeIndex].nodeValue = calculateValue;
-        }
-        var getChildNodeList = nodes.filter(c => c.parent >= currentItemConfig.id);
-        for (var p = 0; p < getChildNodeList.length; p++) {
-            var parent_Node = nodes.filter(c => c.id == getChildNodeList[p].parent);
-            var parentNodeValue = parseInt(parent_Node[0].nodeValue);
-            var findNodeIndex = nodes.findIndex(n => n.id == getChildNodeList[p].id);
-            var calculateValue = parentNodeValue * getChildNodeList[p].nodePercentage / 100;
-            nodes[findNodeIndex].nodeValue = calculateValue;
-        }
-
-        this.setState({
-            items: nodes,
-            openEditNodeModal: false,
-        }, () => {
-            console.log("updated tree data+++", this.state);
-        });
-    }
-    onRemoveButtonClick(itemConfig) {
-        const { items } = this.state;
-
-        this.setState(this.getDeletedItems(items, [itemConfig.id]));
-    }
-    onMoveItem(parentid, itemid) {
-        const { items } = this.state;
-
-        this.setState({
-            cursorItem: itemid,
-            items: (items.map(item => {
-                if (item.id === itemid) {
-                    return {
-                        ...item,
-                        parent: parentid
-                    }
-                }
-                return item;
-            }))
-        })
-    }
-    canDropItem(parentid, itemid) {
-        const { items } = this.state;
-        const tree = this.getTree(items);
-        let result = parentid !== itemid;
-        tree.loopParents(this, parentid, function (id, node) {
-            if (id === itemid) {
-                result = false;
-                return true;
-            }
-        });
-        return result;
-    }
-    onRemoveItem(id) {
-        const { items } = this.state;
-
-        this.setState(this.getDeletedItems(items, [id]));
-    }
-    getDeletedItems(items = [], deletedItems = []) {
-        const tree = this.getTree(items);
-        const hash = deletedItems.reduce((agg, itemid) => {
-            agg.add(itemid.toString());
-            return agg;
-        }, new Set());
-        const cursorParent = this.getDeletedItemsParent(tree, deletedItems, hash);
-        const result = [];
-        tree.loopLevels(this, (nodeid, node) => {
-            if (hash.has(nodeid.toString())) {
-                return tree.SKIP;
-            }
-            result.push(node);
-        });
-
-        return {
-            items: result,
-            cursorItem: cursorParent
-        };
-    }
-    getDeletedItemsParent(tree, deletedItems, deletedHash) {
-        let result = null;
-        const lca = LCA(tree);
-        result = deletedItems.reduce((agg, itemid) => {
-            if (agg == null) {
-                agg = itemid;
-            } else {
-                agg = lca.getLowestCommonAncestor(agg, itemid);
-            }
-            return agg;
-        }, null);
-
-        if (deletedHash.has(result.toString())) {
-            result = tree.parentid(result);
-        }
-        return result;
-    }
-
-    getTree(items = []) {
-        const tree = Tree();
-
-        for (let index = 0; index < items.length; index += 1) {
-            const item = items[index];
-            tree.add(item.parent, item.id, item);
-        }
-
-        return tree;
-    }
-
-    onHighlightChanged(event, data) {
-        const { context: item } = data;
-        const { config } = this.state;
-        if (item != null) {
-            this.setState({
-                title: item.title,
-                config: {
-                    ...config,
-                    // highlightItem: item.id,
-                    // cursorItem: item.id
-                },
-                highlightItem: item.id,
-                cursorItem: item.id
-            }, () => {
-                console.log("highlighted item---", this.state)
-            })
-        }
-    };
-    onCursoChanged(event, data) {
-        const { context: item } = data;
-        const { config } = this.state;
-        if (item != null) {
-            this.setState({
-                nodeDetail: item.nodeType == 2 ? item.dosageSet.dosage.forecastingUnit.label.label_en + " " + item.dosageSet.dosage.noOfTimesPerDay + "/day " + item.dosageSet.dosage.noOfDaysPerMonth + "/ month =" + item.dosageSet.dosage.totalQuantity : '',
-                title: item.title,
-                config: {
-                    ...config,
-                    // highlightItem: item.id,
-                    // cursorItem: item.id
-                },
-                highlightItem: item.id,
-                cursorItem: item.id
-            }, () => {
-                console.log("highlighted item---", this.state)
-            })
-        }
-    };
-
-    updateNodeInfoInJson(currentItemConfig) {
-        var nodes = this.state.items;
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex].title = currentItemConfig.title;
-        nodes[findNodeIndex].valueType = currentItemConfig.valueType;
-        this.setState({
-            items: nodes,
-            modalOpen: false,
-        }, () => {
-            // console.log("updated tree data+++", this.state);
-        });
-    }
-
-
-    render() {
-        let treeLevel = this.state.items.length;
-        const treeLevelItems = []
-        for (var i = 0; i <= treeLevel; i++) {
-            if (i == 0) {
-                treeLevelItems.push({
-                    annotationType: AnnotationType.Level,
-                    levels: [0],
-                    title: "Level 0",
-                    titleColor: Colors.RoyalBlue,
-                    offset: new Thickness(0, 0, 0, -1),
-                    lineWidth: new Thickness(0, 0, 0, 0),
-                    opacity: 0,
-                    borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
-                    lineType: LineType.Dotted
-                });
-            }
-            else if (i % 2 == 0) {
-                treeLevelItems.push(new LevelAnnotationConfig({
-                    levels: [i],
-                    title: "Level " + i,
-                    titleColor: Colors.RoyalBlue,
-                    offset: new Thickness(0, 0, 0, -1),
-                    lineWidth: new Thickness(0, 0, 0, 0),
-                    opacity: 0,
-                    borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
-                    lineType: LineType.Solid
-                })
-                );
-            }
-            else {
-                treeLevelItems.push(new LevelAnnotationConfig({
-                    levels: [i],
-                    title: "Level " + i,
-                    titleColor: Colors.RoyalBlue,
-                    offset: new Thickness(0, 0, 0, -1),
-                    lineWidth: new Thickness(0, 0, 0, 0),
-                    opacity: 0.08,
-                    borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
-                    lineType: LineType.Dotted
-                }));
-            }
-            console.log("level json***", treeLevelItems);
-        }
-        const config = {
-            ...this.state,
-            // pageFitMode: PageFitMode.Enabled,
-            pageFitMode: PageFitMode.None,
-            // highlightItem: 0,
-            hasSelectorCheckbox: Enabled.False,
-            hasButtons: Enabled.True,
-            buttonsPanelSize: 40,
-            onButtonsRender: (({ context: itemConfig }) => {
-                return <>  <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        this.onAddButtonClick(itemConfig);
-                    }}>
-                    <FontAwesomeIcon icon={faPlus} />
-                </button>
-                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            this.onEditButtonClick(itemConfig);
-                        }}>
-                        <FontAwesomeIcon icon={faEdit} />
-                    </button>
-
-                    {itemConfig.parent != null &&
-                        <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                confirmAlert({
-                                    message: "Are you sure you want to delete this node.",
-                                    buttons: [
-                                        {
-                                            label: i18n.t('static.program.yes'),
-                                            onClick: () => {
-                                                this.onRemoveButtonClick(itemConfig);
-                                            }
-                                        },
-                                        {
-                                            label: i18n.t('static.program.no')
-                                        }
-                                    ]
-                                });
-                            }}>
-                            <FontAwesomeIcon icon={faTrash} />
-                        </button>}
-
-                </>
-            }),
-            orientationType: OrientationType.Top,
-            defaultTemplateName: "contactTemplate",
-            linesColor: Colors.Black,
-            annotations: treeLevelItems,
-            // itemTitleFirstFontColor: Colors.White,
-            templates: [{
-                name: "contactTemplate",
-                itemSize: { width: 190, height: 75 },
-                minimizedItemSize: { width: 2, height: 2 },
-                highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
-                onItemRender: ({ context: itemConfig }) => {
-                    return <NodeDragDropSource
-                        itemConfig={itemConfig}
-                        onRemoveItem={this.onRemoveItem}
-                        canDropItem={this.canDropItem}
-                        onMoveItem={this.onMoveItem}
-                    />;
-                }
+            {
+                forecastDatasetName: 'AGO-CON-MOH',
+                forecastMethod: 'Morbidity',
+                treeName: 'Angola Morbiity Tree',
+                scenarioName: 'Low',
+                status: 'Active',
+                createdDate: '2021-07-21',
+                createdBy: 'Anchal C',
+                lastModifiedDate: '2021-07-21',
+                lastModifiedBy: 'Anchal C'
             }]
         }
-        return <div className="animated fadeIn">
-            <Tabs defaultIndex={1} onSelect={index => console.log(index)}>
-                <TabList>
-                    <Tab>Dataset Data</Tab>
-                    <Tab>Trees</Tab>
-                    <Tab>Forecast Output</Tab>
-                </TabList>
-                <TabPanel>hi 1</TabPanel>
-                <TabPanel>
-                    <div>
-                        <Row>
-                            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                <Card className="mb-lg-0">
-                                    <CardBody>
-                                        <div className="container">
-                                            <div class="sample">
-                                                {/* <h3>DragNDrop Tree.</h3> */}
-                                                {/* <DndProvider backend={HTML5Backend} > */}
-                                                <Provider>
-                                                    <div className="placeholder" style={{ clear: 'both' }} >
-                                                        {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                                        <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
-                                                    </div>
-                                                </Provider>
-                                                {/* </DndProvider> */}
-                                            </div>
 
-                                        </div>
-                                        <h6>{this.state.nodeDetail}</h6>
-                                    </CardBody>
-                                    <CardFooter>
-                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                                    </CardFooter>
-                                </Card></Col></Row>
-                        {/* Add Modal start------------------- */}
-                        <Modal isOpen={this.state.openAddNodeModal}
-                            className={'modal-md '} >
-                            <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                <strong>Add Node</strong>
-                                <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                            </ModalHeader>
-                            <ModalBody>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        name="nodeTitle"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                    ></Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Scaling</Label>
-                                    <Input
-                                        type="select"
-                                        name="scaling"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Linear growth of 1%</option>
-                                        <option value="2">Constant</option>
-                                        <option value="3">Linear growth of 1.5%</option>
-                                        <option value="4">Linear growth of 0.76%</option>
+    }
+    componentDidMount() {
+        this.buildJexcel();
+    }
+    hideFirstComponent() {
+        this.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
 
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
-                                    <Input
-                                        type="select"
-                                        name="nodeType"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Regular node</option>
-                                        <option value="2">Dosage Set</option>
-                                        <option value="3">PU conversion</option>
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+    buildJexcel() {
+        let treeList = this.state.treeObj;
+        // console.log("dataSourceList---->", dataSourceList);
+        let treeArray = [];
+        let count = 0;
 
-                                    </Input>
-                                </FormGroup>
-                                {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
-                                    <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
-                                    <Input
-                                        type="select"
-                                        name="dosageSet"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Condoms</option>
+        for (var j = 0; j < treeList.length; j++) {
+            data = [];
+            data[0] = treeList[j].forecastDatasetName
+            data[1] = treeList[j].forecastMethod
+            data[2] = treeList[j].treeName
+            data[3] = treeList[j].scenarioName
+            data[4] = treeList[j].createdBy;
+            data[5] = treeList[j].createdDate;
+            data[6] = treeList[j].lastModifiedBy;
+            data[7] = treeList[j].lastModifiedDate;
+            // data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = treeList[j].status;
+            treeArray[count] = data;
+            count++;
+        }
+        // if (dataSourceList.length == 0) {
+        //     data = [];
+        //     dataSourceArray[0] = data;
+        // }
+        // console.log("dataSourceArray---->", dataSourceArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = treeArray;
 
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Forecast Dataset',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Forecast Method',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Tree Name',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Scenario Name',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.createdBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.createdDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
 
-                                    </Input>
-                                </FormGroup>}
-                                {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
-                                    <Label htmlFor="currencyId">Node Value Type</Label>
-                                    <Input
-                                        type="select"
-                                        name="nodeValueType"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Percentage</option>
-                                        <option value="2">Derived value</option>
-                                        {/*<option value="3">Use Expression (y=mx+c)</option>
-                            <option value="4">Forecasting Unit</option> */}
-                                    </Input>
-                                </FormGroup>}
-                                {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            name="percentage"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                        ></Input>
-                                    </FormGroup>
-                                }
-                                {this.state.currentItemConfig.nodeType == 2 &&
-                                    <>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">Forecasting Unit</Label>
-                                            <Input
-                                                type="select"
-                                                name="forecastingUnit"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                required
-                                            >
-                                                <option value="-1">Nothing Selected</option>
-                                                <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
-                                            </Input>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="fuPerApplication"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                            ></Input>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="noOfTimesPerDay"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                            ></Input>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="noOfDaysPerMonth"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                            ></Input>
-                                        </FormGroup>
-                                    </>
-                                }
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" onClick={(e) => { this.addNode() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Add Modal end------------------------ */}
-
-                        {/* edit modal start---------------------- */}
-                        <Modal isOpen={this.state.openEditNodeModal}
-                            className={'modal-md '} >
-                            <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                                <strong>Edit Node</strong>
-                                <Button size="md" onClick={() => this.setState({ openEditNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                            </ModalHeader>
-                            <ModalBody>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        name="nodeTitle"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        value={this.state.currentItemConfig.title}
-                                    ></Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Scaling</Label>
-                                    <Input
-                                        type="select"
-                                        name="scaling"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                        value={this.state.currentItemConfig.scaling}
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Linear growth of 1%</option>
-                                        <option value="2">Constant</option>
-                                        <option value="3">Linear growth of 1.5%</option>
-                                        <option value="4">Linear growth of 0.76%</option>
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
-                                    <Input
-                                        type="select"
-                                        name="nodeType"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                        value={this.state.currentItemConfig.nodeType}
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Regular node</option>
-                                        <option value="2">Dosage Set</option>
-                                        <option value="3">PU conversion</option>
-
-                                    </Input>
-                                </FormGroup>
-                                {this.state.currentItemConfig.nodeType == 2 && <FormGroup>
-                                    <Label htmlFor="currencyId">Dosage Set<span class="red Reqasterisk">*</span></Label>
-                                    <Input
-                                        type="select"
-                                        name="dosageSet"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                        value={this.state.currentItemConfig.dosageSet.dosageSetId}
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Condoms</option>
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
 
 
-                                    </Input>
-                                </FormGroup>}
-                                {this.state.currentItemConfig.nodeType == 1 && <FormGroup>
-                                    <Label htmlFor="currencyId">Node Value Type</Label>
-                                    <Input
-                                        type="select"
-                                        name="nodeValueType"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                        value={this.state.currentItemConfig.nodeValueType}
-                                    >
-                                        <option value="-1">Nothing Selected</option>
-                                        <option value="1">Percentage</option>
-                                        <option value="2">Derived value</option>
-                                        {/*<option value="3">Use Expression (y=mx+c)</option>
-                            <option value="4">Forecasting Unit</option> */}
-                                    </Input>
-                                </FormGroup>}
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: 'Delete',
+                            onclick: function () {
 
-                                {(this.state.currentItemConfig.nodeType == 1 && this.state.currentItemConfig.nodeValueType == 1) &&
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">Enter Percentage<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            name="percentage"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            value={this.state.currentItemConfig.nodePercentage}
-                                        ></Input>
-                                    </FormGroup>
-                                }
-                                {this.state.currentItemConfig.nodeType == 2 &&
-                                    <> <FormGroup>
-                                        <Label htmlFor="currencyId">Forecasting Unit</Label>
-                                        <Input
-                                            type="select"
-                                            name="nodeValueType"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            required
-                                            value={this.state.currentItemConfig.dosageSet.dosage.forecastingUnit.id}
+                            }.bind(this)
+                        });
+                    }
+                }
 
-                                        >
-                                            <option value="-1">Nothing Selected</option>
-                                            <option value="1">Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</option>
-                                        </Input>
-                                    </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">FU per application<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="fuPerApplication"
-                                                // onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.currentItemConfig.dosageSet.dosage.fuPerApplication}
-                                            ></Input>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">No of time per day<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="noOfTimesPerDay"
-                                                // onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.currentItemConfig.dosageSet.dosage.noOfTimesPerDay}
-                                            ></Input>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">No of days per month<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                name="noOfDaysPerMonth"
-                                                // onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.currentItemConfig.dosageSet.dosage.noOfDaysPerMonth}
-                                            ></Input>
-                                        </FormGroup>
-                                    </>
+                return items;
+            }.bind(this),
+        };
+        var treeEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = treeEl;
+        this.setState({
+            treeEl: treeEl, loading: false
+        })
+    }
 
-                                }
+    render() {
 
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" onClick={(e) => { this.editNode(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openEditNodeModal: false, currentItemConfig: { nodeType: -1, nodeValueType: -1 } })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
+        return <div className="animated">
+            <AuthenticationServiceComponent history={this.props.history} />
+            <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
+            <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+            <Card>
+                <div className="Card-header-addicon">
+                    {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
+                    <div className="card-header-actions">
+                        <div className="card-header-action">
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
+                        </div>
                     </div>
-                </TabPanel>
-                <TabPanel>hi 2</TabPanel>
-            </Tabs>
+
+                </div>
+                <CardBody className="pb-lg-0 pt-lg-0">
+                    <Col md="9 pl-0">
+                        <div className="d-md-flex Selectdiv2">
+                            <Tabs defaultIndex={1} onSelect={index => console.log(index)}>
+                                <TabList>
+                                    <Tab>Dataset Data</Tab>
+                                    <Tab>Trees</Tab>
+                                    <Tab>Forecast Output</Tab>
+                                </TabList>
+                                <TabPanel>hi 1</TabPanel>
+                                <TabPanel>
+                                    <div>
+                                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                                        </div>
+                                    </div>
+                                </TabPanel>
+                                <TabPanel>hi 2</TabPanel>
+                            </Tabs>
+                        </div>
+                    </Col>
+                </CardBody>
+            </Card>
         </div>
     }
 }
