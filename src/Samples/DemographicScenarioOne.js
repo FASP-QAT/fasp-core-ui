@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../node_modules/jexcel-pro/dist/jexcel.css";
-import "../../node_modules/jsuites/dist/jsuites.css";
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM } from '../Constants.js';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../CommonComponent/JExcelCommonFunctions.js'
+// import jexcel from 'jexcel-pro';
+// import "../../node_modules/jexcel-pro/dist/jexcel.css";
+// import "../../node_modules/jsuites/dist/jsuites.css";
+import {
+    JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY,
+    JEXCEL_DATE_FORMAT_SM
+
+} from '../Constants.js';
+// import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../CommonComponent/JExcelCommonFunctions.js'
 import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
@@ -26,7 +30,6 @@ import "../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../Constants';
 import AuthenticationService from '../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
 
@@ -40,20 +43,10 @@ export default class DemographicScenarioOne extends Component {
         // this.canDropItem = this.canDropItem.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.buildJexcel = this.buildJexcel.bind(this);
-        this.onRemoveItem = this.onRemoveItem.bind(this);
-        this.canDropItem = this.canDropItem.bind(this);
-        this.onMoveItem = this.onMoveItem.bind(this);
+        this.createNewTree = this.createNewTree.bind(this);
 
-        this.onAddButtonClick = this.onAddButtonClick.bind(this);
-        this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
-        this.onHighlightChanged = this.onHighlightChanged.bind(this);
-        this.onCursoChanged = this.onCursoChanged.bind(this);
-        this.resetTree = this.resetTree.bind(this);
-        this.dataChange = this.dataChange.bind(this);
-        this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
-        this.onEditButtonClick = this.onEditButtonClick.bind(this);
-        this.editNode = this.editNode.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+        // this.dataChange = this.dataChange.bind(this);
         this.buildJexcelForFrecastOutPut = this.buildJexcelForFrecastOutPut.bind(this);
         this.loadedFunctionForMergeProblemList = this.loadedFunctionForMergeProblemList.bind(this);
         this.state = {
@@ -120,6 +113,9 @@ export default class DemographicScenarioOne extends Component {
     componentDidMount() {
         this.buildJexcelForFrecastOutPut();
         this.buildJexcel();
+    }
+    createNewTree() {
+        this.props.history.push(`/morbidity/scenarioOne`)
     }
     buildJexcelForFrecastOutPut() {
         var options = {
@@ -327,6 +323,10 @@ export default class DemographicScenarioOne extends Component {
         })
     }
 
+    loaded = function (instance) {
+        jExcelLoadedFunction(instance);
+    }
+
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -428,7 +428,7 @@ export default class DemographicScenarioOne extends Component {
         }
 
     }
-  
+
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
@@ -440,7 +440,7 @@ export default class DemographicScenarioOne extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
-  
+
 
     tabPane() {
 
@@ -457,6 +457,15 @@ export default class DemographicScenarioOne extends Component {
                         {/* <Row> */}
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Card className="mb-lg-0">
+                                <div className="Card-header-addicon">
+                                    {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
+                                    <div className="card-header-actions">
+                                        <div className="card-header-action">
+                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
+                                        </div>
+                                    </div>
+
+                                </div>
                                 <CardBody>
                                     <div>
                                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
@@ -468,7 +477,7 @@ export default class DemographicScenarioOne extends Component {
                                 </CardFooter>
                             </Card></Col>
                         {/* </Row> */}
-                       
+
                     </div>
                 </TabPane>
                 <TabPane tabId="3">
