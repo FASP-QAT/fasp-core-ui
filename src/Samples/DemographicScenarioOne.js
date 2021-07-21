@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+import jexcel from 'jexcel-pro';
+import "../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../node_modules/jsuites/dist/jsuites.css";
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM } from '../Constants.js';
+import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../CommonComponent/JExcelCommonFunctions.js'
 import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
@@ -14,6 +19,7 @@ import CardBody from 'reactstrap/lib/CardBody';
 import CardFooter from 'reactstrap/lib/CardFooter';
 import Provider from '../Samples/Provider';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import 'react-tabs/style/react-tabs.css';
 
 
@@ -98,7 +104,10 @@ export default class DemographicScenarioOne extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.onEditButtonClick = this.onEditButtonClick.bind(this);
         this.editNode = this.editNode.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+        this.loadedFunctionForMergeProblemList = this.loadedFunctionForMergeProblemList.bind(this);
         this.state = {
+            activeTab: new Array(3).fill('1'),
             openAddNodeModal: false,
             openEditNodeModal: false,
             title: '',
@@ -122,6 +131,85 @@ export default class DemographicScenarioOne extends Component {
             }
         }
     }
+    componentDidMount() {
+        this.buildJexcel();
+    }
+    buildJexcel() {
+        var options = {
+            data: [],
+            columnDrag: true,
+            colWidths: [50, 50, 50, 50, 50,50,50],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Tree Name',
+                    type: 'text',
+                },
+
+                {
+                    title: 'Scenarion',
+                    type: 'text',
+                },
+                {
+                    title: 'Forecasting Unit',
+                    type: 'text',
+                },
+                {
+                    title: 'Planning Unit',
+                    type: 'text',
+                },
+                {
+                    title: 'Supply Plan Dataset',
+                    type: 'text',
+                },
+                {
+                    title: 'Supply Plan Planning Unit',
+                    type: 'text',
+                },
+                {
+                    title: 'Value (%)',
+                    type: 'text',
+                },
+            ],
+            pagination: localStorage.getItem("sesRecordCount"),
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            editable: false,
+            onload: this.loadedFunctionForMergeProblemList,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+
+
+
+        }
+
+        var forecastOutPutJexcel = jexcel(document.getElementById("forecastOutPutDiv"), options);
+        this.el = forecastOutPutJexcel;
+    }
+
+    loadedFunctionForMergeProblemList = function (instance) {
+        jExcelLoadedFunction(instance);
+    }
+
+    toggle(tabPane, tab) {
+        const newArray = this.state.activeTab.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab: newArray,
+        });
+    }
+
     resetTree() {
         // console.log("in reset>>>", TreeData.demographic_scenario_one);
         window.location.reload();
@@ -421,8 +509,7 @@ export default class DemographicScenarioOne extends Component {
         });
     }
 
-
-    render() {
+    tabPane() {
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
@@ -540,41 +627,41 @@ export default class DemographicScenarioOne extends Component {
                 }
             }]
         }
-        return <div className="animated fadeIn">
-            <Tabs defaultIndex={1} onSelect={index => console.log(index)}>
-                <TabList>
-                    <Tab>Dataset Data</Tab>
-                    <Tab>Trees</Tab>
-                    <Tab>Forecast Output</Tab>
-                </TabList>
-                <TabPanel>hi 1</TabPanel>
-                <TabPanel>
+        return (
+            <>
+                <TabPane tabId="1">
+                    <Row>
+                        hi 1
+                    </Row>
+                </TabPane>
+                <TabPane tabId="2">
                     <div>
-                        <Row>
-                            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                                <Card className="mb-lg-0">
-                                    <CardBody>
-                                        <div className="container">
-                                            <div class="sample">
-                                                {/* <h3>DragNDrop Tree.</h3> */}
-                                                {/* <DndProvider backend={HTML5Backend} > */}
-                                                <Provider>
-                                                    <div className="placeholder" style={{ clear: 'both' }} >
-                                                        {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                                        <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
-                                                    </div>
-                                                </Provider>
-                                                {/* </DndProvider> */}
-                                            </div>
-
+                        {/* <Row> */}
+                        <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                            <Card className="mb-lg-0">
+                                <CardBody>
+                                    <div className="container">
+                                        <div class="sample">
+                                            {/* <h3>DragNDrop Tree.</h3> */}
+                                            {/* <DndProvider backend={HTML5Backend} > */}
+                                            <Provider>
+                                                <div className="placeholder" style={{ clear: 'both' }} >
+                                                    {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
+                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                </div>
+                                            </Provider>
+                                            {/* </DndProvider> */}
                                         </div>
-                                        <h6>{this.state.nodeDetail}</h6>
-                                    </CardBody>
-                                    <CardFooter>
-                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                                    </CardFooter>
-                                </Card></Col></Row>
+
+                                    </div>
+                                    <h6>{this.state.nodeDetail}</h6>
+                                </CardBody>
+                                <CardFooter>
+                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                                </CardFooter>
+                            </Card></Col>
+                        {/* </Row> */}
                         {/* Add Modal start------------------- */}
                         <Modal isOpen={this.state.openAddNodeModal}
                             className={'modal-md '} >
@@ -854,9 +941,58 @@ export default class DemographicScenarioOne extends Component {
                             </ModalFooter>
                         </Modal>
                     </div>
-                </TabPanel>
-                <TabPanel>hi 2</TabPanel>
-            </Tabs>
+                </TabPane>
+                <TabPane tabId="3">
+                    <Row>
+                        <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                            <Col md="12 pl-0" id="realmDiv">
+                                <div className="table-responsive RemoveStriped">
+                                    <div id="forecastOutPutDiv" />
+                                </div>
+                            </Col>
+                        </Col>
+                    </Row>
+                </TabPane>
+
+            </>
+        );
+    }
+
+    render() {
+        return <div className="animated fadeIn">
+            <Row>
+                <Col xs="12" md="12" className="mb-4">
+                    <Nav tabs>
+                        <NavItem>
+                            <NavLink
+                                active={this.state.activeTab[0] === '1'}
+                                onClick={() => { this.toggle(0, '1'); }}
+                            >
+                                Data Set
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                active={this.state.activeTab[0] === '2'}
+                                onClick={() => { this.toggle(0, '2'); }}
+                            >
+                                Tree
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink
+                                active={this.state.activeTab[0] === '3'}
+                                onClick={() => { this.toggle(0, '3'); }}
+                            >
+                                Forecast Output
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab={this.state.activeTab[0]}>
+                        {this.tabPane()}
+                    </TabContent>
+                </Col>
+            </Row>
         </div>
     }
 }
