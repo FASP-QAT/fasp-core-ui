@@ -17,6 +17,7 @@ import { faPlus, faTrash, faEdit, faDigitalTachograph } from '@fortawesome/free-
 import i18n from '../i18n'
 import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
 import CardBody from 'reactstrap/lib/CardBody';
@@ -288,14 +289,12 @@ export default class DemographicScenarioOne extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -455,12 +454,12 @@ export default class DemographicScenarioOne extends Component {
                         hi 1
                     </Row>
                 </TabPane>
-                <TabPane tabId="2">
+                <TabPane tabId="2" className="tabpadding" >
                     <div>
                         {/* <Row> */}
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Card className="mb-lg-0">
-                                <div className="Card-header-addicon">
+                            <div className="mb-lg-0 ">
+                                <div className="Card-header-addicon" style={{padding:'0px 0px 10px 24px'}}>
                                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                                     <div className="card-header-actions">
                                         <div className="card-header-action">
@@ -469,30 +468,33 @@ export default class DemographicScenarioOne extends Component {
                                     </div>
 
                                 </div>
-                                <CardBody>
+                                <CardBody className="pl-lg-0 pr-lg-0">
                                     <div>
                                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                                         </div>
                                     </div>
                                 </CardBody>
-                                <CardFooter>
+                                {/* <CardFooter>
 
-                                </CardFooter>
-                            </Card></Col>
+                                </CardFooter> */}
+                            </div>
+                            </Col>
                         {/* </Row> */}
 
                     </div>
                 </TabPane>
-                <TabPane tabId="3">
-                    <Row>
+                <TabPane tabId="3" className="tabpadding">
+                    <div>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
+                            <div className="pl-lg-0 pr-lg-0">
                                 <div className="table-responsive RemoveStriped">
                                     <div id="forecastOutPutDiv" />
                                 </div>
+                                </div>
                             </Col>
                         </Col>
-                    </Row>
+                    </div>
                 </TabPane>
 
             </>
@@ -501,7 +503,8 @@ export default class DemographicScenarioOne extends Component {
 
     render() {
         return <div className="animated fadeIn">
-            <Row>
+            <Card className="mt-lg-2">
+            <div className="pt-lg-2">
                 <Col xs="12" md="12" className="mb-4">
                     <Nav tabs>
                         <NavItem>
@@ -533,7 +536,9 @@ export default class DemographicScenarioOne extends Component {
                         {this.tabPane()}
                     </TabContent>
                 </Col>
-            </Row>
+            </div>
+            </Card>
         </div>
+    
     }
 }
