@@ -4541,10 +4541,10 @@ color: #000000!important;
 }
 //sidebar menu css mod2
 .module2{
-  background-color:#009471!important;
+  background-color:#118b70!important;
 }
 .module1{
-  background-color:#215ebc!important;
+  background-color:#0067b9!important;
 }
 .sidebar .nav-link .nav-icon {
   color: #fff!important;
@@ -4553,16 +4553,18 @@ color: #000000!important;
   background-color: #3a4248!important;
 }
 .sidebar .nav-link.tab1.active {
-  background: #009471!important;
+  // background: #009471!important;
+  background: #118b70!important;
 }
 .sidebar .nav-link.tab2 {
-  background: #215ebc!important;
+  // background: #215ebc!important;
+  background: #0067b9!important;
 }
 .sidebar .nav-link.tab2.active {
-  background: #215ebc!important;
+  background: #0067b9!important;
 }
 .sidebar .nav-link.tab1 {
-  background: #009471!important;
+  background: #118b70!important;
 }
 .sidebar .nav-dropdown-toggle::before {
   background-image:url('/src/assets/img/menu-dropdown.png')!important;
@@ -4570,12 +4572,12 @@ color: #000000!important;
 }
 
 .titleColorModule2{
-  color:#009471!important;
+  color:#118b70!important;
   text-align: justify;
 }
 
 .titleColorModule1{
-  color:#215ebc!important;
+  color:#0067b9!important;
   text-align: justify;
 }
 

@@ -657,7 +657,7 @@ const routes = [
   { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
   { path: '/integration/listIntegration/:message', component: IntegrationList },
   { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration },
-  { path: '/morbidity/scenarioOne', name: 'Morbidity Scenario One', component: MorbidityScenarioOne },
+  { path: '/morbidity/scenarioOne', name: 'Build Forecast Tree', component: MorbidityScenarioOne },
   { path: '/morbidity/scenarioTwo', name: 'Morbidity Scenario Two', component: MorbidityScenarioTwo },
   { path: '/morbidity/scenarioThree', name: 'Morbidity Scenario Three', component: MorbidityScenarioThree },
 

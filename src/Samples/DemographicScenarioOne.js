@@ -111,6 +111,9 @@ export default class DemographicScenarioOne extends Component {
         }
 
     }
+    createNewTree() {
+        this.props.history.push(`/morbidity/scenarioOne`)
+    }
     componentDidMount() {
         this.buildJexcelForFrecastOutPut();
         this.buildJexcel();
