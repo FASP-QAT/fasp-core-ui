@@ -35,6 +35,7 @@ export default class DemographicScenarioOne extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.createNewTree = this.createNewTree.bind(this);
         this.state = {
             treeEl: '',
             treeObj: [{
@@ -72,6 +73,9 @@ export default class DemographicScenarioOne extends Component {
             }]
         }
 
+    }
+    createNewTree() {
+        this.props.history.push(`/morbidity/scenarioOne`)
     }
     componentDidMount() {
         this.buildJexcel();
@@ -236,7 +240,7 @@ export default class DemographicScenarioOne extends Component {
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                     <div className="card-header-actions">
                         <div className="card-header-action">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
                         </div>
                     </div>
 

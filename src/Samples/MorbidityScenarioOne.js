@@ -6,17 +6,53 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../i18n'
-import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+// import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
-import CardBody from 'reactstrap/lib/CardBody';
-import CardFooter from 'reactstrap/lib/CardFooter';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader,FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import Provider from '../Samples/Provider'
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../views/Forms/ValidationForms/ValidationForms.css'
 
 const ItemTypes = {
     NODE: 'node'
 }
+let initialValues = {
+    forecastMethod: ""
+}
+
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        forecastMethod: Yup.string()
+            .required(i18n.t('static.user.validlanguage')),
+       
+    })
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
     const opacity = isDragging ? 0.4 : 1
     let itemTitleColor = Colors.RoyalBlue;
@@ -400,6 +436,91 @@ export default class MorbidityScenarioOne extends Component {
                     <Card className="mb-lg-0">
                         <CardBody>
                             <div className="container">
+                                <div>
+                                    <Formik
+                                        enableReinitialize={true}
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+
+
+                                        }}
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                                    <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                        <FormGroup>
+                                                            <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="languageId"
+                                                                id="languageId"
+                                                                bsSize="sm"
+                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                // invalid={touched.languageId && !!errors.languageId}
+                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                // onBlur={handleBlur}
+                                                                required
+                                                            // value={this.state.user.language.languageId}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                            </Input>
+                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="text"
+                                                                name="languageId"
+                                                                id="languageId"
+                                                                bsSize="sm"
+                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                // invalid={touched.languageId && !!errors.languageId}
+                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                // onBlur={handleBlur}
+                                                                required
+                                                            // value={this.state.user.language.languageId}
+                                                            >
+                                                            </Input>
+                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="text"
+                                                                name="languageId"
+                                                                id="languageId"
+                                                                bsSize="sm"
+                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                // invalid={touched.languageId && !!errors.languageId}
+                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                // onBlur={handleBlur}
+                                                                required
+                                                            // value={this.state.user.language.languageId}
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                            </Input>
+                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                </Form>
+                                            )} />
+                                </div>
                                 <div class="sample">
                                     {/* <h3>DragNDrop Tree.</h3> */}
                                     <Provider>
