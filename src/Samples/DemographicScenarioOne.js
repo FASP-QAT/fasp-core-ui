@@ -8,6 +8,7 @@ import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../i18n'
 import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
 import CardBody from 'reactstrap/lib/CardBody';
@@ -187,14 +188,12 @@ export default class DemographicScenarioOne extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -227,7 +226,8 @@ export default class DemographicScenarioOne extends Component {
 
     render() {
 
-        return <div className="animated">
+        return (
+         <div className="animated">
             <AuthenticationServiceComponent history={this.props.history} />
             <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
             <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
@@ -241,9 +241,11 @@ export default class DemographicScenarioOne extends Component {
                     </div>
 
                 </div>
+
                 <CardBody className="pb-lg-0 pt-lg-0">
-                    <Col md="9 pl-0">
-                        <div className="d-md-flex Selectdiv2">
+                    <Row>
+                    <Col md="12 pl-0">
+                        <div className="d-md-flex">
                             <Tabs defaultIndex={1} onSelect={index => console.log(index)}>
                                 <TabList>
                                     <Tab>Dataset Data</Tab>
@@ -261,8 +263,10 @@ export default class DemographicScenarioOne extends Component {
                             </Tabs>
                         </div>
                     </Col>
+                    </Row>
                 </CardBody>
             </Card>
         </div>
+        );
     }
 }
