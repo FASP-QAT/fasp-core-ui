@@ -476,9 +476,9 @@ export default class MorbidityScenarioOne extends Component {
         return <div className="animated fadeIn">
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0">
-                        <CardBody>
-                            <div className="container">
+                    <Card className="mb-lg-0 mt-lg-2">
+                        <CardBody className="pt-lg-2">
+                            <div className="container-fuild">
                                 <div>
                                     <Formik
                                         enableReinitialize={true}
@@ -504,11 +504,11 @@ export default class MorbidityScenarioOne extends Component {
                                                 setFieldTouched
                                             }) => (
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                                    <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                        <div className="col-md-12">
+                                                    <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                        <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                                <FormGroup className="pl-3">
-                                                                    <FormGroup>
+                                                                {/* <FormGroup className=""> */}
+                                                                    <FormGroup className="col-md-3 pl-lg-0">
                                                                         <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                         <Input
                                                                             type="select"
@@ -527,9 +527,9 @@ export default class MorbidityScenarioOne extends Component {
                                                                         </Input>
                                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                     </FormGroup>
-                                                                </FormGroup>
-                                                                <FormGroup className="pl-3">
-                                                                    <FormGroup>
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="pl-3"> */}
+                                                                    <FormGroup className="col-md-3">
                                                                         <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
                                                                         <Input
                                                                             type="text"
@@ -546,9 +546,9 @@ export default class MorbidityScenarioOne extends Component {
                                                                         </Input>
                                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                     </FormGroup>
-                                                                </FormGroup>
-                                                                <FormGroup className="pl-3">
-                                                                    <FormGroup>
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="pl-3"> */}
+                                                                    <FormGroup className="col-md-3">
                                                                         <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
                                                                         <Input
                                                                             type="text"
@@ -567,7 +567,7 @@ export default class MorbidityScenarioOne extends Component {
                                                                         </Input>
                                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                     </FormGroup>
-                                                                </FormGroup>
+                                                                {/* </FormGroup> */}
                                                             </Row>
                                                         </div>
                                                     </CardBody>
@@ -601,6 +601,9 @@ export default class MorbidityScenarioOne extends Component {
                                                     Low
                                                 </NavLink>
                                             </NavItem>
+                                            <NavItem>
+                                            <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{padding:'5px 20px 5px 20px'}}><i className="fa fa-plus"></i> Add Scenario</Button>
+                                            </NavItem>
                                         </Nav>
                                         <TabContent activeTab={this.state.activeTab[0]}>
                                             {this.tabPane()}
@@ -611,8 +614,8 @@ export default class MorbidityScenarioOne extends Component {
                             </div>
                         </CardBody>
                         <CardFooter>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
             {/* Modal start------------------- */}
