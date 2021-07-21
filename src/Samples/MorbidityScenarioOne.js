@@ -10,11 +10,14 @@ import i18n from '../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader,FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import Provider from '../Samples/Provider'
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../views/Forms/ValidationForms/ValidationForms.css'
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import AuthenticationService from '../views/Common/AuthenticationService';
+import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
 
 const ItemTypes = {
     NODE: 'node'
@@ -27,7 +30,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethod: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
-       
+
     })
 }
 
@@ -131,8 +134,18 @@ export default class MorbidityScenarioOne extends Component {
             cursorItem: 0,
             highlightItem: 0,
             items: TreeData.morbidity_scenario_one,
-            currentItemConfig: {}
+            currentItemConfig: {},
+            activeTab: new Array(3).fill('1'),
         }
+    }
+
+
+    toggle(tabPane, tab) {
+        const newArray = this.state.activeTab.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab: newArray,
+        });
     }
 
     resetTree() {
@@ -316,8 +329,7 @@ export default class MorbidityScenarioOne extends Component {
         });
     }
 
-    render() {
-        // console.log("this.state+++", this.state);
+    tabPane() {
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
@@ -430,6 +442,37 @@ export default class MorbidityScenarioOne extends Component {
                 }
             }]
         }
+
+        return (
+            <>
+                <TabPane tabId="1">
+                    {/* <Row> */}
+                    <div class="sample">
+                        {/* <h3>DragNDrop Tree.</h3> */}
+                        <Provider>
+                            <div className="placeholder" style={{ clear: 'both' }} >
+                                <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                            </div>
+                        </Provider>
+
+                    </div>
+                    {/* </Row> */}
+                </TabPane>
+                <TabPane tabId="2">
+
+                </TabPane>
+                <TabPane tabId="3">
+
+                </TabPane>
+
+            </>
+        );
+    }
+
+    render() {
+        // console.log("this.state+++", this.state);
+        
+
         return <div className="animated fadeIn">
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -462,74 +505,109 @@ export default class MorbidityScenarioOne extends Component {
                                             }) => (
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                                     <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                        <FormGroup>
-                                                            <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="languageId"
-                                                                id="languageId"
-                                                                bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                // onBlur={handleBlur}
-                                                                required
-                                                            // value={this.state.user.language.languageId}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                            </Input>
-                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="text"
-                                                                name="languageId"
-                                                                id="languageId"
-                                                                bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                // onBlur={handleBlur}
-                                                                required
-                                                            // value={this.state.user.language.languageId}
-                                                            >
-                                                            </Input>
-                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input
-                                                                type="text"
-                                                                name="languageId"
-                                                                id="languageId"
-                                                                bsSize="sm"
-                                                                // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                // invalid={touched.languageId && !!errors.languageId}
-                                                                // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                // onBlur={handleBlur}
-                                                                required
-                                                            // value={this.state.user.language.languageId}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                            </Input>
-                                                            {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        </FormGroup>
+                                                        <div className="col-md-12">
+                                                            <Row>
+                                                                <FormGroup className="pl-3">
+                                                                    <FormGroup>
+                                                                        <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="md"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                        </Input>
+                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    </FormGroup>
+                                                                </FormGroup>
+                                                                <FormGroup className="pl-3">
+                                                                    <FormGroup>
+                                                                        <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                        <Input
+                                                                            type="text"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="md"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                        </Input>
+                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    </FormGroup>
+                                                                </FormGroup>
+                                                                <FormGroup className="pl-3">
+                                                                    <FormGroup>
+                                                                        <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
+                                                                        <Input
+                                                                            type="text"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="md"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                        </Input>
+                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    </FormGroup>
+                                                                </FormGroup>
+                                                            </Row>
+                                                        </div>
                                                     </CardBody>
                                                 </Form>
                                             )} />
                                 </div>
-                                <div class="sample">
-                                    {/* <h3>DragNDrop Tree.</h3> */}
-                                    <Provider>
-                                        <div className="placeholder" style={{ clear: 'both' }} >
-                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
-                                        </div>
-                                    </Provider>
+                                <Row>
+                                    <Col xs="12" md="12" className="mb-4">
+                                        <Nav tabs>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '1'}
+                                                    onClick={() => { this.toggle(0, '1'); }}
+                                                >
+                                                    High
+                                                </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '2'}
+                                                    onClick={() => { this.toggle(0, '2'); }}
+                                                >
+                                                    Medium
+                                                </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                                <NavLink
+                                                    active={this.state.activeTab[0] === '3'}
+                                                    onClick={() => { this.toggle(0, '3'); }}
+                                                >
+                                                    Low
+                                                </NavLink>
+                                            </NavItem>
+                                        </Nav>
+                                        <TabContent activeTab={this.state.activeTab[0]}>
+                                            {this.tabPane()}
+                                        </TabContent>
+                                    </Col>
+                                </Row>
 
-                                </div>
                             </div>
                         </CardBody>
                         <CardFooter>

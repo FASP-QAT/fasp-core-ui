@@ -278,6 +278,7 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 
 // Forecasting module
 const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
+const DeleteDatasetComponent = React.lazy(() => import('../../views/Dataset/DeleteDatasetComponent'));
 const AddForecastProgram = React.lazy(() => import('../../views/ForecastProgram/AddForecastProgram'));
 const ForecastProgramList = React.lazy(() => import('../../views/ForecastProgram/ForecastProgramList'));
 const EditForecastProgram = React.lazy(() => import('../../views/ForecastProgram/EditForecastProgram'));
@@ -665,6 +666,7 @@ const routes = [
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
   { path: '/forecastProgram/addForecastProgram', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddForecastProgram },
   { path: '/forecastProgram/listForecastProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: ForecastProgramList },
@@ -2348,8 +2350,8 @@ class DefaultLayout extends Component {
 
                           },
                           {
-                            name: "Load Cosmption",
-                            url: '/report/stockStatusAcrossPlanningUnits',
+                            name: "Delete Forecast Dataset",
+                            url: '/dataset/deleteDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 

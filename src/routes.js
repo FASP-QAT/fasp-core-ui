@@ -243,6 +243,7 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 
 // Forecasting module
 const LoadDatasetComponent = React.lazy(() => import('./views/Dataset/LoadDatasetComponent'));
+const DeleteDatasetComponent = React.lazy(() => import('./views/Dataset/DeleteDatasetComponent'));
 
 const AddForecastProgram = React.lazy(() => import('./views/ForecastProgram/AddForecastProgram'));
 const ForecastProgramList = React.lazy(() => import('./views/ForecastProgram/ForecastProgramList'));
@@ -623,6 +624,7 @@ const routes = [
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
   { path: '/forecastProgram/addForecastProgram', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddForecastProgram },
   // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
