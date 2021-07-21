@@ -136,6 +136,7 @@ export default class MorbidityScenarioOne extends Component {
             items: TreeData.morbidity_scenario_one,
             currentItemConfig: {},
             activeTab: new Array(3).fill('1'),
+            activeTab1: new Array(2).fill('1'),
         }
     }
 
@@ -145,6 +146,14 @@ export default class MorbidityScenarioOne extends Component {
         newArray[tabPane] = tab
         this.setState({
             activeTab: newArray,
+        });
+    }
+
+    toggleModal(tabPane, tab) {
+        const newArray = this.state.activeTab1.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab1: newArray,
         });
     }
 
@@ -323,7 +332,7 @@ export default class MorbidityScenarioOne extends Component {
         nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
             items: nodes,
-            modalOpen: false,
+            openAddNodeModal: false,
         }, () => {
             console.log("updated tree data+++", this.state);
         });
@@ -464,14 +473,101 @@ export default class MorbidityScenarioOne extends Component {
                 <TabPane tabId="3">
 
                 </TabPane>
+                <TabPane tabId="4">
+
+                </TabPane>
+                <TabPane tabId="5">
+
+                </TabPane>
 
             </>
         );
     }
 
+    tabPane1() {
+        return (
+            <>
+                <TabPane tabId="1">
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeValueType"
+                            bsSize="sm"
+                            onChange={(e) => { this.dataChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Top Node</option>
+                            <option value="2">Data Node</option>
+                            <option value="3">Usage Node</option>
+                            <option value="4">Planning Unit Node</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Month<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Parent<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            readOnly={true}
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            readOnly={true}
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Percentage Of Parent<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
+                        <Input type="textarea"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                </TabPane>
+                <TabPane tabId="2">
+
+                </TabPane>
+
+            </>
+        );
+    }
     render() {
         // console.log("this.state+++", this.state);
-        
+
 
         return <div className="animated fadeIn">
             <Row>
@@ -619,38 +715,41 @@ export default class MorbidityScenarioOne extends Component {
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-md '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ modalOpen: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <strong>Add/Edit Node</strong>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Value Type<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="nodeValueType"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.currentItemConfig.valueType}
-                        >
-                            <option value="-1">Nothing Selected</option>
-                            <option value="1">Percentage</option>
-                            <option value="2">Derived value</option>
-                            <option value="3">Use Expression (y=mx+c)</option>
-                            <option value="4">Forecasting Unit</option>
-                        </Input>
-                    </FormGroup>
+                    <Row>
+                        <Col xs="12" md="12" className="mb-4">
+                            <Nav tabs>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '1'}
+                                        onClick={() => { this.toggleModal(0, '1'); }}
+                                    >
+                                        Node Data
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '2'}
+                                        onClick={() => { this.toggleModal(0, '2'); }}
+                                    >
+                                        Scaling/Transfer
+                                    </NavLink>
+                                </NavItem>
+                               
+                            </Nav>
+                            <TabContent activeTab={this.state.activeTab1[0]}>
+                                {this.tabPane1()}
+                            </TabContent>
+                        </Col>
+                    </Row>
+                  
                 </ModalBody>
                 <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ modalOpen: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>
             {/* Modal end------------------------ */}
