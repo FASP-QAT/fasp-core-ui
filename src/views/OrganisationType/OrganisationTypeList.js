@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import UserService from "../../api/UserService.js";
-import OrganisationService from "../../api/OrganisationService.js";
+import OrganisationTypeService from "../../api/OrganisationTypeService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import OrganisationTypeService from "../../api/OrganisationTypeService.js";
 import { NavLink } from 'react-router-dom'
 import { Col, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button } from 'reactstrap';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -23,22 +22,22 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
-const entityname = i18n.t('static.organisation.organisation');
+const entityname = i18n.t('static.organisationType.organisationType');
 
 
-export default class OrganisationListComponent extends Component {
+export default class OrganisationTypeListComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             realms: [],
-            organisations: [],
+            organisationsType: [],
             message: "",
             selSource: [],
             loading: true
         }
-        this.editOrganisation = this.editOrganisation.bind(this);
-        this.addOrganisation = this.addOrganisation.bind(this);
+        this.editOrganisationType = this.editOrganisationType.bind(this);
+        this.addOrganisationType = this.addOrganisationType.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -63,36 +62,34 @@ export default class OrganisationListComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.organisations.filter(c => c.realm.id == realmId)
+            const selSource = this.state.organisationsType.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() })
         } else {
             this.setState({
-                selSource: this.state.organisations
+                selSource: this.state.organisationsType
             },
                 () => { this.buildJexcel() })
         }
     }
     buildJexcel() {
-        let organisations = this.state.selSource;
+        let organisationsType = this.state.selSource;
         // console.log("organisations---->", organisations);
-        let organisationsArray = [];
+        let organisationsTypeArray = [];
         let count = 0;
 
-        for (var j = 0; j < organisations.length; j++) {
+        for (var j = 0; j < organisationsType.length; j++) {
             data = [];
-            data[0] = organisations[j].organisationId
-            data[1] = getLabelText(organisations[j].realm.label, this.state.lang)
-            data[2] = getLabelText(organisations[j].label, this.state.lang)
-            data[3] = organisations[j].organisationCode
-            data[4] = getLabelText(organisations[j].organisationType.label, this.state.lang)
-            data[5] = organisations[j].lastModifiedBy.username;
-            data[6] = (organisations[j].lastModifiedDate ? moment(organisations[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = organisations[j].active;
+            data[0] = organisationsType[j].organisationTypeId
+            data[1] = getLabelText(organisationsType[j].realm.label, this.state.lang)
+            data[2] = getLabelText(organisationsType[j].label, this.state.lang)
+            data[3] = organisationsType[j].lastModifiedBy.username;
+            data[4] = (organisationsType[j].lastModifiedDate ? moment(organisationsType[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[5] = organisationsType[j].active;
 
-            organisationsArray[count] = data;
+            organisationsTypeArray[count] = data;
             count++;
         }
         // if (organisations.length == 0) {
@@ -103,7 +100,7 @@ export default class OrganisationListComponent extends Component {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
-        var data = organisationsArray;
+        var data = organisationsTypeArray;
 
         var options = {
             data: data,
@@ -112,7 +109,7 @@ export default class OrganisationListComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'organisationsId',
+                    title: 'organisationsTypeId',
                     type: 'hidden',
                     readOnly: true
                 },
@@ -122,17 +119,7 @@ export default class OrganisationListComponent extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.organisation.organisationName'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.organisation.organisationcode'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.organisationType.organisationType'),
+                    title: i18n.t('static.organisationType.organisationTypeName'),
                     type: 'text',
                     readOnly: true
                 },
@@ -183,10 +170,10 @@ export default class OrganisationListComponent extends Component {
                 return [];
             }.bind(this),
         };
-        var organisationsEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = organisationsEl;
+        var organisationsTypeEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = organisationsTypeEl;
         this.setState({
-            organisationsEl: organisationsEl, loading: false
+            organisationsTypeEl: organisationsTypeEl, loading: false
         })
     }
 
@@ -254,11 +241,11 @@ export default class OrganisationListComponent extends Component {
                 }
             );
 
-        OrganisationService.getOrganisationList()
+        OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
-                console.log("response---", response);
+                console.log("response------->", response);
                 this.setState({
-                    organisations: response.data,
+                    organisationsType: response.data,
                     selSource: response.data
                 }, () => { this.buildJexcel() })
             }).catch(
@@ -379,7 +366,7 @@ export default class OrganisationListComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ORGANIZATION') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisation}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_ORGANIZATION_TYPE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addOrganisationType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
 
@@ -409,8 +396,7 @@ export default class OrganisationListComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION_TYPE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}></div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
@@ -431,10 +417,10 @@ export default class OrganisationListComponent extends Component {
 
 
 
-    editOrganisation(organisation) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
+    editOrganisationType(organisationType) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION_TYPE')) {
             this.props.history.push({
-                pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
+                pathname: `/organisationType/editOrganisationType/${organisationType.organisationTypeId}`,
                 // state: { organisation: organisation }
             });
         }
@@ -444,9 +430,9 @@ export default class OrganisationListComponent extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_ORGANIZATION_TYPE')) {
                     this.props.history.push({
-                        pathname: `/organisation/editOrganisation/${this.el.getValueFromCoords(0, x)}`,
+                        pathname: `/organisationType/editOrganisationType/${this.el.getValueFromCoords(0, x)}`,
                         // state: { role }
                     });
                 }
@@ -454,9 +440,9 @@ export default class OrganisationListComponent extends Component {
         }
     }.bind(this);
 
-    addOrganisation() {
+    addOrganisationType() {
         if (isSiteOnline()) {
-            this.props.history.push(`/organisation/addOrganisation`);
+            this.props.history.push(`/organisationType/addOrganisationType`);
         } else {
             alert("You must be Online.")
         }
