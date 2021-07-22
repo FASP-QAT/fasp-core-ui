@@ -664,7 +664,7 @@ const routes = [
   { path: '/demographic/scenarioOne', name: 'Demographic Scenario One', component: DemographicScenarioOne },
   { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
-  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset', name: 'Load/Delete Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
   { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
@@ -2343,19 +2343,19 @@ class DefaultLayout extends Component {
                         attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
                         children: [
                           {
-                            name: "Load Dataset",
+                            name: "Load/Delete Dataset",
                             url: '/dataset/loadDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 
                           },
-                          {
-                            name: "Delete Forecast Dataset",
-                            url: '/dataset/deleteDataset',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          // {
+                          //   name: "Delete Forecast Dataset",
+                          //   url: '/dataset/deleteDataset',
+                          //   icon: 'fa fa-exchange',
+                          //   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 
-                          },
+                          // },
                           {
                             name: "Commit",
                             url: '/report/stockStatusAcrossPlanningUnits',

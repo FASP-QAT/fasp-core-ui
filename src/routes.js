@@ -622,7 +622,7 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
-  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset', name: 'Load/Delete Dataset', component: LoadDatasetComponent },
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
   { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 

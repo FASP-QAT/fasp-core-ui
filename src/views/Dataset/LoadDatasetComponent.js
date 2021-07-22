@@ -28,10 +28,11 @@ import RealmService from '../../api/RealmService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import cleanUp from '../../assets/img/cleanUp.png';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
-class LoadDatasetComponent extends Component {
+class Program extends Component {
 
     constructor(props) {
         super(props);
@@ -63,9 +64,6 @@ class LoadDatasetComponent extends Component {
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
     getMoreVersions(programId, pageNo) {
-        // console.log("val---", val);
-        // console.log("programId---", programId);
-        // console.log("pageNo---", pageNo);
         ProgramService.loadMoreProgramList(programId, pageNo)
             .then(response => {
                 if (response.status == 200) {
@@ -73,7 +71,6 @@ class LoadDatasetComponent extends Component {
                     var index = prgList.findIndex(c => c.program.id == programId);
                     prgList[index].versionList = prgList[index].versionList.concat(response.data.versionList);
                     prgList[index].currentPage = response.data.currentPage;
-                    // console.log("Program List more", response.data);
                     this.setState({
                         prgList,
                         loading: false
@@ -91,7 +88,7 @@ class LoadDatasetComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.common.networkError',
+                            message: 'static.unkownError',
                             loading: false,
                             color: "red"
                         }, () => {
@@ -141,7 +138,6 @@ class LoadDatasetComponent extends Component {
             );
     }
     checkNewerVersions(programs) {
-        // console.log("T***going to call check newer versions")
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
@@ -167,6 +163,7 @@ class LoadDatasetComponent extends Component {
     }
 
     componentDidMount() {
+        this.hideSecondComponent()
         this.getLocalPrograms();
         this.getPrograms();
         if (AuthenticationService.getRealmId() == -1) {
@@ -178,7 +175,7 @@ class LoadDatasetComponent extends Component {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase 
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -196,7 +193,7 @@ class LoadDatasetComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.common.networkError',
+                                message: 'static.unkownError',
                                 loading: false,
                                 color: "red"
                             }, () => {
@@ -300,7 +297,6 @@ class LoadDatasetComponent extends Component {
                         proList.push(programJson);
                     }
                 }
-                console.log("D--------------->ProList", proList);
                 this.setState({
                     programList: proList,
                     // loading: false
@@ -311,10 +307,8 @@ class LoadDatasetComponent extends Component {
 
     getTree() {
         this.setState({ loading: true })
-        // console.log(this.state.realmId)
         document.getElementById("treeDiv").style.display = "block";
         // AuthenticationService.setupAxiosInterceptors();
-        // console.log("This.state.realmId", this.state.realmId)
         if (this.state.realmId != "" && this.state.realmId > 0) {
             this.setState({
                 message: ""
@@ -322,27 +316,19 @@ class LoadDatasetComponent extends Component {
             RealmCountryService.getRealmCountryForProgram(this.state.realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        // console.log("response.data------------>", response.data)
-                        var lang = this.state.lang;
                         this.setState({
-                            countryList: (response.data).sort(function (a, b) {
-                                a = getLabelText(a.realmCountry.label, lang).toLowerCase();
-                                b = getLabelText(b.realmCountry.label, lang).toLowerCase();
-                                return a < b ? -1 : a > b ? 1 : 0;
-                            })
+                            countryList: response.data
                         })
                         // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
-                        //     .then(response => {
-                        //         if (response.status == 200) {
-                        //             console.log("Response.data", response.data);
-                        //             this.setState({
-                        //                 healthAreaList: response.data
-                        //             })
+                        // .then(response => {
+                        // if (response.status == 200) {
+                        // this.setState({
+                        // healthAreaList: response.data
+                        // })
                         ProgramService.loadProgramList()
                             // getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
-                                    // console.log("Program List", response.data);
                                     this.setState({
                                         prgList: response.data,
                                         loading: false
@@ -360,7 +346,7 @@ class LoadDatasetComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.common.networkError',
+                                            message: 'static.unkownError',
                                             loading: false,
                                             color: "red"
                                         }, () => {
@@ -408,37 +394,36 @@ class LoadDatasetComponent extends Component {
                                     }
                                 }
                             );
-                        //     } else {
-                        //         this.setState({
-                        //             message: response.data.messageCode,
-                        //             loading: false, color: "red"
-                        //         })
-                        //         this.hideFirstComponent()
-                        //     }
+                        // } else {
+                        // this.setState({
+                        // message: response.data.messageCode,
+                        // loading: false, color: "red"
+                        // })
+                        // this.hideFirstComponent()
+                        // }
                         // }).catch(
-                        //     error => {
-                        //         if (error.message === "Network Error") {
-                        //             this.setState({ message: error.message, loading: false, color: "red" });
-                        //             this.hideFirstComponent()
-                        //         } else {
-                        //             switch (error.response ? error.response.status : "") {
-                        //                 case 500:
-                        //                 case 401:
-                        //                 case 404:
-                        //                 case 406:
-                        //                 case 412:
-                        //                     this.setState({ message: error.response.data.messageCode, color: "red" });
-                        //                     this.hideFirstComponent()
-                        //                     break;
-                        //                 default:
-                        //                     this.setState({ message: 'static.unkownError', color: "red" });
-                        //                     this.hideFirstComponent()
-                        //                     console.log("Error code unkown");
-                        //                     break;
-                        //             }
-                        //             this.setState({ loading: false })
-                        //         }
-                        //     }
+                        // error => {
+                        // if (error.message === "Network Error") {
+                        // this.setState({ message: error.message, loading: false, color: "red" });
+                        // this.hideFirstComponent()
+                        // } else {
+                        // switch (error.response ? error.response.status : "") {
+                        // case 500:
+                        // case 401:
+                        // case 404:
+                        // case 406:
+                        // case 412:
+                        // this.setState({ message: error.response.data.messageCode, color: "red" });
+                        // this.hideFirstComponent()
+                        // break;
+                        // default:
+                        // this.setState({ message: 'static.unkownError', color: "red" });
+                        // this.hideFirstComponent()
+                        // break;
+                        // }
+                        // this.setState({ loading: false })
+                        // }
+                        // }
                         // );
                     } else {
                         this.setState({
@@ -452,7 +437,7 @@ class LoadDatasetComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.common.networkError',
+                                message: 'static.unkownError',
                                 loading: false,
                                 color: "red"
                             }, () => {
@@ -533,7 +518,6 @@ class LoadDatasetComponent extends Component {
     }
 
     getPrograms() {
-        // console.log("T***get programs called");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -545,7 +529,7 @@ class LoadDatasetComponent extends Component {
                 this.hideFirstComponent()
             })
             // if (this.props.updateState != undefined) {
-            //     this.props.updateState(false);
+            // this.props.updateState(false);
             // }
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -563,7 +547,7 @@ class LoadDatasetComponent extends Component {
                     this.hideFirstComponent()
                 })
                 // if (this.props.updateState != undefined) {
-                //     this.props.updateState(false);
+                // this.props.updateState(false);
                 // }
             }.bind(this);
             getRequest.onsuccess = function (event) {
@@ -578,7 +562,6 @@ class LoadDatasetComponent extends Component {
                         // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         // var programJson1 = JSON.parse(programData);
-                        // console.log("programData---", programData);
                         var programJson = {
                             programId: myResult[i].programId,
                             versionId: myResult[i].version
@@ -587,12 +570,12 @@ class LoadDatasetComponent extends Component {
                     }
                 }
                 // this.setState({
-                //     programs: proList
+                // programs: proList
                 // })
                 this.checkNewerVersions(proList);
                 // if (this.props.updateState != undefined) {
-                //     this.props.updateState(false);
-                //     this.props.fetchData();
+                // this.props.updateState(false);
+                // this.props.fetchData();
                 // }
             }.bind(this);
         }.bind(this)
@@ -611,25 +594,25 @@ class LoadDatasetComponent extends Component {
                     </option>
                 )
             }, this);
-
+        console.log("this.props.match.params.message", this.props.params)
         return (
             <div className="animated fadeIn">
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 >{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className="green" id="div2">{i18n.t(this.props.match.params.message)}</h5>
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             {/* <CardHeader>
-                                <strong>{i18n.t('static.program.download')}</strong>
-                            </CardHeader> */}
+ <strong>{i18n.t('static.program.download')}</strong>
+ </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded.'} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -644,135 +627,122 @@ class LoadDatasetComponent extends Component {
                                                     {realms}
                                                 </Input>
                                                 {/* <InputGroupAddon addonType="append">
-                                                    <Button color="secondary Gobtn btn-sm" onClick={this.getTree}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon> */}
+ <Button color="secondary Gobtn btn-sm" onClick={this.getTree}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
                                 </Col>
                                 {/* </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-                <Row id="treeDiv" style={{ display: "none" }}>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            <CardBody> */}
-                                <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div className="table-responsive" id="treeDiv" style={{ display: "none" }}>
-                                        <ul className="tree">
-                                            <li>
-                                                <input type="checkbox" id="c1" />
-                                                <label className="tree_label" htmlFor="c1">{'Dataset'}</label>
-                                                <ul>
-                                                    {
-                                                        this.state.countryList.map(item => (
-                                                            <li>
-                                                                <input type="checkbox" id={"c1-".concat(item.realmCountry.id)} />
-                                                                <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
-                                                                <ul>
-                                                                    {
-                                                                        item.healthAreaList.sort(function (a, b) {
-                                                                            a = getLabelText(a.label, this.state.lang).toLowerCase();
-                                                                            b = getLabelText(b.label, this.state.lang).toLowerCase();
-                                                                            return a < b ? -1 : a > b ? 1 : 0;
-                                                                        }.bind(this)).map(item1 => (
-                                                                            <li>
-                                                                                <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
-                                                                                <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
-                                                                                <ul>
-                                                                                    {
-                                                                                        this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id)
-                                                                                            .filter(c => c.healthArea.id == item1.id).sort(function (a, b) {
-                                                                                                a = getLabelText(a.program.label, this.state.lang).toLowerCase();
-                                                                                                b = getLabelText(b.program.label, this.state.lang).toLowerCase();
-                                                                                                return a < b ? -1 : a > b ? 1 : 0;
-                                                                                            }.bind(this))
-                                                                                            .map(item2 => (
+ </Card>
+ </Col>
+ </Row>
+ <Row id="treeDiv" style={{ display: "none" }}>
+ <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+ <Card>
+ <CardBody> */}
+                                <div className="table-responsive" id="treeDiv" style={{ display: "none" }}>
+                                    <ul className="tree">
+                                        <li>
+                                            <input type="checkbox" id="c1" />
+                                            <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label>
+                                            <ul>
+                                                {
+                                                    this.state.countryList.map(item => (
+                                                        <li>
+                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id)} />
+                                                            <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
+                                                            <ul>
+                                                                {
+                                                                    item.healthAreaList.map(item1 => (
+                                                                        <li>
+                                                                            <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
+                                                                            <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
+                                                                            <ul>
+                                                                                {
+                                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
 
-                                                                                                <li>
-                                                                                                    {/* {item2} */}
-                                                                                                    <span className="tree_label">
-                                                                                                        <span className="">
-                                                                                                            <div className="checkbox m-0">
-                                                                                                                <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
-                                                                                                                {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
-                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
-                                                                                                            </div>
-                                                                                                        </span>
-                                                                                                    </span>
-                                                                                                    {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))}
-                                                                                                    <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
-                                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
-                                                                                                    <ul>
-                                                                                                        {
-                                                                                                            this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
-                                                                                                                (item3.versionList).map((item4, count) => (
-                                                                                                                    <>
-                                                                                                                        <li><span className="tree_label">
-                                                                                                                            <span className="">
-                                                                                                                                <div className="checkbox m-0">
-                                                                                                                                    <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                                </div>
-                                                                                                                            </span>
-                                                                                                                        </span>
-                                                                                                                        </li>
-
-                                                                                                                        {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
-                                                                                                                    </>
-
-                                                                                                                ))
-                                                                                                            ))
-                                                                                                        }
-
-                                                                                                    </ul>
-                                                                                                    {/* <ul>
-
+                                                                                        <li>
+                                                                                            {/* {item2} */}
+                                                                                            <span className="tree_label">
+                                                                                                <span className="">
+                                                                                                    <div className="checkbox m-0">
+                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
+                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
+                                                                                                    </div>
+                                                                                                </span>
+                                                                                            </span>
+                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
+                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
+                                                                                            <ul>
                                                                                                 {
-                                                                                                    this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
-                                                                                                        (item3.versionList).map(item4 => (
-                                                                                                            <label onClick={this.getMoreVersions(item2.programId, 1)}><a>See More</a></label>
+                                                                                                    this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
+                                                                                                        (item3.versionList).map((item4, count) => (
+                                                                                                            <>
+                                                                                                                <li><span className="tree_label">
+                                                                                                                    <span className="">
+                                                                                                                        <div className="checkbox m-0">
+                                                                                                                            <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
+                                                                                                                        </div>
+                                                                                                                    </span>
+                                                                                                                </span>
+                                                                                                                </li>
+
+                                                                                                                {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                            </>
+
                                                                                                         ))
-                                                                                                    ))}
-                                                                                            </ul> */}
-                                                                                                </li>
+                                                                                                    ))
+                                                                                                }
 
-                                                                                            ))}
-                                                                                </ul>
-                                                                            </li>
+                                                                                            </ul>
+                                                                                            {/* <ul>
+ {
+ this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
+ (item3.versionList).map(item4 => (
+ <label onClick={this.getMoreVersions(item2.programId, 1)}><a>See More</a></label>
+ ))
+ ))}
+ </ul> */}
+                                                                                        </li>
 
-                                                                        ))}
-                                                                </ul>
-                                                            </li>
-                                                        ))}
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                                                                    ))}
+                                                                            </ul>
+                                                                        </li>
 
-                                            <div class="spinner-border blue ml-4" role="status">
-
-                                            </div>
-                                        </div>
-                                    </div>
+                                                                    ))}
+                                                            </ul>
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                        </li>
+                                    </ul>
                                 </div>
                             </CardBody>
 
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
                             </CardFooter>
                         </Card>
                     </Col>
                 </Row>
 
+                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
+                            <div class="spinner-border blue ml-4" role="status">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -780,6 +750,228 @@ class LoadDatasetComponent extends Component {
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    deleteClicked() {
+        this.setState({ loading: true })
+        var programCheckboxes = document.getElementsByName("programCheckBox");
+        var versionCheckBox = document.getElementsByClassName("versionCheckBox");
+        var checkboxesChecked = [];
+        var programCheckedCount = 0;
+        var programInvalidCheckedCount = 0;
+        var count = 0;
+
+        for (var i = 0; i < versionCheckBox.length; i++) {
+            if (versionCheckBox[i].checked) {
+                programCheckedCount = programCheckedCount + 1;
+                count = count + 1;
+                var json = {
+                    programId: versionCheckBox[i].dataset.programId,
+                    versionId: parseInt(versionCheckBox[i].value)
+                }
+                checkboxesChecked = checkboxesChecked.concat([json]);
+            }
+        }
+        // loop over them all
+        for (var i = 0; i < programCheckboxes.length; i++) {
+            // And stick the checked ones onto an array...
+            if (programCheckboxes[i].checked) {
+                programCheckedCount = programCheckedCount + 1;
+                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+                // loop over them all
+                if (versionCheckboxes.length > 0) {
+                    var count1 = 0;
+                    for (var j = 0; j < versionCheckboxes.length; j++) {
+                        // And stick the checked ones onto an array...
+                        if (versionCheckboxes[j].checked) {
+                            count = count + 1;
+                            count1 = count1 + 1;
+                            var json = {
+                                programId: programCheckboxes[i].value,
+                                versionId: parseInt(versionCheckboxes[j].value)
+                            }
+                            // checkboxesChecked = checkboxesChecked.concat([json]);
+                        }
+
+                    }
+                    if (count1 == 0) {
+                        var programList = this.state.programList.filter(c => c.programId == programCheckboxes[i].value);
+                        for (var p = 0; p < programList.length; p++) {
+                            var json = {
+                                programId: programCheckboxes[i].value,
+                                versionId: programList[p].versionId
+                            }
+                            checkboxesChecked = checkboxesChecked.concat([json]);
+                        }
+                    }
+
+                }
+            } else {
+                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+                // loop over them all
+                if (versionCheckboxes.length > 0) {
+                    // var count = 0;
+                    for (var j = 0; j < versionCheckboxes.length; j++) {
+                        // And stick the checked ones onto an array...
+                        if (versionCheckboxes[j].checked) {
+                            count = count + 1;
+                        }
+                    }
+                    if (count > 0) {
+                        programInvalidCheckedCount = programInvalidCheckedCount + 1;
+                    }
+                }
+            }
+        }
+        if (programCheckedCount == 0) {
+            this.setState({
+                message: 'Select at least one program to delete',
+                // message: i18n.t('static.program.errorSelectAtleastOneProgram'),
+                loading: false, color: "red"
+            },
+                () => {
+                    this.hideFirstComponent();
+                })
+        } else {
+            console.log("Checkbox checked+++", checkboxesChecked);
+            var listOfProgramVersion = checkboxesChecked;
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                for (var i = 0; i < listOfProgramVersion.length; i++) {
+                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                    programTransaction.delete(id);
+                }
+                transaction.oncomplete = function (event) {
+                    var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        programTransaction1.delete(id);
+                    }
+                    transaction1.oncomplete = function (event) {
+                        var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                        for (var i = 0; i < listOfProgramVersion.length; i++) {
+                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                            programTransaction2.delete(id);
+                        }
+                        transaction2.oncomplete = function (event) {
+                            // this.setState({
+                            // loading: false,
+                            // message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            // color: 'green'
+                            // }, () => {
+                            // this.hideFirstComponent()
+                            // })
+                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+                            window.location.reload();
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }
+    }
+
+    deleteLocalVersionUsingProgramId(programId) {
+        this.setState({
+            loading: true
+        })
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
+        var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            for (var i = 0; i < listOfProgramVersion.length; i++) {
+                var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                programTransaction.delete(id);
+            }
+            transaction.oncomplete = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                for (var i = 0; i < listOfProgramVersion.length; i++) {
+                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                    programTransaction1.delete(id);
+                }
+                transaction1.oncomplete = function (event) {
+                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        programTransaction2.delete(id);
+                    }
+                    transaction2.oncomplete = function (event) {
+                        this.setState({
+                            loading: false,
+                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            color: 'green'
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.getPrograms();
+                        this.getLocalPrograms();
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
+    deleteLocalVersion(programId, versionId) {
+        this.setState({
+            loading: true
+        })
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var id = programId + "_v" + versionId + "_uId_" + userId;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var deleteRequest = programTransaction.delete(id);
+            deleteRequest.onsuccess = function (event) {
+                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                var deleteRequest1 = programTransaction1.delete(id);
+                deleteRequest1.onsuccess = function (event) {
+                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                    var deleteRequest2 = programTransaction2.delete(id);
+                    deleteRequest2.onsuccess = function (event) {
+                        this.setState({
+                            loading: false,
+                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            color: 'green'
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
+                        this.getPrograms();
+                        this.getLocalPrograms();
+
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
     }
 
     downloadClicked() {
@@ -791,11 +983,9 @@ class LoadDatasetComponent extends Component {
         var programInvalidCheckedCount = 0;
         var count = 0;
 
-        // console.log("versionCheckBox-------------", versionCheckBox);
         for (var i = 0; i < versionCheckBox.length; i++) {
             if (versionCheckBox[i].checked) {
                 programCheckedCount = programCheckedCount + 1;
-                // console.log("parent program--------", versionCheckBox[i].dataset.programId);
                 count = count + 1;
                 var json = {
                     programId: versionCheckBox[i].dataset.programId,
@@ -804,33 +994,25 @@ class LoadDatasetComponent extends Component {
                 checkboxesChecked = checkboxesChecked.concat([json]);
             }
         }
-        // console.log("checkboxesChecked--------", checkboxesChecked);
         // loop over them all
-        // console.log("programCheckboxes.length---", programCheckboxes.length)
         for (var i = 0; i < programCheckboxes.length; i++) {
             // And stick the checked ones onto an array...
             if (programCheckboxes[i].checked) {
-                // console.log("program checked")
                 programCheckedCount = programCheckedCount + 1;
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
                 if (versionCheckboxes.length > 0) {
                     var count1 = 0;
-                    // console.log("versionCheckboxes length > 0")
                     for (var j = 0; j < versionCheckboxes.length; j++) {
                         // And stick the checked ones onto an array...
-                        // console.log("inside for loop")
                         if (versionCheckboxes[j].checked) {
-                            // console.log("versionCheckboxes[j].checked---")
                             count = count + 1;
                             count1 = count1 + 1;
-                            // console.log("count ---", count)
                             var json = {
                                 programId: programCheckboxes[i].value,
                                 versionId: versionCheckboxes[j].value
                             }
                             // checkboxesChecked = checkboxesChecked.concat([json]);
-                            // console.log("checkboxesChecked inside loop---", checkboxesChecked);
                         }
 
                     }
@@ -871,11 +1053,10 @@ class LoadDatasetComponent extends Component {
             // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         }
         // else if (programInvalidCheckedCount > 0) {
-        //     this.setState({ loading: false })
-        //     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
+        // this.setState({ loading: false })
+        // this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         // }
         else {
-            console.log("Checl boxes checked array", checkboxesChecked)
             var programThenCount = 0;
             // for (var i = 0; i < checkboxesChecked.length; i++) {
             // var version = (checkboxesChecked[i]).versionId;
@@ -883,8 +1064,6 @@ class LoadDatasetComponent extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
-                        // console.log("ProgramThenCount", programThenCount)
-                        // console.log("Response data", response.data)
                         var json = response.data;
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
@@ -894,10 +1073,7 @@ class LoadDatasetComponent extends Component {
                             }
                             programAndVersionList.push({ programId: json[r].programId, version: version })
                         }
-                        // console.log("Json-------->", json);
-                        // console("version befor -1 check",version)
 
-                        // console.log("Version", version)
                         var db1;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -913,7 +1089,6 @@ class LoadDatasetComponent extends Component {
                             getRequest.onsuccess = function (event) {
                                 var myResult = [];
                                 myResult = getRequest.result;
-                                console.log("myResult---", myResult)
                                 var programAndVersionListLocal = [];
                                 for (var i = 0; i < myResult.length; i++) {
                                     // for (var j = 0; j < json.length; j++) {
@@ -925,11 +1100,8 @@ class LoadDatasetComponent extends Component {
                                 }
                                 var isExists = 0;
                                 var downloadProgram = false;
-                                console.log("D------------------>", programAndVersionListLocal);
-                                console.log("D------------------>", programAndVersionList);
                                 for (var r = 0; r < programAndVersionList.length; r++) {
                                     var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
-                                    console.log("D---------------->filterList", filterList)
                                     if (filterList.length > 0) {
                                         isExists += 1;
                                     }
@@ -943,10 +1115,8 @@ class LoadDatasetComponent extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
-                                                    console.log("D-------------------->Yes clicked");
-                                                    console.log("D--------------> in download program")
-                                                    var transactionForSavingData = db1.transaction(['forecastDataset'], 'readwrite');
-                                                    var programSaveData = transactionForSavingData.objectStore('forecastDataset');
+                                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                                    var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
                                                         json[r].actionList = [];
                                                         // json[r].openCount = 0;
@@ -970,13 +1140,12 @@ class LoadDatasetComponent extends Component {
                                                             // openCount: 0,
                                                             // addressedCount: 0
                                                         };
-                                                        // console.log("Item------------>", item);
                                                         var putRequest = programSaveData.put(item);
 
                                                     }
                                                     transactionForSavingData.oncomplete = function (event) {
-                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedForecastDataset'], 'readwrite');
-                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedForecastDataset');
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                                         for (var r = 0; r < json.length; r++) {
                                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -993,7 +1162,6 @@ class LoadDatasetComponent extends Component {
                                                                 programData: encryptedText.toString(),
                                                                 userId: userId
                                                             };
-                                                            // console.log("Item------------>", item);
                                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                                         }
@@ -1051,9 +1219,8 @@ class LoadDatasetComponent extends Component {
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
-                                    console.log("D--------------> in download program")
-                                    var transactionForSavingData = db1.transaction(['forecastDataset'], 'readwrite');
-                                    var programSaveData = transactionForSavingData.objectStore('forecastDataset');
+                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                    var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {
                                         json[r].actionList = [];
                                         // json[r].openCount = 0;
@@ -1077,13 +1244,12 @@ class LoadDatasetComponent extends Component {
                                             // openCount: 0,
                                             // addressedCount: 0
                                         };
-                                        // console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
 
                                     }
                                     transactionForSavingData.oncomplete = function (event) {
-                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedForecastDataset'], 'readwrite');
-                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedForecastDataset');
+                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                         for (var r = 0; r < json.length; r++) {
                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1100,7 +1266,6 @@ class LoadDatasetComponent extends Component {
                                                 programData: encryptedText.toString(),
                                                 userId: userId
                                             };
-                                            // console.log("Item------------>", item);
                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                         }
@@ -1146,7 +1311,7 @@ class LoadDatasetComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.common.networkError',
+                                    message: 'static.unkownError',
                                     loading: false,
                                     color: "red"
                                 }, () => {
@@ -1208,4 +1373,4 @@ class LoadDatasetComponent extends Component {
     }
 }
 
-export default LoadDatasetComponent;
+export default Program;
