@@ -1249,6 +1249,8 @@ class AuthenticationService {
                         return true;
                     }
                     break;
+                    case "/forecastReport/consumptionForecastError":
+                            return true;
                 default:
                     console.log("default case");
                     return false;

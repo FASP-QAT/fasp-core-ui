@@ -257,6 +257,7 @@ const ShipmentSummery = React.lazy(() => import('../../views/Report/ShipmentSumm
 const WarehouseCapacity = React.lazy(() => import('../../views/Report/WarehouseCapacity'));
 const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('../../views/Report/StockStatusAccrossPlanningUnitGlobalView'));
 const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustment'));
+const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
@@ -544,6 +545,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message',exact:true,name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
+  { path: '/forecastReport/consumptionForecastError', name: 'static.dashboard.consumptionByMonth', component: ConsumptionForecastError },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
 
@@ -2228,10 +2230,16 @@ class DefaultLayout extends Component {
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
   {
-  name: "Output Reports",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  name: "Forecast Output",
+  url: '/report/forecastOutput',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+  },
+  {
+    name: i18n.t('static.dashboard.consumptionByMonth'),
+    url: '/forecastReport/consumptionForecastError',
+    icon: 'fa fa-exchange',
+    attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
   ]
   }
