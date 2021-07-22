@@ -603,11 +603,13 @@ export default class OrganisationTicketComponent extends Component {
         organisation.realmCountryId = '';
         organisation.organisationName = '';
         organisation.organisationCode = '';
+        organisation.organisationType = '';
         organisation.notes = '';
         this.setState({
             organisation: organisation,
             realm: this.props.items.userRealmId,
-            countryId: ''
+            countryId: '',
+            organisationTypeId: ''
         },
             () => { });
     }
