@@ -222,7 +222,7 @@ export default class ProgramList extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            
+
 
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -574,7 +574,7 @@ export default class ProgramList extends Component {
 
     addNewProgram() {
         this.props.history.push({
-            pathname: "/program/programOnboarding"
+            pathname: "/forecastProgram/addForecastProgram"
         });
     }
     buttonFormatter(cell, row) {
