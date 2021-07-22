@@ -458,7 +458,7 @@ export default class AddOrganisationComponent extends Component {
                         });
                         this.setState({
                             organisationTypeId: '',
-                            organisationTypeList: listArray,
+                            organisationTypeList: listArray.filter(c => c.active == true),
                             loading: false,
                         })
                     } else {
