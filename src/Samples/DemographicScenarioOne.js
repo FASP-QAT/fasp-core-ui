@@ -1,29 +1,23 @@
 import React, { Component } from 'react';
-// import jexcel from 'jexcel-pro';
-// import "../../node_modules/jexcel-pro/dist/jexcel.css";
-// import "../../node_modules/jsuites/dist/jsuites.css";
 import {
     JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY,
     JEXCEL_DATE_FORMAT_SM
 
 } from '../Constants.js';
-// import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, } from '../CommonComponent/JExcelCommonFunctions.js'
 import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash, faEdit, faDigitalTachograph } from '@fortawesome/free-solid-svg-icons'
-import i18n from '../i18n'
-import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import i18n from '../i18n'
+import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import TreeData from './TreeData';
 import CardBody from 'reactstrap/lib/CardBody';
 import CardFooter from 'reactstrap/lib/CardFooter';
-import Provider from '../Samples/Provider';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import 'react-tabs/style/react-tabs.css';
 import jexcel from 'jexcel-pro';
@@ -33,9 +27,6 @@ import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationService from '../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
-
-
-
 
 export default class DemographicScenarioOne extends Component {
     constructor() {
@@ -50,7 +41,9 @@ export default class DemographicScenarioOne extends Component {
         // this.dataChange = this.dataChange.bind(this);
         this.buildJexcelForFrecastOutPut = this.buildJexcelForFrecastOutPut.bind(this);
         this.loadedFunctionForMergeProblemList = this.loadedFunctionForMergeProblemList.bind(this);
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
         this.state = {
+            forecastOutPutEl: "",
             treeEl: '',
             treeObj: [{
                 forecastDatasetName: 'AGO-CON-MOH',
@@ -122,36 +115,44 @@ export default class DemographicScenarioOne extends Component {
         this.props.history.push(`/morbidity/scenarioOne`)
     }
     buildJexcelForFrecastOutPut() {
+        // this.forecastOutPutEl = jexcel(document.getElementById("forecastOutPutDiv"), '');
+        // this.forecastOutPutEl.destroy();
         var options = {
-            data: [],
+            data: [{ 0: '1', 1: '1', 2: '1', 3: '1', 4: '1', 5: '1', 6: '20' }],
             columnDrag: true,
             colWidths: [50, 50, 50, 50, 50, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
                     title: 'Tree Name',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'Demographic tree for Ben PRH/Con' }, { 'id': '2', 'name': 'Morbidity tree for Ben Malaria' }]
                 },
 
                 {
                     title: 'Scenarion',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'High' }, { 'id': '2', 'name': 'Medium' }, { 'id': '3', 'name': 'Low' }]
                 },
                 {
                     title: 'Forecasting Unit',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'Artemeter 1x6' }, { 'id': '2', 'name': 'Primaquite 7.5mg' }, { 'id': '3', 'name': 'Paracetamol' }]
                 },
                 {
                     title: 'Planning Unit',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'Microplate, PCR, 96-Well, Clear, Low Profile, Unskirted, Max 200 uL/Well, 10 Each' }, { 'id': '2', 'name': 'Ammonium Sulfate, ACS Reagent, 500 gm' }, { 'id': '3', 'name': 'Darunavir/Ritonavir 400/50mg Tablet, 60 Tablets' }]
                 },
                 {
                     title: 'Supply Plan Dataset',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'AGO-CON-NACP' }, { 'id': '2', 'name': 'BEN-ARV-TBD' }, { 'id': '3', 'name': 'BWA-CON-TBD' }]
                 },
                 {
                     title: 'Supply Plan Planning Unit',
-                    type: 'text',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' },{ 'id': '1', 'name': 'Microplate, PCR, 96-Well, Clear, Low Profile, Unskirted, Max 200 uL/Well, 10 Each' }, { 'id': '2', 'name': 'Ammonium Sulfate, ACS Reagent, 500 gm' }, { 'id': '3', 'name': 'Darunavir/Ritonavir 400/50mg Tablet, 60 Tablets' }]
                 },
                 {
                     title: 'Value (%)',
@@ -167,7 +168,7 @@ export default class DemographicScenarioOne extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            editable: false,
+            editable: true,
             onload: this.loadedFunctionForMergeProblemList,
             filters: true,
             license: JEXCEL_PRO_KEY,
@@ -176,16 +177,170 @@ export default class DemographicScenarioOne extends Component {
                 show: '',
                 entries: '',
             },
-
-
-
         }
 
-        var forecastOutPutJexcel = jexcel(document.getElementById("forecastOutPutDiv"), options);
-        this.el = forecastOutPutJexcel;
+        var forecastOutPutJexcelVar = jexcel(document.getElementById("forecastOutPutDiv"), options);
+        this.el = forecastOutPutJexcelVar;
+        this.setState({ forecastOutPutEl: forecastOutPutJexcelVar });
+    }
+    loadedFunctionForMergeProblemList = function (instance) {
+        jExcelLoadedFunction(instance);
+    }
+    addRowInJexcel() {
+        var obj = this.state.forecastOutPutEl;
+        // console.log("obj++++",obj);
+        var data = [];
+        data[0] = "0";
+        data[1] = "0";
+        data[2] = "0";
+        data[3] = "0";
+        data[4] = "0";
+        data[5] = "0";
+        data[6] = "0";
+        // console.log("data+++",data);
+        obj.insertRow(data);
     }
 
-    loadedFunctionForMergeProblemList = function (instance) {
+
+    buildJexcel() {
+        let treeList = this.state.treeObj;
+        // console.log("dataSourceList---->", dataSourceList);
+        let treeArray = [];
+        let count = 0;
+
+        for (var j = 0; j < treeList.length; j++) {
+            data = [];
+            data[0] = treeList[j].forecastDatasetName
+            data[1] = treeList[j].forecastMethod
+            data[2] = treeList[j].treeName
+            data[3] = treeList[j].scenarioName
+            data[4] = treeList[j].createdBy;
+            data[5] = treeList[j].createdDate;
+            data[6] = treeList[j].lastModifiedBy;
+            data[7] = treeList[j].lastModifiedDate;
+            // data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = treeList[j].status;
+            treeArray[count] = data;
+            count++;
+        }
+        // if (dataSourceList.length == 0) {
+        //     data = [];
+        //     dataSourceArray[0] = data;
+        // }
+        // console.log("dataSourceArray---->", dataSourceArray);
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = treeArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            // colWidths: [150, 150, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Forecast Dataset',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Forecast Method',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Tree Name',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Scenario Name',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.createdBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.createdDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
+                },
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+
+
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: 'Delete',
+                            onclick: function () {
+
+                            }.bind(this)
+                        });
+                    }
+                }
+
+                return items;
+            }.bind(this),
+        };
+        var treeEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = treeEl;
+        this.setState({
+            treeEl: treeEl, loading: false
+        })
+    }
+
+    loaded = function (instance) {
         jExcelLoadedFunction(instance);
     }
 
@@ -445,8 +600,6 @@ export default class DemographicScenarioOne extends Component {
 
 
     tabPane() {
-
-
         return (
             <>
                 <TabPane tabId="1">
@@ -483,18 +636,25 @@ export default class DemographicScenarioOne extends Component {
 
                     </div>
                 </TabPane>
-                <TabPane tabId="3" className="tabpadding">
-                    <div>
-                        <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0" id="realmDiv">
-                            <div className="pl-lg-0 pr-lg-0">
+                <TabPane tabId="3">
+                    {/* <Row> */}
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardBody>
                                 <div className="table-responsive RemoveStriped">
                                     <div id="forecastOutPutDiv" />
                                 </div>
-                                </div>
-                            </Col>
-                        </Col>
-                    </div>
+                            </CardBody>
+                            <CardFooter>
+                                <FormGroup>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button" > Export</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </CardFooter>
+                        </Card>
+                    </Col>
+                    {/* </Row> */}
                 </TabPane>
 
             </>
