@@ -127,8 +127,12 @@ export default class MorbidityScenarioOne extends Component {
         this.resetTree = this.resetTree.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
+        this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.state = {
+            displayParentData: false,
+            displayPlanningUnit: false,
+            displayUsage: false,
             openAddNodeModal: false,
             title: '',
             cursorItem: 0,
@@ -170,6 +174,51 @@ export default class MorbidityScenarioOne extends Component {
             currentItemConfig.valueType = event.target.value;
         }
         this.setState({ currentItemConfig: currentItemConfig });
+    }
+
+    nodeTypeChange(event) {
+        var nodeTypeId = event.target.value;
+        console.log("node type value---", nodeTypeId)
+        if (nodeTypeId == 1) {
+
+        } else if (nodeTypeId == 2) {
+            console.log("case 2")
+            this.setState({
+                displayParentData: true
+            });
+        }
+        else if (nodeTypeId == 3) {
+            this.setState({
+                displayUsage: true
+            });
+        }
+        else if (nodeTypeId == 4) {
+            this.setState({
+                displayPlanningUnit: true
+            });
+        }
+        // switch (nodeTypeId) {
+        //     case 1:
+        //         break;
+        //     case 2:
+        //         console.log("case 2")
+        //         this.setState({
+        //             displayParentData: true
+        //         });
+        //         break;
+        //     case 3:
+        //         this.setState({
+        //             displayUsage: true
+        //         });
+        //         break;
+        //     case 4:
+        //         this.setState({
+        //             displayPlanningUnit: true
+        //         });
+        //         break;
+        //     default:
+        //         console.log()
+        // }
     }
     onAddButtonClick(itemConfig) {
 
@@ -499,9 +548,9 @@ export default class MorbidityScenarioOne extends Component {
                         <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
                         <Input
                             type="select"
-                            name="nodeValueType"
+                            name="nodeTypeId"
                             bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
+                            onChange={(e) => { this.nodeTypeChange(e) }}
                             required
                             value={this.state.currentItemConfig.valueType}
                         >
@@ -512,6 +561,38 @@ export default class MorbidityScenarioOne extends Component {
                             <option value="4">Planning Unit Node</option>
                         </Input>
                     </FormGroup>
+                    {this.state.displayUsage &&
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Usage<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeValueType"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Condoms</option>
+                            </Input>
+                        </FormGroup>
+                    }
+                    {this.state.displayPlanningUnit &&
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Planning Unit<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeValueType"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">No logo condoms pack of 500</option>
+                            </Input>
+                        </FormGroup>
+                    }
                     <FormGroup>
                         <Label htmlFor="currencyId">Month<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
@@ -519,29 +600,31 @@ export default class MorbidityScenarioOne extends Component {
                             onChange={(e) => { this.dataChange(e) }}
                             value={this.state.currentItemConfig.title}></Input>
                     </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Parent<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            readOnly={true}
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            readOnly={true}
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Percentage Of Parent<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
-                    </FormGroup>
+                    {this.state.displayParentData &&
+                        <>
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Parent<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    readOnly={true}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.currentItemConfig.title}></Input>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    readOnly={true}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.currentItemConfig.title}></Input>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Percentage Of Parent<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.currentItemConfig.title}></Input>
+                            </FormGroup></>}
                     <FormGroup>
                         <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
@@ -573,6 +656,15 @@ export default class MorbidityScenarioOne extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0 mt-lg-2">
+                        <div className="Card-header-addicon">
+                            {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
+                            <div className="card-header-actions">
+                                <div className="card-header-action">
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
+                                </div>
+                            </div>
+
+                        </div>
                         <CardBody className="pt-lg-2">
                             <div className="container-fuild">
                                 <div>
@@ -604,65 +696,65 @@ export default class MorbidityScenarioOne extends Component {
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
                                                                 {/* <FormGroup className=""> */}
-                                                                    <FormGroup className="col-md-3 pl-lg-0">
-                                                                        <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="languageId"
-                                                                            id="languageId"
-                                                                            bsSize="md"
-                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                            // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                            // onBlur={handleBlur}
-                                                                            required
-                                                                        // value={this.state.user.language.languageId}
-                                                                        >
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                        </Input>
-                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                    </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
                                                                 {/* </FormGroup> */}
                                                                 {/* <FormGroup className="pl-3"> */}
-                                                                    <FormGroup className="col-md-3">
-                                                                        <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                        <Input
-                                                                            type="text"
-                                                                            name="languageId"
-                                                                            id="languageId"
-                                                                            bsSize="md"
-                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                            // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                            // onBlur={handleBlur}
-                                                                            required
-                                                                        // value={this.state.user.language.languageId}
-                                                                        >
-                                                                        </Input>
-                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                    </FormGroup>
+                                                                <FormGroup className="col-md-3">
+                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
                                                                 {/* </FormGroup> */}
                                                                 {/* <FormGroup className="pl-3"> */}
-                                                                    <FormGroup className="col-md-3">
-                                                                        <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
-                                                                        <Input
-                                                                            type="text"
-                                                                            name="languageId"
-                                                                            id="languageId"
-                                                                            bsSize="md"
-                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                            // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                            // onBlur={handleBlur}
-                                                                            required
-                                                                        // value={this.state.user.language.languageId}
-                                                                        >
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                        </Input>
-                                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                    </FormGroup>
+                                                                <FormGroup className="col-md-3">
+                                                                    <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
                                                                 {/* </FormGroup> */}
                                                             </Row>
                                                         </div>
@@ -698,7 +790,7 @@ export default class MorbidityScenarioOne extends Component {
                                                 </NavLink>
                                             </NavItem>
                                             <NavItem>
-                                            <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{padding:'5px 20px 5px 20px'}}><i className="fa fa-plus"></i> Add Scenario</Button>
+                                                <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{ padding: '5px 20px 5px 20px' }}><i className="fa fa-plus"></i> Add Scenario</Button>
                                             </NavItem>
                                         </Nav>
                                         <TabContent activeTab={this.state.activeTab[0]}>
@@ -741,14 +833,14 @@ export default class MorbidityScenarioOne extends Component {
                                         Scaling/Transfer
                                     </NavLink>
                                 </NavItem>
-                               
+
                             </Nav>
                             <TabContent activeTab={this.state.activeTab1[0]}>
                                 {this.tabPane1()}
                             </TabContent>
                         </Col>
                     </Row>
-                  
+
                 </ModalBody>
                 <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
