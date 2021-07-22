@@ -1777,5 +1777,6 @@
     "static.report.consumptionAdjustedForStock":"Show consumption adjusted for stock out",
     "static.report.average":"Average",
     "static.forecastReport.error":"Error",
-    "static.forecastReport.difference":"Difference"
+    "static.forecastReport.difference":"Difference",
+    "static.forecastReport.compareScenario":"Compare Scenario"
 }

@@ -258,6 +258,7 @@ const WarehouseCapacity = React.lazy(() => import('../../views/Report/WarehouseC
 const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('../../views/Report/StockStatusAccrossPlanningUnitGlobalView'));
 const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustment'));
 const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
+const CompareScenario = React.lazy(() => import('../../views/ForecastingReports/CompareScenario'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
@@ -546,6 +547,7 @@ const routes = [
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/forecastReport/consumptionForecastError', name: 'static.dashboard.consumptionByMonth', component: ConsumptionForecastError },
+  { path: '/forecastReport/compareScenario', name: 'static.forecastReport.compareScenario', component: CompareScenario },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
 
@@ -2225,7 +2227,7 @@ class DefaultLayout extends Component {
   children: [
   {
   name: "Compare Scenarios",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: '/forecastReport/compareScenario',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
