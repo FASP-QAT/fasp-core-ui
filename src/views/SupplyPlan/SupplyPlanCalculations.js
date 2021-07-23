@@ -54,8 +54,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     var programQPLDetailsJsonRequest = programQPLDetailsOs.get(programId);
                     programQPLDetailsJsonRequest.onsuccess = function (e) {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
-                        if (page != "whatIf") {
-                            programQPLDetailsJson.programModified = 1;
+                        if (objectStoreName != "whatIfProgramData") {
+                            if(page!="masterDataSync"){
+                                programQPLDetailsJson.programModified = 1;
+                            }
                         }
                         var programPlanningUnitList = myResult;
                         var programJsonForStoringTheResult = programJson;
