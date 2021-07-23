@@ -162,7 +162,6 @@ export default class WhatIfReportComponent extends React.Component {
             expiredStockArr: [],
             scenarioId: '',
             percentage: '',
-            startDate: '',
             stopDate: '',
             rows: rows,
             expiredStockDetails: [],
@@ -430,9 +429,7 @@ export default class WhatIfReportComponent extends React.Component {
                         color: 'green',
                         rows: [],
                         scenarioId: '',
-                        percentage: '',
-                        startDate: '',
-                        stopDate: ''
+                        percentage: ''
                     })
                 }.bind(this)
             }.bind(this)
@@ -1314,7 +1311,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1412,7 +1409,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1520,7 +1517,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', startDate: '', stopDate: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -2350,7 +2347,6 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
-        console.log("MonthCount+++", monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -4039,9 +4035,7 @@ export default class WhatIfReportComponent extends React.Component {
                             this.addRow();
                             resetForm({
                                 scenarioId: '',
-                                percentage: '',
-                                startDate: '',
-                                stopDate: ''
+                                percentage: ''
                             });
                         }}
                         render={
@@ -5099,7 +5093,6 @@ export default class WhatIfReportComponent extends React.Component {
             ledgerForBatch: ledgerForBatch,
             loading: false
         })
-        console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
     showShipmentWithBatch(batchNo, expiryDate) {
