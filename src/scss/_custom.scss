@@ -4050,3 +4050,74 @@ z-index:999;
   --rmsc-radius: 0.2rem!important;
   color: #697069!important;
   }
+// CSS for mod1 and mod2 tabs
+.itemWhidth{
+  width:100px!important;
+  text-align:center!important;
+}
+@media (min-width: 992px){
+  .itemWhidth{
+    width:0px;
+    text-align:center;
+  }
+  .sidebar-minimized .sidebar .nav-item:hover > .nav-link.bgColourRemoveItem{
+    background: none!important;
+  }
+.sidebar-minimized .sidebar .nav-link.bgColourRemoveLink  {
+    width: 0px !important;
+    background:none!important;
+    color: #fff !important;
+}
+  .sidebar-minimized .sidebar .nav-link :hover .bgColourRemoveLink{
+    background: none!important; 
+  }
+  }
+  
+  @media (min-width: 992px){
+  .sidebar-minimized .sidebar .nav.nav-tabs.marginTopTabs {
+    width: 50px;
+    margin-top: -143px!important;
+
+  }
+}
+//sidebar menu css mod2
+.module2{
+  background-color:#118b70!important;
+}
+.module1{
+  background-color:#0067b9!important;
+}
+.sidebar .nav-link .nav-icon {
+  color: #fff!important;
+}
+.sidebar .sidebar-minimizer {
+  background-color: #3a4248!important;
+}
+.sidebar .nav-link.tab1.active {
+  // background: #009471!important;
+  background: #118b70!important;
+}
+.sidebar .nav-link.tab2 {
+  // background: #215ebc!important;
+  background: #0067b9!important;
+}
+.sidebar .nav-link.tab2.active {
+  background: #0067b9!important;
+}
+.sidebar .nav-link.tab1 {
+  background: #118b70!important;
+}
+.sidebar .nav-dropdown-toggle::before {
+  background-image:url('/src/assets/img/menu-dropdown.png')!important;
+  height: 10px!important;
+}
+
+.titleColorModule2{
+  color:#118b70!important;
+  text-align: justify;
+}
+
+.titleColorModule1{
+  color:#0067b9!important;
+  text-align: justify;
+}
