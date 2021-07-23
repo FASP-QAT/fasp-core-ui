@@ -85,7 +85,7 @@ export default class UsagePeriodListComponent extends Component {
                     textEditor: true,
                 },
                 {
-                    title: i18n.t('static.mt.reminders2D'),
+                    title: i18n.t('static.usagePeriod.conversionFactor'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,

@@ -1220,6 +1220,20 @@ class DefaultLayout extends Component {
                           //   }]
                           // },
 
+                          {
+                            name: i18n.t('static.usagePeriod.usagePeriod'),
+                            url: '/usagePeriod/listUsagePeriod',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
+
+
+                          {
+                            name: i18n.t('static.scaleUpType.scaleUpType'),
+                            url: '/scaleUpType/listscaleUpType',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
 
 
                         ]
@@ -1354,43 +1368,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') ? false : true) }
                           },
 
-                          {
-                            name: i18n.t('static.forecastProgram.forecastProgram'),
-                            url: '/forecastProgram/listForecastProgram',
-                            icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
-                          },
-
 
                           {
                             name: i18n.t('static.forecastMethod.forecastMethod'),
                             url: '/forecastMethod/listForecastMethod',
                             icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
-                          },
-
-
-                          {
-                            name: i18n.t('static.usagePeriod.usagePeriod'),
-                            url: '/usagePeriod/listUsagePeriod',
-                            icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
-                          },
-
-
-                          {
-                            name: i18n.t('static.scaleUpType.scaleUpType'),
-                            url: '/scaleUpType/listscaleUpType',
-                            icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
-                          },
-
-
-                          {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
-                            url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
                           },
 
                           // {
@@ -2336,6 +2319,21 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list-alt',
                         attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
                         children: [
+
+                          {
+                            name: i18n.t('static.forecastProgram.forecastProgram'),
+                            url: '/forecastProgram/listForecastProgram',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                            url: '/equivalancyUnit/listEquivalancyUnit',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
+
                           {
                             name: "Load Dataset",
                             url: '/report/stockStatusAcrossPlanningUnits',
