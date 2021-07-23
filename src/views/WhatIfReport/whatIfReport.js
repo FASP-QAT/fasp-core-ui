@@ -181,7 +181,8 @@ export default class WhatIfReportComponent extends React.Component {
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             batchInfoInInventoryPopUp: [],
             ledgerForBatch: [],
-            showBatchSaveButton: false
+            showBatchSaveButton: false,
+            programModified: 0
         }
 
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
@@ -457,30 +458,17 @@ export default class WhatIfReportComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
-            var programRequest = programDataOs.get(document.getElementById("programId").value);
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false,
-                    color: "red"
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var whatIfProgramDataTransaction = db1.transaction(['programData'], 'readwrite');
-                var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('programData');
-                var item = {
-                    id: programRequest.result.id,
-                    programId: programRequest.result.programId,
-                    version: programRequest.result.version,
-                    programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
-                    programData: programRequest.result.programData,
-                    userId: programRequest.result.userId
-                }
-                var whatIfRequest = whatIfProgramDataOs.put(item);
-                whatIfRequest.onerror = function (event) {
+            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+            var programQPLDetailsJsonRequest = programQPLDetailsOs.get(document.getElementById("programId").value);
+            programQPLDetailsJsonRequest.onsuccess = function (e) {
+                var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
+                programQPLDetailsJson.programModified = 1;
+
+                var programDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('whatIfProgramData');
+                var programRequest = programDataOs.get(document.getElementById("programId").value);
+                programRequest.onerror = function (event) {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
@@ -488,16 +476,44 @@ export default class WhatIfReportComponent extends React.Component {
                     })
                     this.hideFirstComponent()
                 }.bind(this);
-                whatIfRequest.onsuccess = function (e) {
-                    this.formSubmit(this.state.planningUnit, this.state.monthCount);
-                    this.setState({
-                        message: i18n.t('static.whatIf.supplyPlanSaved'),
-                        color: 'green',
-                        rows: [],
-                        scenarioId: '',
-                        percentage: '',
+                programRequest.onsuccess = function (e) {
+                    var whatIfProgramDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('programData');
+                    var item = {
+                        id: programRequest.result.id,
+                        programId: programRequest.result.programId,
+                        version: programRequest.result.version,
+                        programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
+                        programData: programRequest.result.programData,
+                        userId: programRequest.result.userId
+                    }
+                    var whatIfRequest = whatIfProgramDataOs.put(item);
+                    whatIfRequest.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "red"
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    whatIfRequest.onsuccess = function (e) {
 
-                    })
+                        var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                        var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
+                        programQPLDetailsRequest1.onsuccess = function (event) {
+
+                            this.formSubmit(this.state.planningUnit, this.state.monthCount);
+                            this.setState({
+                                message: i18n.t('static.whatIf.supplyPlanSaved'),
+                                color: 'green',
+                                rows: [],
+                                scenarioId: '',
+                                percentage: '',
+
+                            })
+                        }.bind(this)
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
         }.bind(this)
@@ -650,7 +666,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = consumptionList.findIndex(c =>
                                         c.region.id == consumptionFiltered[i].region.id &&
                                         c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
                                         c.actualFlag == consumptionFiltered[i].actualFlag
                                     );
                                 }
@@ -695,7 +711,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = consumptionList.findIndex(c =>
                                         c.region.id == consumptionFiltered[i].region.id &&
                                         c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
                                         c.actualFlag == consumptionFiltered[i].actualFlag
                                     );
                                 }
@@ -963,7 +979,10 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     putRequest1.onsuccess = function (event) {
-                        document.getElementById("saveScenarioDiv").style.display = 'none'
+                        document.getElementById("saveScenarioDiv").style.display = 'none';
+                        this.setState({
+                            programModified: 1
+                        })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
@@ -1060,6 +1079,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 } else if (this.state.scenarioId == 1) {
@@ -1086,7 +1106,7 @@ export default class WhatIfReportComponent extends React.Component {
                             index = consumptionList.findIndex(c =>
                                 c.region.id == consumptionFiltered[i].region.id &&
                                 c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
                                 c.actualFlag == consumptionFiltered[i].actualFlag
                             );
                         }
@@ -1131,6 +1151,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 } else if (this.state.scenarioId == 2) {
@@ -1157,7 +1178,7 @@ export default class WhatIfReportComponent extends React.Component {
                             index = consumptionList.findIndex(c =>
                                 c.region.id == consumptionFiltered[i].region.id &&
                                 c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).filter("YYYY-MM") &&
+                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
                                 c.actualFlag == consumptionFiltered[i].actualFlag
                             );
                         }
@@ -1200,6 +1221,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
@@ -1296,6 +1318,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
 
                     }.bind(this)
@@ -1393,6 +1416,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
 
                     }.bind(this)
@@ -1500,6 +1524,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
 
                     }.bind(this)
@@ -1957,18 +1982,18 @@ export default class WhatIfReportComponent extends React.Component {
                     align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                    for (var i = 0; i < splitTitle.length; i++) {
-                        if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                        } else {
-                            y = y + 3
-                        }
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
                     }
-                    if (splitTitle.length > 1) {
-                        y = y + (5 * (splitTitle.length - 1));
-                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
             }
         })
 
@@ -1995,18 +2020,18 @@ export default class WhatIfReportComponent extends React.Component {
                     align: 'left'
                 })
                 var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                    for (var i = 0; i < splitTitle.length; i++) {
-                        if (y > doc.internal.pageSize.height - 100) {
-                            doc.addPage();
-                            y = 80;
-                        } else {
-                            y = y + 3
-                        }
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+                for (var i = 0; i < splitTitle.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+                    } else {
+                        y = y + 3
                     }
-                    if (splitTitle.length > 1) {
-                        y = y + (5 * (splitTitle.length - 1));
-                    }
+                }
+                if (splitTitle.length > 1) {
+                    y = y + (5 * (splitTitle.length - 1));
+                }
 
             }
         }
@@ -5288,7 +5313,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardFooter className="pb-5">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <Button style={{ display: this.state.display }} type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                        <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                        {this.state.programModified==1 && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                     </CardFooter>
                 </Card>
 
