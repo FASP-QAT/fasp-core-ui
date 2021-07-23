@@ -695,8 +695,14 @@ class DefaultLayout extends Component {
 
   displayHeaderTitle = (name,url) => {
     if (this.state.name !== name) {
-      // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
-      console.log("P*** Call indexed db methods0---------------------------")
+      if (AuthenticationService.checkTypeOfSession(url)) {
+        this.setState({
+          url:""
+        })
+      }else{
+          localStorage.setItem("sessionChanged", 1)
+          this.props.history.push(`/login/static.message.sessionChange`);
+      }
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
