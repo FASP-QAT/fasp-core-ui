@@ -12,7 +12,7 @@ import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
 import { lang } from "moment";
 import i18n from "../../i18n"
-// import HealthAreaService from "../../api/HealthAreaService";
+import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -21,25 +21,6 @@ import classNames from 'classnames';
 
 const entityname = i18n.t('static.forecastProgram.forecastProgram');
 let initialValues = {
-    // programName: '',
-    // realmId: '',
-    // realmCountryId: '',
-    // organisationId: '',
-    // userId: '',
-    // airFreightPerc: '',
-    // seaFreightPerc: '',
-    // // deliveredToReceivedLeadTime: '',
-    // plannedToSubmittedLeadTime: '',
-    // submittedToApprovedLeadTime: '',
-    // approvedToShippedLeadTime: '',
-    // shippedToArrivedByAirLeadTime: '',
-    // shippedToArrivedBySeaLeadTime: '',
-    // arrivedToDeliveredLeadTime: '',
-    // healthAreaId: '',
-    // programNotes: '',
-    // regionId: [],
-    // uniqueCode: '',
-
     realmId: '',
     realmCountryId: '',
     healthAreaId: [],
@@ -159,6 +140,9 @@ export default class AddForecastProgram extends Component {
                 },
                 programNotes: '',
                 healthAreaArray: [],
+                customField1: '',
+                customField2: '',
+                customField3: '',
 
 
             },
@@ -174,7 +158,6 @@ export default class AddForecastProgram extends Component {
             organisationCode: '',
             realmCountryCode: '',
             healthAreaId: '',
-            healthAreaList: [],
 
         }
 
@@ -187,6 +170,13 @@ export default class AddForecastProgram extends Component {
         this.changeLoading = this.changeLoading.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
+        this.realmList = this.realmList.bind(this);
+        this.getRealmCountryList = this.getRealmCountryList.bind(this);
+        this.getHealthAreaList = this.getHealthAreaList.bind(this);
+        this.getOrganisationList = this.getOrganisationList.bind(this);
+        this.getProgramManagerList = this.getProgramManagerList.bind(this);
+        this.generateCountryCode = this.generateCountryCode.bind(this);
+        this.updateFieldData = this.updateFieldData.bind(this);
     }
 
     changeMessage(message) {
@@ -206,21 +196,393 @@ export default class AddForecastProgram extends Component {
         let { program } = this.state
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+
+    realmList() {
+        HealthAreaService.getRealmList()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        realmList: listArray,
+                        loading: false
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
+
+    getRealmCountryList() {
+        console.log("in get realmCOuntry list----->", this.state.program.realm.realmId);
+        ProgramService.getRealmCountryList(this.state.program.realm.realmId)
+            .then(response => {
+                if (response.status == 200) {
+                    // var realmCountries = response.data.filter(c => c.active == true );
+                    var listArray = response.data.filter(c => c.active == true);
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        realmCountryList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getHealthAreaList() {
+        ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("response------>0", response.data);
+                    var json = (response.data).filter(c => c.active == true);
+                    var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                    for (var i = 0; i < json.length; i++) {
+                        regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    console.log("response------>1", regList);
+                    var listArray = regList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    console.log("response------>2", listArray);
+                    this.setState({
+                        healthAreaList: listArray
+                    }, (
+                    ) => {
+                        console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    updateFieldData(value) {
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+
+        if (selectedArray.includes("-1")) {
+            this.setState({ healthAreaId: [] });
+            var list = this.state.healthAreaList.filter(c => c.value != -1)
+            this.setState({ healthAreaId: list });
+            var healthAreaId = list;
+        } else {
+            this.setState({ healthAreaId: value });
+            var healthAreaId = value;
+        }
+
+        let { program } = this.state;
+        // this.setState({ realmCountryId: value });
+        // var realmCountryId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
+        this.setState({ program: program });
+    }
+
+    getOrganisationList() {
+        ProgramService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        organisationList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getProgramManagerList() {
+        ProgramService.getProgramManagerList(this.state.program.realm.realmId)
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        programManagerList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
+
+    generateCountryCode(event) {
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
+        this.setState({ realmCountryCode: realmCountryCode })
+    }
+
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        this.setState({
-            loading: false
-        })
+        this.realmList();
+        let { program } = this.state;
+        let realmId = AuthenticationService.getRealmId();
+        // console.log("realmId----->",realmId);
+        if (realmId != -1) {
+            // console.log("in if");
+            program.realm.realmId = realmId;
+            this.setState({ program }, () => {
+
+                this.getRealmCountryList();
+                // this.getHealthAreaList();
+                // this.getOrganisationList();
+                this.getProgramManagerList();
+
+            });
+            document.getElementById('realmId').disabled = true;
+
+        } else {
+            console.log("in else");
+            document.getElementById('realmId').disabled = false;
+        }
+
+
+
+
 
 
 
     }
 
     generateHealthAreaCode(event) {
-        let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
-        this.setState({
-            healthAreaCode: healthAreaCode
-        })
+        // let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
+        // this.setState({
+        //     healthAreaCode: healthAreaCode
+        // })
     }
 
     generateOrganisationCode(event) {
@@ -236,8 +598,20 @@ export default class AddForecastProgram extends Component {
             program.label.label_en = event.target.value;
         } else if (event.target.name == "realmId") {
             program.realm.realmId = event.target.value;
+            this.getRealmCountryList();
+            // this.refs.healthAreaChild.getHealthAreaList();
+            // this.refs.organisationChild.getOrganisationList();
+            this.getProgramManagerList();
         } else if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
+
+            this.getHealthAreaList();
+            this.getOrganisationList();
+
+
+            program.organisation.id = '';
+            program.healthAreaArray = [];
+
         } else if (event.target.name == 'organisationId') {
             program.organisation.id = event.target.value;
         } else if (event.target.name == 'userId') {
@@ -290,15 +664,37 @@ export default class AddForecastProgram extends Component {
     }
 
     render() {
-        // const { programManagerList } = this.state;
-        // let programManagers = programManagerList.length > 0
-        //     && programManagerList.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.userId}>
-        //                 {item.username}
-        //             </option>
-        //         )
-        //     }, this);
+        const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { realmCountryList } = this.state;
+        let realmCountries = realmCountryList.length > 0
+            && realmCountryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.country.label, this.state.lang)}
+                        {/* {item.country.countryCode} */}
+                    </option>
+                )
+            }, this);
+
+        const { programManagerList } = this.state;
+        let programManagers = programManagerList.length > 0
+            && programManagerList.map((item, i) => {
+                return (
+                    <option key={i} value={item.userId}>
+                        {item.username}
+                    </option>
+                )
+            }, this);
+
         // const { healthAreaList } = this.state;
         // let realmHealthArea = healthAreaList.length > 0
         //     && healthAreaList.map((item, i) => {
@@ -310,16 +706,16 @@ export default class AddForecastProgram extends Component {
         //         )
         //     }, this);
 
-        // const { organisationList } = this.state;
-        // let realmOrganisation = organisationList.length > 0
-        //     && organisationList.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.organisationId}>
-        //                 {/* {item.organisationCode} */}
-        //                 {getLabelText(item.label, this.state.lang)}
-        //             </option>
-        //         )
-        //     }, this);
+        const { organisationList } = this.state;
+        let realmOrganisation = organisationList.length > 0
+            && organisationList.map((item, i) => {
+                return (
+                    <option key={i} value={item.organisationId}>
+                        {/* {item.organisationCode} */}
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
 
 
         return (
@@ -331,7 +727,21 @@ export default class AddForecastProgram extends Component {
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    realmId: this.state.program.realm.realmId,
+                                    realmCountryId: this.state.program.realmCountry.realmCountryId,
+                                    healthAreaId: this.state.healthAreaId,
+                                    organisationId: this.state.program.organisation.id,
+                                    programName: this.state.program.label.label_en,
+                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
+                                    programCode1: this.state.uniqueCode,
+                                    userId: this.state.program.programManager.userId,
+                                    customField1: this.state.program.customField1,
+                                    customField2: this.state.program.customField2,
+                                    customField3: this.state.program.customField3,
+                                    programNotes: this.state.program.programNotes,
+                                }}
                                 validate={validate(validationSchema)}
 
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -366,7 +776,7 @@ export default class AddForecastProgram extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.program.realm.realmId != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             bsSize="sm"
                                                             // className="col-md-4"
@@ -376,7 +786,7 @@ export default class AddForecastProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {/* {realms} */}
+                                                            {realms}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
 
@@ -387,13 +797,13 @@ export default class AddForecastProgram extends Component {
                                                         <Input
                                                             valid={!errors.realmCountryId && this.state.program.realmCountry.realmCountryId != ''}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.generateCountryCode(e) }}
                                                             bsSize="sm"
                                                             // className="col-md-4"
                                                             onBlur={handleBlur}
                                                             type="select" name="realmCountryId" id="realmCountryId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {/* {realmCountries} */}
+                                                            {realmCountries}
                                                         </Input>
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
 
@@ -411,7 +821,9 @@ export default class AddForecastProgram extends Component {
                                                             onChange={(e) => {
                                                                 handleChange(e);
                                                                 setFieldValue("healthAreaId", e);
-                                                                // this.updateFieldData(e);
+                                                                this.updateFieldData(e);
+                                                                this.generateHealthAreaCode(e)
+
                                                             }}
                                                             onBlur={() => setFieldTouched("healthAreaId", true)}
                                                             multi
@@ -435,7 +847,7 @@ export default class AddForecastProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {/* {realmOrganisation} */}
+                                                            {realmOrganisation}
 
                                                         </Input>
 
@@ -449,7 +861,9 @@ export default class AddForecastProgram extends Component {
                                                             type="text" name="programName" valid={!errors.programName}
                                                             bsSize="sm"
                                                             // invalid={touched.programName && !!errors.programName || this.state.program.label.label_en == ''}
-                                                            invalid={touched.programName && !!errors.programName || !!errors.programName}
+                                                            // invalid={touched.programName && !!errors.programName || !!errors.programName}
+                                                            valid={!errors.programName && this.state.program.label.label_en != ''}
+                                                            invalid={touched.programName && !!errors.programName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.program.label.label_en}
@@ -495,14 +909,13 @@ export default class AddForecastProgram extends Component {
                                                         <Input
                                                             value={this.state.program.programManager.userId}
                                                             bsSize="sm"
-                                                            valid={!errors.userId}
-                                                            invalid={touched.userId && !!errors.userId || this.state.program.programManager.userId == ''}
+                                                            valid={!errors.userId && this.state.program.programManager.userId != ''}
+                                                            invalid={touched.userId && !!errors.userId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="userId" id="userId">
                                                             {/* <option value="0">Please select</option> */}
-                                                            {/* <option value="1">Anchal</option> */}
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {/* {programManagers} */}
+                                                            {programManagers}
 
                                                         </Input>
                                                         <FormFeedback>{errors.userId}</FormFeedback>
@@ -512,7 +925,8 @@ export default class AddForecastProgram extends Component {
                                                         <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="customField1" valid={!errors.customField1 && this.state.program.customField1 != ''}
+                                                            type="text" name="customField1"
+                                                            valid={!errors.customField1 && this.state.program.customField1 != ''}
                                                             invalid={touched.customField1 && !!errors.customField1}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
@@ -524,7 +938,8 @@ export default class AddForecastProgram extends Component {
                                                         <Label htmlFor="customField2">{i18n.t('static.forecastProgram.customField2')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="customField2" valid={!errors.customField2 && this.state.program.customField2 != ''}
+                                                            type="text" name="customField2"
+                                                            valid={!errors.customField2 && this.state.program.customField2 != ''}
                                                             invalid={touched.customField2 && !!errors.customField2}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
@@ -536,7 +951,8 @@ export default class AddForecastProgram extends Component {
                                                         <Label htmlFor="customField3">{i18n.t('static.forecastProgram.customField3')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="customField3" valid={!errors.customField3 && this.state.program.customField3 != ''}
+                                                            type="text" name="customField3"
+                                                            valid={!errors.customField3 && this.state.program.customField3 != ''}
                                                             invalid={touched.customField3 && !!errors.customField3}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
@@ -567,7 +983,8 @@ export default class AddForecastProgram extends Component {
                                                     <FormGroup>
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                             </FormGroup>
                                                 </CardFooter>
