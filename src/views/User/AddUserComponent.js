@@ -20,7 +20,9 @@ let initialValues = {
     username: "",
     realmId: [],
     emailId: "",
-    phoneNumber: "",
+    // phoneNumber: "",
+    organisation: "",
+    country: "",
     languageId: [],
     roleId: []
 }
@@ -84,19 +86,25 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
         //     .required(i18n.t('static.user.validphone')),
 
-        needPhoneValidation: Yup.boolean(),
-        phoneNumber: Yup.string()
-            .when("needPhoneValidation", {
-                is: val => {
-                    return document.getElementById("needPhoneValidation").value === "true";
+        // needPhoneValidation: Yup.boolean(),
+        // phoneNumber: Yup.string()
+        //     .when("needPhoneValidation", {
+        //         is: val => {
+        //             return document.getElementById("needPhoneValidation").value === "true";
 
-                },
-                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
-                    .max(15, i18n.t('static.user.validphonemaxdigit'))
-                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-                    .required(i18n.t('static.user.validphone')),
-                otherwise: Yup.string().notRequired()
-            }),
+        //         },
+        //         then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
+        //             .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //             .required(i18n.t('static.user.validphone')),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+
+        organisation: Yup.string()
+            .required(i18n.t('static.user.validusername')),
+
+        country: Yup.string()
+            .required(i18n.t('static.user.validusername')),
     })
 }
 
@@ -140,7 +148,9 @@ class AddUserComponent extends Component {
                 roles: [],
                 username: '',
                 emailId: '',
-                phoneNumber: '',
+                // phoneNumber: '',
+                organisation: '',
+                country: ''
             },
             loading: true,
             roleId: '',
@@ -198,8 +208,16 @@ class AddUserComponent extends Component {
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
         }
-        if (event.target.name == "phoneNumber") {
-            user.phoneNumber = event.target.value;
+        // if (event.target.name == "phoneNumber") {
+        //     user.phoneNumber = event.target.value;
+        // }
+
+        if (event.target.name == "organisation") {
+            user.organisation = event.target.value;
+        }
+
+        if (event.target.name == "country") {
+            user.country = event.target.value;
         }
 
         if (event.target.name == "realmId") {
@@ -286,7 +304,9 @@ class AddUserComponent extends Component {
             username: true,
             realmId: true,
             emailId: true,
-            phoneNumber: true,
+            // phoneNumber: true,
+            organisation: true,
+            country: true,
             languageId: true,
             roleId: true
         }
@@ -645,12 +665,12 @@ class AddUserComponent extends Component {
                                                         id="roleValid"
                                                     />
 
-                                                    <Input
+                                                    {/* <Input
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
                                                         value={(this.state.user.phoneNumber === '' ? false : true)}
-                                                    />
+                                                    /> */}
 
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -706,7 +726,7 @@ class AddUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             autocomplete="off"
@@ -720,7 +740,42 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.phoneNumber}
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+                                                        <Label for="organisation">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            autocomplete="off"
+                                                            name="organisation"
+                                                            id="organisation"
+                                                            bsSize="sm"
+                                                            valid={!errors.organisation && this.state.user.organisation != ''}
+                                                            invalid={touched.organisation && !!errors.organisation}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            // maxLength={25}
+                                                            required
+                                                            value={this.state.user.organisation}
+                                                        /><FormFeedback className="red">{errors.organisation}</FormFeedback>
                                                     </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label for="country">{i18n.t('static.report.country')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            autocomplete="off"
+                                                            name="country"
+                                                            id="country"
+                                                            bsSize="sm"
+                                                            valid={!errors.country && this.state.user.country != ''}
+                                                            invalid={touched.country && !!errors.country}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            // maxLength={25}
+                                                            required
+                                                            value={this.state.user.country}
+                                                        /><FormFeedback className="red">{errors.country}</FormFeedback>
+                                                    </FormGroup>
+
+
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
@@ -803,7 +858,9 @@ class AddUserComponent extends Component {
         let { user } = this.state;
         user.username = '';
         user.emailId = '';
-        user.phoneNumber = '';
+        // user.phoneNumber = '';
+        user.organisation = '';
+        user.country = '';
         user.realm.realmId = '';
         user.language.languageId = '';
         this.state.roleId = '';
