@@ -53,8 +53,7 @@ export default class ConsumptionDetails extends React.Component {
             consumptionType: "",
             dataSources: [],
             planningUnitId: '',
-            realmCountryPlanningUnitList: [],
-            consumptionModalTitle:""
+            realmCountryPlanningUnitList: []
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -913,7 +912,7 @@ export default class ConsumptionDetails extends React.Component {
                         <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
                             <div className="table-responsive consumptionDataEntryTable" id="consumptionTableDiv">
-                                <div id="consumptionTable" className="ConsumptionRowheightForjexcel" />
+                                <div id="consumptionTable" />
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -943,7 +942,7 @@ export default class ConsumptionDetails extends React.Component {
                 <Modal isOpen={this.state.consumptionBatchInfo}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                        <strong>{this.state.consumptionModalTitle}</strong>
+                        <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
@@ -951,23 +950,11 @@ export default class ConsumptionDetails extends React.Component {
                             <div id="consumptionBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
-                        <div id="consumptionNotesDiv" style={{ "display": 'none' }}>
-                            <FormGroup style={{ "marginTop": "-50px" }}>
-                                <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                <Input
-                                    bsSize="sm"
-                                    type="textarea" name="consumptionNotes" id="consumptionNotes" style={{height:"400px"}}/>
-                                <input type="hidden" name="yForNotes" id="yForNotes" />
-                            </FormGroup>
-                        </div>
                     </ModalBody>
                     <ModalFooter>
                         <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.refs.consumptionChild.saveConsumptionBatchInfo}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
                             {this.refs.consumptionChild != undefined && <Button id="consumptionBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
-                        </div>
-                        <div id="showSaveConsumptionNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveConsumptionNotes')}</Button>
                         </div>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>

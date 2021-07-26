@@ -34,8 +34,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.consumptionNotesClicked = this.consumptionNotesClicked.bind(this);
-        this.oneditionstart = this.oneditionstart.bind(this);
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -119,12 +117,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
         }
 
-    }
-
-    oneditionstart = function (instance, cell, x, y, value) {
-        if (x == 9) {
-            this.consumptionNotesClicked(instance, cell, x, y, value)
-        }
     }
 
     showConsumptionData() {
@@ -350,7 +342,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
-                        oneditionstart: this.oneditionstart,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -487,7 +478,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("loading", true);
         var rowData = obj.getRowData(y);
         if (this.props.consumptionPage == "consumptionDataEntry") {
-            this.props.updateState("consumptionModalTitle", i18n.t("static.dataEntry.batchDetails"));
             this.props.toggleLarge();
         }
         var batchList = [];
@@ -1524,47 +1514,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             this.props.hideSecondComponent();
         }
     }
-
-    consumptionNotesClicked = function (instance, cell, x, y, value) {
-        if (x == 9) {
-            this.props.updateState("loading", true);
-            if (this.props.consumptionPage == "consumptionDataEntry") {
-                this.props.updateState("consumptionModalTitle", i18n.t("static.consumption.consumptionNotes"));
-                this.props.toggleLarge();
-            }
-            if (document.getElementById("showSaveConsumptionNotesButtonsDiv") != null) {
-                document.getElementById("showSaveConsumptionNotesButtonsDiv").style.display = 'block';
-            }
-            if (document.getElementById("consumptionNotesDiv") != null) {
-                document.getElementById("consumptionNotesDiv").style.display = 'block';
-            }
-            var elInstance = this.state.consumptionEl;
-            var rowData = elInstance.getRowData(y);
-            var notes = rowData[9];
-            document.getElementById("consumptionNotes").value = notes;
-            document.getElementById("yForNotes").value = y;
-            this.props.updateState("loading", false);
-        }
-    }
-
-    saveConsumptionNotes() {
-        this.props.updateState("loading", true);
-        var elInstance = this.state.consumptionEl;
-        elInstance.setValueFromCoords(9, document.getElementById("yForNotes").value, document.getElementById("consumptionNotes").value, true);
-        this.props.updateState("consumptionChangedFlag", 1);
-        if (document.getElementById("showSaveConsumptionNotesButtonsDiv") != null) {
-            document.getElementById("showSaveConsumptionNotesButtonsDiv").style.display = 'none';
-        }
-        if (document.getElementById("consumptionNotesDiv") != null) {
-            document.getElementById("consumptionNotesDiv").style.display = 'none';
-        }
-        if (this.props.consumptionPage == "consumptionDataEntry") {
-            this.props.toggleLarge("submit");
-        }
-        this.props.updateState("loading", false);
-    }
-
-
 
     render() { return (<div></div>) }
 }
