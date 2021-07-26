@@ -276,6 +276,9 @@ const DemographicScenarioOne = React.lazy(() => import('../../Samples/Demographi
 const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
 const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
 
+// Forecasting module
+const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
+const DeleteDatasetComponent = React.lazy(() => import('../../views/Dataset/DeleteDatasetComponent'));
 const AddForecastProgram = React.lazy(() => import('../../views/ForecastProgram/AddForecastProgram'));
 const ForecastProgramList = React.lazy(() => import('../../views/ForecastProgram/ForecastProgramList'));
 const EditForecastProgram = React.lazy(() => import('../../views/ForecastProgram/EditForecastProgram'));
@@ -654,13 +657,16 @@ const routes = [
   { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
   { path: '/integration/listIntegration/:message', component: IntegrationList },
   { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration },
-  { path: '/morbidity/scenarioOne', name: 'Morbidity Scenario One', component: MorbidityScenarioOne },
+  { path: '/morbidity/scenarioOne', name: 'Build Forecast Tree', component: MorbidityScenarioOne },
   { path: '/morbidity/scenarioTwo', name: 'Morbidity Scenario Two', component: MorbidityScenarioTwo },
   { path: '/morbidity/scenarioThree', name: 'Morbidity Scenario Three', component: MorbidityScenarioThree },
 
   { path: '/demographic/scenarioOne', name: 'Demographic Scenario One', component: DemographicScenarioOne },
   { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
+  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
   { path: '/forecastProgram/addForecastProgram', name: 'static.breadcrum.add', entityname: 'static.forecastProgram.forecastProgram', component: AddForecastProgram },
   { path: '/forecastProgram/listForecastProgram/:color/:message', name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: ForecastProgramList },
@@ -2290,7 +2296,7 @@ class DefaultLayout extends Component {
                       {
                         name: 'Demographic Tree',
                         icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER1')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_USER')) ? false : true) },
                         children: [
                           {
                             name: 'Scenario 1',
@@ -2336,14 +2342,14 @@ class DefaultLayout extends Component {
 
                           {
                             name: "Load Dataset",
-                            url: '/report/stockStatusAcrossPlanningUnits',
+                            url: '/dataset/loadDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 
                           },
                           {
-                            name: "Load Cosmption",
-                            url: '/report/stockStatusAcrossPlanningUnits',
+                            name: "Delete Forecast Dataset",
+                            url: '/dataset/deleteDataset',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
 

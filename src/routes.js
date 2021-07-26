@@ -241,6 +241,9 @@ const DemographicScenarioOne = React.lazy(() => import('../../Samples/Demographi
 const DemographicScenarioTwo = React.lazy(() => import('../../Samples/DemographicScenarioTwo'));
 const DemographicScenarioThree = React.lazy(() => import('../../Samples/DemographicScenarioThree'));
 
+// Forecasting module
+const LoadDatasetComponent = React.lazy(() => import('./views/Dataset/LoadDatasetComponent'));
+const DeleteDatasetComponent = React.lazy(() => import('./views/Dataset/DeleteDatasetComponent'));
 
 const AddForecastProgram = React.lazy(() => import('./views/ForecastProgram/AddForecastProgram'));
 const ForecastProgramList = React.lazy(() => import('./views/ForecastProgram/ForecastProgramList'));
@@ -619,6 +622,9 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+  { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
+  { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
   { path: '/forecastProgram/addForecastProgram', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.forecastProgram.forecastProgram') }), component: AddForecastProgram },
   // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
