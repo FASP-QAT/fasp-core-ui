@@ -241,7 +241,8 @@ export default class ProgramList extends Component {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
                 this.props.history.push({
-                    pathname: `/forecastProgram/editForecastProgram/${this.el.getValueFromCoords(0, x)}`,
+                    // pathname: `/forecastProgram/editForecastProgram/${this.el.getValueFromCoords(0, x)}`,
+                    pathname: `/demographic/scenarioOne`,
                 });
             }
         }
