@@ -661,7 +661,7 @@ export default class AddOrganisationComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // console.log("-------------------->" + this.state.organisation.organisationCode);
+                                    console.log("ORGANISATION-------------------->1" + JSON.stringify(this.state.organisation));
                                     if (this.state.organisation.organisationCode != '') {
                                         this.setState({
                                             loading: true
