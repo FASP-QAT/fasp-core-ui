@@ -545,11 +545,11 @@ export default class OrganisationTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmId: this.props.items.userRealmId,
-                            realmCountryId: '',
-                            organisationCode: '',
-                            organisationName: '',
-                            notes: ''
+                            realmId: this.state.realm,
+                            realmCountryId: this.state.countryId,
+                            organisationCode: this.state.organisation.organisationCode,
+                            organisationName: this.state.organisation.organisationName,
+                            notes: this.state.organisation.notes
                         }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -722,7 +722,7 @@ export default class OrganisationTicketComponent extends Component {
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                         <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </ModalFooter>
                                     {/* <br></br><br></br>
                                     <div className={this.props.className}>
