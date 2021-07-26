@@ -50,8 +50,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         this.onPasteForBatchInfo = this.onPasteForBatchInfo.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
-        this.shipmentNotesClicked = this.shipmentNotesClicked.bind(this);
-        this.oneditionstart = this.oneditionstart.bind(this);
     }
 
     formatter = value => {
@@ -82,9 +80,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 (instance.jexcel).setValueFromCoords(18, data[i].y, `=ROUND(ROUND(K${parseInt(data[i].y) + 1}*P${parseInt(data[i].y) + 1},2)+R${parseInt(data[i].y) + 1},2)`, true);
-                if (data[i].x == 17 || data[i].x == 15 || data[i].x == 11 || data[i].x == 7) {
-                    (instance.jexcel).setValueFromCoords(data[i].x, data[i].y, data[i].value, true);
-                }
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(22, data[i].y, false, true);
                     (instance.jexcel).setValueFromCoords(23, data[i].y, "", true);
@@ -175,12 +170,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(18, y, parseFloat(rowData[18]), true);
         }
 
-    }
-
-    oneditionstart = function (instance, cell, x, y, value) {
-        if (x == 20) {
-            this.shipmentNotesClicked(instance, cell, x, y, value)
-        }
     }
 
     showShipmentData() {
@@ -645,17 +634,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             onchange: this.shipmentChanged,
                                             // oneditionstart: this.shipmentEditStart,
                                             allowExport: false,
-                                            rowResize: true,
                                             parseFormulas: true,
                                             filters: filterOption,
                                             license: JEXCEL_PRO_KEY,
                                             onchangepage: this.onchangepage,
                                             oneditionend: this.oneditionend,
-                                            oneditionstart: this.oneditionstart,
                                             oncreateeditor: function (a, b, c, d, e) {
                                                 if (c == 10) {
                                                     this.shipmentEditStart(a, b, c, d, e)
                                                 }
+                                                // if (e.value) {
+                                                //     e.selectionStart = e.value.length;
+                                                //     e.selectionEnd = e.value.length;
+                                                // }
                                             }.bind(this),
                                             onpaste: this.onPaste,
                                             text: {
@@ -1885,7 +1876,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     shipmentChanged = function (instance, cell, x, y, value) {
-        console.log("D--------------------------> on change")
         var elInstance = instance.jexcel;
         var rowData = elInstance.getRowData(y);
         var planningUnitId = rowData[2];
@@ -3861,45 +3851,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
     }
 
     render() { return (<div></div>) }
-
-    shipmentNotesClicked = function (instance, cell, x, y, value) {
-        if (x == 20) {
-            this.props.updateState("loading", true);
-            if (this.props.shipmentPage == "shipmentDataEntry") {
-                this.props.updateState("shipmentModalTitle", i18n.t("static.shipment.shipmentNotes"));
-                this.props.toggleLarge();
-            }
-            if (document.getElementById("showSaveShipmentsNotesButtonsDiv") != null) {
-                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'block';
-            }
-            if (document.getElementById("shipmentNotesDiv") != null) {
-                document.getElementById("shipmentNotesDiv").style.display = 'block';
-            }
-            var elInstance = this.state.shipmentsEl;
-            var rowData = elInstance.getRowData(y);
-            var notes = rowData[20];
-            document.getElementById("shipmentNotes").value = notes;
-            document.getElementById("yForNotes").value = y;
-            this.props.updateState("loading", false);
-        }
-    }
-
-    saveShipmentsNotes() {
-        this.props.updateState("loading", true);
-        var elInstance = this.state.shipmentsEl;
-        elInstance.setValueFromCoords(20, document.getElementById("yForNotes").value, document.getElementById("shipmentNotes").value, true);
-        this.props.updateState("shipmentChangedFlag", 1);
-        if (document.getElementById("showSaveShipmentsNotesButtonsDiv") != null) {
-            document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
-        }
-        if (document.getElementById("shipmentNotesDiv") != null) {
-            document.getElementById("shipmentNotesDiv").style.display = 'none';
-        }
-        if (this.props.shipmentPage == "shipmentDataEntry") {
-            this.props.toggleLarge("submit");
-        }
-        this.props.updateState("loading", false);
-    }
 
     shipmentEditStart = function (instance, cell, x, y, value) {
         var papuResult = this.state.procurementAgentPlanningUnitListAll;

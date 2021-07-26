@@ -38,8 +38,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             inventoryEl: "",
             inventoryBatchInfoTableEl: ""
         }
-        this.inventoryNotesClicked = this.inventoryNotesClicked.bind(this);
-        this.oneditionstart = this.oneditionstart.bind(this);
     }
 
     onPaste(instance, data) {
@@ -79,12 +77,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
 
-    }
-
-    oneditionstart = function (instance, cell, x, y, value) {
-        if (x == 10) {
-            this.inventoryNotesClicked(instance, cell, x, y, value)
-        }
     }
 
     onPasteForBatchInfo(instance, data) {
@@ -367,7 +359,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
-                        oneditionstart: this.oneditionstart,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -464,7 +455,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var rowData = obj.getRowData(y);
         this.props.updateState("loading", true);
         if (this.props.inventoryPage == "inventoryDataEntry") {
-            this.props.updateState("inventoryModalTitle", i18n.t("static.dataEntry.batchDetails"));
             this.props.toggleLarge();
         }
         var batchList = [];
@@ -1710,46 +1700,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             this.props.updateState("loading", false);
             this.props.hideSecondComponent();
         }
-    }
-
-
-    inventoryNotesClicked = function (instance, cell, x, y, value) {
-        if (x == 10) {
-            this.props.updateState("loading", true);
-            if (this.props.inventoryPage == "inventoryDataEntry") {
-                this.props.updateState("inventoryModalTitle", i18n.t("static.inventory.inventoryNotes"));
-                this.props.toggleLarge();
-            }
-            if (document.getElementById("showSaveInventoryNotesButtonsDiv") != null) {
-                document.getElementById("showSaveInventoryNotesButtonsDiv").style.display = 'block';
-            }
-            if (document.getElementById("inventoryNotesDiv") != null) {
-                document.getElementById("inventoryNotesDiv").style.display = 'block';
-            }
-            var elInstance = this.state.inventoryEl;
-            var rowData = elInstance.getRowData(y);
-            var notes = rowData[10];
-            document.getElementById("inventoryNotes").value = notes;
-            document.getElementById("yForNotes").value = y;
-            this.props.updateState("loading", false);
-        }
-    }
-
-    saveInventoryNotes() {
-        this.props.updateState("loading", true);
-        var elInstance = this.state.inventoryEl;
-        elInstance.setValueFromCoords(10, document.getElementById("yForNotes").value, document.getElementById("inventoryNotes").value, true);
-        this.props.updateState("inventoryChangedFlag", 1);
-        if (document.getElementById("showSaveInventoryNotesButtonsDiv") != null) {
-            document.getElementById("showSaveInventoryNotesButtonsDiv").style.display = 'none';
-        }
-        if (document.getElementById("inventoryNotesDiv") != null) {
-            document.getElementById("inventoryNotesDiv").style.display = 'none';
-        }
-        if (this.props.inventoryPage == "inventoryDataEntry") {
-            this.props.toggleLarge("submit");
-        }
-        this.props.updateState("loading", false);
     }
 
     render() { return (<div></div>) }

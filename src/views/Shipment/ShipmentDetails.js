@@ -1041,7 +1041,7 @@ export default class ShipmentDetails extends React.Component {
                         <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} updateState={this.updateState} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="shipmentDataEntry" useLocalData={1} openBatchPopUp={this.openBatchPopUp} />
                             <div className="table-responsive shipmentDataEntryTable" id="shipmentsDetailsTableDiv">
-                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground RowheightForjexcel" />
+                                <div id="shipmentsDetailsTable" className="jexcelremoveReadonlybackground" />
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -1089,15 +1089,7 @@ export default class ShipmentDetails extends React.Component {
                         <div className="table-responsive">
                             <div id="shipmentBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
-                        <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
-                            <FormGroup style={{ "marginTop": "-30px" }}>
-                                <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                <Input
-                                    bsSize="sm"
-                                    type="textarea" name="shipmentNotes" id="shipmentNotes" style={{height:"400px"}}/>
-                                <input type="hidden" name="yForNotes" id="yForNotes" />
-                            </FormGroup>
-                        </div>
+
                     </ModalBody>
                     <ModalFooter>
                         <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
@@ -1112,10 +1104,6 @@ export default class ShipmentDetails extends React.Component {
                         <div id="showSaveQtyButtonDiv" style={{ display: 'none' }} className="mr-0">
                             <Button size="md" color="danger" className="submitBtn float-right mr-2" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.shipmentQtyChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentQty()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentQty')}</Button>}
-                        </div>
-                        <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
                         </div>
                     </ModalFooter>
                 </Modal>

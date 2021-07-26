@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import {
     Card, CardBody, CardHeader,
     Col, Table, Modal, ModalBody, ModalFooter, ModalHeader, Button,
-    Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent, Input
+    Label, FormGroup, Form, Row, Nav, NavItem, NavLink, TabPane, TabContent
 } from 'reactstrap';
 import i18n from '../../i18n';
 import 'react-contexify/dist/ReactContexify.min.css';
@@ -1080,10 +1080,7 @@ export default class SupplyPlanComponent extends React.Component {
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
-                        callback: function (value) {
-                            return value.toLocaleString();
-                        }
+                        fontColor: 'black'
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -1785,7 +1782,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </Table>
                                 {this.state.showConsumption == 1 && <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="supplyPlan" useLocalData={1} />}
                                 <div className="table-responsive mt-3">
-                                    <div id="consumptionTable" className="ConsumptionRowheightForjexcel" />
+                                    <div id="consumptionTable" />
                                 </div>
                                 <h6 className="red" id="div3">{this.state.consumptionBatchInfoDuplicateError || this.state.consumptionBatchInfoNoStockError || this.state.consumptionBatchError}</h6>
                                 <div className="table-responsive">
@@ -1794,22 +1791,9 @@ export default class SupplyPlanComponent extends React.Component {
 
                                 <div id="showConsumptionBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
-                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption('consumptionBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledConsumption()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.consumptionBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.consumptionChild != undefined && <Button id="consumptionBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.consumptionChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
-                                </div>
-                                <div id="consumptionNotesDiv" style={{ "display": 'none' }}>
-                                    <FormGroup style={{ "marginTop": "42px" }}>
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            bsSize="sm"
-                                            type="textarea" name="consumptionNotes" id="consumptionNotes" style={{ height: "400px" }} />
-                                        <input type="hidden" name="yForNotes" id="yForNotes" />
-                                    </FormGroup>
-                                </div>
-                                <div id="showSaveConsumptionNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledConsumption('consumptionNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.consumptionChild.saveConsumptionNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveConsumptionNotes')}</Button>
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
@@ -2012,7 +1996,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 }
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                                 <div className="table-responsive mt-3">
-                                    <div id="adjustmentsTable" className="table-responsive InventoryRowheightForjexcel" />
+                                    <div id="adjustmentsTable" className="table-responsive " />
                                 </div>
                                 <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                                 <div className="table-responsive">
@@ -2021,22 +2005,9 @@ export default class SupplyPlanComponent extends React.Component {
 
                                 <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
-                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory('inventoryBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
-                                </div>
-                                <div id="inventoryNotesDiv" style={{ "display": 'none' }}>
-                                    <FormGroup style={{ "marginTop": "42px" }}>
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            bsSize="sm"
-                                            type="textarea" name="inventoryNotes" id="inventoryNotes" style={{ height: "400px" }} />
-                                        <input type="hidden" name="yForNotes" id="yForNotes" />
-                                    </FormGroup>
-                                </div>
-                                <div id="showSaveInventoryNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledInventory('inventoryNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveInventoryNotes')}</Button>
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
@@ -2081,7 +2052,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" useLocalData={1} />
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" className="RowheightForjexcel" />
+                                    <div id="shipmentsDetailsTable" />
                                 </div>
 
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
@@ -2115,20 +2086,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
-                                <div id="shipmentNotesDiv" style={{ "display": 'none' }}>
-                                    <FormGroup style={{ "marginTop": "42px" }}>
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            bsSize="sm"
-                                            type="textarea" name="shipmentNotes" id="shipmentNotes" style={{ height: "400px" }} />
-                                        <input type="hidden" name="yForNotes" id="yForNotes" />
-                                    </FormGroup>
-                                </div>
-                                <div id="showSaveShipmentsNotesButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledShipments('shipmentNotes')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentsNotes()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveShipmentNotes')}</Button>
-                                </div>
-
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>
@@ -4379,16 +4336,10 @@ export default class SupplyPlanComponent extends React.Component {
                     shipmentBatchInfoDuplicateError: ""
                 })
             }
-        } else if (type == "shipmentNotes") {
-            var cont = true;
-            if (cont == true) {
-                document.getElementById("showSaveShipmentsNotesButtonsDiv").style.display = 'none';
-                document.getElementById("shipmentNotesDiv").style.display = 'none';
-            }
         }
     }
 
-    actionCanceledInventory(type) {
+    actionCanceledInventory() {
         var cont = false;
         if (this.state.inventoryBatchInfoChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -4400,7 +4351,7 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             cont = true;
         }
-        if (type == 'inventoryBatch' && cont == true) {
+        if (cont == true) {
             document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
             (this.refs.inventoryChild.state.inventoryBatchInfoTableEl).destroy();
             this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
@@ -4411,16 +4362,9 @@ export default class SupplyPlanComponent extends React.Component {
                 inventoryBatchError: ""
             })
         }
-        if (type == 'inventoryNotes') {
-            var cont = true;
-            if (cont == true) {
-                document.getElementById("showSaveInventoryNotesButtonsDiv").style.display = 'none';
-                document.getElementById("inventoryNotesDiv").style.display = 'none';
-            }
-        }
     }
 
-    actionCanceledConsumption(type) {
+    actionCanceledConsumption() {
         var cont = false;
         if (this.state.consumptionBatchInfoChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -4432,7 +4376,7 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             cont = true;
         }
-        if (type == "consumptionBatch" && cont == true) {
+        if (cont == true) {
             document.getElementById("showConsumptionBatchInfoButtonsDiv").style.display = 'none';
             (this.refs.consumptionChild.state.consumptionBatchInfoTableEl).destroy();
             this.refs.consumptionChild.state.consumptionBatchInfoChangedFlag = 0;
@@ -4442,13 +4386,6 @@ export default class SupplyPlanComponent extends React.Component {
                 consumptionBatchInfoNoStockError: "",
                 consumptionBatchError: ""
             })
-        }
-        if (type == "consumptionNotes") {
-            var cont = true;
-            if (cont == true) {
-                document.getElementById("showSaveConsumptionNotesButtonsDiv").style.display = 'none';
-                document.getElementById("consumptionNotesDiv").style.display = 'none';
-            }
         }
     }
     getDataforExport = (report) => {
