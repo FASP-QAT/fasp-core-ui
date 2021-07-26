@@ -4,6 +4,7 @@ import { API_URL } from '../Constants.js';
 class OrganisationService {
 
     addOrganisation(json) {
+        console.log("ORGANISATION-------------------->2" + JSON.stringify(json));
         return axios.post(`${API_URL}/api/organisation/`, json, {}
         );
     }
@@ -27,7 +28,7 @@ class OrganisationService {
         );
     }
 
-    getOrganisationDisplayName(json1,json2) {
+    getOrganisationDisplayName(json1, json2) {
         return axios.get(`${API_URL}/api/organisation/getDisplayName/realmId/${json1}/name/${json2}`, {}
         );
     }
