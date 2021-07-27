@@ -41,8 +41,8 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.common.displayName'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -545,11 +545,11 @@ export default class OrganisationTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmId: this.props.items.userRealmId,
-                            realmCountryId: '',
-                            organisationCode: '',
-                            organisationName: '',
-                            notes: ''
+                            realmId: this.state.realm,
+                            realmCountryId: this.state.countryId,
+                            organisationCode: this.state.organisation.organisationCode,
+                            organisationName: this.state.organisation.organisationName,
+                            notes: this.state.organisation.notes
                         }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -635,101 +635,101 @@ export default class OrganisationTicketComponent extends Component {
                                 setFieldValue,
                                 setFieldTouched
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.organisation.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.organisation.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmId" id="realmId"
-                                                bsSize="sm"
-                                                valid={!errors.realmId && this.state.organisation.realmId != ''}
-                                                invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e.target.value) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realm}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup className="Selectcontrol-bdrNone">
-                                            <Label for="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.realmCountryId && this.state.organisation.realmCountryId.length != 0 },
-                                                    { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
-                                                )}
-                                                name="realmCountryId" id="realmCountryId"
-                                                bsSize="sm"
-                                                onChange={(e) => { handleChange(e); setFieldValue("realmCountryId", e); this.updateFieldData(e) }}
-                                                onBlur={() => setFieldTouched("realmCountryId", true)}
-                                                multi
-                                                options={this.state.realmCountryList}
-                                                value={this.state.countryId}
-                                                required />
-                                            <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="organisationName" id="organisationName"
-                                                bsSize="sm"
-                                                valid={!errors.organisationName && this.state.organisation.organisationName != ''}
-                                                invalid={touched.organisationName && !!errors.organisationName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
-                                                onBlur={(e) => { handleBlur(e); }}
-                                                value={this.state.organisation.organisationName}
-                                                required />
-                                            <FormFeedback className="red">{errors.organisationName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="organisationCode" id="organisationCode"
-                                                bsSize="sm"
-                                                valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
-                                                invalid={touched.organisationCode && !!errors.organisationCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.organisation.organisationCode}
-                                                required
-                                            />
-                                            <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.organisation.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.organisation.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.organisation.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.organisation.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmId" id="realmId"
+                                            bsSize="sm"
+                                            valid={!errors.realmId && this.state.organisation.realmId != ''}
+                                            invalid={touched.realmId && !!errors.realmId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e.target.value) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup className="Selectcontrol-bdrNone">
+                                        <Label for="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.realmCountryId && this.state.organisation.realmCountryId.length != 0 },
+                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                            )}
+                                            name="realmCountryId" id="realmCountryId"
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); setFieldValue("realmCountryId", e); this.updateFieldData(e) }}
+                                            onBlur={() => setFieldTouched("realmCountryId", true)}
+                                            multi
+                                            options={this.state.realmCountryList}
+                                            value={this.state.countryId}
+                                            required />
+                                        <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="organisationName" id="organisationName"
+                                            bsSize="sm"
+                                            valid={!errors.organisationName && this.state.organisation.organisationName != ''}
+                                            invalid={touched.organisationName && !!errors.organisationName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value); this.getDisplayName() }}
+                                            onBlur={(e) => { handleBlur(e); }}
+                                            value={this.state.organisation.organisationName}
+                                            required />
+                                        <FormFeedback className="red">{errors.organisationName}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="organisationCode" id="organisationCode"
+                                            bsSize="sm"
+                                            valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
+                                            invalid={touched.organisationCode && !!errors.organisationCode}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.organisation.organisationCode}
+                                            required
+                                        />
+                                        <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.organisation.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.organisation.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -743,4 +743,4 @@ export default class OrganisationTicketComponent extends Component {
         );
     }
 
-} 
+}
