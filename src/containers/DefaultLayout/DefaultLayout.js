@@ -259,6 +259,7 @@ const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('../../
 const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustment'));
 const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const CompareScenario = React.lazy(() => import('../../views/ForecastingReports/CompareScenario'));
+const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
@@ -548,6 +549,7 @@ const routes = [
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/forecastReport/consumptionForecastError', name: 'static.dashboard.consumptionByMonth', component: ConsumptionForecastError },
   { path: '/forecastReport/compareScenario', name: 'static.forecastReport.compareScenario', component: CompareScenario },
+  { path: '/forecastReport/forecastSummary', name: 'static.forecastReport.forecastSummary', component: ForecastSummary },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
 
@@ -2231,6 +2233,12 @@ class DefaultLayout extends Component {
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
+  {
+    name: "Forecast Summary",
+    url: '/forecastReport/forecastSummary',
+    icon: 'fa fa-exchange',
+    attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+    },
   {
   name: "Forecast Output",
   url: '/report/forecastOutput',

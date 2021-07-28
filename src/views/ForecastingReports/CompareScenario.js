@@ -61,14 +61,14 @@ class CompareScenario extends Component {
             versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
             forecastingUnits: [{ forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, { forecastingUnitId: 4, label: "Tenofovir 300 mg / Lamivudine 300 mg Tablet" }],
             planningUnitListAll: [{ planningUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 4, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 5, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 6, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 7, label: "Tenofovir 300 mg / Lamivudine 300 mg Tablet, 30 tablet bottle", forecastingUnit: { forecastingUnitId: 4, label: "Tenofovir 300 mg / Lamivudine 300 mg Tablet" }, program: { programId: 2 } }],
-            planningUnits: [{ planningUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 4, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 5, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 6, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 7, label: "Tenofovir 300 mg / Lamivudine 300 mg Tablet, 30 tablet bottle", forecastingUnit: { forecastingUnitId: 4, label: "Tenofovir 300 mg / Lamivudine 300 mg Tablet" }, program: { programId: 2 } }],
+            planningUnits: [],
             forecastingUnitId: "",
             showTotalForecast: true,
             showTotalActual: true,
             showTotalDifference: true,
             monthArrayList: [],
             planningUnitId: "",
-            consumptionData: [
+            consumptionDataAll: [
                 { consumptionDate: '2020-07-01', consumptionQty: 58, scenario: { scenarioId: 1 }, actualFlag: true },
                 { consumptionDate: '2020-08-01', consumptionQty: 52, scenario: { scenarioId: 1 }, actualFlag: true },
                 { consumptionDate: '2020-09-01', consumptionQty: 32, scenario: { scenarioId: 1 }, actualFlag: true },
@@ -143,9 +143,10 @@ class CompareScenario extends Component {
                 { consumptionDate: '2021-05-01', consumptionQty: 40, scenario: { scenarioId: 5 }, actualFlag: false },
                 { consumptionDate: '2021-06-01', consumptionQty: 55, scenario: { scenarioId: 5 }, actualFlag: false },
             ],
-            errorValues: ["10%", "12%", "15%", "30%", "20%"],
+            consumptionData: [],
             scenarioList: [],
-            selectedScenarioId: 1
+            selectedScenarioId: 1,
+
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -169,18 +170,41 @@ class CompareScenario extends Component {
 
     }
 
-    setEquivalencyUnit(e) {
+    showData() {
+        var scenarioList = [
+            { scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd", program: { id: 2 }, errorValue: "10%" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646", program: { id: 2 }, errorValue: "12%" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000", program: { id: 2 }, errorValue: "15%" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000", program: { id: 2 }, errorValue: "30%" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b", program: { id: 2 }, errorValue: "20%" },
+            { scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd", program: { id: 1 }, errorValue: "20%" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646", program: { id: 1 }, errorValue: "25%" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000", program: { id: 1 }, errorValue: "30%" },
+            { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000", program: { id: 3 }, errorValue: "10%" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b", program: { id: 3 }, errorValue: "15%" }
+        ]
+        var consumptionData = this.state.consumptionDataAll;
         this.setState({
-            equivalencyUnitId: e.target.value
+            scenarioList: scenarioList.filter(c => c.program.id == this.state.programId),
+            consumptionData: consumptionData
+        })
+    }
+
+    setEquivalencyUnit(e) {
+        var equivalencyUnitId = e.target.value;
+        this.setState({
+            equivalencyUnitId
+        }, () => {
+            if (this.state.viewById == 3 && equivalencyUnitId > 0) {
+                this.showData();
+            }
         })
     }
 
     storeProduct(e) {
         console.log("E++++++++", e.target)
         var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
+        var planningUnitId = e.target.value;
         this.setState({
             planningUnitId: e.target.value,
             planningUnitLabel: name[0].label,
+        }, () => {
+            if (planningUnitId > 0) {
+                this.showData();
+            }
         })
     }
 
@@ -240,10 +264,14 @@ class CompareScenario extends Component {
     }
 
     setForecastingUnit(e) {
+        var forecastingUnitId = e.target.value;
         this.setState({
-            forecastingUnitId: e.target.value
+            forecastingUnitId
         }, () => {
             this.filterPlanningUnit()
+            if (this.state.viewById == 2 && forecastingUnitId > 0) {
+                this.showData()
+            }
         })
     }
 
@@ -338,8 +366,21 @@ class CompareScenario extends Component {
     getVersionIds() {
         var versionListAll = this.state.versionListAll;
         var planningUnitListAll = this.state.planningUnitListAll;
-        var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
-        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId), scenarioList: scenarioList });
+        var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
+        var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
+        var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
+
+        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
+        let stopDate = endDate;
+        var monthArrayList = [];
+        let cursorDate = startDate;
+        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+            monthArrayList.push(dt);
+        }
+        // var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
+        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId), rangeValue: rangeValue, monthArrayList: monthArrayList });
     }
 
     show() {
@@ -402,12 +443,28 @@ class CompareScenario extends Component {
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,
-            planningUnitId: ""
+            planningUnitId: "",
+            forecastingUnitId: "",
+            consumptionData: []
         }, () => {
             if (viewById == 2) {
                 document.getElementById("planningUnitDiv").style.display = "none";
-            } else {
+                document.getElementById("forecastingUnitDiv").style.display = "block";
+                if (this.state.planningUnitId > 0) {
+                    this.showData()
+                }
+            } else if (viewById == 1) {
                 document.getElementById("planningUnitDiv").style.display = "block";
+                document.getElementById("forecastingUnitDiv").style.display = "block";
+                if (this.state.forecastingUnitId > 0) {
+                    this.showData()
+                }
+            } else {
+                document.getElementById("planningUnitDiv").style.display = "none";
+                document.getElementById("forecastingUnitDiv").style.display = "none";
+                if (this.state.equivalencyUnitId > 0) {
+                    this.showData()
+                }
             }
         })
     }
@@ -420,23 +477,23 @@ class CompareScenario extends Component {
             },
             scales: {
                 yAxes: [
-                {
-                    id: 'A',
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Units",
-                        fontColor: 'black'
-                    },
-                    stacked: false,
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: 'black'
-                    },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    },
-                    position: 'left',
-                }
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Units",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black'
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 0
+                        },
+                        position: 'left',
+                    }
                 ],
                 xAxes: [{
                     ticks: {
@@ -479,8 +536,8 @@ class CompareScenario extends Component {
 
 
         let bar = {}
-        if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length>0){
-            var datasetsArr=[];
+        if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0) {
+            var datasetsArr = [];
             datasetsArr.push({
                 label: i18n.t('static.report.stock'),
                 stack: 0,
@@ -496,7 +553,7 @@ class CompareScenario extends Component {
                 pointStyle: 'line',
                 pointRadius: 0,
                 showInLegend: true,
-                data: [70,70,70,70,70,70,70,70,70,70,70,70]
+                data: [70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70]
             })
             datasetsArr.push(
                 {
@@ -513,15 +570,15 @@ class CompareScenario extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.consumptionData.filter(c=>c.actualFlag).map((item, index) => (item.consumptionQty > 0 ? item.consumptionQty : null))
+                    data: this.state.consumptionData.filter(c => c.actualFlag).map((item, index) => (item.consumptionQty > 0 ? item.consumptionQty : null))
                 }
             )
-            this.state.scenarioList.filter(c=>c.checked).map((item,idx)=>{
+            this.state.scenarioList.filter(c => c.checked).map((item, idx) => {
                 datasetsArr.push(
                     {
                         label: item.label,
                         type: 'line',
-                        stack: idx+2,
+                        stack: idx + 2,
                         backgroundColor: 'transparent',
                         borderColor: item.color,
                         ticks: {
@@ -529,11 +586,11 @@ class CompareScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth:idx==0?7:3,
+                        borderWidth: idx == 0 ? 7 : 3,
                         pointStyle: 'line',
                         pointRadius: 0,
                         showInLegend: true,
-                        data: this.state.consumptionData.filter(c=>c.scenario.scenarioId==item.scenarioId && !c.actualFlag).map((item1, index) => (item1.consumptionQty > 0 ? item1.consumptionQty : null))
+                        data: this.state.consumptionData.filter(c => c.scenario.scenarioId == item.scenarioId && !c.actualFlag).map((item1, index) => (item1.consumptionQty > 0 ? item1.consumptionQty : null))
                     }
                 )
             })
@@ -617,25 +674,6 @@ class CompareScenario extends Component {
                                     <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
-
-
-                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -654,6 +692,23 @@ class CompareScenario extends Component {
                                                         </Input>
 
                                                     </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
@@ -715,7 +770,7 @@ class CompareScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-3" id="forecastingUnitDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -774,30 +829,32 @@ class CompareScenario extends Component {
                                     </div>
                                 </Form>
                                 <br></br>
-                                <Table hover responsive className="table-outline mb-0  d-sm-table table-bordered">
-                                    <thead><tr>
-                                        <th>Display?</th>
-                                        <th>Tree/Scenario Name</th>
-                                        <th>Select as forecast?</th>
-                                        <th>Forecast Error</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td style={{ color: "#808080" }}>Actuals (Adjusted)</td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        {this.state.scenarioList.map((item, idx) => (
-                                            <tr id="addr0">
-                                                <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.scenarioId} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.scenarioId)} /></td>
-                                                <td style={{ color: item.color }}>{item.label}</td>
-                                                <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedScenarioId == item.scenarioId ? true : false} onClick={() => this.scenarioOrderChanged(item.scenarioId)}></input></td>
-                                                <td align="center">{this.state.errorValues[idx]}</td>
+                                {this.state.consumptionData.length > 0 &&
+                                    <Table hover responsive className="table-outline mb-0  d-sm-table table-bordered">
+                                        <thead><tr>
+                                            <th>Display?</th>
+                                            <th>Tree/Scenario Name</th>
+                                            <th>Select as forecast?</th>
+                                            <th>Forecast Error</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td style={{ color: "#808080" }}>Actuals (Adjusted)</td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
+                                            {this.state.scenarioList.map((item, idx) => (
+                                                <tr id="addr0">
+                                                    <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.scenarioId} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.scenarioId)} /></td>
+                                                    <td style={{ color: item.color }}>{item.label}</td>
+                                                    <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedScenarioId == item.scenarioId ? true : false} onClick={() => this.scenarioOrderChanged(item.scenarioId)}></input></td>
+                                                    <td align="center">{item.errorValue}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                }
                                 <br></br>
                                 <br></br>
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -849,7 +906,7 @@ class CompareScenario extends Component {
                                                                         this.state.monthArrayList.map(item => {
                                                                             {
                                                                                 var consumption = this.state.consumptionData.filter(c => c.actualFlag == true && moment(c.consumptionDate).format("YYYY-MM") == moment(item).format("YYYY-MM"));
-                                                                                return (<td>{consumption.length>0?consumption[0].consumptionQty:""}</td>)
+                                                                                return (<td>{consumption.length > 0 ? consumption[0].consumptionQty : ""}</td>)
                                                                             }
                                                                         })}
                                                                 </tr>
@@ -859,8 +916,8 @@ class CompareScenario extends Component {
                                                                         {
                                                                             this.state.monthArrayList.map(item => {
                                                                                 {
-                                                                                    var consumption = this.state.consumptionData.filter(c => c.actualFlag == false && moment(c.consumptionDate).format("YYYY-MM") == moment(item).format("YYYY-MM") && c.scenario.scenarioId==item2.scenarioId);
-                                                                                    return (<td>{consumption.length>0?consumption[0].consumptionQty:""}</td>)
+                                                                                    var consumption = this.state.consumptionData.filter(c => c.actualFlag == false && moment(c.consumptionDate).format("YYYY-MM") == moment(item).format("YYYY-MM") && c.scenario.scenarioId == item2.scenarioId);
+                                                                                    return (<td>{consumption.length > 0 ? consumption[0].consumptionQty : ""}</td>)
                                                                                 }
                                                                             })}
                                                                     </tr>

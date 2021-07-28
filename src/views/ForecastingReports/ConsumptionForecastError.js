@@ -1,4 +1,4 @@
-import React, { Component, lazy } from 'react';
+import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
 import MultiSelect from "react-multi-select-component";
 import {
@@ -9,25 +9,14 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from '../../api/RealmService';
-import getLabelText from '../../CommonComponent/getLabelText';
-import PlanningUnitService from '../../api/PlanningUnitService';
-import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import {  DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
 import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
-import { LOGO } from '../../CommonComponent/Logo.js'
-import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
