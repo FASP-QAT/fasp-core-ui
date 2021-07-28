@@ -45,8 +45,8 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.common.displayName'))
             .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext')),
@@ -644,12 +644,12 @@ export default class OrganisationTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmId: this.props.items.userRealmId,
-                            realmCountryId: '',
-                            organisationCode: '',
-                            organisationName: '',
-                            notes: '',
-                            organisationType: ''
+                            realmId: this.state.realm,
+                            realmCountryId: this.state.countryId,
+                            organisationCode: this.state.organisation.organisationCode,
+                            organisationName: this.state.organisation.organisationName,
+                            notes: this.state.organisation.notes,
+                            organisationType: this.state.organisationTypeId
                         }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -800,7 +800,6 @@ export default class OrganisationTicketComponent extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.organisationType}</FormFeedback>
                                         </FormGroup>
-
                                         < FormGroup >
                                             <Label for="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text" name="organisationName" id="organisationName"
@@ -843,7 +842,7 @@ export default class OrganisationTicketComponent extends Component {
                                         <ModalFooter className="pb-0 pr-0">
                                             <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                         </ModalFooter>
                                         {/* <br></br><br></br>
                                     <div className={this.props.className}>
@@ -864,4 +863,4 @@ export default class OrganisationTicketComponent extends Component {
         );
     }
 
-} 
+}
