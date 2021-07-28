@@ -244,12 +244,15 @@ class ForecastSummary extends Component {
     }
 
     setVersionId(event) {
+        var versionId = event.target.value;
         this.setState({
             versionId: event.target.value,
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
             // this.filterVersion();
-            this.buildJexcel();
+            if (versionId > 0 && this.state.programId > 0) {
+                this.buildJexcel();
+            }
         })
     }
 
@@ -284,7 +287,7 @@ class ForecastSummary extends Component {
                 { title: i18n.t('static.product.product'), type: 'text', width: 200, readOnly: true },
                 { type: 'dropdown', title: "Scenario", source: this.state.scenarioList, width: 200 },
                 { title: "Forecast (PU)", type: 'numeric', width: 100, type: 'numeric', mask: '#,##', decimal: '.', readOnly: true },
-                { title: "Starting Stock (PU) - end of Dec 2020", type: 'numeric', mask: '#,##', readOnly: true,width:100 },
+                { title: "Starting Stock (PU) - end of Dec 2020", type: 'numeric', mask: '#,##', readOnly: true, width: 100 },
                 { title: 'Existing Shipments in period (PU)', type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100, },
                 { title: "Ending Stock - end of Dec 2023", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
                 { title: "Desired End of Period Stock (in months)", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
@@ -337,7 +340,11 @@ class ForecastSummary extends Component {
 
     getVersionIds() {
         var versionListAll = this.state.versionListAll;
-        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false });
+        var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
+        var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
+        var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
+        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
+        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false,rangeValue });
     }
 
     show() {
@@ -482,25 +489,6 @@ class ForecastSummary extends Component {
                                     <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
-
-
-                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -521,6 +509,26 @@ class ForecastSummary extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>
+
+
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
