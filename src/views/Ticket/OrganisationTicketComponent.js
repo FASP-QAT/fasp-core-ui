@@ -659,67 +659,67 @@ export default class OrganisationTicketComponent extends Component {
                             this.state.organisation.summary = summaryText_2;
                             this.state.organisation.userLanguageCode = this.state.lang;
                             console.log("SUBMIT---------->", this.state.organisation);
-                            // JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
-                            //     console.log("Response :", response.status, ":", JSON.stringify(response.data));
-                            //     if (response.status == 200 || response.status == 201) {
-                            //         var msg = response.data.key;
-                            //         this.setState({
-                            //             message: msg, loading: false
-                            //         },
-                            //             () => {
-                            //                 this.resetClicked();
-                            //                 this.hideSecondComponent();
-                            //             })
-                            //     } else {
-                            //         this.setState({
-                            //             message: i18n.t('static.unkownError'), loading: false
-                            //         },
-                            //             () => {
-                            //                 this.hideSecondComponent();
-                            //             })
-                            //     }
-                            //     this.props.togglehelp();
-                            //     this.props.toggleSmall(this.state.message);
-                            // }).catch(
-                            //     error => {
-                            //         if (error.message === "Network Error") {
-                            //             this.setState({
-                            //                 message: 'static.unkownError',
-                            //                 loading: false
-                            //             });
-                            //         } else {
-                            //             switch (error.response ? error.response.status : "") {
+                            JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
+                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                if (response.status == 200 || response.status == 201) {
+                                    var msg = response.data.key;
+                                    this.setState({
+                                        message: msg, loading: false
+                                    },
+                                        () => {
+                                            this.resetClicked();
+                                            this.hideSecondComponent();
+                                        })
+                                } else {
+                                    this.setState({
+                                        message: i18n.t('static.unkownError'), loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                }
+                                this.props.togglehelp();
+                                this.props.toggleSmall(this.state.message);
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
 
-                            //                 case 401:
-                            //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                            //                     break;
-                            //                 case 403:
-                            //                     this.props.history.push(`/accessDenied`)
-                            //                     break;
-                            //                 case 500:
-                            //                 case 404:
-                            //                 case 406:
-                            //                     this.setState({
-                            //                         message: error.response.data.messageCode,
-                            //                         loading: false
-                            //                     });
-                            //                     break;
-                            //                 case 412:
-                            //                     this.setState({
-                            //                         message: error.response.data.messageCode,
-                            //                         loading: false
-                            //                     });
-                            //                     break;
-                            //                 default:
-                            //                     this.setState({
-                            //                         message: 'static.unkownError',
-                            //                         loading: false
-                            //                     });
-                            //                     break;
-                            //             }
-                            //         }
-                            //     }
-                            // );
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: error.response.data.messageCode,
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                         }}
                         render={
                             ({
