@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import jexcel from 'jexcel-pro';
+import "../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../node_modules/jsuites/dist/jsuites.css";
 import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
@@ -18,6 +21,12 @@ import '../views/Forms/ValidationForms/ValidationForms.css'
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import AuthenticationService from '../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../CommonComponent/JExcelCommonFunctions.js'
+import {
+    JEXCEL_MONTH_PICKER_FORMAT,
+    JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY,
+} from '../Constants.js';
+
 
 const ItemTypes = {
     NODE: 'node'
@@ -125,10 +134,14 @@ export default class MorbidityScenarioOne extends Component {
         this.onHighlightChanged = this.onHighlightChanged.bind(this);
         this.onCursoChanged = this.onCursoChanged.bind(this);
         this.resetTree = this.resetTree.bind(this);
+        this.buildJexcelForScalingAndTransfer = this.buildJexcelForScalingAndTransfer.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+        this.loadedFunctionForMergeProblemList = this.loadedFunctionForMergeProblemList.bind(this);
+        this.selected = this.selected.bind(this);
+
         this.state = {
             displayParentData: false,
             displayPlanningUnit: false,
@@ -141,9 +154,133 @@ export default class MorbidityScenarioOne extends Component {
             currentItemConfig: {},
             activeTab: new Array(3).fill('1'),
             activeTab1: new Array(2).fill('1'),
+            scalingAndTransferEl: "",
+            openCalculateModal: false
         }
     }
 
+    addRowInJexcel() {
+        var obj = this.state.scalingAndTransferEl;
+        // console.log("obj++++",obj);
+        var data = [];
+        data[0] = "0";
+        data[1] = "";
+        data[2] = "0";
+        data[3] = "Jul-2021";
+        data[4] = "Dec-2021";
+        data[5] = "0.00";
+        data[6] = "0.00";
+        data[7] = "0";
+        data[8] = '<a style="color:#205493;text-decoration:none;background-color: transparent">Calculate</a>'
+        data[9] = '0.00'
+        // console.log("data+++",data);
+        obj.insertRow(data);
+    }
+
+
+    buildJexcelForScalingAndTransfer() {
+        this.scalingAndTransferEl = jexcel(document.getElementById("scalingAndTransferDiv"), '');
+        this.scalingAndTransferEl.destroy();
+        var options = {
+            data: [{ 0: '0', 1: '', 2: '0', 3: 'Jul-2021', 4: 'Dec-2021', 5: '0.00', 6: '20000', 7: '0', 8: '<a style="color:#205493;text-decoration:none;background-color: transparent">Calculate</a>', 9: '0.00' }],
+            columnDrag: true,
+            colWidths: [50, 50, 50, 50, 50, 50, 50, 50, 100, 50],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Transfer to node',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' }, { 'id': '1', 'name': '1/L' }, { 'id': '2', 'name': '2/L' }]
+                },
+                {
+                    title: 'Note',
+                    type: 'text'
+                },
+                {
+                    title: 'Scale Type',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' }, { 'id': '1', 'name': 'Liner (#)' }, { 'id': '2', 'name': 'Liner (%)' }, { 'id': '3', 'name': 'Exponential (%)' }, { 'id': '4', 'name': 'Target (#)' }]
+                },
+                {
+                    title: 'Start Date',
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }
+                },
+                {
+                    title: 'Stop Date',
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }
+                },
+                {
+                    title: '%',
+                    type: 'numeric', mask: '#,##.00', decimal: '.'
+
+                },
+                {
+                    title: '#',
+                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: 'Period',
+                    type: 'dropdown',
+                    source: [{ 'id': '0', 'name': 'Please select' }, { 'id': '1', 'name': 'Every year' }, { 'id': '2', 'name': 'Every 6 month' }, { 'id': '3', 'name': 'Every quarter' }, { 'id': '4', 'name': 'Every month' }]
+                },
+                {
+                    title: 'Calculate',
+                    type: 'html'
+                },
+                {
+                    title: 'Calculated Value',
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    readOnly: true
+                }
+            ],
+            pagination: localStorage.getItem("sesRecordCount"),
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            editable: true,
+            onload: this.loadedFunctionForMergeProblemList,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            onselection: this.selected,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+        }
+
+        console.log("hi***");
+        console.log("***", document.getElementById("scalingAndTransferDiv"));
+
+        var scalingAndTransferJexcelVar = jexcel(document.getElementById("scalingAndTransferDiv"), options);
+        this.el = scalingAndTransferJexcelVar;
+        this.setState({ scalingAndTransferEl: scalingAndTransferJexcelVar });
+    }
+
+    loadedFunctionForMergeProblemList = function (instance) {
+        jExcelLoadedFunction(instance);
+    }
+
+    selected = function (instance, cell, x, y, value) {
+        if (y == 8) {
+            // alert("hi");
+            console.log("1+++", this.el.getValueFromCoords(3, x));
+            console.log("2+++", this.el.getValueFromCoords(5, x));
+            console.log("3+++", this.el.getValueFromCoords(6, x));
+
+            this.setState({
+                openCalculateModal: true,
+                startValueTocalculate: this.el.getValueFromCoords(6, x),
+                startDateToclaculate: this.el.getValueFromCoords(3, x),
+            });
+        }
+
+    }
 
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
@@ -154,10 +291,15 @@ export default class MorbidityScenarioOne extends Component {
     }
 
     toggleModal(tabPane, tab) {
+
         const newArray = this.state.activeTab1.slice()
         newArray[tabPane] = tab
         this.setState({
             activeTab1: newArray,
+        }, () => {
+            if (tab == 2) {
+                this.buildJexcelForScalingAndTransfer();
+            }
         });
     }
 
@@ -222,7 +364,7 @@ export default class MorbidityScenarioOne extends Component {
     }
     onAddButtonClick(itemConfig) {
 
-        this.setState({ openAddNodeModal: true });
+        this.setState({ openAddNodeModal: true, activeTab1: new Array(2).fill('1') });
 
         // const { items } = this.state;
         // var newItem = {
@@ -642,7 +784,22 @@ export default class MorbidityScenarioOne extends Component {
                     </FormGroup>
                 </TabPane>
                 <TabPane tabId="2">
-
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardBody>
+                                <div className="table-responsive RemoveStriped">
+                                    <div id="scalingAndTransferDiv" />
+                                </div>
+                            </CardBody>
+                            <CardFooter>
+                                <FormGroup>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button" > Update</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowInJexcel()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </CardFooter>
+                        </Card>
+                    </Col>
                 </TabPane>
 
             </>
@@ -808,7 +965,7 @@ export default class MorbidityScenarioOne extends Component {
                     </Card></Col></Row>
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}
-                className={'modal-md '} >
+                className={'modal-lg '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>Add/Edit Node</strong>
                     <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -848,7 +1005,75 @@ export default class MorbidityScenarioOne extends Component {
                 </ModalFooter>
             </Modal>
             {/* Modal end------------------------ */}
-        </div>
+
+            {/* Calculate modal start------------------- */}
+            <Modal isOpen={this.state.openCalculateModal}
+                className={'modal-lg '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Scale calculator tool</strong>
+                    <Button size="md" onClick={() => this.setState({ openCalculateModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <Row>
+                        <FormGroup className="col-md-4">
+                            <Label for="program">Start Date</Label>
+                            <Input type="text"
+                                bsSize="sm"
+                                readOnly
+                                value={this.state.startDateToclaculate}
+                            />
+
+                        </FormGroup>
+                        <FormGroup className="col-md-4 ">
+                            <Label for="planningunit">Start Value</Label>
+                            <Input type="text"
+                                bsSize="sm"
+                                readOnly
+                                value={this.state.startValueTocalculate}
+                            />
+                        </FormGroup>
+                        <FormGroup className="col-md-4 ">
+                            <Label for="planningunit">Target date</Label>
+                            <Input type="text"
+                                bsSize="sm"
+
+                            // value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
+                            />
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4 ">
+                            <Label for="planningunit">Target value</Label>
+                            <Input type="text"
+                                bsSize="sm"
+
+                            // value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
+                            />
+                        </FormGroup>
+
+                        <FormGroup className="col-md-1 ">
+                            <Label for="planningunit">OR</Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-4 ">
+                            <Label for="planningunit">Target growth (%)</Label>
+                            <Input type="text"
+                                bsSize="sm"
+
+                            // value={getLabelText(this.state.problemDetail.planningUnit.label, this.state.lang)}
+                            />
+                        </FormGroup>
+
+                    </Row>
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Calculate</Button>
+                    <Button type="submit" size="md" onClick={(e) => { }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Accept</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openCalculateModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+
+
+        </div >
 
     }
 }
