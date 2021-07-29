@@ -743,7 +743,7 @@ class AddUserComponent extends Component {
                                                             // invalid={touched.orgAndCountry && !!errors.orgAndCountry}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            // maxLength={25}
+                                                            maxLength={15}
                                                             required
                                                             value={this.state.user.orgAndCountry}
                                                         /><FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
