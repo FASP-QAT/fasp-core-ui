@@ -21,8 +21,7 @@ const initialValues = {
     realmId: [],
     emailId: "",
     // phoneNumber: "",
-    organisation: "",
-    country: "",
+    orgAndCountry: "",
     languageId: []
 }
 const entityname = i18n.t('static.user.user')
@@ -60,11 +59,8 @@ const validationSchema = function (values) {
         //         otherwise: Yup.string().notRequired()
         //     }),
 
-        organisation: Yup.string()
-            .required(i18n.t('static.user.validusername')),
-
-        country: Yup.string()
-            .required(i18n.t('static.user.validusername')),
+        // orgAndCountry: Yup.string()
+        //     .required(i18n.t('static.user.validusername')),
 
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
@@ -123,8 +119,7 @@ class EditUserComponent extends Component {
                 username: '',
                 emailId: '',
                 // phoneNumber: '',
-                organisation: '',
-                country: '',
+                orgAndCountry: '',
                 roleList: []
             },
             message: '',
@@ -161,13 +156,10 @@ class EditUserComponent extends Component {
         // if (event.target.name == "phoneNumber") {
         //     user.phoneNumber = event.target.value;
         // }
-        if (event.target.name == "organisation") {
-            user.organisation = event.target.value;
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
-        if (event.target.name == "country") {
-            user.country = event.target.value;
-        }
-
+        
         if (event.target.name == "roleId") {
             user.roles = Array.from(event.target.selectedOptions, (item) => item.value);
         }
@@ -193,8 +185,7 @@ class EditUserComponent extends Component {
             realmId: true,
             emailId: true,
             // phoneNumber: true,
-            organisation: true,
-            country: true,
+            orgAndCountry: true,
             languageId: true,
             roleId: true
         }
@@ -567,8 +558,7 @@ class EditUserComponent extends Component {
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
                                     // phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
-                                    organisation: this.state.user.organisation,
-                                    country: this.state.user.country,
+                                    orgAndCountry: this.state.user.orgAndCountry,
                                     roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
                                     roleId: this.state.user.roleList
@@ -726,37 +716,20 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup> */}
                                                     <FormGroup>
-                                                        <Label for="organisation">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
-                                                            name="organisation"
-                                                            id="organisation"
+                                                            name="orgAndCountry"
+                                                            id="orgAndCountry"
                                                             bsSize="sm"
-                                                            valid={!errors.organisation}
+                                                            // valid={!errors.orgAndCountry}
                                                             // invalid={touched.username && !!errors.username || this.state.user.username == ''}
-                                                            invalid={(touched.organisation && !!errors.organisation) || !!errors.organisation}
+                                                            // invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             // maxLength={25}
                                                             required
-                                                            value={this.state.user.organisation}
-                                                        /> <FormFeedback className="red">{errors.organisation}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="country">{i18n.t('static.report.country')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="country"
-                                                            id="country"
-                                                            bsSize="sm"
-                                                            valid={!errors.country}
-                                                            // invalid={touched.username && !!errors.username || this.state.user.username == ''}
-                                                            invalid={(touched.country && !!errors.country) || !!errors.country}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            // maxLength={25}
-                                                            required
-                                                            value={this.state.user.country}
-                                                        /> <FormFeedback className="red">{errors.country}</FormFeedback>
+                                                            value={this.state.user.orgAndCountry}
+                                                        /> <FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                                     </FormGroup>
 
 

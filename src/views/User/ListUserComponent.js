@@ -126,14 +126,13 @@ class ListUserComponent extends Component {
             data[1] = getLabelText(userList[j].realm.label, this.state.lang)
             data[2] = userList[j].username;
             // data[3] = userList[j].phoneNumber;
-            data[4] = userList[j].organisation;
-            data[5] = userList[j].country;
-            data[6] = userList[j].emailId;
-            data[7] = userList[j].faildAttempts;
-            data[8] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format("YYYY-MM-DD") : null)
-            data[9] = userList[j].lastModifiedBy.username;
-            data[10] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-            data[11] = userList[j].active;
+            data[3] = userList[j].orgAndCountry;
+            data[4] = userList[j].emailId;
+            data[5] = userList[j].faildAttempts;
+            data[6] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format("YYYY-MM-DD") : null)
+            data[7] = userList[j].lastModifiedBy.username;
+            data[8] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+            data[9] = userList[j].active;
 
 
             userArray[count] = data;
@@ -175,12 +174,7 @@ class ListUserComponent extends Component {
                 //     readOnly: true
                 // },
                 {
-                    title: i18n.t('static.program.organisation'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.report.country'),
+                    title: i18n.t('static.user.orgAndCountry'),
                     type: 'text',
                     readOnly: true
                 },

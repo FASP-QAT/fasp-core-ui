@@ -24,8 +24,7 @@ const initialValues = {
     name: "",
     emailId: "",
     // phoneNumber: "",
-    organisation: "",
-    country: "",
+    orgAndCountry: "",
     role: "",
     language: "",
     notes: ""
@@ -77,11 +76,8 @@ const validationSchema = function (values) {
         //             .required(i18n.t('static.user.validphone')),
         //         otherwise: Yup.string().notRequired()
         //     }),
-        organisation: Yup.string()
-            .required(i18n.t('static.user.validusername')),
-
-        country: Yup.string()
-            .required(i18n.t('static.user.validusername')),
+        // orgAndCountry: Yup.string()
+        //     .required(i18n.t('static.user.validusername')),        
     })
 }
 
@@ -118,8 +114,7 @@ export default class UserTicketComponent extends Component {
                 name: "",
                 emailId: "",
                 // phoneNumber: "",
-                organisation: '',
-                country: '',
+                orgAndCountry: '',
                 role: [],
                 language: "",
                 notes: ''
@@ -160,13 +155,10 @@ export default class UserTicketComponent extends Component {
         // if (event.target.name == "phoneNumber") {
         //     user.phoneNumber = event.target.value;
         // }
-        if (event.target.name == "organisation") {
-            user.organisation = event.target.value;
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
 
-        if (event.target.name == "country") {
-            user.country = event.target.value;
-        }
         if (event.target.name == "language") {
             user.language = event.target.options[event.target.selectedIndex].innerHTML;
             this.setState({
@@ -218,8 +210,7 @@ export default class UserTicketComponent extends Component {
             name: true,
             emailId: true,
             // phoneNumber: true,
-            organisation: true,
-            country: true,
+            orgAndCountry: true,
             role: true,
             language: true,
             notes: true
@@ -466,8 +457,7 @@ export default class UserTicketComponent extends Component {
         user.name = '';
         user.emailId = '';
         // user.phoneNumber = '';
-        user.organisation = '';
-        user.country = '';
+        user.orgAndCountry = '';        
         user.role = '';
         user.language = '';
         user.notes = '';
@@ -517,8 +507,7 @@ export default class UserTicketComponent extends Component {
                             name: "",
                             emailId: "",
                             // phoneNumber: "",
-                            organisation: "",
-                            country: "",
+                            orgAndCountry: "",
                             role: "",
                             language: "",
                             notes: ""
@@ -687,37 +676,20 @@ export default class UserTicketComponent extends Component {
                                         </FormGroup> */}
 
                                         <FormGroup>
-                                            <Label for="organisation">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 autocomplete="off"
-                                                name="organisation"
-                                                id="organisation"
+                                                name="orgAndCountry"
+                                                id="orgAndCountry"
                                                 bsSize="sm"
-                                                valid={!errors.organisation && this.state.user.organisation != ''}
-                                                invalid={touched.organisation && !!errors.organisation}
+                                                // valid={!errors.orgAndCountry && this.state.user.orgAndCountry != ''}
+                                                // invalid={touched.orgAndCountry && !!errors.orgAndCountry}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
                                                 // maxLength={25}
                                                 required
-                                                value={this.state.user.organisation}
-                                            /><FormFeedback className="red">{errors.organisation}</FormFeedback>
-                                        </FormGroup>
-
-                                        <FormGroup>
-                                            <Label for="country">{i18n.t('static.report.country')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                autocomplete="off"
-                                                name="country"
-                                                id="country"
-                                                bsSize="sm"
-                                                valid={!errors.country && this.state.user.country != ''}
-                                                invalid={touched.country && !!errors.country}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                // maxLength={25}
-                                                required
-                                                value={this.state.user.country}
-                                            /><FormFeedback className="red">{errors.country}</FormFeedback>
+                                                value={this.state.user.orgAndCountry}
+                                            /><FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                         </FormGroup>
 
                                         <FormGroup className="Selectcontrol-bdrNone">

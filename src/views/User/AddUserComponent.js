@@ -21,8 +21,7 @@ let initialValues = {
     realmId: [],
     emailId: "",
     // phoneNumber: "",
-    organisation: "",
-    country: "",
+    orgAndCountry: "",
     languageId: [],
     roleId: []
 }
@@ -100,11 +99,9 @@ const validationSchema = function (values) {
         //         otherwise: Yup.string().notRequired()
         //     }),
 
-        organisation: Yup.string()
-            .required(i18n.t('static.user.validusername')),
+        // orgAndCountry: Yup.string()
+        //     .required(i18n.t('static.user.validusername')),
 
-        country: Yup.string()
-            .required(i18n.t('static.user.validusername')),
     })
 }
 
@@ -149,8 +146,7 @@ class AddUserComponent extends Component {
                 username: '',
                 emailId: '',
                 // phoneNumber: '',
-                organisation: '',
-                country: ''
+                orgAndCountry: '',
             },
             loading: true,
             roleId: '',
@@ -212,12 +208,8 @@ class AddUserComponent extends Component {
         //     user.phoneNumber = event.target.value;
         // }
 
-        if (event.target.name == "organisation") {
-            user.organisation = event.target.value;
-        }
-
-        if (event.target.name == "country") {
-            user.country = event.target.value;
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
 
         if (event.target.name == "realmId") {
@@ -305,8 +297,7 @@ class AddUserComponent extends Component {
             realmId: true,
             emailId: true,
             // phoneNumber: true,
-            organisation: true,
-            country: true,
+            orgAndCountry: true,
             languageId: true,
             roleId: true
         }
@@ -742,39 +733,21 @@ class AddUserComponent extends Component {
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup> */}
                                                     <FormGroup>
-                                                        <Label for="organisation">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             autocomplete="off"
-                                                            name="organisation"
-                                                            id="organisation"
+                                                            name="orgAndCountry"
+                                                            id="orgAndCountry"
                                                             bsSize="sm"
-                                                            valid={!errors.organisation && this.state.user.organisation != ''}
-                                                            invalid={touched.organisation && !!errors.organisation}
+                                                            // valid={!errors.orgAndCountry && this.state.user.orgAndCountry != ''}
+                                                            // invalid={touched.orgAndCountry && !!errors.orgAndCountry}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             // maxLength={25}
                                                             required
-                                                            value={this.state.user.organisation}
-                                                        /><FormFeedback className="red">{errors.organisation}</FormFeedback>
+                                                            value={this.state.user.orgAndCountry}
+                                                        /><FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                                     </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="country">{i18n.t('static.report.country')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            autocomplete="off"
-                                                            name="country"
-                                                            id="country"
-                                                            bsSize="sm"
-                                                            valid={!errors.country && this.state.user.country != ''}
-                                                            invalid={touched.country && !!errors.country}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            // maxLength={25}
-                                                            required
-                                                            value={this.state.user.country}
-                                                        /><FormFeedback className="red">{errors.country}</FormFeedback>
-                                                    </FormGroup>
-
 
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
@@ -859,8 +832,7 @@ class AddUserComponent extends Component {
         user.username = '';
         user.emailId = '';
         // user.phoneNumber = '';
-        user.organisation = '';
-        user.country = '';
+        user.orgAndCountry = '';
         user.realm.realmId = '';
         user.language.languageId = '';
         this.state.roleId = '';
