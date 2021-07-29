@@ -11,7 +11,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import {  DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
 import moment from "moment";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -45,7 +45,7 @@ class ConsumptionForecastError extends Component {
             viewById: 1,
             regionList: [],
             regionVal: [],
-            regionListFiltered:[],
+            regionListFiltered: [],
             versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
             forecastingUnits: [{ forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }],
             planningUnitListAll: [{ planningUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 4, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 1, label: "Female Condom (Nitrile) Lubricated, 17 cm Female Condom" }, program: { programId: 1 } }, { planningUnitId: 5, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 2, label: "Male Condom (Latex) Lubricated, No Logo, 53 mm Male Condom" }, program: { programId: 1 } }, { planningUnitId: 6, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom, 1000 Each", forecastingUnit: { forecastingUnitId: 3, label: "Male Condom (Latex) Lubricated, Prudence Plus, 53 mm Male Condom" }, program: { programId: 1 } }],
@@ -54,100 +54,101 @@ class ConsumptionForecastError extends Component {
             showTotalForecast: true,
             showTotalActual: true,
             showTotalDifference: true,
-            monthArrayList:[],
-            planningUnitId:"",
-            consumptionData:[
-                {consumptionDate:'2020-07-01',consumptionQty:8,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-07-01',consumptionQty:8,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-07-01',consumptionQty:8,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-07-01',consumptionQty:8,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-07-01',consumptionQty:12,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-07-01',consumptionQty:17,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-07-01',consumptionQty:17,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-07-01',consumptionQty:12,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-08-01',consumptionQty:16,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-08-01',consumptionQty:16,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-08-01',consumptionQty:10,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2020-09-01',consumptionQty:10,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-09-01',consumptionQty:10,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-09-01',consumptionQty:10,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-09-01',consumptionQty:10,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-09-01',consumptionQty:6,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-09-01',consumptionQty:8,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-09-01',consumptionQty:8,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-09-01',consumptionQty:6,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2020-10-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-10-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-10-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-10-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-10-01',consumptionQty:6,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-10-01',consumptionQty:10,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-10-01',consumptionQty:10,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-10-01',consumptionQty:6,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2020-11-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-11-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-11-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-11-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-11-01',consumptionQty:10,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-11-01',consumptionQty:14,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-11-01',consumptionQty:14,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-11-01',consumptionQty:10,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2020-12-01',consumptionQty:13,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2020-12-01',consumptionQty:13,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2020-12-01',consumptionQty:13,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2020-12-01',consumptionQty:13,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2020-12-01',consumptionQty:8,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2020-12-01',consumptionQty:12,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2020-12-01',consumptionQty:12,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2020-12-01',consumptionQty:8,region:{regionId:4},actualFlag:true},
-                
-                
-                {consumptionDate:'2021-01-01',consumptionQty:8,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-01-01',consumptionQty:8,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-01-01',consumptionQty:8,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-01-01',consumptionQty:8,region:{regionId:4},actualFlag:false},
-                {consumptionDate:'2021-01-01',consumptionQty:7,region:{regionId:1},actualFlag:true},
-                {consumptionDate:'2021-01-01',consumptionQty:10,region:{regionId:2},actualFlag:true},
-                {consumptionDate:'2021-01-01',consumptionQty:10,region:{regionId:3},actualFlag:true},
-                {consumptionDate:'2021-01-01',consumptionQty:7,region:{regionId:4},actualFlag:true},
-                
-                {consumptionDate:'2021-02-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-02-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-02-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-02-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                
-                {consumptionDate:'2021-03-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-03-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-03-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-03-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                
-                {consumptionDate:'2021-04-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-04-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-04-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-04-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                
-                {consumptionDate:'2021-05-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-05-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-05-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-05-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                
-                {consumptionDate:'2021-06-01',consumptionQty:9,region:{regionId:1},actualFlag:false},
-                {consumptionDate:'2021-06-01',consumptionQty:9,region:{regionId:2},actualFlag:false},
-                {consumptionDate:'2021-06-01',consumptionQty:9,region:{regionId:3},actualFlag:false},
-                {consumptionDate:'2021-06-01',consumptionQty:9,region:{regionId:4},actualFlag:false},
-                ],
-                errorValues:["39%","66%","48%","32%","30%","37%","32%","28%","NA","NA","NA","NA","NA"]
-                
+            monthArrayList: [],
+            planningUnitId: "",
+            consumptionDataAll: [
+                { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: true },
+
+
+                { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
+                { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 1 }, actualFlag: true },
+                { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: true },
+                { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: true },
+                { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 4 }, actualFlag: true },
+
+                { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+
+                { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+
+                { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+
+                { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+
+                { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
+                { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
+                { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
+                { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
+            ],
+            consumptionData: [],
+            errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"]
+
         };
         this.getPrograms = this.getPrograms.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -162,19 +163,24 @@ class ConsumptionForecastError extends Component {
         // this.setVersionId = this.setVersionId.bind(this);
         this.setForecastingUnit = this.setForecastingUnit.bind(this);
         this.setRegionVal = this.setRegionVal.bind(this);
-        this.toggleAccordionTotalActual=this.toggleAccordionTotalActual.bind(this);
-        this.toggleAccordionTotalF=this.toggleAccordionTotalForecast.bind(this);
-        this.toggleAccordionTotalDiffernce=this.toggleAccordionTotalDiffernce.bind(this);
-        this.storeProduct=this.storeProduct.bind(this)
+        this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
+        this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
+        this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
+        this.storeProduct = this.storeProduct.bind(this)
 
     }
 
-    storeProduct(e){
-        console.log("E++++++++",e.target)
-        var name=this.state.planningUnits.filter(c=>c.planningUnitId==e.target.value);
+    storeProduct(e) {
+        console.log("E++++++++", e.target)
+        var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
+        var planningUnitId = e.target.value;
         this.setState({
-            planningUnitId:e.target.value,
-            planningUnitLabel:name[0].label,
+            planningUnitId: e.target.value,
+            planningUnitLabel: name[0].label,
+        }, () => {
+            if (planningUnitId > 0) {
+                this.showData();
+            }
         })
     }
 
@@ -221,23 +227,35 @@ class ConsumptionForecastError extends Component {
     }
 
     setRegionVal(e) {
-        console.log("e+++",e);
-        var regionIdArr=[];
-        for(var i=0;i<e.length;i++){
+        console.log("e+++", e);
+        var regionIdArr = [];
+        for (var i = 0; i < e.length; i++) {
             regionIdArr.push(e[i].value);
         }
-        var regionListFiltered=this.state.regionList.filter(c=>regionIdArr.includes(c.value));
+        var regionListFiltered = this.state.regionList.filter(c => regionIdArr.includes(c.value));
         this.setState({
             regionVal: e,
-            regionListFiltered
+            regionListFiltered,
+            regionIdArr
+        })
+    }
+
+    showData() {
+        var consumptionData = this.state.consumptionDataAll;
+        this.setState({
+            consumptionData: consumptionData
         })
     }
 
     setForecastingUnit(e) {
+        var forecastingUnitId = e.target.value;
         this.setState({
             forecastingUnitId: e.target.value
         }, () => {
             this.filterPlanningUnit()
+            if (this.state.viewById == 2 && forecastingUnitId) {
+                this.showData();
+            }
         })
     }
 
@@ -255,7 +273,7 @@ class ConsumptionForecastError extends Component {
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
-    
+
     exportCSV() {
     }
 
@@ -286,6 +304,7 @@ class ConsumptionForecastError extends Component {
             regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
             regionList: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
             regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
+            regionIdArr: [1, 2, 3, 4]
         })
     }
 
@@ -310,7 +329,20 @@ class ConsumptionForecastError extends Component {
     getVersionIds() {
         var versionListAll = this.state.versionListAll;
         var planningUnitListAll = this.state.planningUnitListAll;
-        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId) });
+        var reportPeriod = [{ programId: 2, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 1, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
+        var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
+        var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
+
+        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
+        let stopDate = endDate;
+        var monthArrayList = [];
+        let cursorDate = startDate;
+        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+            monthArrayList.push(dt);
+        }
+        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId), rangeValue: rangeValue, monthArrayList: monthArrayList });
     }
 
     show() {
@@ -322,14 +354,14 @@ class ConsumptionForecastError extends Component {
     handleRangeDissmis(value) {
         let startDate = value.from.year + '-' + value.from.month + '-01';
         let stopDate = value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate();
-        var monthArrayList=[];
-        let cursorDate=value.from.year + '-' + value.from.month + '-01';
-        for(var i=0;moment(cursorDate).format("YYYY-MM")<=moment(stopDate).format("YYYY-MM");i++){
-            var dt=moment(startDate).add(i,'months').format("YYYY-MM-DD");
-            cursorDate=moment(cursorDate).add(1,'months').format("YYYY-MM-DD");
+        var monthArrayList = [];
+        let cursorDate = value.from.year + '-' + value.from.month + '-01';
+        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
             monthArrayList.push(dt);
         }
-        this.setState({ rangeValue: value,monthArrayList:monthArrayList }, () => {
+        this.setState({ rangeValue: value, monthArrayList: monthArrayList }, () => {
             this.filterData();
         })
 
@@ -470,6 +502,19 @@ class ConsumptionForecastError extends Component {
 
 
         let bar = {}
+        var consumptionData = this.state.consumptionData;
+        var actualConsumption = [];
+        var forecastedConsumption = [];
+        this.state.monthArrayList.map((item) => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            actualConsumption.push(sum);
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            forecastedConsumption.push(sum);
+        })
         if (this.state.consumptionData.length > 0)
             bar = {
 
@@ -485,7 +530,7 @@ class ConsumptionForecastError extends Component {
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: '#8064a2',
-                        data: [32,40,40,36,44,52,32,36,36,36,36,36],
+                        data: forecastedConsumption,
                         barPercentage: 0.5
                     },
                     {
@@ -498,7 +543,7 @@ class ConsumptionForecastError extends Component {
                         pointBorderColor: '#fff',
                         pointHoverBackgroundColor: '#fff',
                         pointHoverBorderColor: '#a6a6a6',
-                        data: [58,52,28,32,48,40,34,0,0,0,0,0],
+                        data: actualConsumption,
                         barPercentage: 0.5
                     }, {
                         label: i18n.t('static.supplyPlan.consumption'),
@@ -516,7 +561,7 @@ class ConsumptionForecastError extends Component {
                         pointStyle: 'line',
                         pointRadius: 0,
                         showInLegend: true,
-                        data: [39,66,48,32,30,37,32,28,"","","","",""]
+                        data: [39, 66, 48, 32, 30, 37, 32, 28, "", "", "", "", ""]
                     }
                 ]
 
@@ -595,25 +640,6 @@ class ConsumptionForecastError extends Component {
                                     <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
-
-
-                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -634,6 +660,24 @@ class ConsumptionForecastError extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
@@ -807,7 +851,7 @@ class ConsumptionForecastError extends Component {
 
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
-                                            {this.state.consumptionData.length > 0
+                                        {this.state.consumptionData.length > 0
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
@@ -828,117 +872,117 @@ class ConsumptionForecastError extends Component {
 
 
 
-                                        
+
                                     </div>
 
 
 
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
-                                        {this.state.show &&
-                                            <div className="table-scroll">
-                                                <div className="table-wrap table-responsive">
-                                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="forecastErrorTdWidth sticky-col first-col clone"></th>
-                                                                <th className="">{i18n.t("static.report.average")}</th>
-                                                                {this.state.monthArrayList.map(item=>(
-                                                                    <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
+                                            {this.state.show &&
+                                                <div className="table-scroll">
+                                                    <div className="table-wrap table-responsive">
+                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                    <th className="forecastErrorTdWidth sticky-col first-col clone"></th>
+                                                                    <th className="">{i18n.t("static.report.average")}</th>
+                                                                    {this.state.monthArrayList.map(item => (
+                                                                        <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
+                                                                    ))}
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    <td align="left" className="sticky-col first-col clone" style={{ color: '#8064a2' }}><b>{i18n.t('static.forecastReport.error')}*</b></td>
+                                                                    {this.state.errorValues.map(item => (
+                                                                        <td>{item}</td>
+                                                                    ))}
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalForecast()}>
+                                                                        {this.state.showTotalForecast ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                    </td>
+                                                                    <td align="left" className="sticky-col first-col clone" style={{ color: "#4f81bd" }}><b>{i18n.t('static.consumption.forcast')}</b></td>
+                                                                    <td align="center"><b>39.4</b></td>
+                                                                    {this.state.monthArrayList.map(item => {
+                                                                        var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                        var sum = 0;
+                                                                        cd.map(c => { sum += c.consumptionQty });
+                                                                        return (<td><b>{sum}</b></td>)
+                                                                    })}
+                                                                </tr>
+                                                                {this.state.regionListFiltered.map(item1 => (
+                                                                    <tr className="totalForecast">
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        <td align="left" className="sticky-col first-col clone" style={{ color: "#4f81bd" }}><b>{item1.label}</b></td>
+                                                                        <td align="center">9.5</td>
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                                                                            return (<td>{cd.length > 0 ? cd[0].consumptionQty : ""}</td>)
+                                                                        })}
+                                                                    </tr>
                                                                 ))}
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td align="left" className="sticky-col first-col clone" style={{ color: '#8064a2' }}><b>{i18n.t('static.forecastReport.error')}*</b></td>
-                                                                {this.state.errorValues.map(item=>(
-                                                                    <td>{item}</td>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalActual()}>
+                                                                        {this.state.showTotalActual ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                    </td>
+                                                                    <td align="left" className="sticky-col first-col clone" style={{ color: "#a6a6a6" }}><b>{i18n.t('static.consumption.actual')}</b></td>
+                                                                    <td align="center"><b>41.7</b></td>
+                                                                    {this.state.monthArrayList.map(item => {
+                                                                        var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                        var sum = 0;
+                                                                        cd.map(c => { sum += c.consumptionQty });
+                                                                        return (<td><b>{cd.length > 0 ? sum : "NA"}</b></td>)
+                                                                    })}
+                                                                </tr>
+                                                                {this.state.regionListFiltered.map(item1 => (
+                                                                    <tr className="totalActual">
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        <td align="left" className="sticky-col first-col clone" style={{ color: "#a6a6a6" }}><b>{item1.label}</b></td>
+                                                                        <td align="center">{item1.value == 1 ? 8.4 : item1.value == 2 ? 12.4 : item1.value == 3 ? 12.4 : 8.4}</td>
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                                                                            return (<td>{cd.length > 0 ? cd[0].consumptionQty : ""}</td>)
+                                                                        })}
+                                                                    </tr>
                                                                 ))}
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalForecast()}>
-                                                                    {this.state.showTotalForecast ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td align="left" className="sticky-col first-col clone" style={{color:"#4f81bd"}}><b>{i18n.t('static.consumption.forcast')}</b></td>
-                                                                <td align="center"><b>39.4</b></td>
-                                                                {this.state.monthArrayList.map(item=>{
-                                                                    var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && !c.actualFlag);
-                                                                    var sum=0;
-                                                                    cd.map(c=>{sum+=c.consumptionQty});
-                                                                    return(<td><b>{sum}</b></td>)
-    })}
-                                                            </tr>
-                                                            {this.state.regionListFiltered.map(item1 => (
-                                                                <tr className="totalForecast">
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td align="left" className="sticky-col first-col clone" style={{color:"#4f81bd"}}><b>{item1.label}</b></td>
-                                                                    <td align="center">9.5</td>
-                                                                    {this.state.monthArrayList.map(item=>{
-                                                                        var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId==item1.value);
-                                                                    return(<td>{cd.length>0?cd[0].consumptionQty:""}</td>)
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalDiffernce()}>
+                                                                        {this.state.showTotalDifference ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                    </td>
+                                                                    <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.forecastReport.difference')}</b></td>
+                                                                    <td align="center"><b>2.3</b></td>
+                                                                    {this.state.monthArrayList.map(item => {
+                                                                        var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                        var sum = 0;
+                                                                        cd.map(c => { sum += c.consumptionQty });
+                                                                        var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                        var sum1 = 0;
+                                                                        cd1.map(c => { sum1 += c.consumptionQty });
+                                                                        return (<td><b>{sum1 > 0 ? sum1 - sum : "NA"}</b></td>)
                                                                     })}
                                                                 </tr>
-                                                            ))}
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalActual()}>
-                                                                    {this.state.showTotalActual ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td align="left" className="sticky-col first-col clone" style={{color:"#a6a6a6"}}><b>{i18n.t('static.consumption.actual')}</b></td>
-                                                                <td align="center"><b>41.7</b></td>
-                                                                {this.state.monthArrayList.map(item=>{
-                                                                    var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && c.actualFlag);
-                                                                    var sum=0;
-                                                                    cd.map(c=>{sum+=c.consumptionQty});
-                                                                    return(<td><b>{cd.length>0?sum:"NA"}</b></td>)
-    })}
-                                                            </tr>
-                                                            {this.state.regionListFiltered.map(item1 => (
-                                                                <tr className="totalActual">
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td align="left" className="sticky-col first-col clone" style={{color:"#a6a6a6"}}><b>{item1.label}</b></td>
-                                                                    <td align="center">{item1.value==1?8.4:item1.value==2?12.4:item1.value==3?12.4:8.4}</td>
-                                                                    {this.state.monthArrayList.map(item=>{
-                                                                    var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId==item1.value);
-                                                                    return(<td>{cd.length>0?cd[0].consumptionQty:""}</td>)
-                                                                    })}
-                                                                </tr>
-                                                            ))}
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalDiffernce()}>
-                                                                    {this.state.showTotalDifference ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.forecastReport.difference')}</b></td>
-                                                                <td align="center"><b>2.3</b></td>
-                                                                {this.state.monthArrayList.map(item=>{
-                                                                    var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && !c.actualFlag);
-                                                                    var sum=0;
-                                                                    cd.map(c=>{sum+=c.consumptionQty});
-                                                                    var cd1=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && c.actualFlag);
-                                                                    var sum1=0;
-                                                                    cd1.map(c=>{sum1+=c.consumptionQty});
-                                                                    return(<td><b>{sum1>0?sum1-sum:"NA"}</b></td>)
-    })}
-                                                            </tr>
-                                                            {this.state.regionListFiltered.map(item1 => (
-                                                                <tr className="totalDifference">
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td align="left" className="sticky-col first-col clone"><b>{item1.label}</b></td>
-                                                                    <td align="center">{item1.value==1?-1.4:item1.value==2?2.6:item1.value==3?2.6:-1.4}</td>
-                                                                    {this.state.monthArrayList.map(item=>{
-                                                                    var cd=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId==item1.value);
-                                                                    var cd1=this.state.consumptionData.filter(c=>moment(c.consumptionDate).format("YYYY-MM-DD")==moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId==item1.value);
-                                                                    return(<td>{(cd.length>0 && cd1.length>0)?cd[0].consumptionQty-cd1[0].consumptionQty:""}</td>)
-                                                                    })}
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
+                                                                {this.state.regionListFiltered.map(item1 => (
+                                                                    <tr className="totalDifference">
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        <td align="left" className="sticky-col first-col clone"><b>{item1.label}</b></td>
+                                                                        <td align="center">{item1.value == 1 ? -1.4 : item1.value == 2 ? 2.6 : item1.value == 3 ? 2.6 : -1.4}</td>
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                                                                            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                                                                            return (<td>{(cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : ""}</td>)
+                                                                        })}
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
 
-                                                    </Table>
+                                                        </Table>
 
-                                                </div>
-                                            </div>}
+                                                    </div>
+                                                </div>}
                                         </div>
                                     </div>
 
