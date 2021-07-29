@@ -733,7 +733,7 @@ class AddUserComponent extends Component {
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup> */}
                                                     <FormGroup>
-                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}</Label>
                                                         <Input type="text"
                                                             autocomplete="off"
                                                             name="orgAndCountry"
