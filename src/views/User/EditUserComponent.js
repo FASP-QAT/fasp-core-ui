@@ -20,7 +20,8 @@ const initialValues = {
     username: "",
     realmId: [],
     emailId: "",
-    phoneNumber: "",
+    // phoneNumber: "",
+    orgAndCountry: "",
     languageId: []
 }
 const entityname = i18n.t('static.user.user')
@@ -44,19 +45,22 @@ const validationSchema = function (values) {
         //     .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
         //     .required(i18n.t('static.user.validphone')),
 
-        needPhoneValidation: Yup.boolean(),
-        phoneNumber: Yup.string()
-            .when("needPhoneValidation", {
-                is: val => {
-                    return document.getElementById("needPhoneValidation").value === "true";
+        // needPhoneValidation: Yup.boolean(),
+        // phoneNumber: Yup.string()
+        //     .when("needPhoneValidation", {
+        //         is: val => {
+        //             return document.getElementById("needPhoneValidation").value === "true";
 
-                },
-                then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
-                    .max(15, i18n.t('static.user.validphonemaxdigit'))
-                    .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
-                    .required(i18n.t('static.user.validphone')),
-                otherwise: Yup.string().notRequired()
-            }),
+        //         },
+        //         then: Yup.string().min(6, i18n.t('static.user.validphonemindigit'))
+        //             .max(15, i18n.t('static.user.validphonemaxdigit'))
+        //             .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+        //             .required(i18n.t('static.user.validphone')),
+        //         otherwise: Yup.string().notRequired()
+        //     }),
+
+        // orgAndCountry: Yup.string()
+        //     .required(i18n.t('static.user.validusername')),
 
         roleId: Yup.string()
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
@@ -114,7 +118,8 @@ class EditUserComponent extends Component {
                 roles: [],
                 username: '',
                 emailId: '',
-                phoneNumber: '',
+                // phoneNumber: '',
+                orgAndCountry: '',
                 roleList: []
             },
             message: '',
@@ -148,9 +153,13 @@ class EditUserComponent extends Component {
         if (event.target.name == "emailId") {
             user.emailId = event.target.value;
         }
-        if (event.target.name == "phoneNumber") {
-            user.phoneNumber = event.target.value;
+        // if (event.target.name == "phoneNumber") {
+        //     user.phoneNumber = event.target.value;
+        // }
+        if (event.target.name == "orgAndCountry") {
+            user.orgAndCountry = event.target.value;
         }
+        
         if (event.target.name == "roleId") {
             user.roles = Array.from(event.target.selectedOptions, (item) => item.value);
         }
@@ -175,7 +184,8 @@ class EditUserComponent extends Component {
             username: true,
             realmId: true,
             emailId: true,
-            phoneNumber: true,
+            // phoneNumber: true,
+            orgAndCountry: true,
             languageId: true,
             roleId: true
         }
@@ -547,7 +557,8 @@ class EditUserComponent extends Component {
                                     username: this.state.user.username,
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
-                                    phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
+                                    // phoneNumber: (this.state.user.phoneNumber == null ? '' : this.state.user.phoneNumber),
+                                    orgAndCountry: this.state.user.orgAndCountry,
                                     roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
                                     roleId: this.state.user.roleList
@@ -638,12 +649,12 @@ class EditUserComponent extends Component {
                                                         name="roleValid"
                                                         id="roleValid"
                                                     />
-                                                    <Input
+                                                    {/* <Input
                                                         type="hidden"
                                                         name="needPhoneValidation"
                                                         id="needPhoneValidation"
                                                         value={((this.state.user.phoneNumber === '' || this.state.user.phoneNumber == null) ? false : true)}
-                                                    />
+                                                    /> */}
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label><Input
                                                             type="text"
@@ -688,7 +699,7 @@ class EditUserComponent extends Component {
                                                         />
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
@@ -703,7 +714,25 @@ class EditUserComponent extends Component {
                                                             value={this.state.user.phoneNumber}
                                                         />
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}</Label>
+                                                        <Input type="text"
+                                                            name="orgAndCountry"
+                                                            id="orgAndCountry"
+                                                            bsSize="sm"
+                                                            // valid={!errors.orgAndCountry}
+                                                            // invalid={touched.username && !!errors.username || this.state.user.username == ''}
+                                                            // invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            maxLength={15}
+                                                            required
+                                                            value={this.state.user.orgAndCountry}
+                                                        /> <FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
                                                     </FormGroup>
+
+
                                                     <FormGroup className="Selectcontrol-bdrNone">
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
