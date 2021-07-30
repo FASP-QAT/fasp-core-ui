@@ -571,7 +571,10 @@ class AddFundingSourceComponent extends Component {
   resetClicked() {
     let { fundingSource } = this.state;
 
-    fundingSource.realm.id = ''
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+      fundingSource.realm.id = ''
+    }
+
     fundingSource.label.label_en = ''
     fundingSource.fundingSourceCode = ''
 
