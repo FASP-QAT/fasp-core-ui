@@ -700,9 +700,8 @@ export default class AddForecastingUnitComponent extends Component {
 
         forecastingUnit.label.label_en = ''
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
-            fundingSource.realm.id = ''
-          }
-        forecastingUnit.realm.id = ''
+            forecastingUnit.realm.id = ''
+        }
         forecastingUnit.tracerCategory.id = ''
         forecastingUnit.productCategory.id = ''
         forecastingUnit.genericLabel.label_en = ''
