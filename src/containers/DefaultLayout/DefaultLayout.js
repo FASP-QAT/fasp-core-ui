@@ -2333,12 +2333,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
                           },
 
-                          {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
-                            url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-medkit',
-                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                          //   url: '/equivalancyUnit/listEquivalancyUnit',
+                          //   icon: 'fa fa-medkit',
+                          //   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          // },
 
                           {
                             name: "Load Dataset",

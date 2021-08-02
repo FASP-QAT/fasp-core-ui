@@ -799,7 +799,7 @@ class ScaleUpType extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Constant (m c)",
+                    "label_en": "Target(#)",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -825,7 +825,7 @@ class ScaleUpType extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Incremental (m c)",
+                    "label_en": "Linear (#)",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -851,11 +851,37 @@ class ScaleUpType extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Linear growth (m c)",
+                    "label_en": "Linear (%)",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
-                }
+                },
+            },
+            {
+                "createdBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "createdDate": "2020-02-25 12:00:00",
+                "lastModifiedBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "lastModifiedDate": "2020-02-25 12:00:00",
+                "active": true,
+                "scaleUpTypeId": 1,
+                "label": {
+                    "createdBy": null,
+                    "createdDate": null,
+                    "lastModifiedBy": null,
+                    "lastModifiedDate": null,
+                    "active": true,
+                    "labelId": 126,
+                    "label_en": "Exponential (%)",
+                    "label_sp": "",
+                    "label_fr": "",
+                    "label_pr": ""
+                },
             }
         ];
         this.setState({
@@ -1113,7 +1139,7 @@ class ScaleUpType extends Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;

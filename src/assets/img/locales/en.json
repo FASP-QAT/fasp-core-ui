@@ -1778,5 +1778,8 @@
     "static.scaleUpType.scaleUpType": "ScaleUp Type",
     "static.program.healthareas": "Technical Areas",
     "static.usagePeriod.conversionFactor": "Conversion Factor",
-    "static.equivalancyUnit.equivalancyUnit": "Equivalancy Unit"
+    "static.equivalancyUnit.equivalancyUnit": "Equivalancy Unit",
+    "static.forecastProgram.customField1": "Custom Field 1",
+    "static.forecastProgram.customField2": "Custom Field 2",
+    "static.forecastProgram.customField3": "Custom Field 3"
 }

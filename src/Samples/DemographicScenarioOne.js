@@ -124,6 +124,7 @@ export default class DemographicScenarioOne extends Component {
         this.getProgramManagerList = this.getProgramManagerList.bind(this);
         this.getHealthAreaList = this.getHealthAreaList.bind(this);
         this.getOrganisationList = this.getOrganisationList.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
         this.state = {
             forecastOutPutEl: "",
             treeEl: '',
@@ -1115,6 +1116,10 @@ export default class DemographicScenarioOne extends Component {
                 break
             }
         }
+    }
+
+    cancelClicked() {
+        this.props.history.push(`/forecastProgram/listForecastProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 

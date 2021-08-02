@@ -1009,7 +1009,7 @@ export default class AddForecastProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/forecastProgram/listForecastProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
