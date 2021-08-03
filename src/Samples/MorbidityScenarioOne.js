@@ -129,11 +129,14 @@ export default class MorbidityScenarioOne extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+
+        this.addScenario = this.addScenario.bind(this);
         this.state = {
             displayParentData: false,
             displayPlanningUnit: false,
             displayUsage: false,
             openAddNodeModal: false,
+            openAddScenarioModal: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
@@ -144,7 +147,22 @@ export default class MorbidityScenarioOne extends Component {
         }
     }
 
+    addScenario() {
+        const { tabs } = this.state;
 
+        const newTabObject = {
+            id: uuid(),
+            name: `Tab ${tabs.length + 1}`,
+            content: `This is Tab ${tabs.length + 1}`
+        };
+
+        this.setState({
+            tabs: [...tabs, newTabObject],
+            currentTab: newTabObject,
+            editMode: false,
+            editTabNameMode: false
+        });
+    }
     toggle(tabPane, tab) {
         const newArray = this.state.activeTab.slice()
         newArray[tabPane] = tab
@@ -656,15 +674,6 @@ export default class MorbidityScenarioOne extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0 mt-lg-2">
-                        <div className="Card-header-addicon">
-                            {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
-                            <div className="card-header-actions">
-                                <div className="card-header-action">
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create new tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
-                                </div>
-                            </div>
-
-                        </div>
                         <CardBody className="pt-lg-2">
                             <div className="container-fuild">
                                 <div>
@@ -790,7 +799,7 @@ export default class MorbidityScenarioOne extends Component {
                                                 </NavLink>
                                             </NavItem>
                                             <NavItem>
-                                                <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{ padding: '5px 20px 5px 20px' }}><i className="fa fa-plus"></i> Add Scenario</Button>
+                                                <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{ padding: '5px 20px 5px 20px' }} onClick={() => this.setState({ openAddScenarioModal: true })}><i className="fa fa-plus"></i> Add Scenario</Button>
                                             </NavItem>
                                         </Nav>
                                         <TabContent activeTab={this.state.activeTab[0]}>
@@ -806,6 +815,36 @@ export default class MorbidityScenarioOne extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
+            {/* Scenario Modal start------------------- */}
+            <Modal isOpen={this.state.openAddScenarioModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Scenario</strong>
+                    <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Scenario Description<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            name="nodeTitle"
+                            onChange={(e) => { this.dataChange(e) }}
+                            value={this.state.currentItemConfig.title}></Input>
+                    </FormGroup>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-md '} >
@@ -847,7 +886,8 @@ export default class MorbidityScenarioOne extends Component {
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>
-            {/* Modal end------------------------ */}
+            {/* Scenario Modal end------------------------ */}
+
         </div>
 
     }

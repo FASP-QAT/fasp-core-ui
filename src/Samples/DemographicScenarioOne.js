@@ -129,9 +129,9 @@ export default class DemographicScenarioOne extends Component {
             treeEl: '',
             treeObj: [{
                 forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Morbidity',
-                treeName: 'Angola Morbiity Tree',
-                scenarioName: 'High',
+                forecastMethod: 'Demographic',
+                treeName: 'Angola Demographic Tree',
+                scenarioName: 'High,Medium',
                 status: 'Active',
                 createdDate: '2021-07-21',
                 createdBy: 'Anchal C',
@@ -139,8 +139,8 @@ export default class DemographicScenarioOne extends Component {
                 lastModifiedBy: 'Anchal C'
             }, {
                 forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Morbidity',
-                treeName: 'Angola Morbiity Tree',
+                forecastMethod: 'Consumption',
+                treeName: 'Angola Consumption Tree',
                 scenarioName: 'Medium',
                 status: 'Active',
                 createdDate: '2021-07-21',
@@ -151,8 +151,8 @@ export default class DemographicScenarioOne extends Component {
             {
                 forecastDatasetName: 'AGO-CON-MOH',
                 forecastMethod: 'Morbidity',
-                treeName: 'Angola Morbiity Tree',
-                scenarioName: 'Low',
+                treeName: 'Angola Morbidity Tree',
+                scenarioName: 'High,Medium,Low',
                 status: 'Active',
                 createdDate: '2021-07-21',
                 createdBy: 'Anchal C',
