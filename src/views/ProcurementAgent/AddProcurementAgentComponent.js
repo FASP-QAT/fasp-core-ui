@@ -760,7 +760,10 @@ class AddProcurementAgentComponent extends Component {
     resetClicked() {
         let { procurementAgent } = this.state;
 
-        procurementAgent.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            procurementAgent.realm.id = ''
+        }
+
         procurementAgent.procurementAgentCode = ''
         procurementAgent.label.label_en = ''
         procurementAgent.submittedToApprovedLeadTime = ''
