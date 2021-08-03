@@ -259,6 +259,7 @@ const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('../../
 const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustment'));
 const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const CompareScenario = React.lazy(() => import('../../views/ForecastingReports/CompareScenario'));
+const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
@@ -549,6 +550,7 @@ const routes = [
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/forecastReport/consumptionForecastError', name: 'static.dashboard.consumptionByMonth', component: ConsumptionForecastError },
   { path: '/forecastReport/compareScenario', name: 'static.forecastReport.compareScenario', component: CompareScenario },
+  { path: '/forecastReport/forecastOutput', name: 'static.forecastReport.forecastOutput', component: ForecastOutput },
   { path: '/forecastReport/forecastSummary', name: 'static.forecastReport.forecastSummary', component: ForecastSummary },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
@@ -2241,7 +2243,7 @@ class DefaultLayout extends Component {
     },
   {
   name: "Forecast Output",
-  url: '/report/forecastOutput',
+  url: '/forecastReport/forecastOutput',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },

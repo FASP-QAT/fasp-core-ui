@@ -1779,5 +1779,6 @@
     "static.forecastReport.error":"Error",
     "static.forecastReport.difference":"Difference",
     "static.forecastReport.compareScenario":"Compare Scenario",
-    "static.forecastReport.forecastSummary":"Forecast Summary"
+    "static.forecastReport.forecastSummary":"Forecast Summary",
+    "static.forecastReport.forecastOutput":"Forecast Output"
 }
