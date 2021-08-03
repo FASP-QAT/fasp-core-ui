@@ -1072,7 +1072,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1142,7 +1142,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' },
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' },
                             () => {
                             })
                         this.hideFirstComponent();
@@ -1214,7 +1214,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1311,7 +1311,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1409,7 +1409,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
@@ -1517,7 +1517,7 @@ export default class WhatIfReportComponent extends React.Component {
                             stopDate: "",
                             scenarioChecked: true
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', message: i18n.t('static.whatIf.scenarioAdded'), color: 'green' })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green' })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
