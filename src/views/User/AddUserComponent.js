@@ -802,9 +802,11 @@ class AddUserComponent extends Component {
     resetClicked() {
         let { user } = this.state;
         user.username = '';
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            user.realm.realmId = '';
+        }
         user.emailId = '';
         user.phoneNumber = '';
-        user.realm.realmId = '';
         user.language.languageId = '';
         this.state.roleId = '';
         this.setState(

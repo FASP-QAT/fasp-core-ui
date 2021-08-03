@@ -765,7 +765,9 @@ export default class AddHealthAreaComponent extends Component {
     let { healthArea } = this.state;
 
     healthArea.label.label_en = ''
-    healthArea.realm.id = ''
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+      healthArea.realm.id = ''
+    }
     this.state.realmCountryId = ''
     healthArea.healthAreaCode = ''
     healthArea.realmCountryArray = []

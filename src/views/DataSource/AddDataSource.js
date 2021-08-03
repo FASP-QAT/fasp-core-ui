@@ -612,7 +612,9 @@ export default class AddDataSource extends Component {
 
         this.state.label.label_en = ''
         this.state.dataSourceType.id = ''
-        this.state.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            this.state.realm.id = '';
+        }
         this.state.program.id = ''
 
         let { dataSource } = this.state

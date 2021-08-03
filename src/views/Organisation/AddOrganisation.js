@@ -752,7 +752,10 @@ export default class AddOrganisationComponent extends Component {
 
         organisation.label.label_en = ''
         organisation.organisationCode = ''
-        organisation.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            organisation.realm.id = ''
+        }
+
         this.state.realmCountryId = ''
         organisation.realmCountryArray = []
 
