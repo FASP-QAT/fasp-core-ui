@@ -250,7 +250,7 @@ export default class ExportProgram extends Component {
                                                                                     var txt1 = JSON.stringify(dArray)
                                                                                     // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                                                                                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                    var labelName = (programId[j].label).replace("/", "-")
+                                                                                    var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                     // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
                                                                                     console.log("Txt ", txt);
                                                                                     console.log("Txt 1", txt1);
