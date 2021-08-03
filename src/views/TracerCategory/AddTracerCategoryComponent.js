@@ -703,8 +703,10 @@ class AddTracerCategoryComponent extends Component {
 
     resetClicked() {
         let { tracerCategory } = this.state;
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            tracerCategory.realm.id = ''
+        }
 
-        tracerCategory.realm.id = ''
         tracerCategory.label.label_en = ''
 
         this.setState({

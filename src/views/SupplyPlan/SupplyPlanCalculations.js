@@ -1082,6 +1082,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.hideFirstComponent()
                                 } else if (page == "whatIf") {
                                     props.updateState("programJson", programJsonForStoringTheResult);
+                                    props.updateState("message",i18n.t('static.whatIf.scenarioAdded'));
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("loading", false);
                                 } else if (page == "supplyPlan") {

@@ -366,7 +366,10 @@ class AddSupplierComponent extends Component {
   resetClicked() {
     let { supplier } = this.state;
 
-    supplier.realm.id = ''
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+      supplier.realm.id = ''
+    }
+
     supplier.label.label_en = ''
 
     this.setState({
