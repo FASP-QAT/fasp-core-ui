@@ -657,7 +657,7 @@ export default class EditOrganisationComponent extends Component {
                                                             invalid={touched.organisationTypeId && !!errors.organisationTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            disabled
+                                                            // disabled
                                                             value={this.state.organisation.organisationType.id}
                                                             required
                                                         >
