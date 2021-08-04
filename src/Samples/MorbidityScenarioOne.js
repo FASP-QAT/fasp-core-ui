@@ -18,6 +18,7 @@ import '../views/Forms/ValidationForms/ValidationForms.css'
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import AuthenticationService from '../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../views/Common/AuthenticationServiceComponent';
+import classnames from 'classnames';
 
 const ItemTypes = {
     NODE: 'node'
@@ -123,7 +124,7 @@ export default class MorbidityScenarioOne extends Component {
         this.onAddButtonClick = this.onAddButtonClick.bind(this);
         this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
         this.onHighlightChanged = this.onHighlightChanged.bind(this);
-        this.onCursoChanged = this.onCursoChanged.bind(this);
+        this.onCursorChanged = this.onCursorChanged.bind(this);
         this.resetTree = this.resetTree.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
@@ -142,33 +143,49 @@ export default class MorbidityScenarioOne extends Component {
             highlightItem: 0,
             items: TreeData.morbidity_scenario_one,
             currentItemConfig: {},
-            activeTab: new Array(3).fill('1'),
+            activeTab: 1,
             activeTab1: new Array(2).fill('1'),
+            tabList: [
+                {
+                    scenarioId: 1,
+                    scenarioName: 'High'
+                },
+                {
+                    scenarioId: 2,
+                    scenarioName: 'Medium'
+                }
+            ]
         }
     }
 
     addScenario() {
-        const { tabs } = this.state;
+        const { tabList } = this.state;
 
         const newTabObject = {
-            id: uuid(),
-            name: `Tab ${tabs.length + 1}`,
-            content: `This is Tab ${tabs.length + 1}`
+            scenarioId: 3,
+            scenarioName: 'Low'
         };
+        // tabList.push(newTabObject);
 
         this.setState({
-            tabs: [...tabs, newTabObject],
-            currentTab: newTabObject,
-            editMode: false,
-            editTabNameMode: false
+            tabList: [...tabList, newTabObject],
+            activeTab: 3
         });
     }
-    toggle(tabPane, tab) {
-        const newArray = this.state.activeTab.slice()
-        newArray[tabPane] = tab
-        this.setState({
-            activeTab: newArray,
-        });
+    // toggle(tabPane, tab) {
+    //     const newArray = this.state.activeTab.slice()
+    //     newArray[tabPane] = tab
+    //     this.setState({
+    //         activeTab: newArray,
+    //     });
+    // }
+
+    toggle(tab) {
+        if (this.state.activeTab !== tab.i) {
+            this.setState({
+                activeTab: tab.i
+            });
+        }
     }
 
     toggleModal(tabPane, tab) {
@@ -369,12 +386,13 @@ export default class MorbidityScenarioOne extends Component {
             })
         }
     };
-    onCursoChanged(event, data) {
+    onCursorChanged(event, data) {
         const { context: item } = data;
         const { config } = this.state;
-        // console.log("data1---", item.title);
+        console.log("Node clicked-------------------");
         // console.log("data2---", item.id);
         // item.id
+        this.setState({ openAddNodeModal: true })
         if (item != null) {
 
             this.setState({
@@ -521,31 +539,25 @@ export default class MorbidityScenarioOne extends Component {
 
         return (
             <>
-                <TabPane tabId="1">
-                    {/* <Row> */}
-                    <div class="sample">
-                        {/* <h3>DragNDrop Tree.</h3> */}
-                        <Provider>
-                            <div className="placeholder" style={{ clear: 'both' }} >
-                                <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                {this.state.tabList.map(function (data, i) {
+                    return (
+                        <TabPane tabId={data.scenarioId} key={i}>
+                            <div class="sample">
+                                <Provider>
+                                    <div className="placeholder"
+                                        style={{ clear: 'both' }}
+                                    >
+                                        <OrgDiagram centerOnCursor={true} config={config}
+                                        //onCursorChanged={this.onCursorChanged}
+                                        />
+                                    </div>
+                                </Provider>
+
                             </div>
-                        </Provider>
-
-                    </div>
-                    {/* </Row> */}
-                </TabPane>
-                <TabPane tabId="2">
-
-                </TabPane>
-                <TabPane tabId="3">
-
-                </TabPane>
-                <TabPane tabId="4">
-
-                </TabPane>
-                <TabPane tabId="5">
-
-                </TabPane>
+                            {/* </Row> */}
+                        </TabPane>
+                    )
+                })}
 
             </>
         );
@@ -774,35 +786,20 @@ export default class MorbidityScenarioOne extends Component {
                                 <Row>
                                     <Col xs="12" md="12" className="mb-4">
                                         <Nav tabs>
-                                            <NavItem>
-                                                <NavLink
-                                                    active={this.state.activeTab[0] === '1'}
-                                                    onClick={() => { this.toggle(0, '1'); }}
-                                                >
-                                                    High
-                                                </NavLink>
-                                            </NavItem>
-                                            <NavItem>
-                                                <NavLink
-                                                    active={this.state.activeTab[0] === '2'}
-                                                    onClick={() => { this.toggle(0, '2'); }}
-                                                >
-                                                    Medium
-                                                </NavLink>
-                                            </NavItem>
-                                            <NavItem>
-                                                <NavLink
-                                                    active={this.state.activeTab[0] === '3'}
-                                                    onClick={() => { this.toggle(0, '3'); }}
-                                                >
-                                                    Low
-                                                </NavLink>
-                                            </NavItem>
+
+                                            {this.state.tabList.map((data, i) =>
+                                                <NavItem>
+                                                    <NavLink className={classnames({ active: this.state.activeTab === { i } })} onClick={() => { this.toggle({ i }); }} key={i}>
+                                                        {data.scenarioName}
+                                                    </NavLink>
+                                                </NavItem>
+                                            )}
+
                                             <NavItem>
                                                 <Button type="submit" size="md" color="success" className="float-right ml-4 mb-1" style={{ padding: '5px 20px 5px 20px' }} onClick={() => this.setState({ openAddScenarioModal: true })}><i className="fa fa-plus"></i> Add Scenario</Button>
                                             </NavItem>
                                         </Nav>
-                                        <TabContent activeTab={this.state.activeTab[0]}>
+                                        <TabContent activeTab={this.state.activeTab}>
                                             {this.tabPane()}
                                         </TabContent>
                                     </Col>
