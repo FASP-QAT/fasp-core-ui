@@ -332,7 +332,7 @@ class EditUserComponent extends Component {
             }
         );
 
-        LanguageService.getLanguageList()
+        LanguageService.getLanguageListActive()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;

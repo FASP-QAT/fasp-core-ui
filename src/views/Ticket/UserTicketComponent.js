@@ -235,7 +235,7 @@ export default class UserTicketComponent extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
 
-        LanguageService.getLanguageList()
+        LanguageService.getLanguageListActive()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
