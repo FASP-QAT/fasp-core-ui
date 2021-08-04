@@ -56,6 +56,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     z = data[i].y;
                 }
             }
+            if (data[i].x == 0 && data[i].value != "") {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+            }
         }
     }
 
@@ -364,7 +367,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                     }
                                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
-                                    console.log("Check role", AuthenticationService.getLoggedInUserRoleIdArr());
                                     if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
                                         for (var c = 0; c < colArr.length; c++) {
                                             var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))

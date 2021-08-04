@@ -58,6 +58,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     z = data[i].y;
                 }
             }
+            if (data[i].x == 0 && data[i].value != "") {
+                (instance.jexcel).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+            }
         }
     }
 
