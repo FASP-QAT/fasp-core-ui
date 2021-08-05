@@ -334,7 +334,7 @@ export default class ProgramList extends Component {
             "lastModifiedDate": "2021-02-20 12:00:00",
             "active": true,
             "programId": 1,
-            "programCode": "BEN-PRHCON-MOH",
+            "programCode": "BEN-CONPRHCON-MOH",
             "realmCountry": {
                 "realmCountryId": 5,
                 "country": {
@@ -396,7 +396,7 @@ export default class ProgramList extends Component {
             "lastModifiedDate": "2021-02-20 12:00:00",
             "active": true,
             "programId": 2,
-            "programCode": "BEN-ARV-MOH",
+            "programCode": "BEN-ARVRTK-MOH",
             "realmCountry": {
                 "realmCountryId": 5,
                 "country": {

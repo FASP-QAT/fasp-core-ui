@@ -1389,7 +1389,7 @@ export default class DemographicScenarioOne extends Component {
                                                                             bsSize="sm"
                                                                             disabled
                                                                             // value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
-                                                                            value="BEN-ARV-MOH"
+                                                                            value="BEN-ARVRTK-MOH"
                                                                             id="programCode" />
                                                                         <FormFeedback className="red">{errors.programCode}</FormFeedback>
                                                                     </FormGroup>

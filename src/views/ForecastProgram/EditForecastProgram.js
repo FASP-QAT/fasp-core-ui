@@ -442,7 +442,7 @@ export default class EditProgram extends Component {
             this.setState({
                 program: programJson1, loading: false,
                 uniqueCode: "",
-                healthAreaCode: (tempProgramId == 1 ? "PRHCON" : (tempProgramId == 2 ? "ARV" : "MAL")),
+                healthAreaCode: (tempProgramId == 1 ? "CONPRHCON" : (tempProgramId == 2 ? "ARVRTK" : "MAL")),
                 organisationCode: "MOH",
                 realmCountryCode: "BEN"
             })

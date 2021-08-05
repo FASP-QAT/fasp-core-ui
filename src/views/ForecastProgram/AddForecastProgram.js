@@ -842,7 +842,7 @@ export default class AddForecastProgram extends Component {
                                                             type="select"
                                                             name="organisationId"
                                                             id="organisationId"
-                                                            disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                            // disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                             value={this.state.program.organisation.id}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                         >
