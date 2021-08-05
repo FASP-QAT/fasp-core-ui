@@ -85,9 +85,9 @@ export default class OrganisationListComponent extends Component {
             data = [];
             data[0] = organisations[j].organisationId
             data[1] = getLabelText(organisations[j].realm.label, this.state.lang)
-            data[2] = getLabelText(organisations[j].label, this.state.lang)
-            data[3] = organisations[j].organisationCode
-            data[4] = getLabelText(organisations[j].organisationType.label, this.state.lang)
+            data[2] = getLabelText(organisations[j].organisationType.label, this.state.lang)
+            data[3] = getLabelText(organisations[j].label, this.state.lang)
+            data[4] = organisations[j].organisationCode
             data[5] = organisations[j].lastModifiedBy.username;
             data[6] = (organisations[j].lastModifiedDate ? moment(organisations[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = organisations[j].active;
@@ -122,17 +122,17 @@ export default class OrganisationListComponent extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.organisationType.organisationType'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
                     title: i18n.t('static.organisation.organisationName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.organisation.organisationcode'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.organisationType.organisationType'),
                     type: 'text',
                     readOnly: true
                 },
