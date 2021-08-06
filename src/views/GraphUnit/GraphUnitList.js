@@ -22,14 +22,14 @@ import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import moment from 'moment';
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 
-const entityname = i18n.t('static.equivalancyUnit.equivalancyUnit')
+const entityname = i18n.t('static.graphUnit.graphUnit')
 
 
-class EquivalancyUnit extends Component {
+class GraphUnit extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            equivalancyUnitList: [],
+            graphUnitList: [],
             message: '',
             selSource: [],
             loading: true
@@ -69,7 +69,7 @@ class EquivalancyUnit extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 data = [];
-                data[0] = papuList[j].equivalancyUnitId
+                data[0] = papuList[j].graphUnitId
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
                 data[2] = papuList[j].lastModifiedBy.username;
                 data[3] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
@@ -101,12 +101,12 @@ class EquivalancyUnit extends Component {
             columns: [
 
                 {
-                    title: 'equivalancyUnitId',
+                    title: 'graphUnitId',
                     type: 'hidden',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                    title: i18n.t('static.graphUnit.graphUnit'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
@@ -390,7 +390,7 @@ class EquivalancyUnit extends Component {
                 },
                 "lastModifiedDate": "2020-02-25 12:00:00",
                 "active": true,
-                "equivalancyUnitId": 1,
+                "graphUnitId": 1,
                 "label": {
                     "createdBy": null,
                     "createdDate": null,
@@ -398,7 +398,7 @@ class EquivalancyUnit extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Patient Month of ARV",
+                    "label_en": "Patient Month",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -416,7 +416,7 @@ class EquivalancyUnit extends Component {
                 },
                 "lastModifiedDate": "2020-02-25 12:00:00",
                 "active": true,
-                "equivalancyUnitId": 1,
+                "graphUnitId": 1,
                 "label": {
                     "createdBy": null,
                     "createdDate": null,
@@ -424,7 +424,7 @@ class EquivalancyUnit extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Male Condom (Latex) Lubricated, 53 mm",
+                    "label_en": "# Condoms",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -442,7 +442,7 @@ class EquivalancyUnit extends Component {
                 },
                 "lastModifiedDate": "2020-02-25 12:00:00",
                 "active": true,
-                "equivalancyUnitId": 1,
+                "graphUnitId": 1,
                 "label": {
                     "createdBy": null,
                     "createdDate": null,
@@ -450,7 +450,7 @@ class EquivalancyUnit extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Artemether/Lumefantrine 20/120 mg Tablet",
+                    "label_en": "Tablets",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -468,7 +468,7 @@ class EquivalancyUnit extends Component {
                 },
                 "lastModifiedDate": "2020-02-25 12:00:00",
                 "active": true,
-                "equivalancyUnitId": 1,
+                "graphUnitId": 1,
                 "label": {
                     "createdBy": null,
                     "createdDate": null,
@@ -476,7 +476,7 @@ class EquivalancyUnit extends Component {
                     "lastModifiedDate": null,
                     "active": true,
                     "labelId": 126,
-                    "label_en": "Malaria Treatment",
+                    "label_en": "Treatments",
                     "label_sp": "",
                     "label_fr": "",
                     "label_pr": ""
@@ -484,7 +484,7 @@ class EquivalancyUnit extends Component {
             }
         ];
         this.setState({
-            equivalancyUnitList: templist,
+            graphUnitList: templist,
             selSource: templist
         },
             () => {
@@ -756,5 +756,5 @@ class EquivalancyUnit extends Component {
 
 }
 
-export default EquivalancyUnit
+export default GraphUnit
 

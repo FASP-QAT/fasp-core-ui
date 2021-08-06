@@ -1263,10 +1263,10 @@ class AuthenticationService {
                         break;
 
                     case "/dataset/loadDataset":
-                        case "/dataset/deleteDataset":
+                    case "/dataset/deleteDataset":
                         // if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                         return true;
-                        // }
+                    // }
                     case "/forecastProgram/addForecastProgram":
                         if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
                             return true;
@@ -1279,6 +1279,23 @@ class AuthenticationService {
                         break;
                     case "/forecastProgram/listForecastProgram":
                     case "/forecastProgram/listForecastProgram/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/mapForecastingUnitToEquivalancyUnit/addMapForecastingUnitToEquivalancyUnit":
+                        if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/:mapForecastingUnitToEquivalancyUnitId":
+                        if (bfunction.includes("ROLE_BF_EDIT_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit":
+                    case "/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
                             return true;
                         }
@@ -1347,6 +1364,12 @@ class AuthenticationService {
                         break;
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
+                            return true;
+                        }
+                        break;
+                    case "/graphUnit/listGraphUnit":
+                    case "/graphUnit/listGraphUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_HEALTH_AREA")) {
                             return true;
                         }

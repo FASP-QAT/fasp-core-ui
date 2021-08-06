@@ -283,6 +283,10 @@ const AddForecastProgram = React.lazy(() => import('../../views/ForecastProgram/
 const ForecastProgramList = React.lazy(() => import('../../views/ForecastProgram/ForecastProgramList'));
 const EditForecastProgram = React.lazy(() => import('../../views/ForecastProgram/EditForecastProgram'));
 
+const AddMapForecastingUnitToEquivalancyUnit = React.lazy(() => import('../../views/MapForecastingUnitToEquivalancyUnit/AddMapForecastingUnitToEquivalancyUnit'));
+const MapForecastingUnitToEquivalancyUnitList = React.lazy(() => import('../../views/MapForecastingUnitToEquivalancyUnit/MapForecastingUnitToEquivalancyUnitList'));
+const EditMapForecastingUnitToEquivalancyUnit = React.lazy(() => import('../../views/MapForecastingUnitToEquivalancyUnit/EditMapForecastingUnitToEquivalancyUnit'));
+
 const AddForecastMethod = React.lazy(() => import('../../views/ForecastMethod/AddForecastMethod'));
 const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
 const EditForecastMethod = React.lazy(() => import('../../views/ForecastMethod/EditForecastMethod'));
@@ -298,6 +302,8 @@ const EditScaleUpType = React.lazy(() => import('../../views/ScaleUpType/EditSca
 const AddEquivalancyUnit = React.lazy(() => import('../../views/EquivalancyUnit/AddEquivalancyUnit'));
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 const EditEquivalancyUnit = React.lazy(() => import('../../views/EquivalancyUnit/EditEquivalancyUnit'));
+
+const GraphUnitList = React.lazy(() => import('../../views/GraphUnit/GraphUnitList'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -673,6 +679,11 @@ const routes = [
   { path: '/forecastProgram/listForecastProgram', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: ForecastProgramList },
   { path: '/forecastProgram/editForecastProgram/:forecastProgramId', name: 'static.breadcrum.edit', entityname: 'static.forecastProgram.forecastProgram', component: EditForecastProgram },
 
+  { path: '/mapForecastingUnitToEquivalancyUnit/addMapForecastingUnitToEquivalancyUnit', name: 'static.breadcrum.add', entityname: 'static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit', component: AddMapForecastingUnitToEquivalancyUnit },
+  { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit', component: MapForecastingUnitToEquivalancyUnitList },
+  { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit', component: MapForecastingUnitToEquivalancyUnitList },
+  { path: '/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/:MapForecastingUnitToEquivalancyUnitId', name: 'static.breadcrum.edit', entityname: 'static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit', component: EditMapForecastingUnitToEquivalancyUnit },
+
   { path: '/forecastMethod/addForecastMethod', name: 'static.breadcrum.add', entityname: 'static.forecastMethod.forecastMethod', component: AddForecastMethod },
   { path: '/forecastMethod/listForecastMethod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.forecastMethod.forecastMethod', component: ForecastMethodList },
   { path: '/forecastMethod/listForecastMethod', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastMethod.forecastMethod', component: ForecastMethodList },
@@ -688,10 +699,13 @@ const routes = [
   { path: '/scaleUpType/listscaleUpType', exact: true, name: 'static.breadcrum.list', entityname: 'static.scaleUpType.scaleUpType', component: ScaleUpTypeList },
   { path: '/scaleUpType/editscaleUpType/:scaleUpTypeId', name: 'static.breadcrum.edit', entityname: 'static.scaleUpType.scaleUpType', component: EditScaleUpType },
 
-  { path: '/equivalancyUnit/addEquivalancyUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.healthareaheader', component: AddEquivalancyUnit },
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditEquivalancyUnit },
+  { path: '/equivalancyUnit/addEquivalancyUnit', name: 'static.breadcrum.add', entityname: 'static.equivalancyUnit.equivalancyUnit', component: AddEquivalancyUnit },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: 'static.breadcrum.edit', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EditEquivalancyUnit },
+
+  { path: '/graphUnit/listGraphUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.graphUnit.graphUnit', component: GraphUnitList },
+  { path: '/graphUnit/listGraphUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.graphUnit.graphUnit', component: GraphUnitList },
 ];
 
 class DefaultLayout extends Component {
@@ -2333,12 +2347,26 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
                           },
 
-                          // {
-                          //   name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
-                          //   url: '/equivalancyUnit/listEquivalancyUnit',
-                          //   icon: 'fa fa-medkit',
-                          //   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-                          // },
+                          {
+                            name: i18n.t('static.graphUnit.graphUnit'),
+                            url: '/graphUnit/listGraphUnit',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                            url: '/equivalancyUnit/listEquivalancyUnit',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit'),
+                            url: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
 
                           {
                             name: "Load Dataset",

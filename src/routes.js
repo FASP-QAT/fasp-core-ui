@@ -249,6 +249,10 @@ const AddForecastProgram = React.lazy(() => import('./views/ForecastProgram/AddF
 const ForecastProgramList = React.lazy(() => import('./views/ForecastProgram/ForecastProgramList'));
 const EditForecastProgram = React.lazy(() => import('./views/ForecastProgram/EditForecastProgram'));
 
+const AddMapForecastingUnitToEquivalancyUnit = React.lazy(() => import('./views/MapForecastingUnitToEquivalancyUnit/AddMapForecastingUnitToEquivalancyUnit'));
+const MapForecastingUnitToEquivalancyUnitList = React.lazy(() => import('./views/MapForecastingUnitToEquivalancyUnit/MapForecastingUnitToEquivalancyUnitList'));
+const EditMapForecastingUnitToEquivalancyUnit = React.lazy(() => import('./views/MapForecastingUnitToEquivalancyUnit/EditMapForecastingUnitToEquivalancyUnit'));
+
 const AddForecastMethod = React.lazy(() => import('./views/ForecastMethod/AddForecastMethod'));
 const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
 const EditForecastMethod = React.lazy(() => import('./views/ForecastMethod/EditForecastMethod'));
@@ -264,6 +268,8 @@ const EditScaleUpType = React.lazy(() => import('./views/ScaleUpType/EditScaleUp
 const AddEquivalancyUnit = React.lazy(() => import('./views/EquivalancyUnit/AddEquivalancyUnit'));
 const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
 const EditEquivalancyUnit = React.lazy(() => import('./views/EquivalancyUnit/EditEquivalancyUnit'));
+
+const GraphUnitList = React.lazy(() => import('./views/GraphUnit/GraphUnitList'));
 
 
 
@@ -632,6 +638,12 @@ const routes = [
   { path: '/forecastProgram/listForecastProgram', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastProgram.forecastProgram') }), component: ForecastProgramList },
   { path: '/forecastProgram/editForecastProgram/:forecastProgramId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.forecastProgram.forecastProgram') }), component: EditForecastProgram },
 
+  { path: '/mapForecastingUnitToEquivalancyUnit/addMapForecastingUnitToEquivalancyUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: AddMapForecastingUnitToEquivalancyUnit },
+  // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: MapForecastingUnitToEquivalancyUnitList },
+  { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: MapForecastingUnitToEquivalancyUnitList },
+  { path: '/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/:MapForecastingUnitToEquivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: EditMapForecastingUnitToEquivalancyUnit },
+
   { path: '/forecastMethod/addForecastMethod', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: AddForecastMethod },
   // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
   { path: '/forecastMethod/listForecastMethod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
@@ -650,10 +662,13 @@ const routes = [
   { path: '/scaleUpType/listscaleUpType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.scaleUpType.scaleUpType') }), component: ScaleUpTypeList },
   { path: '/scaleUpType/editscaleUpType/:scaleUpTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.scaleUpType.scaleUpType') }), component: EditScaleUpType },
 
-  { path: '/equivalancyUnit/addEquivalancyUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: AddEquivalancyUnit },
+  { path: '/equivalancyUnit/addEquivalancyUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: AddEquivalancyUnit },
   // { path: '/equivalancyUnit/listEquivalancyUnit/:message', component: HealthAreaList },
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healthareaheader') }), component: EditEquivalancyUnit },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/editEquivalancyUnit/:equivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EditEquivalancyUnit },
+
+  { path: '/graphUnit/listGraphUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.graphUnit.graphUnit') }), component: GraphUnitList },
+  { path: '/graphUnit/listGraphUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.graphUnit.graphUnit') }), component: GraphUnitList },
 ];
 export default routes;

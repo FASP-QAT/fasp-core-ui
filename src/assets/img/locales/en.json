@@ -1781,5 +1781,8 @@
     "static.equivalancyUnit.equivalancyUnit": "Equivalancy Unit",
     "static.forecastProgram.customField1": "Custom Field 1",
     "static.forecastProgram.customField2": "Custom Field 2",
-    "static.forecastProgram.customField3": "Custom Field 3"
+    "static.forecastProgram.customField3": "Custom Field 3",
+    "static.graphUnit.graphUnit": "Graph Unit",
+    "static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit": "Map Forecasting Unit To Equivalancy Unit",
+    "static.mapForecastingUnitToEquivalancyUnit.conversionToFu": "Conversion To FU"
 }
