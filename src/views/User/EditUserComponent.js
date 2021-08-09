@@ -726,7 +726,7 @@ class EditUserComponent extends Component {
                                                             // invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            maxLength={15}
+                                                            maxLength={100}
                                                             required
                                                             value={this.state.user.orgAndCountry}
                                                         /> <FormFeedback className="red">{errors.orgAndCountry}</FormFeedback>
