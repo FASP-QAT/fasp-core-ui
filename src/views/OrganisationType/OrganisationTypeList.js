@@ -244,10 +244,22 @@ export default class OrganisationTypeListComponent extends Component {
         OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
                 console.log("response------->", response);
-                this.setState({
-                    organisationsType: response.data,
-                    selSource: response.data
-                }, () => { this.buildJexcel() })
+                // this.setState({
+                //     organisationsType: response.data,
+                //     selSource: response.data
+                // }, () => { this.buildJexcel() })
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        organisationsType: listArray,
+                        selSource: listArray
+                    }, () => { this.buildJexcel() })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
