@@ -81,7 +81,7 @@ class DefaultHeaderDropdown extends Component {
     this.props.history.push(`/ApplicationDashboard/`)
   }
   getLanguageList() {
-    console.log("Hey anchal going to get languages for profile section")
+    console.log("Going to get languages for profile section")
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
