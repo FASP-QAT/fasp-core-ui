@@ -128,10 +128,13 @@ export default class MorbidityScenarioOne extends Component {
         this.resetTree = this.resetTree.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
+        this.scenarioChange = this.scenarioChange.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
 
         this.addScenario = this.addScenario.bind(this);
+        this.levelClicked = this.levelClicked.bind(this);
+        this.deleteScenario = this.deleteScenario.bind(this);
         this.state = {
             displayParentData: false,
             displayPlanningUnit: false,
@@ -143,33 +146,85 @@ export default class MorbidityScenarioOne extends Component {
             highlightItem: 0,
             items: TreeData.morbidity_scenario_one,
             currentItemConfig: {},
-            activeTab: 1,
+            activeTab: 0,
             activeTab1: new Array(2).fill('1'),
             tabList: [
                 {
                     scenarioId: 1,
-                    scenarioName: 'High'
+                    scenarioName: 'High',
+                    scenarioDesc: 'High',
+                    active: true
                 },
                 {
                     scenarioId: 2,
-                    scenarioName: 'Medium'
+                    scenarioName: 'Medium',
+                    scenarioDesc: 'Medium',
+                    active: true
+                }
+            ],
+            scenario: {
+                scenarioId: '',
+                scenarioName: '',
+                scenarioDesc: '',
+                active: ''
+
+            }
+        }
+    }
+
+    levelClicked(i) {
+        console.log("level onclick function called----" + i);
+    }
+
+    deleteScenario(scenarioId, scenarioName, index) {
+        console.log("scenarioId---", scenarioId);
+        confirmAlert({
+            message: "Are you sure you want to delete the scenario - " + scenarioName,
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        let newArray = [...this.state.tabList];
+                        newArray[index].active = false;
+                        // var obj = newArray.filter(obj => {
+                        //     return obj.scenarioId === scenarioId
+                        // });
+                        // console.log("obj---",obj);
+                        // console.log("obj---",obj.active);
+                        // var foundIndex = newArray.findIndex(x => x.scenarioId == obj.scenarioId);
+                        // newArray[foundIndex] = obj;
+                        this.setState({ tabList: newArray });
+                        // this.setState({
+
+                        // });
+                        // this.props.history.push(`/logout/static.logoutSuccess`)
+                    }
+                },
+                {
+                    label: i18n.t('static.program.no')
                 }
             ]
-        }
+        });
     }
 
     addScenario() {
         const { tabList } = this.state;
-
-        const newTabObject = {
-            scenarioId: 3,
-            scenarioName: 'Low'
+        const { scenario } = this.state;
+        var newTabObject = {
+            scenarioId: parseInt(tabList.length) + 1,
+            scenarioName: scenario.scenarioName,
+            scenarioDesc: scenario.scenarioDesc,
+            active: true
         };
-        // tabList.push(newTabObject);
-
+        // console.log("tab data---", newTabObject);
+        var tabList1 = [...tabList, newTabObject];
+        // console.log("tabList---", tabList1)
         this.setState({
             tabList: [...tabList, newTabObject],
-            activeTab: 3
+            activeTab: parseInt(tabList.length),
+            openAddScenarioModal: false
+        }, () => {
+            console.log("final tab list---", this.state);
         });
     }
     // toggle(tabPane, tab) {
@@ -180,7 +235,8 @@ export default class MorbidityScenarioOne extends Component {
     //     });
     // }
 
-    toggle(tab) {
+    toggle(e, tab) {
+        console.log("event type---", e.button);
         if (this.state.activeTab !== tab.i) {
             this.setState({
                 activeTab: tab.i
@@ -209,6 +265,17 @@ export default class MorbidityScenarioOne extends Component {
             currentItemConfig.valueType = event.target.value;
         }
         this.setState({ currentItemConfig: currentItemConfig });
+    }
+
+    scenarioChange(event) {
+        let { scenario } = this.state;
+        if (event.target.name === "scenarioName") {
+            scenario.scenarioName = event.target.value;
+        }
+        if (event.target.name === "scenarioDesc") {
+            scenario.scenarioDesc = event.target.value;
+        }
+        this.setState({ scenario });
     }
 
     nodeTypeChange(event) {
@@ -438,7 +505,8 @@ export default class MorbidityScenarioOne extends Component {
                     opacity: 0,
                     borderColor: Colors.Gray,
                     fillColor: Colors.Gray,
-                    lineType: LineType.Dotted
+                    lineType: LineType.Dotted,
+                    // onclick: this.levelClicked(i)
                 });
             }
             else if (i % 2 == 0) {
@@ -451,7 +519,8 @@ export default class MorbidityScenarioOne extends Component {
                     opacity: 0,
                     borderColor: Colors.Gray,
                     fillColor: Colors.Gray,
-                    lineType: LineType.Solid
+                    lineType: LineType.Solid,
+                    // onclick: this.levelClicked(i)
                 })
                 );
             }
@@ -465,10 +534,16 @@ export default class MorbidityScenarioOne extends Component {
                     opacity: 0.08,
                     borderColor: Colors.Gray,
                     fillColor: Colors.Gray,
-                    lineType: LineType.Dotted
+                    lineType: LineType.Dotted,
+                    // onclick: this.levelClicked(i)
                 }));
             }
-            console.log("level json***", treeLevelItems);
+            // treeLevelItems[i].addEventListener("click", function () {
+            //     /* Do your stuffs here */
+            //     console.log("level clicked---------------");
+            // });
+            // treeLevelItems[i].onclick = function () { console.log("anchal-----------------"); };
+            console.log("level json***");
         }
         const config = {
             ...this.state,
@@ -541,7 +616,7 @@ export default class MorbidityScenarioOne extends Component {
             <>
                 {this.state.tabList.map(function (data, i) {
                     return (
-                        <TabPane tabId={data.scenarioId} key={i}>
+                        <TabPane tabId={i} key={i}>
                             <div class="sample">
                                 <Provider>
                                     <div className="placeholder"
@@ -757,25 +832,7 @@ export default class MorbidityScenarioOne extends Component {
                                                                 </FormGroup>
                                                                 {/* </FormGroup> */}
                                                                 {/* <FormGroup className="pl-3"> */}
-                                                                <FormGroup className="col-md-3">
-                                                                    <Label htmlFor="languageId">{'Month'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                </FormGroup>
+
                                                                 {/* </FormGroup> */}
                                                             </Row>
                                                         </div>
@@ -787,12 +844,25 @@ export default class MorbidityScenarioOne extends Component {
                                     <Col xs="12" md="12" className="mb-4">
                                         <Nav tabs>
 
-                                            {this.state.tabList.map((data, i) =>
+                                            {this.state.tabList.filter(c => c.active == true).map((data, i) =>
+                                                // data.active &&
                                                 <NavItem>
-                                                    <NavLink className={classnames({ active: this.state.activeTab === { i } })} onClick={() => { this.toggle({ i }); }} key={i}>
-                                                        {data.scenarioName}
+                                                    <NavLink
+                                                        active={this.state.activeTab === i}
+                                                        onClick={(e) => { this.toggle(e, { i }); }}
+                                                        key={i}
+                                                        onDoubleClick={() => {
+                                                            let scenario = this.state.tabList.find(x => x.scenarioId === data.scenarioId);
+                                                            this.setState({
+                                                                openAddScenarioModal: true,
+                                                                scenario
+                                                            })
+                                                        }}
+                                                    >
+                                                        {data.scenarioName}   <i className="fa fa-trash" onClick={(e) => { this.deleteScenario(data.scenarioId, data.scenarioName, i) }}></i>
                                                     </NavLink>
                                                 </NavItem>
+
                                             )}
 
                                             <NavItem>
@@ -823,16 +893,18 @@ export default class MorbidityScenarioOne extends Component {
                     <FormGroup>
                         <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
+                            id="scenarioName"
+                            name="scenarioName"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                            value={this.state.scenario.scenarioName}></Input>
                     </FormGroup>
                     <FormGroup>
                         <Label htmlFor="currencyId">Scenario Description<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
-                            name="nodeTitle"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.currentItemConfig.title}></Input>
+                            id="scenarioDesc"
+                            name="scenarioDesc"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                            value={this.state.scenario.scenarioDesc}></Input>
                     </FormGroup>
 
                 </ModalBody>

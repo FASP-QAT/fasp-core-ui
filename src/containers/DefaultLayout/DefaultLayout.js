@@ -2327,7 +2327,7 @@ class DefaultLayout extends Component {
                         children: [
 
                           {
-                            name: i18n.t('static.forecastProgram.forecastProgram'),
+                            name: 'Update Dataset Info',
                             url: '/forecastProgram/listForecastProgram',
                             icon: 'fa fa-medkit',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
