@@ -7,6 +7,7 @@ import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container,Col, Row,Nav,NavItem,TabPane,NavLink } from 'reactstrap';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
+import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png';
 import IdleTimer from 'react-idle-timer';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 import moment from 'moment';
@@ -2772,7 +2773,7 @@ class DefaultLayout extends Component {
                               active={this.state.activeTab[0] === '1'}
                               onClick={() => { this.toggle(0, '1'); }}
                               style={{border:"none"}}
-                              title={"Supply Planning"}
+                              title={"Forecast Dataset Module"}
                             >
                               <i class="nav-icon fa fa-line-chart"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i>
                             
@@ -2784,10 +2785,12 @@ class DefaultLayout extends Component {
                               active={this.state.activeTab[0] === '2'}
                               onClick={() => { this.toggle(0, '2'); }}
                               style={{border:"none"}}
-                              title={"Forecast Dataset Module"}
+                              title={"Supply Planning"}
                             >
                               {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
-                              <i class="nav-icon"><img src={imgforcastmoduletab} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
+                              <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
+                              <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
+
                             </NavLink>
                           </NavItem>
                         </Nav>
