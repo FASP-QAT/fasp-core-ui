@@ -199,7 +199,7 @@ export default class EditProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                healthAreaArray:[]
+                healthAreaArray: []
 
 
             },
@@ -207,7 +207,7 @@ export default class EditProgram extends Component {
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
             regionId: '',
-            healthAreaId:'',
+            healthAreaId: '',
             lang: localStorage.getItem('lang'),
             realmList: [],
             realmCountryList: [],
@@ -232,7 +232,7 @@ export default class EditProgram extends Component {
         this.changeLoading = this.changeLoading.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
-        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
     }
 
     changeMessage(message) {
@@ -256,7 +256,7 @@ export default class EditProgram extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             console.log("program obj===>", response.data);
-            var proObj=response.data;
+            var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
             // proObj.healthAreaArray=healthAreaArrayDummy;
@@ -271,7 +271,7 @@ export default class EditProgram extends Component {
                 uniqueCode = ""
             }
             this.setState({
-                program: proObj, 
+                program: proObj,
                 loading: false,
                 uniqueCode: uniqueCode,
                 healthAreaCode: healthAreaCode,
@@ -484,10 +484,17 @@ export default class EditProgram extends Component {
             ProgramService.getHealthAreaListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
                         var haList = [];
-                        for (var i = 0; i < json.length; i++) {
-                            haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        if (AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+                            var json = response.data;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                            }
+                        }else{
+                            var json = this.state.program.healthAreaList;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                            }
                         }
 
                         var listArray = haList;
@@ -662,7 +669,7 @@ export default class EditProgram extends Component {
         }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;
-        } 
+        }
         // if (event.target.name == 'healthAreaId') {
         //     program.healthArea.id = event.target.value;
         // } 
@@ -781,7 +788,7 @@ export default class EditProgram extends Component {
                                     shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                                     healthAreaId: this.state.program.healthAreaArray,
-                                    healthAreaArray:this.state.program.healthAreaArray,
+                                    healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
                                     regionId: this.state.program.regionArray
@@ -1016,7 +1023,7 @@ export default class EditProgram extends Component {
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
 
-                                                <FormGroup>
+                                               <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -1037,6 +1044,7 @@ export default class EditProgram extends Component {
                                                         disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
+                                                        
                                                     />
 
                                                     {/* <Input
@@ -1056,6 +1064,7 @@ export default class EditProgram extends Component {
                                                         </Input> */}
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
+                                                
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -1317,8 +1326,8 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
-            
-            var proObj=response.data;
+
+            var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
             // proObj.healthAreaArray=healthAreaArrayDummy;
@@ -1343,11 +1352,11 @@ export default class EditProgram extends Component {
                 shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 // healthAreaId: this.state.program.healthArea.id,
-                healthAreaArray:this.state.program.healthAreaArray,
+                healthAreaArray: this.state.program.healthAreaArray,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
                 uniqueCode: this.state.uniqueCode,
-                healthAreaArray:this.state.program.healthAreaArray
+                healthAreaArray: this.state.program.healthAreaArray
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
