@@ -190,6 +190,7 @@
     "static.mt.reminders2C": "If there is a note in a QAT shipment, this will carry over when you link to the ERP shipment. ",
     "static.mt.reminders2B": "ERP orders available for linking: ",
     "static.mt.reminders2A": "QAT shipments available for linking:  ",
+    "static.user.org&CountryText": "Enter Organization & Country",
     "static.procurementUnit.unitsPerPallet": "Units per Pallet",
     "static.planningUnit.associatedForecastingUnit": "Associated Forecasting Unit",
     "static.healtharea.healtharea": "Technical Area",

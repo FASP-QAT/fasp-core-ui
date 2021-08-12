@@ -190,6 +190,7 @@
     "static.mt.reminders2C": "Si hay una nota en un envío QAT, esta se transferirá cuando se vincule al envío ERP.",
     "static.mt.reminders2B": "Pedidos ERP disponibles para vincular:",
     "static.mt.reminders2A": "Envíos QAT disponibles para vincular:",
+    "static.user.org&CountryText": "Ingrese Organización y País",
     "static.procurementUnit.unitsPerPallet": "Unidades por palet",
     "static.planningUnit.associatedForecastingUnit": "Producto (estimación) asociado",
     "static.healtharea.healtharea": "Área técnica",
