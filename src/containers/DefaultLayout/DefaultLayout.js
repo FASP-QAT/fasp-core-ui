@@ -7,7 +7,7 @@ import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container,Col, Row,Nav,NavItem,TabPane,NavLink } from 'reactstrap';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
-import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png';
+// import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png';
 import IdleTimer from 'react-idle-timer';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 import moment from 'moment';
@@ -2155,27 +2155,27 @@ class DefaultLayout extends Component {
 //   children: [
   {
   name: "Dataset management",
-  url: '/supplyPlan',
+  url: 'Dataset management',
   icon: 'fa fa-list-alt',
   attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
   children: [
   {
   name: "Load Dataset",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Load Dataset',
   icon: 'fa fa-exchange',
   attributes: { hidden: ( this.state.activeTab[0] === '1' ? false : true) }
  
   },
   {
   name: "Load Cosmption",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Load Cosmption',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
  
   },
   {
   name: "Commit",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Commit',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
  
@@ -2186,25 +2186,25 @@ class DefaultLayout extends Component {
   },
   {
   name: "Tree Design",
-  url: '/supplyPlan',
+  url: 'Tree Design',
   icon: 'fa fa-list-alt',
   attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
   children: [
   {
   name: "High Level",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'High Level',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
   {
   name: "Lower Level/Dosing",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Lower Level/Dosing',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
   {
   name: "Input Reports",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Input Reports',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
@@ -2212,19 +2212,19 @@ class DefaultLayout extends Component {
   },
   {
   name: "Forcast Outputs",
-  url: '/supplyPlan',
+  url: 'Forcast Outputs',
   icon: 'fa fa-list-alt',
   attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
   children: [
   {
   name: "Compare Scenarios",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Compare Scenarios',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
   {
   name: "Output Reports",
-  url: '/report/stockStatusAcrossPlanningUnits',
+  url: 'Output Reports',
   icon: 'fa fa-exchange',
   attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
   },
@@ -2775,7 +2775,7 @@ class DefaultLayout extends Component {
                               style={{border:"none"}}
                               title={"Forecast Dataset Module"}
                             >
-                              <i class="nav-icon fa fa-line-chart"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i>
+                              <i class="nav-icon fa fa-line-chart tabicon"  style={{ fontSize: '18px', paddingTop: '5px' ,color:'#fff'}} ></i>
                             
                             </NavLink>
                           </NavItem>
@@ -2789,7 +2789,7 @@ class DefaultLayout extends Component {
                             >
                               {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
                               <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
-                              <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
+                              {/* <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i> */}
 
                             </NavLink>
                           </NavItem>
