@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX } from '../../Constants.js';
+import { LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 
@@ -71,6 +71,10 @@ const validationSchema = function (values) {
                     }
                 })
             .required(i18n.t('static.user.validrole')),
+
+        orgAndCountry: Yup.string()
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.user.org&CountryText')),
     })
 }
 
@@ -159,7 +163,7 @@ class EditUserComponent extends Component {
         if (event.target.name == "orgAndCountry") {
             user.orgAndCountry = event.target.value;
         }
-        
+
         if (event.target.name == "roleId") {
             user.roles = Array.from(event.target.selectedOptions, (item) => item.value);
         }
@@ -716,14 +720,13 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup> */}
                                                     <FormGroup>
-                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}</Label>
+                                                        <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="orgAndCountry"
                                                             id="orgAndCountry"
                                                             bsSize="sm"
-                                                            // valid={!errors.orgAndCountry}
-                                                            // invalid={touched.username && !!errors.username || this.state.user.username == ''}
-                                                            // invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
+                                                            valid={!errors.orgAndCountry}
+                                                            invalid={(touched.orgAndCountry && !!errors.orgAndCountry) || !!errors.orgAndCountry}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             maxLength={100}

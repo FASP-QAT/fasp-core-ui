@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import { LABEL_REGEX, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
@@ -76,8 +76,10 @@ const validationSchema = function (values) {
         //             .required(i18n.t('static.user.validphone')),
         //         otherwise: Yup.string().notRequired()
         //     }),
-        // orgAndCountry: Yup.string()
-        //     .required(i18n.t('static.user.validusername')),        
+
+        orgAndCountry: Yup.string()
+            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.user.org&CountryText')),
     })
 }
 
@@ -457,7 +459,7 @@ export default class UserTicketComponent extends Component {
         user.name = '';
         user.emailId = '';
         // user.phoneNumber = '';
-        user.orgAndCountry = '';        
+        user.orgAndCountry = '';
         user.role = '';
         user.language = '';
         user.notes = '';
@@ -676,14 +678,14 @@ export default class UserTicketComponent extends Component {
                                         </FormGroup> */}
 
                                         <FormGroup>
-                                            <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}</Label>
+                                            <Label for="orgAndCountry">{i18n.t('static.user.orgAndCountry')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 autocomplete="off"
                                                 name="orgAndCountry"
                                                 id="orgAndCountry"
                                                 bsSize="sm"
-                                                // valid={!errors.orgAndCountry && this.state.user.orgAndCountry != ''}
-                                                // invalid={touched.orgAndCountry && !!errors.orgAndCountry}
+                                                valid={!errors.orgAndCountry && this.state.user.orgAndCountry != ''}
+                                                invalid={touched.orgAndCountry && !!errors.orgAndCountry}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 onBlur={handleBlur}
                                                 maxLength={100}

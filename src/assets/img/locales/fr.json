@@ -190,6 +190,7 @@
     "static.mt.reminders2C": "Sil y a une note dans un envoi QAT, cela sera reporté lorsque vous établissez un lien vers lenvoi ERP.",
     "static.mt.reminders2B": "Commandes ERP disponibles pour liaison:",
     "static.mt.reminders2A": "Envois QAT disponibles pour la liaison:",
+    "static.user.org&CountryText": "Entrez l organisation et le pays",
     "static.procurementUnit.unitsPerPallet": "Unités par palette",
     "static.planningUnit.associatedForecastingUnit": "Produit associé (prévision)",
     "static.healtharea.healtharea": "Secteur technique",
