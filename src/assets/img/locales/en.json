@@ -1188,6 +1188,7 @@
     "static.ticket.ticketcreated": " Ticket has been created.",
     "static.username.username": "Username",
     "static.report.issupplyplanapprove": "Supply Plan Approved?",
+    "static.programValidation.programCode": "Combination of program code and unique code character length must be less then 45.",
     "static.report.shelfLife": "Shelf Life (months)",
     "static.common.active": "Active",
     "static.manualTagging.erpShipment": "Enterprise Resource Planning (ERP) Shipment",

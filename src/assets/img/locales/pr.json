@@ -1188,6 +1188,7 @@
     "static.ticket.ticketcreated": "O bilhete foi criado.",
     "static.username.username": "Nome do usuário\n",
     "static.report.issupplyplanapprove": "Plano de suprimento aprovado?",
+    "static.programValidation.programCode": "A combinação de código de programa e comprimento de caractere de código exclusivo deve ser inferior a 45.",
     "static.report.shelfLife": "Vida útil (meses)",
     "static.common.active": "Ativo",
     "static.manualTagging.erpShipment": "Remessa de Planejamento de Recursos Empresariais (ERP)",
