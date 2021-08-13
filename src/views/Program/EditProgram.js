@@ -17,6 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 
 
 const entityname = i18n.t('static.program.programMaster');
@@ -38,7 +39,7 @@ let initialValues = {
     healthAreaId: [],
     programNotes: '',
     regionId: [],
-    uniqueCode: ''
+    programCode1: ''
 }
 
 const validationSchema = function (values) {
@@ -98,6 +99,15 @@ const validationSchema = function (values) {
         // uniqueCode: Yup.string()
         //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
         //     .required(i18n.t('static.programOnboarding.validprogramCode')),
+        programCode1: Yup.string()
+            .test('programCode', i18n.t('static.programValidation.programCode'),
+                function (value) {
+                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
     })
 }
 
@@ -490,7 +500,7 @@ export default class EditProgram extends Component {
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                             }
-                        }else{
+                        } else {
                             var json = this.state.program.healthAreaList;
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
@@ -709,6 +719,7 @@ export default class EditProgram extends Component {
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
             regionId: true,
+            programCode1: true
             // uniqueCode:''
         }
         )
@@ -791,7 +802,9 @@ export default class EditProgram extends Component {
                                     healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
-                                    regionId: this.state.program.regionArray
+                                    regionId: this.state.program.regionArray,
+                                    programCode1:this.state.uniqueCode,
+                                    programCode:this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -898,11 +911,13 @@ export default class EditProgram extends Component {
                                                             <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
                                                             <Input
                                                                 type="text" name="programCode"
+                                                                valid={!errors.programCode1 && this.state.uniqueCode != ''}
+                                                                invalid={touched.programCode1 && !!errors.programCode1}
                                                                 bsSize="sm"
                                                                 disabled
                                                                 value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
                                                                 id="programCode" />
-                                                            <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                                         </FormGroup>
                                                     </Col>
                                                     <Col xs="1" className="" style={{ marginTop: '32px' }}>
@@ -922,7 +937,7 @@ export default class EditProgram extends Component {
                                                                 value={this.state.uniqueCode}
                                                                 disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                                 name="programCode1" id="programCode1" />
-                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                            {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
                                                         </FormGroup>
                                                     </Col>
                                                 </FormGroup>
@@ -1023,7 +1038,7 @@ export default class EditProgram extends Component {
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
 
-                                               <FormGroup>
+                                                <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -1044,7 +1059,7 @@ export default class EditProgram extends Component {
                                                         disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
-                                                        
+
                                                     />
 
                                                     {/* <Input
@@ -1064,7 +1079,7 @@ export default class EditProgram extends Component {
                                                         </Input> */}
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
-                                                
+
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input

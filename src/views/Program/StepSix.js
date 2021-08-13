@@ -5,7 +5,7 @@ import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import Setupprogram from '../../assets/img/SetupProgram.png'
-import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
+import { MAX_PROGRAM_CODE_LENGTH,PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
 // import Setupprogram from '../../assets/img/setup-program-img.jpg'
 import step1 from '../../assets/img/1-step.png'
 import step2 from '../../assets/img/2-step.png'
@@ -93,7 +93,7 @@ const validationSchemaSix = function (values) {
         programCode1: Yup.string()
             .test('programCode', i18n.t('static.programValidation.programCode'),
                 function (value) {
-                    if (parseInt(document.getElementById("programCode").value.length + value.length) > 45) {
+                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
                         return false;
                     } else {
                         return true;
@@ -273,7 +273,7 @@ export default class StepSix extends Component {
                                             <Input
                                                 type="text" name="programCode"
                                                 bsSize="sm"
-                                                valid={!errors.programCode1}
+                                                valid={!errors.programCode1 && this.props.items.program.programCode != ''}
                                                 invalid={touched.programCode1 && !!errors.programCode1}
                                                 disabled
                                                 value={this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode}
@@ -519,7 +519,7 @@ export default class StepSix extends Component {
                                 <FormGroup className="col-md-12">
                                     <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
 
                                 </FormGroup>
                             </Row>
