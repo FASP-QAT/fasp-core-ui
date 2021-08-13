@@ -17,6 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 
 
 const entityname = i18n.t('static.program.programMaster');
@@ -38,7 +39,7 @@ let initialValues = {
     healthAreaId: [],
     programNotes: '',
     regionId: [],
-    uniqueCode: ''
+    programCode1: ''
 }
 
 const validationSchema = function (values) {
@@ -98,6 +99,15 @@ const validationSchema = function (values) {
         // uniqueCode: Yup.string()
         //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
         //     .required(i18n.t('static.programOnboarding.validprogramCode')),
+        programCode1: Yup.string()
+            .test('programCode', i18n.t('static.programValidation.programCode'),
+                function (value) {
+                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
     })
 }
 
@@ -199,7 +209,7 @@ export default class EditProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                healthAreaArray:[]
+                healthAreaArray: []
 
 
             },
@@ -207,7 +217,7 @@ export default class EditProgram extends Component {
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
             regionId: '',
-            healthAreaId:'',
+            healthAreaId: '',
             lang: localStorage.getItem('lang'),
             realmList: [],
             realmCountryList: [],
@@ -232,7 +242,7 @@ export default class EditProgram extends Component {
         this.changeLoading = this.changeLoading.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
-        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
     }
 
     changeMessage(message) {
@@ -256,7 +266,7 @@ export default class EditProgram extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             console.log("program obj===>", response.data);
-            var proObj=response.data;
+            var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
             // proObj.healthAreaArray=healthAreaArrayDummy;
@@ -271,7 +281,7 @@ export default class EditProgram extends Component {
                 uniqueCode = ""
             }
             this.setState({
-                program: proObj, 
+                program: proObj,
                 loading: false,
                 uniqueCode: uniqueCode,
                 healthAreaCode: healthAreaCode,
@@ -484,10 +494,17 @@ export default class EditProgram extends Component {
             ProgramService.getHealthAreaListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        var json = response.data;
                         var haList = [];
-                        for (var i = 0; i < json.length; i++) {
-                            haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        if (AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+                            var json = response.data;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                            }
+                        } else {
+                            var json = this.state.program.healthAreaList;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                            }
                         }
 
                         var listArray = haList;
@@ -662,7 +679,7 @@ export default class EditProgram extends Component {
         }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;
-        } 
+        }
         // if (event.target.name == 'healthAreaId') {
         //     program.healthArea.id = event.target.value;
         // } 
@@ -702,6 +719,7 @@ export default class EditProgram extends Component {
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
             regionId: true,
+            programCode1: true
             // uniqueCode:''
         }
         )
@@ -781,10 +799,12 @@ export default class EditProgram extends Component {
                                     shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                                     healthAreaId: this.state.program.healthAreaArray,
-                                    healthAreaArray:this.state.program.healthAreaArray,
+                                    healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
-                                    regionId: this.state.program.regionArray
+                                    regionId: this.state.program.regionArray,
+                                    programCode1:this.state.uniqueCode,
+                                    programCode:this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -891,11 +911,13 @@ export default class EditProgram extends Component {
                                                             <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
                                                             <Input
                                                                 type="text" name="programCode"
+                                                                valid={!errors.programCode1 && this.state.uniqueCode != ''}
+                                                                invalid={touched.programCode1 && !!errors.programCode1}
                                                                 bsSize="sm"
                                                                 disabled
                                                                 value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
                                                                 id="programCode" />
-                                                            <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                                         </FormGroup>
                                                     </Col>
                                                     <Col xs="1" className="" style={{ marginTop: '32px' }}>
@@ -915,7 +937,7 @@ export default class EditProgram extends Component {
                                                                 value={this.state.uniqueCode}
                                                                 disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                                 name="programCode1" id="programCode1" />
-                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                            {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
                                                         </FormGroup>
                                                     </Col>
                                                 </FormGroup>
@@ -1037,6 +1059,7 @@ export default class EditProgram extends Component {
                                                         disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
+
                                                     />
 
                                                     {/* <Input
@@ -1056,6 +1079,7 @@ export default class EditProgram extends Component {
                                                         </Input> */}
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
+
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -1317,8 +1341,8 @@ export default class EditProgram extends Component {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
-            
-            var proObj=response.data;
+
+            var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
             // proObj.healthAreaArray=healthAreaArrayDummy;
@@ -1343,11 +1367,11 @@ export default class EditProgram extends Component {
                 shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 // healthAreaId: this.state.program.healthArea.id,
-                healthAreaArray:this.state.program.healthAreaArray,
+                healthAreaArray: this.state.program.healthAreaArray,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
                 uniqueCode: this.state.uniqueCode,
-                healthAreaArray:this.state.program.healthAreaArray
+                healthAreaArray: this.state.program.healthAreaArray
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
