@@ -1188,6 +1188,7 @@
     "static.ticket.ticketcreated": "Se ha creado el ticket",
     "static.username.username": "Nombre de usuario",
     "static.report.issupplyplanapprove": "¿Plan de suministro aprobado?",
+    "static.programValidation.programCode": "La combinación del código de programa y la longitud de los caracteres del código único debe ser inferior a 45.",
     "static.report.shelfLife": "Vida útil (meses)",
     "static.common.active": "Activo",
     "static.manualTagging.erpShipment": "Pedido del sistema de planificación de recursos empresariales (ERP)",

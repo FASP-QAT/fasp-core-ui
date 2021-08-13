@@ -1188,6 +1188,7 @@
     "static.ticket.ticketcreated": "Le ticket a été créé.",
     "static.username.username": "Nom d`utilisateur",
     "static.report.issupplyplanapprove": "Plan d`approvisionnement approuvé?",
+    "static.programValidation.programCode": "La combinaison du code de programme et de la longueur de caractère du code unique doit être inférieure à 45.",
     "static.report.shelfLife": "Durée de vie (mois)",
     "static.common.active": "Actif",
     "static.manualTagging.erpShipment": "Expédition du progiciel (PGI)",
