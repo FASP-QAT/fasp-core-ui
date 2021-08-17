@@ -642,7 +642,7 @@ const routes = [
   // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
   { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: MapForecastingUnitToEquivalancyUnitList },
   { path: '/mapForecastingUnitToEquivalancyUnit/listMapForecastingUnitToEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: MapForecastingUnitToEquivalancyUnitList },
-  { path: '/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/:MapForecastingUnitToEquivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: EditMapForecastingUnitToEquivalancyUnit },
+  { path: '/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/:mapForecastingUnitToEquivalancyUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit') }), component: EditMapForecastingUnitToEquivalancyUnit },
 
   { path: '/forecastMethod/addForecastMethod', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: AddForecastMethod },
   // { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },

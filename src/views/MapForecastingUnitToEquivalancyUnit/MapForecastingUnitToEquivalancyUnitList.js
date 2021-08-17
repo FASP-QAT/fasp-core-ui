@@ -192,7 +192,7 @@ export default class MapForecastingUnitToEquivalancyUnitList extends Component {
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
                 this.props.history.push({
                     // pathname: `/mapForecastingUnitToEquivalancyUnit/editmapForecastingUnitToEquivalancyUnit/${this.el.getValueFromCoords(0, x)}`,
-                    pathname: `/mapForecastingUnitToEquivalancyUnit/editmapForecastingUnitToEquivalancyUnit/1`,
+                    pathname: `/mapForecastingUnitToEquivalancyUnit/editMapForecastingUnitToEquivalancyUnit/1`,
                 });
             }
         }

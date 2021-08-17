@@ -19,16 +19,16 @@ const entityname = i18n.t('static.mapForecastingUnitToEquivalancyUnit.mapForecas
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastingUnitId: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext')),
+            .required(i18n.t('static.forecastingunit.forecastingunittext')),
         equivalancyUnitId: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext')),
+            .required(i18n.t('static.equivalancyUnit.equivalancyUnittext')),
         graphUnitId: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext')),
+            .required(i18n.t('static.graphUnit.graphUnittext')),
         conversionToFu: Yup.string()
             .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin')),
         dataSetId: Yup.string()
-            .required(i18n.t('static.datasource.datasourcetypetext'))
+            .required(i18n.t('static.dataSet.dataSettext'))
 
     })
 }
@@ -56,7 +56,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-export default class AddScaleUpTypeComponent extends Component {
+export default class AddMapForecastingUnitToEquivalancyUnitComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -275,6 +275,9 @@ export default class AddScaleUpTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="select" name="forecastingUnitId" id="forecastingUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="1">Abacavir 20 mg/mL Solution</option>
+                                                            <option value="2">Abacavir 60 mg Tablet</option>
+                                                            <option value="3">Efavirenz/Lamivudine/Tenofovir DF 600/300/300 mg Tablet</option>
                                                             {/* {realmCountries} */}
                                                         </Input>
                                                         <FormFeedback>{errors.forecastingUnitId}</FormFeedback>
@@ -291,6 +294,9 @@ export default class AddScaleUpTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="select" name="equivalancyUnitId" id="equivalancyUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="1">Patient Month of ARV</option>
+                                                            <option value="2">Male Condom (Latex) Lubricated, 53 mm</option>
+                                                            <option value="3">Artemether/Lumefantrine 20/120 mg Tablet</option>
                                                             {/* {realmCountries} */}
                                                         </Input>
                                                         <FormFeedback>{errors.equivalancyUnitId}</FormFeedback>
@@ -307,6 +313,9 @@ export default class AddScaleUpTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="select" name="graphUnitId" id="graphUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="1">Patient Month</option>
+                                                            <option value="2"># Condoms</option>
+                                                            <option value="3">Tablets</option>
                                                             {/* {realmCountries} */}
                                                         </Input>
                                                         <FormFeedback>{errors.graphUnitId}</FormFeedback>
@@ -333,7 +342,7 @@ export default class AddScaleUpTypeComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.forecastProgram.forecastProgram')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            valid={!errors.dataSetId && this.state.dataChange.id != ''}
+                                                            valid={!errors.dataSetId && this.state.mapForecastingUnitToEquivalancyUnit.dataSet.id != ''}
                                                             invalid={touched.dataSetId && !!errors.dataSetId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             bsSize="sm"
@@ -341,6 +350,9 @@ export default class AddScaleUpTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="select" name="dataSetId" id="dataSetId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="1">Benin PRH,Condoms Forecast Dataset</option>
+                                                            <option value="2">Benin ARV Forecast Dataset</option>
+                                                            <option value="3">Zambia ARV</option>
                                                             {/* {realmCountries} */}
                                                         </Input>
                                                         <FormFeedback>{errors.dataSetId}</FormFeedback>
