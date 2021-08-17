@@ -648,7 +648,7 @@ class StockStatus extends Component {
     var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
     var count = 0;
     list.map(
-      (item,itemCount) => {
+      (item, itemCount) => {
         doc.addPage()
         doc.setFontSize(8)
         // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
@@ -847,7 +847,7 @@ class StockStatus extends Component {
           }
         })
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-          pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc });
+        pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc });
         lastPage = doc.internal.getCurrentPageInfo().pageNumber;
         /*  var y = doc.lastAutoTable.finalY + 20
           var cnt=0
@@ -1597,8 +1597,8 @@ class StockStatus extends Component {
                                 pointBackgroundColor: '#ED8944',
                                 pointBorderColor: '#212721',
                                 pointRadius: 10
-                      
-                            },
+
+                              },
                               {
                                 label: i18n.t('static.supplyPlan.delivered'),
                                 yAxisID: 'A',
@@ -2004,8 +2004,8 @@ class StockStatus extends Component {
                   pointBackgroundColor: '#ED8944',
                   pointBorderColor: '#212721',
                   pointRadius: 10
-        
-              },
+
+                },
                 {
                   label: i18n.t('static.supplyPlan.delivered'),
                   yAxisID: 'A',
@@ -2758,8 +2758,15 @@ class StockStatus extends Component {
 
           ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             console.log('**' + JSON.stringify(response.data))
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-              planningUnits: response.data, message: ''
+              planningUnits: listArray,
+              message: ''
             }, () => {
               this.filterData();
             })
@@ -3174,7 +3181,7 @@ class StockStatus extends Component {
           pointBorderColor: '#212721',
           pointRadius: 10
 
-      },
+        },
         {
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
