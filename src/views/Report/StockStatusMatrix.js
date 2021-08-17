@@ -1188,8 +1188,14 @@ export default class StockStatusMatrix extends React.Component {
             //let productCategoryId = document.getElementById("productCategoryId").value;
             ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
               console.log('**' + JSON.stringify(response.data))
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
               this.setState({
-                planningUnits: response.data,
+                planningUnits: listArray,
                 planningUnitValues: response.data.map((item, i) => {
                   return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 

@@ -352,10 +352,10 @@ class ShipmentSummery extends Component {
             // re[item].localProcurement == true ? i18n.t('static.report.localprocurement').replaceAll(' ', '%20') : '',
             re[item].localProcurement,
             // re[item].orderNo != null ? re[item].orderNo : '', (re[item].procurementAgent.code).replaceAll(' ', '%20'),
-            re[item].orderNo != null ? re[item].orderNo : '', ((re[item].procurementAgent.code == null || re[item].procurementAgent.code == "") ? '' : (re[item].procurementAgent.code).replaceAll(' ', '%20') ),
-            ((re[item].fundingSource.code == null || re[item].fundingSource.code == "") ? '' : (re[item].fundingSource.code).replaceAll(' ', '%20') ),
+            re[item].orderNo != null ? re[item].orderNo : '', ((re[item].procurementAgent.code == null || re[item].procurementAgent.code == "") ? '' : (re[item].procurementAgent.code).replaceAll(' ', '%20')),
+            ((re[item].fundingSource.code == null || re[item].fundingSource.code == "") ? '' : (re[item].fundingSource.code).replaceAll(' ', '%20')),
             // (re[item].fundingSource.code).replaceAll(' ', '%20'),
-            ((re[item].budget.code == null || re[item].budget.code == "") ? '' : (re[item].budget.code).replaceAll(' ', '%20') ),
+            ((re[item].budget.code == null || re[item].budget.code == "") ? '' : (re[item].budget.code).replaceAll(' ', '%20')),
             // (re[item].budget.code).replaceAll(' ', '%20'),
             (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -1351,8 +1351,14 @@ class ShipmentSummery extends Component {
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            planningUnits: response.data, message: ''
+                            planningUnits: listArray, message: ''
                         }, () => {
                             this.fetchData();
                         })
