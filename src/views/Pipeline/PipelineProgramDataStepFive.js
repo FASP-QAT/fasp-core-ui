@@ -148,9 +148,9 @@ export default class PipelineProgramDataStepFive extends Component {
                         var healthAreaId = healthAreaIdd;
                         let healthAreaCode = ''
                         for (var i = 0; i < healthAreaId.length; i++) {
-                            healthAreaCode += response.data.filter(c => (c.healthAreaId == healthAreaId[i]))[0].healthAreaCode;
+                            healthAreaCode += response.data.filter(c => (c.healthAreaId == healthAreaId[i]))[0].healthAreaCode + "/";
                         }
-                        this.props.generateHealthAreaCode(healthAreaCode);
+                        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
 
                         // let healthAreaCode = response.data.filter(c => (c.healthAreaId == healthAreaIdd))[0].healthAreaCode;
                         // this.props.generateHealthAreaCode(healthAreaCode);
