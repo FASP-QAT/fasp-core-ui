@@ -84,9 +84,9 @@ export default class StepThree extends Component {
         var healthAreaId = value;
         let healthAreaCode = ''
         for (var i = 0; i < healthAreaId.length; i++) {
-            healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode;
+            healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
         }
-        this.props.generateHealthAreaCode(healthAreaCode);
+        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
     }
 
     getHealthAreaList() {
