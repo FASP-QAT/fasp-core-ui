@@ -243,6 +243,7 @@ export default class DatabaseTranslations extends React.Component {
         var listToUpdate = [];
         for (var j = 0; j < tableJson.length; j++) {
             if ((tableJson[j])[2] == 1) {
+                console.log("changed------------------");
                 var staticLabelJsonIndex = labelList.findIndex(c => c.staticLabelId == (tableJson[j])[0]);
                 var staticLabelLanguagesList = [];
                 var k = 3;
@@ -379,6 +380,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     changed = function (instance, cell, x, y, value) {
+        console.log("changed function called----------------");
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -389,6 +391,10 @@ export default class DatabaseTranslations extends React.Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
+        }
+         
+         if (x != 2) {
+            this.el.setValueFromCoords(2, y, 1, true);
         }
     }.bind(this)
 
