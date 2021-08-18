@@ -278,6 +278,8 @@ const DemographicScenarioThree = React.lazy(() => import('../../Samples/Demograp
 
 // Forecasting module
 const LoadDatasetComponent = React.lazy(() => import('../../views/Dataset/LoadDatasetComponent'));
+const VersionSettingsComponent = React.lazy(() => import('../../views/Dataset/VersionSettingsComponent'));
+
 const DeleteDatasetComponent = React.lazy(() => import('../../views/Dataset/DeleteDatasetComponent'));
 const AddForecastProgram = React.lazy(() => import('../../views/ForecastProgram/AddForecastProgram'));
 const ForecastProgramList = React.lazy(() => import('../../views/ForecastProgram/ForecastProgramList'));
@@ -665,6 +667,8 @@ const routes = [
   { path: '/demographic/scenarioTwo', name: 'Demographic Scenario Two', component: DemographicScenarioTwo },
   { path: '/demographic/scenarioThree', name: 'Demographic Scenario Three', component: DemographicScenarioThree },
   { path: '/dataset/loadDataset', name: 'Load Dataset', component: LoadDatasetComponent },
+  { path: '/dataset/versionSettings', name: 'Version Settings', component: VersionSettingsComponent },
+  
   { path: '/dataset/loadDataset/:message', component: LoadDatasetComponent },
   { path: '/dataset/deleteDataset', name: 'Delete Forecast Dataset', component: DeleteDatasetComponent },
 
@@ -2332,7 +2336,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-medkit',
                             attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
                           },
-
+                          {
+                            name: 'Version Settings',
+                            url: '/dataset/versionSettings',
+                            icon: 'fa fa-medkit',
+                            attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                          },
                           {
                             name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
                             url: '/equivalancyUnit/listEquivalancyUnit',

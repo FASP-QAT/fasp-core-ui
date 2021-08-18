@@ -1263,10 +1263,14 @@ class AuthenticationService {
                         break;
 
                     case "/dataset/loadDataset":
-                        case "/dataset/deleteDataset":
+                    case "/dataset/deleteDataset":
                         // if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                         return true;
-                        // }
+                    // }
+                    case "/dataset/versionSettings":
+                        // if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
+                        return true;
+                    // }
                     case "/forecastProgram/addForecastProgram":
                         if (bfunction.includes("ROLE_BF_ADD_HEALTH_AREA")) {
                             return true;
