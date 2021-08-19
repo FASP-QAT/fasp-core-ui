@@ -268,6 +268,7 @@
     "static.role.roletext": "Enter role name",
     "static.common.clear": "Clear",
     "static.problemReport.issueStatus": "Problem Status",
+    "static.validNoDoubleSpace.string": "No spaces are allowed at starting & ending of the string, Also no double spaces are allowed in the string",
     "static.program.export": "Export program data",
     "static.procurementUnit.validProcurementUnitText": "Enter Procurement Unit Name",
     "static.supplyPlan.roundDown": "Round Down",

@@ -268,6 +268,7 @@
     "static.role.roletext": "Entrez le nom du rôle",
     "static.common.clear": "Effacer",
     "static.problemReport.issueStatus": "État du problème",
+    "static.validNoDoubleSpace.string": "Aucun espace n est autorisé au début et à la fin de la chaîne. De même, aucun espace double n est autorisé dans la chaîne",
     "static.program.export": "Exporter les données du programme",
     "static.procurementUnit.validProcurementUnitText": "Entrez le nom de l`unité d`approvisionnement",
     "static.supplyPlan.roundDown": "Arrondir à l`entier inférieur",
