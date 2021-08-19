@@ -268,6 +268,7 @@
     "static.role.roletext": "Ingresar el nombre del rol",
     "static.common.clear": "Borrar",
     "static.problemReport.issueStatus": "Estado del problema",
+    "static.validNoDoubleSpace.string": "No se permiten espacios al comienzo y al final de la cadena, tampoco se permiten espacios dobles en la cadena",
     "static.program.export": "Exportar datos del programa",
     "static.procurementUnit.validProcurementUnitText": "Ingresar el nombre del Producto (compra)",
     "static.supplyPlan.roundDown": "Redondear a la baja",
