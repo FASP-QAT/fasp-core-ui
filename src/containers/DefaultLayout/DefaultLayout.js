@@ -43,6 +43,10 @@ const AddOrganisation = React.lazy(() => import('../../views/Organisation/AddOrg
 const OrganisationList = React.lazy(() => import('../../views/Organisation/OrganisationList'));
 const EditOrganisation = React.lazy(() => import('../../views/Organisation/EditOrganisation'));
 
+const AddOrganisationType = React.lazy(() => import('../../views/OrganisationType/AddOrganisationType'));
+const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationType/OrganisationTypeList'));
+const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
+
 const AddSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('../../views/SubFundingSource/EditSubFundingSourceComponent'));
@@ -348,6 +352,12 @@ const routes = [
   { path: '/organisation/listOrganisation', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationHead.organisation', component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: 'static.breadcrum.edit', entityname: 'static.organisationHead.organisation', component: EditOrganisation },
 
+  { path: '/organisationType/addOrganisationType', name: 'static.breadcrum.add', entityname: 'static.organisationType.organisationType', component: AddOrganisationType },
+  // { path: '/organisationType/listOrganisationType/:message', component: OrganisationList },
+  { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
+  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationType.organisationType', component: EditOrganisationType },
+
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -540,7 +550,7 @@ const routes = [
   { path: '/report/supplyPlanVersionAndReview/:color/:message', name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
 
   { path: '/report/shipmentSummery', exact: true, name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
-  { path: '/report/shipmentSummery/:message',exact:true,name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
+  { path: '/report/shipmentSummery/:message', exact: true, name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
@@ -690,15 +700,15 @@ class DefaultLayout extends Component {
 
   }
 
-  displayHeaderTitle = (name,url) => {
+  displayHeaderTitle = (name, url) => {
     if (this.state.name !== name) {
       if (AuthenticationService.checkTypeOfSession(url)) {
         this.setState({
-          url:""
+          url: ""
         })
-      }else{
-          localStorage.setItem("sessionChanged", 1)
-          this.props.history.push(`/login/static.message.sessionChange`);
+      } else {
+        localStorage.setItem("sessionChanged", 1)
+        this.props.history.push(`/login/static.message.sessionChange`);
       }
       this.getProgramData();
       this.getNotificationCount();
@@ -1146,7 +1156,7 @@ class DefaultLayout extends Component {
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
                         attributes: {
                           hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION'))
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
@@ -1195,6 +1205,12 @@ class DefaultLayout extends Component {
                             url: '/organisation/listOrganisation',
                             icon: 'fa fa-building',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.organisationType.organisationType'),
+                            url: '/organisationType/listOrganisationType',
+                            icon: 'fa fa-building',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
@@ -2679,9 +2695,9 @@ class DefaultLayout extends Component {
                         exact={route.exact}
                         name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
                         render={props =>
-                          AuthenticationService.authenticatedRoute(route.path,this.state.url) ?
+                          AuthenticationService.authenticatedRoute(route.path, this.state.url) ?
                             (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '',route.path)} />
+                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '', route.path)} />
                             ) : (
                               <Redirect to={{ pathname: "/accessDenied" }} />
                             )

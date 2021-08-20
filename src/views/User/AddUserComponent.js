@@ -11,7 +11,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { SPECIAL_CHARECTER_WITH_NUM,LABEL_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
@@ -100,7 +100,7 @@ const validationSchema = function (values) {
         //     }),
 
         orgAndCountry: Yup.string()
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
             .required(i18n.t('static.user.org&CountryText')),
 
     })
