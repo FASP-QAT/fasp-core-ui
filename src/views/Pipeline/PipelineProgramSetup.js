@@ -71,6 +71,7 @@ export default class PipelineProgramSetup extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
+                healthAreaArray: [],
 
                 arrivedToDeliveredLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
@@ -102,7 +103,9 @@ export default class PipelineProgramSetup extends Component {
             organisationCode: '',
             healthAreaCode: '',
             programInfoStatus: false,
-            programInfoRegionStatus: false
+            programInfoRegionStatus: false,
+            programInfoHealthAreaStatus:false
+
             // pipelineConsumptionList: []
         }
         this.endProgramInfoStepOne = this.endProgramInfoStepOne.bind(this);
@@ -130,6 +133,7 @@ export default class PipelineProgramSetup extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
 
         this.generateCountryCode = this.generateCountryCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
@@ -147,7 +151,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     endProgramInfoStepOne() {
-        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false });
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:true});
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -157,7 +161,7 @@ export default class PipelineProgramSetup extends Component {
 
     }
     endProgramInfoStepTwo() {
-        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false });
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:false});
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -166,7 +170,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepThree() {
-        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false,programInfoHealthAreaStatus:false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -175,7 +179,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepFour() {
-        this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false });
+        this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false,programInfoHealthAreaStatus:false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -576,7 +580,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     backToprogramInfoStepOne() {
-        this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false });
+        this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:false});
         document.getElementById('pipelineProgramDataStepOne').style.display = 'block';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -585,7 +589,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepTwo() {
-        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false });
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:true});
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -594,7 +598,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepThree() {
-        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false });
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false,programInfoHealthAreaStatus:false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -603,7 +607,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepFour() {
-        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false,programInfoHealthAreaStatus:false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -628,7 +632,7 @@ export default class PipelineProgramSetup extends Component {
             dataSourceStatus: false,
             fundingSourceStatus: false,
             procurmentAgnetStatus: false,
-            programInfoRegionStatus: false, programInfoStatus: true
+            programInfoRegionStatus: false,programInfoHealthAreaStatus:false, programInfoStatus: true
         });
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -817,6 +821,18 @@ export default class PipelineProgramSetup extends Component {
             regionIdArray[i] = regionId[i].value;
         }
         program.regionArray = regionIdArray;
+        this.setState({ program: program });
+    }
+
+    updateFieldDataHealthArea(value) {
+        let { program } = this.state;
+        this.setState({ healthAreaId: value });
+        var healthAreaId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
     }
 
@@ -1398,7 +1414,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList} generateCountryCode={this.generateCountryCode}></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                    <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} dataChange={this.dataChange} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>
+                                                {this.state.programInfoHealthAreaStatus && <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} updateFieldDataHealthArea={this.updateFieldDataHealthArea} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>}
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
                                                     <PipelineProgramDataStepFour endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo} items={this.state} dataChange={this.dataChange} generateOrganisationCode={this.generateOrganisationCode}></PipelineProgramDataStepFour>

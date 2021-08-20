@@ -10,9 +10,12 @@ import {
     Form, FormGroup, Label, Input,
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import classNames from 'classnames';
 
 const initialValuesThree = {
-    healthAreaId: ''
+    healthAreaId: []
 }
 
 const validationSchemaThree = function (values) {
@@ -49,7 +52,8 @@ export default class StepThree extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            healthAreaList: []
+            healthAreaList: [],
+            healthAreaId: ''
         }
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
     }
@@ -76,10 +80,13 @@ export default class StepThree extends Component {
         }
     }
 
-    generateHealthAreaCode(event) {
-        let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
-        // alert(healthAreaCode);
-        this.props.generateHealthAreaCode(healthAreaCode);
+    generateHealthAreaCode(value) {
+        var healthAreaId = value;
+        let healthAreaCode = ''
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
+        }
+        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
     }
 
     getHealthAreaList() {
@@ -88,13 +95,20 @@ export default class StepThree extends Component {
         ProgramService.getHealthAreaListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
-                    var listArray = response.data;
+                    var json = response.data;
+                    var haList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        haList[i] = { healthAreaCode:json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+
+                    var listArray = haList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
+                        healthAreaId: '',
                         healthAreaList: listArray
                     })
                 } else {
@@ -149,17 +163,6 @@ export default class StepThree extends Component {
     }
 
     render() {
-        const { healthAreaList } = this.state;
-        let realmHealthArea = healthAreaList.length > 0
-            && healthAreaList.map((item, i) => {
-                return (
-                    <option key={i} value={item.healthAreaId}>
-                        {/* {item.healthAreaCode} */}
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -182,36 +185,43 @@ export default class StepThree extends Component {
                             isSubmitting,
                             isValid,
                             setTouched,
-                            handleReset
+                            handleReset,
+                            setFieldValue
                         }) => (
-                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='healthAreaForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
-                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                            onBlur={handleBlur}
-                                            bsSize="sm"
-                                            type="select"
-                                            name="healthAreaId"
-                                            id="healthAreaId"
-                                            className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateHealthAreaCode(e) }}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmHealthArea}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
+                            <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.healthAreaId && this.props.items.program.healthAreaArray.length != 0 },
+                                            { 'is-invalid': (touched.healthAreaId && !!errors.healthAreaId) }
+                                        )}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("healthAreaId", e);
+                                            this.props.updateFieldDataHealthArea(e);
+                                            this.generateHealthAreaCode(e)
+                                        }}
 
-                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                                        onBlur={handleBlur}
+                                        bsSize="sm"
+                                        name="healthAreaId"
+                                        id="healthAreaId"
+                                        multi
+                                        options={this.state.healthAreaList}
+                                        value={this.props.items.program.healthAreaArray}
+                                    />
+                                    <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+
+                                    <Button color="info" size="md" className="float-left mr-1" type="reset" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
 
             </>
 
