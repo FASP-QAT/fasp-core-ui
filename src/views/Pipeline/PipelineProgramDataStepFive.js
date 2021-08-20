@@ -82,7 +82,8 @@ export default class PipelineProgramDataStepFive extends Component {
     componentDidMount() {
         var realmId = AuthenticationService.getRealmId();
         var realmCountryIdd = document.getElementById("realmCountryId").value;
-        var healthAreaIdd = document.getElementById("healthAreaId").value;
+        // var healthAreaIdd = document.getElementById("healthAreaId").value;
+        var healthAreaIdd = this.props.items.program.healthAreaArray;
         var organisationIdd = document.getElementById("organisationId").value;
         console.log("realmCountryIdd", realmCountryIdd);
         console.log("healthAreaIdd", healthAreaIdd);
@@ -144,8 +145,15 @@ export default class PipelineProgramDataStepFive extends Component {
             ProgramService.getHealthAreaList(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        let healthAreaCode = response.data.filter(c => (c.healthAreaId == healthAreaIdd))[0].healthAreaCode;
-                        this.props.generateHealthAreaCode(healthAreaCode);
+                        var healthAreaId = healthAreaIdd;
+                        let healthAreaCode = ''
+                        for (var i = 0; i < healthAreaId.length; i++) {
+                            healthAreaCode += response.data.filter(c => (c.healthAreaId == healthAreaId[i]))[0].healthAreaCode + "/";
+                        }
+                        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
+
+                        // let healthAreaCode = response.data.filter(c => (c.healthAreaId == healthAreaIdd))[0].healthAreaCode;
+                        // this.props.generateHealthAreaCode(healthAreaCode);
                     } else {
                         this.setState({
                             message: response.data.messageCode
@@ -194,57 +202,57 @@ export default class PipelineProgramDataStepFive extends Component {
 
         } if (organisationIdd != "") {
             ProgramService.getOrganisationList(realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    let organisationCode = response.data.filter(c => (c.organisationId == organisationIdd))[0].organisationCode;
-                    this.props.generateOrganisationCode(organisationCode);
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                .then(response => {
+                    if (response.status == 200) {
+                        let organisationCode = response.data.filter(c => (c.organisationId == organisationIdd))[0].organisationCode;
+                        this.props.generateOrganisationCode(organisationCode);
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-         
+                );
+
         }
 
         // AuthenticationService.setupAxiosInterceptors();
@@ -321,9 +329,9 @@ export default class PipelineProgramDataStepFive extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
-                                    <FormGroup>
-                                        {/* <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='regionForm'>
+                                <FormGroup>
+                                    {/* <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
                                         <Select
                                             className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
                                                 { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
@@ -346,38 +354,38 @@ export default class PipelineProgramDataStepFive extends Component {
                                             value={this.props.items.program.regionArray}
                                         // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
                                         /> */}
-                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
-                                        <Select
-                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
-                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
-                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
-                                            )}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                                setFieldValue("regionId", e);
-                                                this.props.updateFieldData(e);
-                                            }}
-                                            onBlur={() => setFieldTouched("regionId", true)}
-                                            // onChange={(e) => { this.props.updateFieldData(e) }}
-                                            // className="col-md-4 ml-field"
-                                            bsSize="sm"
-                                            name="regionId"
-                                            id="regionId"
-                                            multi
-                                            options={this.props.items.regionList}
-                                            value={this.props.items.program.regionArray}
-                                        />
+                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                            { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                        )}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("regionId", e);
+                                            this.props.updateFieldData(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("regionId", true)}
+                                        // onChange={(e) => { this.props.updateFieldData(e) }}
+                                        // className="col-md-4 ml-field"
+                                        bsSize="sm"
+                                        name="regionId"
+                                        id="regionId"
+                                        multi
+                                        options={this.props.items.regionList}
+                                        value={this.props.items.program.regionArray}
+                                    />
 
-                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
 
                 {/* <FormGroup className="col-md-4 pl-0">
                     <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>

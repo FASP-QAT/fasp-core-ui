@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { LABEL_REGEX, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants';
+import { LABEL_REGEX, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM,SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
@@ -78,7 +78,7 @@ const validationSchema = function (values) {
         //     }),
 
         orgAndCountry: Yup.string()
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .matches(SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, i18n.t('static.validNoDoubleSpace.string'))
             .required(i18n.t('static.user.org&CountryText')),
     })
 }
