@@ -6,9 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import { lang } from "moment";
-import CountryService from "../../api/CountryService";
-import OrganisationService from "../../api/OrganisationService";
-import OrganisationTypeService from "../../api/OrganisationTypeService.js";
+import OrganisationTypeService from "../../api/OrganisationTypeService";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -19,30 +17,17 @@ import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '
 
 let initialValues = {
     realmId: '',
-    organisationName: '',
-    organisationCode: '',
-    realmCountryId: [],
-    organisationTypeId: '',
+    organisationTypeName: '',
 }
-const entityname = i18n.t('static.organisation.organisation');
+const entityname = i18n.t('static.organisationType.organisationType');
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-        organisationName: Yup.string()
+        organisationTypeName: Yup.string()
             // .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.organisation.organisationtext')),
-        organisationCode: Yup.string()
-            // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-            // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-            .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
-            .required(i18n.t('static.common.displayName'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
-        realmCountryId: Yup.string()
-            .required(i18n.t('static.program.validcountrytext')),
-        organisationTypeId: Yup.string()
-            .required(i18n.t('static.organisationType.organisationTypeValue'))
+            .required(i18n.t('static.organisationType.organisationTypetext')),
     })
 }
 
@@ -69,15 +54,14 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-export default class EditOrganisationComponent extends Component {
+export default class EditOrganisationTypeComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            countries: [],
             realms: [],
             // organisation: this.props.location.state.organisation,
-            organisation: {
+            organisationType: {
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -93,30 +77,14 @@ export default class EditOrganisationComponent extends Component {
                         label_fr: ''
                     }
                 },
-                organisationType: {
-                    id: '',
-                    label: {
-                        label_en: '',
-                        label_sp: '',
-                        label_pr: '',
-                        label_fr: ''
-                    }
-                },
-                realmCountryArray: [],
-                organisationCode: ''
             },
             message: '',
             lang: localStorage.getItem('lang'),
-            realmCountryId: '',
-            realmCountryList: [],
-            organisationTypeList: [],
-            organisationTypeId: '',
             loading: true
         }
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.updateFieldData = this.updateFieldData.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -142,41 +110,34 @@ export default class EditOrganisationComponent extends Component {
     }
 
     dataChange(event) {
-        let { organisation } = this.state
+        let { organisationType } = this.state
         console.log(event.target.name);
         console.log(event.target.value);
         if (event.target.name === "organisationName") {
-            organisation.label.label_en = event.target.value
-        } else if (event.target.name === "organisationCode") {
-            organisation.organisationCode = event.target.value.toUpperCase();
-        } else if (event.target.name === "organisationTypeId") {
-            organisation.organisationType.id = event.target.value
+            organisationType.label.label_en = event.target.value
         } else if (event.target.name === "realmId") {
-            organisation.realm.id = event.target.value
+            organisationType.realm.id = event.target.value
         } else if (event.target.name === "active") {
-            organisation.active = event.target.id === "active2" ? false : true
+            organisationType.active = event.target.id === "active2" ? false : true
         }
         this.setState({
-            organisation
+            organisationType
         }, (
         ) => {
-            console.log("state after update---", this.state.organisation)
+            console.log("state after update---", this.state.organisationType)
         })
     }
 
     touchAll(setTouched, errors) {
         setTouched({
             realmId: true,
-            organisationName: true,
-            organisationCode: true,
-            realmCountryId: true,
-            organisationTypeId: true
+            organisationTypeName: true,
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('organisationForm', (fieldName) => {
+        this.findFirstError('organisationTypeForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -193,10 +154,10 @@ export default class EditOrganisationComponent extends Component {
     componentDidMount() {
 
         // AuthenticationService.setupAxiosInterceptors();
-        OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
+        OrganisationTypeService.getOrganisationTypeById(this.props.match.params.organisationTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    organisation: response.data, loading: false
+                    organisationType: response.data, loading: false
                 })
             }
             else {
@@ -211,9 +172,8 @@ export default class EditOrganisationComponent extends Component {
 
             initialValues = {
                 // label: this.props.location.state.healthArea.label.label_en,
-                organisationName: this.state.organisation.label.label_en,
-                organisationCode: this.state.organisation.organisationCode,
-                realmId: this.state.organisation.realm.id
+                organisationTypeName: this.state.organisationType.label.label_en,
+                realmId: this.state.organisationType.realm.id
             }
             UserService.getRealmList()
                 .then(response => {
@@ -227,136 +187,6 @@ export default class EditOrganisationComponent extends Component {
                     this.setState({
                         realms: listArray, loading: false
                     })
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
-
-            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
-                .then(response => {
-                    console.log("Realm Country List list---", response.data);
-                    if (response.status == 200) {
-                        // var json = response.data;
-                        var json = (response.data).filter(c => c.active == true);
-                        var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
-                        for (var i = 0; i < json.length; i++) {
-                            regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
-                        }
-                        var listArray = regList;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        this.setState({
-                            realmCountryList: listArray,
-                            loading: false
-                        })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode, loading: false
-                        })
-                    }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
-
-            OrganisationTypeService.getOrganisationTypeByRealmId(this.state.organisation.realm.id)
-                .then(response => {
-                    console.log("Realm Country List list---", response.data);
-                    if (response.status == 200) {
-                        // var json = response.data;
-                        var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        this.setState({
-                            organisationTypeId: '',
-                            organisationTypeList: listArray,
-                            loading: false,
-                        })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode, loading: false
-                        })
-                    }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
@@ -441,40 +271,11 @@ export default class EditOrganisationComponent extends Component {
 
     }
 
-    updateFieldData(value) {
-
-        var selectedArray = [];
-        for (var p = 0; p < value.length; p++) {
-            selectedArray.push(value[p].value);
-        }
-
-        if (selectedArray.includes("-1")) {
-            this.setState({ realmCountryId: [] });
-            var list = this.state.realmCountryList.filter(c => c.value != -1)
-            this.setState({ realmCountryId: list });
-            var realmCountryId = list;
-        } else {
-            this.setState({ realmCountryId: value });
-            var realmCountryId = value;
-        }
-
-        let { organisation } = this.state;
-        // this.setState({ realmCountryId: value });
-        // var realmCountryId = value;
-        var realmCountryIdArray = [];
-        for (var i = 0; i < realmCountryId.length; i++) {
-            realmCountryIdArray[i] = realmCountryId[i].value;
-        }
-        organisation.realmCountryArray = realmCountryIdArray;
-        this.setState({ organisation: organisation });
-    }
-
     Capitalize(str) {
-        this.state.organisation.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        this.state.organisationType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
 
-    render() {
-        const { selCountries } = this.state;
+    render() {        
         const { realms } = this.state;
 
         let realmList = realms.length > 0
@@ -490,14 +291,6 @@ export default class EditOrganisationComponent extends Component {
                             }
                         })()}
                     </option>
-                )
-            }, this);
-
-        const { organisationTypeList } = this.state;
-        let organisationTypes = organisationTypeList.length > 0
-            && organisationTypeList.map((item, i) => {
-                return (
-                    <option key={i} value={item.organisationTypeId}>{item.label.label_en}</option>
                 )
             }, this);
 
@@ -517,11 +310,8 @@ export default class EditOrganisationComponent extends Component {
                                 initialValues={{
 
                                     // label: this.props.location.state.healthArea.label.label_en,
-                                    organisationName: this.state.organisation.label.label_en,
-                                    organisationCode: this.state.organisation.organisationCode,
-                                    realmId: this.state.organisation.realm.id,
-                                    realmCountryId: this.state.organisation.realmCountryArray,
-                                    organisationTypeId: this.state.organisation.organisationType.id,
+                                    organisationTypeName: this.state.organisationType.label.label_en,
+                                    realmId: this.state.organisationType.realm.id,
 
                                 }}
                                 validate={validate(validationSchema)}
@@ -529,11 +319,11 @@ export default class EditOrganisationComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("state-------------------->" + this.state.organisation);
-                                    OrganisationService.editOrganisation(this.state.organisation)
+                                    // console.log("-------------------->" + this.state.healthArea);
+                                    OrganisationTypeService.editOrganisationType(this.state.organisationType)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/organisation/listOrganisation/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/organisationType/listOrganisationType/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode, loading: false
@@ -599,14 +389,14 @@ export default class EditOrganisationComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm' autocomplete="off">
+                                            <Form onSubmit={handleSubmit} noValidate name='organisationTypeForm' autocomplete="off">
                                                 <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
 
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            value={this.state.organisation.realm.id}
+                                                            value={this.state.organisationType.realm.id}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -619,81 +409,18 @@ export default class EditOrganisationComponent extends Component {
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
 
-                                                    <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Select
-                                                            bsSize="sm"
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-valid': !errors.realmCountryId },
-                                                            //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
-                                                            // )}
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.realmCountryId },
-                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
-                                                            )}
-                                                            name="realmCountryId"
-                                                            id="realmCountryId"
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue("realmCountryId", e);
-                                                                this.updateFieldData(e);
-                                                            }}
-                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
-                                                            multi
-                                                            options={this.state.realmCountryList}
-                                                            value={this.state.organisation.realmCountryArray}
-                                                        />
-                                                        <FormFeedback>{errors.realmCountryId}</FormFeedback>
-                                                    </FormGroup>
-
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationTypeId">{i18n.t('static.organisationType.organisationType')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="organisationTypeId"
-                                                            id="organisationTypeId"
-                                                            bsSize="sm"
-                                                            valid={!errors.organisationTypeId && this.state.organisation.organisationType.id != ''}
-                                                            invalid={touched.organisationTypeId && !!errors.organisationTypeId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            // disabled
-                                                            value={this.state.organisation.organisationType.id}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {organisationTypes}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.organisationTypeId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="organisationTypeName">{i18n.t('static.organisationType.organisationTypeName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationName}
-                                                            // invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
-                                                            invalid={(touched.organisationName && !!errors.organisationName) || !!errors.organisationName}
+                                                            type="text" name="organisationTypeName" valid={!errors.organisationTypeName}
+                                                            // invalid={touched.organisationTypeName && !!errors.organisationTypeName || this.state.organisationType.label.label_en == ''}
+                                                            invalid={(touched.organisationTypeName && !!errors.organisationTypeName) || !!errors.organisationTypeName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.organisation.label.label_en}
-                                                            id="organisationName" />
-                                                        <FormFeedback className="red">{errors.organisationName}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} <span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            // readOnly
-                                                            type="text" name="organisationCode" valid={!errors.organisationCode}
-                                                            // invalid={touched.organisationCode && !!errors.organisationCode}
-                                                            invalid={(touched.organisationCode && !!errors.organisationCode) || !!errors.organisationCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.organisation.organisationCode}
-                                                            id="organisationCode" required />
-                                                        <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
+                                                            value={this.state.organisationType.label.label_en}
+                                                            id="organisationTypeName" />
+                                                        <FormFeedback className="red">{errors.organisationTypeName}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
@@ -705,7 +432,7 @@ export default class EditOrganisationComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.organisation.active === true}
+                                                                checked={this.state.organisationType.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -721,7 +448,7 @@ export default class EditOrganisationComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.organisation.active === false}
+                                                                checked={this.state.organisationType.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -768,20 +495,20 @@ export default class EditOrganisationComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/organisation/listOrganisation/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/organisationType/listOrganisationType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
         // AuthenticationService.setupAxiosInterceptors();
-        OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
+        OrganisationTypeService.getOrganisationTypeById(this.props.match.params.organisationTypeId).then(response => {
             this.setState({
-                organisation: response.data
+                organisationType: response.data
             })
             // initialValues = {
             //     // label: this.props.location.state.healthArea.label.label_en,
-            //     organisationName: this.state.organisation.label.label_en,
-            //     organisationCode: this.state.organisation.organisationCode,
-            //     realmId: this.state.organisation.realm.id
+            //     organisationTypeName: this.state.organisationType.label.label_en,
+            //     organisationTypeCode: this.state.organisationType.organisationTypeCode,
+            //     realmId: this.state.organisationType.realm.id
             // }
             UserService.getRealmList()
                 .then(response => {
@@ -789,64 +516,6 @@ export default class EditOrganisationComponent extends Component {
                     this.setState({
                         realms: response.data, loading: false
                     })
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
-            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
-                .then(response => {
-                    console.log("Realm Country List list---", response.data);
-                    if (response.status == 200) {
-                        var json = response.data;
-                        var regList = [];
-                        for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
-                        }
-                        this.setState({
-                            realmCountryList: regList, loading: false
-                        })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode
-                        })
-                    }
                 }).catch(
                     error => {
                         if (error.message === "Network Error") {
