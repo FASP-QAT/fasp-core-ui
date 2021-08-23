@@ -291,8 +291,8 @@ export default class SyncMasterData extends Component {
                             programJson.actionList = actionList;
                             programJson.batchInfoList = batchInfoList;
                             programJson.problemReportList = problemReportList;
-                            prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1)).length;
-                            prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3)).length;
+                            prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false )).length;
+                            prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false )).length;
                             prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var db1;
                             var storeOS;
