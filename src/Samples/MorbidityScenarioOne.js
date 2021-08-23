@@ -4,7 +4,7 @@ import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotati
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faEdit,faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../i18n'
 // import { Col, Row, Card, Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -567,6 +567,12 @@ export default class MorbidityScenarioOne extends Component {
                         }}>
                         <FontAwesomeIcon icon={faEdit} />
                     </button>
+                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}>
+                        <FontAwesomeIcon icon={faArrowsAlt} />
+                    </button>
                     {itemConfig.parent != null &&
                         <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
                             onClick={(event) => {
@@ -623,7 +629,7 @@ export default class MorbidityScenarioOne extends Component {
                                         style={{ clear: 'both' }}
                                     >
                                         <OrgDiagram centerOnCursor={true} config={config}
-                                        //onCursorChanged={this.onCursorChanged}
+                                        // onCursorChanged={(e)=>{this.onCursorChanged}}
                                         />
                                     </div>
                                 </Provider>
