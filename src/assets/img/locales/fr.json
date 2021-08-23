@@ -5,13 +5,9 @@
     "static.mt.reminders2A2": "Envois avec le statut «Reçu» (au cours des 6 derniers mois)",
     "static.currency.currencyName": "Nom de la devise",
     "static.dataSourceType.dataSourceTypeName": "Nom du type de source de données",
-<<<<<<< HEAD
-=======
     "static.dashboard.delinking": "Dissociation de l`envoi ERP",
->>>>>>> QAT-1052
     "static.realm.default": "Défaut",
     "static.mt.isAddressed": "Adressé?",
-    "static.dashboard.delinking": "Dissociation de l`envoi ERP",
     "static.program.yes": "Oui",
     "static.program.healtharea": "Domaine technique",
     "static.mt.notAddressed": "Pas adressé",
