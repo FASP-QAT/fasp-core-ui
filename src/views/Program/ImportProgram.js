@@ -252,6 +252,8 @@ export default class ImportProgram extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
+                                                var readonly=json.readonly;
+                                                delete json.readonly;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                 console.log("M sync country transaction start")
@@ -398,6 +400,7 @@ export default class ImportProgram extends Component {
                                                     openCount: openCount,
                                                     addressedCount: addressedCount,
                                                     programModified: programModified,
+                                                    readonly:readonly
                                                 }
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
@@ -469,6 +472,8 @@ export default class ImportProgram extends Component {
                                                                 delete json.regionList;
                                                                 var budgetList = json.budgetList;
                                                                 delete json.budgetList;
+                                                                var readonly=json.readonly;
+                                                                delete json.readonly;
 
                                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                                 console.log("M sync country transaction start")
@@ -613,6 +618,7 @@ export default class ImportProgram extends Component {
                                                                     openCount: openCount,
                                                                     addressedCount: addressedCount,
                                                                     programModified: programModified,
+                                                                    readonly:readonly
                                                                 }
                                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');

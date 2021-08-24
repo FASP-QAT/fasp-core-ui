@@ -153,6 +153,12 @@ export default class ExportProgram extends Component {
                         // Handle errors!
                     };
                     dGetRequest.onsuccess = function (event) {
+                        var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+                var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                var programQPLDetailsGetRequest = programQPLDetailsOs1.getAll();
+                programQPLDetailsGetRequest.onsuccess = function (event) {
+                    var programQPLResult=[];
+                    programQPLResult=programQPLDetailsGetRequest.result;
                         var dMyResult = [];
                         dMyResult = dGetRequest.result;
                         var countryTransaction = db1.transaction(['country'], 'readwrite');
@@ -245,6 +251,8 @@ export default class ExportProgram extends Component {
                                                                                     myResult[i].programPlanningUnitList = programPlanningUnitList;
                                                                                     myResult[i].regionList = regionList;
                                                                                     myResult[i].budgetList = budgetList;
+                                                                                    var readonly=programQPLResult.filter(c => c.id == programId[j].value)[0];
+                                                                                    myResult[i].readonly=readonly;
                                                                                     var txt = JSON.stringify(myResult[i]);
                                                                                     var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
                                                                                     var txt1 = JSON.stringify(dArray)
@@ -284,6 +292,7 @@ export default class ExportProgram extends Component {
                     }.bind(this);
                 }.bind(this)
             }.bind(this)
+        }.bind(this)
         } else {
             console.log("in ekse")
             this.setState({

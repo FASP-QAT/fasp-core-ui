@@ -184,5 +184,10 @@ class ProgramService {
         );
     }
 
+    checkIfCommitRequestExists(programId){
+        return axios.get(`${API_URL}/api/programData/checkIfCommitRequestExistsForProgram/${programId}`, {}
+        );
+    }
+
 }
 export default new ProgramService()

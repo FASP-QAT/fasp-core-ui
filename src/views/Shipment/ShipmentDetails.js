@@ -599,7 +599,8 @@ export default class ShipmentDetails extends React.Component {
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
-                    loading: false
+                    loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -757,7 +758,7 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentTypeIds).includes(1)) {
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
