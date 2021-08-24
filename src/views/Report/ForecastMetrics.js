@@ -655,7 +655,7 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].message != null ? i18n.t(consumptions[j].message) : this.roundN(consumptions[j].forecastError) + "%";
+      data[2] = consumptions[j].message != null ? "" : this.roundN(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
       data[4] = this.roundN(consumptions[j].forecastError);
 
@@ -688,7 +688,8 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.error'),
-          type: 'text',
+          type:'numeric',
+          mask: '#,##%',
         },
         {
           title: i18n.t('static.report.noofmonth'),
