@@ -16,7 +16,7 @@ export default class ProblemListDashboardComponent extends React.Component {
     }
 
     componentDidMount() {
-        var problemListUnFilttered = this.props.problemListUnFilttered;
+        var problemListUnFilttered = this.props.problemListUnFilttered.filter(c=> c.planningUnitActive != false && c.regionActive != false);
         var problemCategoryList = this.props.problemCategoryList;
         var problemStatusList = this.props.problemStatusList.filter(c => c.id != PROBLEM_STATUS_IN_COMPLIANCE);
         var problemStatusListSorted = [];
