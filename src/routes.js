@@ -16,6 +16,10 @@ const AddOrganisation = React.lazy(() => import('./views/Organisation/AddOrganis
 const OrganisationList = React.lazy(() => import('./views/Organisation/OrganisationList'));
 const EditOrganisation = React.lazy(() => import('./views/Organisation/EditOrganisation'));
 
+const AddOrganisationType = React.lazy(() => import('./views/OrganisationType/AddOrganisationType'));
+const OrganisationTypeList = React.lazy(() => import('./views/OrganisationType/OrganisationTypeList'));
+const EditOrganisationType = React.lazy(() => import('./views/OrganisationType/EditOrganisationType'));
+
 const AddSubFundingSource = React.lazy(() => import('./views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/SubFundingSource/EditSubFundingSourceComponent'));
@@ -312,6 +316,12 @@ const routes = [
   { path: '/organisation/listOrganisation/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisation.organisation') }), component: OrganisationList },
   { path: '/organisation/listOrganisation', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisation.organisation') }), component: OrganisationList },
   { path: '/organisation/editOrganisation/:organisationId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisation.organisationheader') }), component: EditOrganisation },
+
+  { path: '/organisationType/addOrganisationType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.organisationType.organisationType') }), component: AddOrganisationType },
+  // { path: '/organisationType/listOrganisationType/:message', component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisationType.organisationType') }), component: OrganisationTypeList },
+  { path: '/organisationType/listOrganisationType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisationType.organisationType') }), component: OrganisationTypeList },
+  { path: '/organisationType/editOrganisationType/:organisationTypeId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisationType.organisationType') }), component: EditOrganisationType },
 
   { path: '/fundingSource/addFundingSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.fundingsourceheader') }), component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.fundingsource') }), component: ListFundingSource },

@@ -58,6 +58,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('organisation')) {
             storeOS = db1.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('organisationType')) {
+            storeOS = db1.createObjectStore('organisationType', { keyPath: 'organisationTypeId', autoIncrement: true });
+        }
         if (!db1.objectStoreNames.contains('healthArea')) {
             storeOS = db1.createObjectStore('healthArea', { keyPath: 'healthAreaId', autoIncrement: true });
         }
