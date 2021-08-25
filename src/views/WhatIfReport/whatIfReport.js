@@ -423,6 +423,9 @@ export default class WhatIfReportComponent extends React.Component {
                     this.hideFirstComponent()
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
+                    this.setState({
+                        programJson:programJson
+                    })
                     this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     this.setState({
                         message: i18n.t('static.whatIf.supplyPlanReset'),
@@ -4172,8 +4175,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <tr id="addr0" key={idx}>
                                                     <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td>
                                                     <td>{this.state.rows[idx].scenarioName}</td>
-                                                    <td>{moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                    <td>{moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                    <td>{this.state.rows[idx].startDate!=""?moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE):""}</td>
+                                                    <td>{this.state.rows[idx].stopDate!=""?moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE):""}</td>
                                                     <td>{this.state.rows[idx].percentage}</td>
 
                                                 </tr>
