@@ -189,5 +189,10 @@ class ProgramService {
         );
     }
 
+    getCommitRequests(json){
+        return axios.post(`${API_URL}/api/getCommitRequest`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()
