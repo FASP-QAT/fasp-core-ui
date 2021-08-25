@@ -34,9 +34,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
             programRequest.onerror = function (event) {
             }.bind(this);
             programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programDataJson = programRequest.result.programData;
+                var planningUnitDataList = programDataJson.planningUnitDataList;
+                var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
 
                 // Getting program planning unit
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -55,7 +62,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programQPLDetailsJsonRequest.onsuccess = function (e) {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
                         if (objectStoreName != "whatIfProgramData") {
-                            if(page!="masterDataSync"){
+                            if (page != "masterDataSync") {
                                 programQPLDetailsJson.programModified = 1;
                             }
                         }
@@ -71,16 +78,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         // Getting region details
                         var regionListFiltered = [];
                         var regionList = [];
-                        for (var i = 0; i < programJsonForStoringTheResult.regionList.length; i++) {
+                        for (var i = 0; i < generalProgramJson.regionList.length; i++) {
                             var regionJson = {
-                                id: programJsonForStoringTheResult.regionList[i].regionId
+                                id: generalProgramJson.regionList[i].regionId
                             }
                             regionList.push(regionJson);
                         }
                         regionListFiltered = regionList;
 
                         // Filtering program planning unit based on program Id and active is true
-                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == programJsonForStoringTheResult.programId && c.active.toString() == "true");
+                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == generalProgramJson.programId && c.active.toString() == "true");
                         // Filter planning unit list for single planning unit
                         if (planningUnitId != 0) {
                             programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
@@ -724,7 +731,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                     if (Number(unallocatedFEFO) < 0 || Number(unallocatedFEFOWps) < 0) {
-                                        var batchNo = (BATCH_PREFIX).concat(programJsonForStoringTheResult.programId).concat(programPlanningUnitList[ppL].planningUnit.id).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                        var batchNo = (BATCH_PREFIX).concat(generalProgramJson.programId).concat(programPlanningUnitList[ppL].planningUnit.id).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                         var json = {
                                             batchId: 0,
                                             batchNo: batchNo,
@@ -877,7 +884,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     // Calculations for Min stock
                                     var maxForMonths = 0;
-                                    var realm = programJsonForStoringTheResult.realmCountry.realm;
+                                    var realm = generalProgramJson.realmCountry.realm;
                                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                     var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
                                     if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnitList[ppL].minMonthsOfStock) {
@@ -946,8 +953,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         mos = 0;
                                     }
                                     var json = {
-                                        programId: programJsonForStoringTheResult.programId,
-                                        versionId: programJsonForStoringTheResult.currentVersion.versionId,
+                                        programId: generalProgramJson.programId,
+                                        versionId: generalProgramJson.currentVersion.versionId,
                                         planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
                                         transDate: startDate,
                                         stockQty: actualStockCount === "" ? null : actualStockCount,
@@ -1002,7 +1009,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         }
                         programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                         programJsonForStoringTheResult.supplyPlan = supplyPlanData;
-                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
+
+
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData=(CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
+                        programDataJson.planningUnitDataList=planningUnitDataList;
+                        programRequest.result.programData = programDataJson;
+
                         var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
                         var programDataOs = programDataTransaction.objectStore(objectStoreName);
                         var putRequest = programDataOs.put(programRequest.result);
@@ -1082,7 +1094,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.hideFirstComponent()
                                 } else if (page == "whatIf") {
                                     props.updateState("programJson", programJsonForStoringTheResult);
-                                    props.updateState("message",i18n.t('static.whatIf.scenarioAdded'));
+                                    props.updateState("message", i18n.t('static.whatIf.scenarioAdded'));
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("loading", false);
                                 } else if (page == "supplyPlan") {

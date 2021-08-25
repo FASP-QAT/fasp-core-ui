@@ -787,9 +787,15 @@ export default class ShipmentDetails extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                        var planningUnitData=planningUnitDataList.filter(c=>c.planningUnitId==planningUnitId)[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
+
+                        var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                        var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                        var generalProgramJson = JSON.parse(generalProgramData);
 
                         var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
                         var shipmentListUnFiltered = programJson.shipmentList;
@@ -807,6 +813,7 @@ export default class ShipmentDetails extends React.Component {
                             shelfLife: programPlanningUnit.shelfLife,
                             catalogPrice: programPlanningUnit.catalogPrice,
                             programJson: programJson,
+                            generalProgramJson:generalProgramJson,
                             shipmentListUnFiltered: shipmentListUnFiltered,
                             shipmentList: shipmentList,
                             showShipments: 1,
