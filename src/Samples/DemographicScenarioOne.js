@@ -1518,7 +1518,7 @@ export default class DemographicScenarioOne extends Component {
                             <div className="mb-lg-0 ">
                                 <div className="Card-header-addicon" style={{ padding: '0px 0px 10px 24px' }}>
                                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
-                                    <div className="card-header-actions">
+                                    <div className="card-header-actions" style={{display:'flex'}}>
                                         <div className="card-header-action">
                                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATA_SOURCE') && <a href="javascript:void();" title={'Create Manual Tree'} onClick={this.createNewTree}><i className="fa fa-plus-square"></i></a>}
                                         </div>
