@@ -3428,10 +3428,22 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var planningUnitId = document.getElementById("planningUnitId").value
                     var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
-                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            problemReportList: [],
+                            supplyPlan: []
+                        }
+                    }
                     var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                     var generalProgramJson = JSON.parse(generalProgramData);
@@ -3831,7 +3843,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     })
                     programJson.shipmentList = shipmentDataList;
                     generalProgramJson.actionList = actionList;
-                    planningUnitDataList[planningUnitDataIndex].planningUnitData=(CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
                     programDataJson.planningUnitDataList=planningUnitDataList;
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);

@@ -787,11 +787,24 @@ export default class ShipmentDetails extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                        var planningUnitData=planningUnitDataList.filter(c=>c.planningUnitId==planningUnitId)[0];
-                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                        var programJson = {};
+                        if (planningUnitDataFilter.length > 0) {
+                            var planningUnitData = planningUnitDataFilter[0]
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                problemReportList: [],
+                                supplyPlan: []
+                            }
+                        }
 
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
