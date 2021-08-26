@@ -1194,12 +1194,13 @@ export default class syncPage extends Component {
 
         proList.sort((a, b) => {
           var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                  
+          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
           return itemLabelA > itemLabelB ? 1 : -1;
         });
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
+          if(proList.length>0){
           if (proList.length == 1) {
             this.setState({
               versionTypeList: response.data,
@@ -1227,6 +1228,7 @@ export default class syncPage extends Component {
               loading: false
             })
           }
+        }
         })
           .catch(
             error => {
@@ -3024,7 +3026,7 @@ export default class syncPage extends Component {
                                       <InputGroup>
                                         <Input type="textarea"
                                           name="notes"
-                                          // maxLength={600}
+                                          // maxLength={600} 
                                           id="notes"
                                           valid={!errors.notes && this.state.notes != ''}
                                           invalid={touched.notes && !!errors.notes}
@@ -3304,6 +3306,12 @@ export default class syncPage extends Component {
             var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
+
+            var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+                var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
+                programQPLDetailsGetRequest.onsuccess = function (event) {
+                  var programQPLDetails=programQPLDetailsGetRequest.result;
             // var planningUnitList = [];
             // var consumptionData = [];
             // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
@@ -3369,73 +3377,78 @@ export default class syncPage extends Component {
             ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
               if (response.status == 200) {
                 if (response.data == this.state.comparedLatestVersion) {
+                  ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
+                    if (response1.status == 200) {
+                      if(response1.data==false){
                   ProgramService.saveProgramData(programJson).then(response => {
                     if (response.status == 200) {
-                      var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-                      var programDataOs1 = programDataTransaction1.objectStore('programData');
-                      var programRequest1 = programDataOs1.delete((this.state.programId).value);
+                      // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                      // var programDataOs1 = programDataTransaction1.objectStore('programData');
+                      // var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-                      var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-                      var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-                      var programRequest3 = programDataOs3.delete((this.state.programId).value);
+                      // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                      // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                      // var programRequest3 = programDataOs3.delete((this.state.programId).value);
 
-                      var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                      var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-                      var programRequest2 = programDataOs2.delete((this.state.programId).value);
+                      // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                      // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                      // var programRequest2 = programDataOs2.delete((this.state.programId).value);
 
-                      programRequest1.onerror = function (event) {
-                        this.setState({
-                          supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                      }.bind(this);
-                      programRequest2.onsuccess = function (e) {
+                      // programRequest1.onerror = function (event) {
+                      //   this.setState({
+                      //     supplyPlanError: i18n.t('static.program.errortext')
+                      //   })
+                      // }.bind(this);
+                      // programRequest2.onsuccess = function (e) {
 
-                        var json = response.data;
-                        json.actionList = [];
-                        var version = json.requestedProgramVersion;
-                        if (version == -1) {
-                          version = json.currentVersion.versionId
-                        }
+                      //   var json = response.data;
+                      //   json.actionList = [];
+                      //   var version = json.requestedProgramVersion;
+                      //   if (version == -1) {
+                      //     version = json.currentVersion.versionId
+                      //   }
 
-                        var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                        var programSaveData = transactionForSavingData.objectStore('programData');
+                        // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                        // var programSaveData = transactionForSavingData.objectStore('programData');
 
-                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                      //   var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                      //   var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
 
                         var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                        // for (var i = 0; i < json.length; i++) {
-                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                        var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                      //   // for (var i = 0; i < json.length; i++) {
+                      //   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                      //   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                      //   var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                      //   var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                      //   var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
 
-                        var item = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                          programData: encryptedText.toString(),
-                          userId: userId
-                        };
-                        var programQPLDetails = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          userId: userId,
-                          programCode: json.programCode,
-                          openCount: openCount,
-                          addressedCount: addressedCount,
-                          programModified: 0
-                        }
-                        var putRequest = programSaveData.put(item);
-                        var putRequest1 = downloadedProgramSaveData.put(item);
+                      //   var item = {
+                      //     id: json.programId + "_v" + version + "_uId_" + userId,
+                      //     programId: json.programId,
+                      //     version: version,
+                      //     programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                      //     programData: encryptedText.toString(),
+                      //     userId: userId
+                      //   };
+                        // var programQPLDetails = {
+                        //   id: json.programId + "_v" + version + "_uId_" + userId,
+                        //   programId: json.programId,
+                        //   version: version,
+                        //   userId: userId,
+                        //   programCode: json.programCode,
+                        //   openCount: openCount,
+                        //   addressedCount: addressedCount,
+                        //   programModified: 0
+                        // }
+                        programQPLDetails.readonly=1;
+                        // var putRequest = programSaveData.put(programRequest.result);
+                      //   var putRequest1 = downloadedProgramSaveData.put(item);
                         var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                        // this.redirectToDashbaord();
-                      }.bind(this)
+
+                      //   this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                        this.redirectToDashbaord();
+                      // }.bind(this)
                     } else {
                       this.setState({
                         message: response.data.messageCode,
@@ -3444,63 +3457,142 @@ export default class syncPage extends Component {
                       })
                       this.hideFirstComponent();
                     }
-                  }).catch(
-                    error => {
-                      console.log("@@@Error4", error);
-                      console.log("@@@Error4", error.message);
-                      console.log("@@@Error4", error.response ? error.response.status : "")
-                      if (error.message === "Network Error") {
-                        console.log("+++in catch 7")
-                        this.setState({
-                          message: 'static.common.networkError',
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent();
-                        });
-                      } else {
-                        switch (error.response ? error.response.status : "") {
+                  })
+                    .catch(
+                      error => {
+                        console.log("@@@Error4", error);
+                        console.log("@@@Error4", error.message);
+                        console.log("@@@Error4", error.response ? error.response.status : "")
+                        if (error.message === "Network Error") {
+                          console.log("+++in catch 7")
+                          this.setState({
+                            message: 'static.common.networkError',
+                            color: "red",
+                            loading: false
+                          }, () => {
+                            this.hideFirstComponent();
+                          });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
 
-                          case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                          case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                          case 500:
-                          case 404:
-                          case 406:
-                            this.setState({
-                              message: error.response.data.messageCode,
-                              color: "red",
-                              loading: false
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
-                          case 412:
-                            this.setState({
-                              message: error.response.data.messageCode,
-                              loading: false,
-                              color: "red"
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
-                          default:
-                            console.log("+++in catch 8")
-                            this.setState({
-                              message: 'static.unkownError',
-                              loading: false,
-                              color: "red"
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
+                            case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                            case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                            case 500:
+                            case 404:
+                            case 406:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                color: "red",
+                                loading: false
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            case 412:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            default:
+                              console.log("+++in catch 8")
+                              this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                          }
                         }
                       }
+                    );
+                  } else {
+                    alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+                    this.setState({
+                      message: i18n.t("static.commitVersion.requestAlreadyExists"),
+                      loading: false,
+                      color: "red"
+                    }, () => {
+                      this.hideFirstComponent()
+                      // this.checkLastModifiedDateForProgram(this.state.programId);
+                    });
+  
+                  }
+                } else {
+                  this.setState({
+                    message: response.data.messageCode,
+                    color: "red",
+                    loading: false
+                  })
+                  this.hideFirstComponent();
+                }
+              })
+                .catch(
+                  error => {
+                    console.log("@@@Error5", error);
+                    console.log("@@@Error5", error.message);
+                    console.log("@@@Error5", error.response ? error.response.status : "")
+                    if (error.message === "Network Error") {
+                      console.log("+++in catch 9")
+                      this.setState({
+                        message: 'static.common.networkError',
+                        color: "red",
+                        loading: false
+                      }, () => {
+                        this.hideFirstComponent();
+                      });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+  
+                        case 401:
+                          this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 403:
+                          this.props.history.push(`/accessDenied`)
+                          break;
+                        case 500:
+                        case 404:
+                        case 406:
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            color: "red",
+                            loading: false
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                        case 412:
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                        default:
+                          console.log("+++in catch 10")
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                      }
                     }
-                  );
+                  }
+                );
                 } else {
                   alert(i18n.t("static.commitVersion.versionIsOutDated"));
                   this.setState({
@@ -3581,6 +3673,7 @@ export default class syncPage extends Component {
               );
           }.bind(this)
         }.bind(this)
+      }.bind(this)
       }
     } else {
       this.setState({ "noFundsBudgetError": i18n.t('static.label.noFundsAvailable'), loading: false });
@@ -3676,7 +3769,7 @@ export default class syncPage extends Component {
             }
             // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
             //   index = latestProgramDataProblemList.findIndex(
-            //     f =>
+            //     f => 
             //       moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
             //       && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
             //       && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
