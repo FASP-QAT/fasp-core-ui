@@ -1694,15 +1694,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     })
                     programJson.inventoryList = inventoryDataList;
                     generalProgramJson.actionList = actionList;
-                    this.setState({
-                        programJson: programJson
-                    })
                     if (planningUnitDataIndex != -1) {
                         planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     } else {
                         planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                     }
+                    this.setState({
+                        programJson: programJson,
+                        planningUnitDataList:planningUnitDataList
+                    })
                     programDataJson.planningUnitDataList=planningUnitDataList;
+                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 

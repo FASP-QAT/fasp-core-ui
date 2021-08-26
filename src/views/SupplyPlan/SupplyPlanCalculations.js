@@ -1049,6 +1049,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.toggleLarge('Consumption');
                                         if (props.consumptionPage != "supplyPlanCompare") {
                                             props.updateState("programJson", programJsonForStoringTheResult);
+                                            props.updateState("planningUnitDataList",planningUnitDataList);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1072,6 +1073,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.toggleLarge('Adjustments');
                                         if (props.inventoryPage != "supplyPlanCompare") {
                                             props.updateState("programJson", programJsonForStoringTheResult);
+                                            props.updateState("planningUnitDataList",planningUnitDataList);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1097,6 +1099,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         props.toggleLarge('shipments');
                                         if (props.shipmentPage != "supplyPlanCompare") {
                                             props.updateState("programJson", programJsonForStoringTheResult);
+                                            props.updateState("planningUnitDataList",planningUnitDataList);
                                             props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                         } else {
                                             props.formSubmit(props.items.monthCount);
@@ -1109,6 +1112,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.hideFirstComponent()
                                 } else if (page == "whatIf") {
                                     props.updateState("programJson", programJsonForStoringTheResult);
+                                    props.updateState("planningUnitDataList",planningUnitDataList);
                                     props.updateState("message", i18n.t('static.whatIf.scenarioAdded'));
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("loading", false);

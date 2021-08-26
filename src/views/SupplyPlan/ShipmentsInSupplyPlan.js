@@ -3849,6 +3849,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                     }
                     programDataJson.planningUnitDataList=planningUnitDataList;
+                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
