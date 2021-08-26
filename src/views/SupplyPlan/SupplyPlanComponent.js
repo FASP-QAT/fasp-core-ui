@@ -2344,7 +2344,8 @@ export default class SupplyPlanComponent extends React.Component {
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
-                    loading: false
+                    loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 var programIdd = '';
@@ -3464,7 +3465,7 @@ export default class SupplyPlanComponent extends React.Component {
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
                 } else {
                     this.setState({
                         shipments: !this.state.shipments
@@ -4235,7 +4236,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
 
         var roleList = AuthenticationService.getLoggedInUserRole();
-        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
             if (document.getElementById("addRowId") != null) {
                 document.getElementById("addRowId").style.display = "none"
             }

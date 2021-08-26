@@ -1011,7 +1011,8 @@ class Program extends Component {
                                                                     programCode: json[r].programCode,
                                                                     openCount: 0,
                                                                     addressedCount: 0,
-                                                                    programModified: 0
+                                                                    programModified: 0,
+                                                                    readonly:0
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1118,7 +1119,8 @@ class Program extends Component {
                                                     programCode: json[r].programCode,
                                                     openCount: 0,
                                                     addressedCount: 0,
-                                                    programModified: 0
+                                                    programModified: 0,
+                                                    readonly:0
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);

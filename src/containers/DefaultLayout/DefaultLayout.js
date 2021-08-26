@@ -221,6 +221,7 @@ const PlanningUnitCountryList = React.lazy(() => import('../../views/RealmCountr
 const PlanningUnitCapacityList = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('../../views/RealmCountry/RealmCountryRegion'));
 const syncPage = React.lazy(() => import('../../views/Synchronisation/syncPage'));
+const commitRequest = React.lazy(() => import('../../views/Synchronisation/CommitRequest'));
 
 const ProductCatalog = React.lazy(() => import('../../views/Report/ProductCatalog'));
 const ConsumptionReport = React.lazy(() => import('../../views/Report/Consumption'));
@@ -438,6 +439,7 @@ const routes = [
   { path: '/dashboard/:color/:message', component: Dashboard },
   { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
+  { path: '/program/commitRequest', name: "static.dashboard.commitRequest", component: commitRequest },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
   { path: '/program/importProgram', name: 'static.dashboard.importprogram', component: ImportProgram },
@@ -1414,6 +1416,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
+                            icon: 'fa fa-upload',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.commitRequest'),
+                            url: '/program/commitRequest',
                             icon: 'fa fa-upload',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
                           },
