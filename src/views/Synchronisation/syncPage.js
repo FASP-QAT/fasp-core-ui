@@ -1194,7 +1194,7 @@ export default class syncPage extends Component {
 
         proList.sort((a, b) => {
           var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                  
+          var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
           return itemLabelA > itemLabelB ? 1 : -1;
         });
 
@@ -3026,7 +3026,7 @@ export default class syncPage extends Component {
                                       <InputGroup>
                                         <Input type="textarea"
                                           name="notes"
-                                          // maxLength={600}
+                                          // maxLength={600} 
                                           id="notes"
                                           valid={!errors.notes && this.state.notes != ''}
                                           invalid={touched.notes && !!errors.notes}
@@ -3457,62 +3457,63 @@ export default class syncPage extends Component {
                       })
                       this.hideFirstComponent();
                     }
-                  }).catch(
-                    error => {
-                      console.log("@@@Error4", error);
-                      console.log("@@@Error4", error.message);
-                      console.log("@@@Error4", error.response ? error.response.status : "")
-                      if (error.message === "Network Error") {
-                        console.log("+++in catch 7")
-                        this.setState({
-                          message: 'static.common.networkError',
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent();
-                        });
-                      } else {
-                        switch (error.response ? error.response.status : "") {
+                  })
+                    .catch(
+                      error => {
+                        console.log("@@@Error4", error);
+                        console.log("@@@Error4", error.message);
+                        console.log("@@@Error4", error.response ? error.response.status : "")
+                        if (error.message === "Network Error") {
+                          console.log("+++in catch 7")
+                          this.setState({
+                            message: 'static.common.networkError',
+                            color: "red",
+                            loading: false
+                          }, () => {
+                            this.hideFirstComponent();
+                          });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
 
-                          case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                          case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                          case 500:
-                          case 404:
-                          case 406:
-                            this.setState({
-                              message: error.response.data.messageCode,
-                              color: "red",
-                              loading: false
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
-                          case 412:
-                            this.setState({
-                              message: error.response.data.messageCode,
-                              loading: false,
-                              color: "red"
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
-                          default:
-                            console.log("+++in catch 8")
-                            this.setState({
-                              message: 'static.unkownError',
-                              loading: false,
-                              color: "red"
-                            }, () => {
-                              this.hideFirstComponent()
-                            });
-                            break;
+                            case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                            case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                            case 500:
+                            case 404:
+                            case 406:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                color: "red",
+                                loading: false
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            case 412:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                            default:
+                              console.log("+++in catch 8")
+                              this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: "red"
+                              }, () => {
+                                this.hideFirstComponent()
+                              });
+                              break;
+                          }
                         }
                       }
-                    }
                     );
                   } else {
                     alert(i18n.t("static.commitVersion.requestAlreadyExists"));
@@ -3768,7 +3769,7 @@ export default class syncPage extends Component {
             }
             // else if (oldProgramDataProblemList[c].realmProblem.problem.problemId == 11 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 16 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 17 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 18 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 19 || oldProgramDataProblemList[c].realmProblem.problem.problemId == 20) {
             //   index = latestProgramDataProblemList.findIndex(
-            //     f =>
+            //     f => 
             //       moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM")
             //       && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
             //       && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId);
