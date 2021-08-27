@@ -4627,6 +4627,7 @@ z-index:999;
 //   color: #fff;
 //   background: #71bba2f7!important;
 // }
+
 .sidebar.module2 .nav-link:hover {
   color:#002f6c;
   background: #71bba2f7;
@@ -4837,3 +4838,7 @@ z-index:999;
       color: #fff !important;
   }
   }
+.sidebar .nav-dropdown{
+  background: none !important;
+  width: 200px;
+}
