@@ -1142,7 +1142,7 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healthareas')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             valid={!errors.healthAreaId && this.state.program.healthArea.id != ''}
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
