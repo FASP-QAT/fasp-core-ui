@@ -358,7 +358,7 @@ class ShipmentSummery extends Component {
             ((re[item].budget.code == null || re[item].budget.code == "") ? '' : (re[item].budget.code).replaceAll(' ', '%20')),
             // (re[item].budget.code).replaceAll(' ', '%20'),
             (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate, 'yyyy-MM-dd').format('MMM YYYY').replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate).format(DATE_FORMAT_CAP).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),
