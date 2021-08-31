@@ -185,7 +185,7 @@ export default class AddPlanningUnit extends Component {
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
-                        console.log(response.data)
+                        console.log("RESP----->", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -310,7 +310,7 @@ export default class AddPlanningUnit extends Component {
             && forecastingUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.forecastingUnitId}>
-                        {item.label.label_en}
+                        {item.label.label_en + "-" + item.unit.label.label_en}
                     </option>
                 )
             }, this);

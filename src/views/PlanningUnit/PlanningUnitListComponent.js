@@ -538,7 +538,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-                                                console.log(response.data)
+                                                console.log("RESP----->", response.data);
                                                 this.setState({
                                                     planningUnitList: response.data,
                                                     selSource: response.data,
