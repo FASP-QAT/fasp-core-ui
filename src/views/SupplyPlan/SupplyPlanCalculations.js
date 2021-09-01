@@ -36,23 +36,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
             programRequest.onsuccess = function (e) {
                 var programDataJson = programRequest.result.programData;
                 var planningUnitDataList = programDataJson.planningUnitDataList;
-                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                var programJson = {};
-                if (planningUnitDataIndex != -1) {
-                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    programJson = JSON.parse(programData);
-                } else {
-                    programJson = {
-                        consumptionList: [],
-                        inventoryList: [],
-                        shipmentList: [],
-                        batchInfoList: [],
-                        problemReportList: [],
-                        supplyPlan: []
-                    }
-                }
+                
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
@@ -79,14 +63,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             }
                         }
                         var programPlanningUnitList = myResult;
-                        var programJsonForStoringTheResult = programJson;
-                        var coreBatchDetails = programJsonForStoringTheResult.batchInfoList;
-
-                        // Checking if data exists
-                        var supplyPlanData = programJsonForStoringTheResult.supplyPlan;
-                        if (supplyPlanData == undefined) {
-                            supplyPlanData = []
-                        }
+                        
                         // Getting region details
                         var regionListFiltered = [];
                         var regionList = [];
@@ -120,6 +97,31 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             programPlanningUnitList = programPlanningUnitList.filter(c => c != undefined);
                             // Loop across filtered planning unit
                             for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
+                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                var programJson = {};
+                if (planningUnitDataIndex != -1) {
+                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id))[0];
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        problemReportList: [],
+                        supplyPlan: []
+                    }
+                }
+                var programJsonForStoringTheResult = programJson;
+                        var coreBatchDetails = programJsonForStoringTheResult.batchInfoList;
+
+                        // Checking if data exists
+                        var supplyPlanData = programJsonForStoringTheResult.supplyPlan;
+                        if (supplyPlanData == undefined) {
+                            supplyPlanData = []
+                        }
                                 // Getting max data entry date
                                 var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                                 var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
@@ -1014,18 +1016,18 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     supplyPlanData.push(json);
                                 }
+                                programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
+                                programJsonForStoringTheResult.supplyPlan = supplyPlanData;
+        
+                                if (planningUnitDataIndex != -1) {
+                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
+                                }else{
+                                    planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString() });
+                                }
                             }
                         } catch (err) {
                             console.log("@@@ in error in calculate")
                             props.fetchData(1, programId)
-                        }
-                        programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
-                        programJsonForStoringTheResult.supplyPlan = supplyPlanData;
-
-                        if (planningUnitDataIndex != -1) {
-                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
-                        }else{
-                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString() });
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
                         programRequest.result.programData = programDataJson;
