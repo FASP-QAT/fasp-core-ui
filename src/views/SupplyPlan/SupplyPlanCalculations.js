@@ -110,7 +110,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                         inventoryList: [],
                         shipmentList: [],
                         batchInfoList: [],
-                        problemReportList: [],
                         supplyPlan: []
                     }
                 }

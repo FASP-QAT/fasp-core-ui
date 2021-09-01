@@ -3440,7 +3440,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }

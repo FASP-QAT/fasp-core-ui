@@ -801,7 +801,6 @@ export default class ShipmentDetails extends React.Component {
                                 inventoryList: [],
                                 shipmentList: [],
                                 batchInfoList: [],
-                                problemReportList: [],
                                 supplyPlan: []
                             }
                         }

@@ -1352,7 +1352,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }

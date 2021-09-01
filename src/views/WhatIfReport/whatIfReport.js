@@ -379,7 +379,6 @@ export default class WhatIfReportComponent extends React.Component {
                 inventoryList: [],
                 shipmentList: [],
                 batchInfoList: [],
-                problemReportList: [],
                 supplyPlan: []
             }
         }
@@ -624,7 +623,6 @@ export default class WhatIfReportComponent extends React.Component {
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }
@@ -1076,7 +1074,6 @@ export default class WhatIfReportComponent extends React.Component {
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }
@@ -2418,7 +2415,6 @@ export default class WhatIfReportComponent extends React.Component {
                                             inventoryList: [],
                                             shipmentList: [],
                                             batchInfoList: [],
-                                            problemReportList: [],
                                             supplyPlan: []
                                         }
                                     }

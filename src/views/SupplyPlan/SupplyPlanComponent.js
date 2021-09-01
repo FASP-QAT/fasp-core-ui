@@ -292,7 +292,6 @@ export default class SupplyPlanComponent extends React.Component {
                 inventoryList: [],
                 shipmentList: [],
                 batchInfoList: [],
-                problemReportList: [],
                 supplyPlan: []
             }
         }
@@ -2557,7 +2556,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             inventoryList: [],
                                             shipmentList: [],
                                             batchInfoList: [],
-                                            problemReportList: [],
                                             supplyPlan: []
                                         }
                                     }
@@ -4491,7 +4489,6 @@ export default class SupplyPlanComponent extends React.Component {
                                 inventoryList: [],
                                 shipmentList: [],
                                 batchInfoList: [],
-                                problemReportList: [],
                                 supplyPlan: []
                             }
                         }

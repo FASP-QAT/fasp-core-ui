@@ -1594,7 +1594,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }

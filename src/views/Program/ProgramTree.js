@@ -900,7 +900,6 @@ class Program extends Component {
                             delete generalData.inventoryList;
                             delete generalData.shipmentList;
                             delete generalData.batchInfoList;
-                            delete generalData.problemReportList;
                             delete generalData.supplyPlan;
                             delete generalData.planningUnitList;
                             generalData.actionList=[];
@@ -914,7 +913,6 @@ class Program extends Component {
                                     inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
                                     shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
                                     batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
-                                    problemReportList: problemReportList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
                                     supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
                                 }
                                 var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();

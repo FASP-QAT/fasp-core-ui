@@ -252,7 +252,6 @@ for(var pu=0;pu<finalPuList.length;pu++){
                                             inventoryList: [],
                                             shipmentList: [],
                                             batchInfoList: [],
-                                            problemReportList: [],
                                             supplyPlan: []
                                     }
                                 }
@@ -434,7 +433,6 @@ for(var pu=0;pu<finalPuList.length;pu++){
                             inventoryList: [],
                             shipmentList: [],
                             batchInfoList: [],
-                            problemReportList: [],
                             supplyPlan: []
                         }
                     }

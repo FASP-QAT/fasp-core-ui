@@ -647,7 +647,6 @@ export default class ConsumptionDetails extends React.Component {
                                 inventoryList: [],
                                 shipmentList: [],
                                 batchInfoList: [],
-                                problemReportList: [],
                                 supplyPlan: []
                             }
                         }

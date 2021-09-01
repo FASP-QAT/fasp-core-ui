@@ -676,7 +676,6 @@ export default class AddInventory extends Component {
                                 inventoryList: [],
                                 shipmentList: [],
                                 batchInfoList: [],
-                                problemReportList: [],
                                 supplyPlan: []
                             }
                         }
