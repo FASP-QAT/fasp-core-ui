@@ -148,7 +148,7 @@ export default class SyncMasterData extends Component {
                                 <FormGroup>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -190,16 +190,18 @@ export default class SyncMasterData extends Component {
                             var prog = programList.filter(c => parseInt(c.programId) == parseInt(response.data.programId) && parseInt(c.version) == parseInt(response.data.versionId) && parseInt(c.userId) == parseInt(response.data.userId))[0];
                             var prgQPLDetails = programQPLDetailsList.filter(c => c.id == prog.id)[0];
                             // console.log("Prog=====================>", prog)
-                            var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-                            var shipmentDataList = (programJson.shipmentList);
-                            var batchInfoList = (programJson.batchInfoList);
-                            var actionList = programJson.actionList;
+                            var generalDataBytes = CryptoJS.AES.decrypt((prog).programData.generalData, SECRET_KEY);
+                            var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+                            var generalJson = JSON.parse(generalData);
+
+                            var planningUnitDataList = (prog).programData.planningUnitDataList;
+                            // var shipmentDataList = (programJson.shipmentList);
+                            // var batchInfoList = (programJson.batchInfoList);
+                            var actionList = generalJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
-                            var problemReportList = programJson.problemReportList;
+                            var problemReportList = generalJson.problemReportList;
                             // console.log("Shipment data list", shipmentDataList);
                             // console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
@@ -218,32 +220,64 @@ export default class SyncMasterData extends Component {
                             var batchArray = response.data.batchInfoList;
                             var planningUnitList = [];
                             for (var j = 0; j < shipArray.length; j++) {
-                                // console.log("In planning unit list", shipArray[j].planningUnit.id);
                                 if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
                                     planningUnitList.push(shipArray[j].planningUnit.id);
                                 }
-                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
-                                if (index == -1) {
-                                    shipmentDataList.push(shipArray[j]);
-                                } else {
-                                    if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                        minDate = shipmentDataList[index].expectedDeliveryDate;
-                                    }
-                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                        minDate = shipmentDataList[index].receivedDate;
-                                    }
-                                    shipmentDataList[index] = shipArray[j];
-                                }
                             }
-                            // console.log("Shipment data updated", shipmentDataList);
 
-                            for (var j = 0; j < batchArray.length; j++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
-                                if (index == -1) {
-                                    batchInfoList.push(batchArray[j]);
+                            for (var pu = 0; pu < planningUnitList.length; pu++) {
+
+                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
+                                var programJson = {}
+                                if (planningUnitDataIndex != -1) {
+                                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitList[pu]))[0];
+                                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    programJson = JSON.parse(programData);
                                 } else {
-                                    batchInfoList[index] = batchArray[j];
+                                    programJson = {
+                                        consumptionList: [],
+                                        inventoryList: [],
+                                        shipmentList: [],
+                                        batchInfoList: [],
+                                        supplyPlan: []
+                                    }
                                 }
+
+                                var shipmentDataList = programJson.shipmentList;
+                                var batchInfoList = programJson.batchInfoList;
+
+                                for (var j = 0; j < shipArray.length; j++) {
+                                    // console.log("In planning unit list", shipArray[j].planningUnit.id);
+                                    var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
+                                    if (index == -1) {
+                                        shipmentDataList.push(shipArray[j]);
+                                    } else {
+                                        if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = shipmentDataList[index].expectedDeliveryDate;
+                                        }
+                                        if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = shipmentDataList[index].receivedDate;
+                                        }
+                                        shipmentDataList[index] = shipArray[j];
+                                    }
+                                }
+                                // console.log("Shipment data updated", shipmentDataList);
+
+                                for (var j = 0; j < batchArray.length; j++) {
+                                    var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
+                                    if (index == -1) {
+                                        batchInfoList.push(batchArray[j]);
+                                    } else {
+                                        batchInfoList[index] = batchArray[j];
+                                    }
+                                }
+                                if (planningUnitDataIndex != -1) {
+                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                } else {
+                                    planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                }
+
                             }
                             // console.log("Batch Info updated", batchInfoList);
 
@@ -287,13 +321,14 @@ export default class SyncMasterData extends Component {
 
                                 })
                             }
-                            programJson.shipmentList = shipmentDataList;
-                            programJson.actionList = actionList;
-                            programJson.batchInfoList = batchInfoList;
-                            programJson.problemReportList = problemReportList;
-                            prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false )).length;
-                            prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false )).length;
-                            prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            // programJson.shipmentList = shipmentDataList;
+                            // programJson.batchInfoList = batchInfoList;
+                            generalJson.actionList = actionList;
+                            generalJson.problemReportList = problemReportList;
+                            prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                            prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                            prog.programData.planningUnitDataList = planningUnitDataList;
+                            prog.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalJson), SECRET_KEY)).toString();
                             var db1;
                             var storeOS;
                             getDatabase();
