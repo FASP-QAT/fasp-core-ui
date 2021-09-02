@@ -38,8 +38,8 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
 
-        realmId: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+        // realmId: Yup.string()
+        //     .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         healthAreaId: Yup.string()
@@ -57,6 +57,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validmanagertext')),
         customField3: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
+        regionsId: Yup.string()
+            .required(i18n.t('static.program.validRegionstext')),
     })
 }
 
@@ -143,6 +145,7 @@ export default class AddForecastProgram extends Component {
                 customField1: '',
                 customField2: '',
                 customField3: '',
+                regionsArray: [],
 
 
             },
@@ -158,6 +161,8 @@ export default class AddForecastProgram extends Component {
             organisationCode: '',
             realmCountryCode: '',
             healthAreaId: '',
+            regionsList: [],
+            regionsId: [],
 
         }
 
@@ -639,6 +644,7 @@ export default class AddForecastProgram extends Component {
             realmId: true,
             realmCountryId: true,
             organisationId: true,
+            regionsId: true,
             userId: true,
             healthAreaId: true,
             customField1: true,
@@ -733,6 +739,7 @@ export default class AddForecastProgram extends Component {
                                     realmCountryId: this.state.program.realmCountry.realmCountryId,
                                     healthAreaId: this.state.healthAreaId,
                                     organisationId: this.state.program.organisation.id,
+                                    regionsId: this.state.regionsId,
                                     programName: this.state.program.label.label_en,
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
                                     programCode1: this.state.uniqueCode,
@@ -773,7 +780,7 @@ export default class AddForecastProgram extends Component {
 
                                                 <FormGroup>
 
-                                                    <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label> */}
 
                                                     <Input
                                                         valid={!errors.realmId && this.state.program.realm.realmId != ''}
@@ -781,7 +788,7 @@ export default class AddForecastProgram extends Component {
                                                         bsSize="sm"
                                                         // className="col-md-4"
                                                         onBlur={handleBlur}
-                                                        type="select" name="realmId" id="realmId"
+                                                        type="hidden" name="realmId" id="realmId"
                                                         value={this.state.program.realm.realmId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                     >
@@ -853,6 +860,32 @@ export default class AddForecastProgram extends Component {
 
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.dashboard.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        bsSize="sm"
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.regionsId && this.state.regionsId.length != 0 },
+                                                            { 'is-invalid': (touched.regionsId && !!errors.regionsId) }
+                                                        )}
+                                                        name="regionsId"
+                                                        id="regionsId"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("regionsId", e);
+                                                            this.updateFieldData(e);
+                                                            // this.generateHealthAreaCode(e)
+
+                                                        }}
+                                                        onBlur={() => setFieldTouched("regionsId", true)}
+                                                        multi
+                                                        options={this.state.regionsList}
+                                                        value={this.state.regionsId}
+                                                    />
+                                                    <FormFeedback className="red">{errors.regionsId}</FormFeedback>
+                                                </FormGroup>
+
                                                 <FormGroup>
 
                                                     <Label htmlFor="company">{i18n.t('static.forecastProgram.forecastProgram')}<span class="red Reqasterisk">*</span></Label>
@@ -922,10 +955,10 @@ export default class AddForecastProgram extends Component {
 
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label> */}
                                                     <Input
                                                         bsSize="sm"
-                                                        type="text" name="customField1"
+                                                        type="hidden" name="customField1"
                                                         valid={!errors.customField1 && this.state.program.customField1 != ''}
                                                         invalid={touched.customField1 && !!errors.customField1}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -935,7 +968,7 @@ export default class AddForecastProgram extends Component {
                                                     <FormFeedback className="red">{errors.customField1}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="customField2">{i18n.t('static.forecastProgram.customField2')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="customField2">{i18n.t('static.forecastProgram.MaxvalueofStockoutdays')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         bsSize="sm"
                                                         type="text" name="customField2"

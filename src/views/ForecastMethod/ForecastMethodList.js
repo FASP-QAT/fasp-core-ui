@@ -422,6 +422,7 @@ import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import moment from 'moment';
+import RealmService from "../../api/RealmService";
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 
 const entityname = i18n.t('static.forecastMethod.forecastMethod')
@@ -434,6 +435,7 @@ class forecastMethod extends Component {
             forecastMethodList: [],
             message: '',
             selSource: [],
+            realms: [],
             loading: true
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
@@ -462,6 +464,23 @@ class forecastMethod extends Component {
     }
 
     buildJexcel() {
+
+        const { realms } = this.state;
+        console.log("REALM------>2", realms);
+        let realmList = [];
+        if (realms.length > 0) {
+            for (var i = 0; i < realms.length; i++) {
+                var paJson = {
+                    name: getLabelText(realms[i].label, this.state.lang),
+                    id: parseInt(realms[i].realmId),
+                    active: realms[i].active
+                }
+                realmList[i] = paJson
+            }
+        }
+
+        console.log("REALM------>3", realmList);
+
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
@@ -472,10 +491,12 @@ class forecastMethod extends Component {
 
                 data = [];
                 data[0] = papuList[j].forecastMethodId
-                data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[2] = papuList[j].lastModifiedBy.username;
-                data[3] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-                data[4] = 0
+                data[1] = papuList[j].realm.id
+                data[2] = getLabelText(papuList[j].label, this.state.lang)
+                data[3] = papuList[j].methodology
+                data[4] = papuList[j].lastModifiedBy.username;
+                data[5] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+                data[6] = 0
                 papuDataArr[count] = data;
                 count++;
             }
@@ -484,10 +505,12 @@ class forecastMethod extends Component {
         if (papuDataArr.length == 0) {
             data = [];
             data[0] = 0;
-            data[1] = "";
+            data[1] = 1;
             data[2] = "";
             data[3] = "";
-            data[4] = 0;
+            data[4] = "";
+            data[5] = "";
+            data[6] = 0;
             papuDataArr[0] = data;
         }
 
@@ -508,10 +531,25 @@ class forecastMethod extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.product.realm'),
+                    readOnly: true,
+                    type: 'autocomplete',
+                    source: realmList,
+                },
+                {
                     title: i18n.t('static.forecastMethod.forecastMethod'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
+                },
+                {
+                    title: i18n.t('static.forecastMethod.methodology'),
+                    // readOnly: true,
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: i18n.t('static.forecastMethod.historicalData') },
+                        { id: 2, name: i18n.t('static.forecastMethod.tree') }
+                    ]
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -627,10 +665,12 @@ class forecastMethod extends Component {
                             onclick: function () {
                                 var data = [];
                                 data[0] = 0;
-                                data[1] = "";
+                                data[1] = 1;
                                 data[2] = "";
                                 data[3] = "";
-                                data[4] = 1;
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = 1;
                                 obj.insertRow(data, parseInt(y), 1);
                             }.bind(this)
                         });
@@ -642,10 +682,12 @@ class forecastMethod extends Component {
                             onclick: function () {
                                 var data = [];
                                 data[0] = 0;
-                                data[1] = "";
+                                data[1] = 1;
                                 data[2] = "";
                                 data[3] = "";
-                                data[4] = 1;
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = 1;
                                 obj.insertRow(data, parseInt(y));
                             }.bind(this)
                         });
@@ -702,6 +744,8 @@ class forecastMethod extends Component {
                 //     });
                 // }
 
+
+
                 return items;
             }.bind(this)
         };
@@ -713,71 +757,62 @@ class forecastMethod extends Component {
     }
 
     componentDidMount() {
-        // this.hideFirstComponent();
-        // AuthenticationService.setupAxiosInterceptors();
-        // IntegrationService.getIntegrationListAll().then(response => {
-        //     if (response.status == 200) {
-        //         console.log("response.data---->", response.data)
+        RealmService.getRealmListAll()
+            .then(response => {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    realms: listArray, loading: false
+                }, () => {
+                    console.log("REALM------>1", this.state.realms);
+                    this.buildJexcel();
+                });
 
-        //         this.setState({
-        //             integrationList: response.data,
-        //             selSource: response.data
-        //         },
-        //             () => {
-        //                 this.buildJexcel()
-        //             })
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-        //     }
-        //     else {
-        //         this.setState({
-        //             message: response.data.messageCode, loading: false
-        //         },
-        //             () => {
-        //                 this.hideSecondComponent();
-        //             })
-        //     }
-
-        // })
-        //     .catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({
-        //                     message: 'static.unkownError',
-        //                     loading: false
-        //                 });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-
-        //                     case 401:
-        //                         this.props.history.push(`/login/static.message.sessionExpired`)
-        //                         break;
-        //                     case 403:
-        //                         this.props.history.push(`/accessDenied`)
-        //                         break;
-        //                     case 500:
-        //                     case 404:
-        //                     case 406:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                     case 412:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                     default:
-        //                         this.setState({
-        //                             message: 'static.unkownError',
-        //                             loading: false
-        //                         });
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
 
         let templist = [
             {
@@ -804,7 +839,14 @@ class forecastMethod extends Component {
                     "label_sp": "",
                     "label_fr": "Consommation reélle",
                     "label_pr": ""
-                }
+                },
+                "realm": {
+                    "id": 1,
+                    "label": {
+                        "label_en": "Global Health",
+                    },
+                },
+                "methodology": "1"
             },
             {
                 "createdBy": {
@@ -830,7 +872,14 @@ class forecastMethod extends Component {
                     "label_sp": "",
                     "label_fr": "Consommation reélle",
                     "label_pr": ""
-                }
+                },
+                "realm": {
+                    "id": 1,
+                    "label": {
+                        "label_en": "Global Health",
+                    },
+                },
+                "methodology": "2"
             },
             {
                 "createdBy": {
@@ -856,7 +905,80 @@ class forecastMethod extends Component {
                     "label_sp": "",
                     "label_fr": "Consommation reélle",
                     "label_pr": ""
-                }
+                },
+                "realm": {
+                    "id": 1,
+                    "label": {
+                        "label_en": "Global Health",
+                    },
+                },
+                "methodology": "2"
+            },
+            {
+                "createdBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "createdDate": "2020-02-25 12:00:00",
+                "lastModifiedBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "lastModifiedDate": "2020-02-25 12:00:00",
+                "active": true,
+                "forecastMethodId": 1,
+                "label": {
+                    "createdBy": null,
+                    "createdDate": null,
+                    "lastModifiedBy": null,
+                    "lastModifiedDate": null,
+                    "active": true,
+                    "labelId": 126,
+                    "label_en": "Demographic",
+                    "label_sp": "",
+                    "label_fr": "Consommation reélle",
+                    "label_pr": ""
+                },
+                "realm": {
+                    "id": 1,
+                    "label": {
+                        "label_en": "Global Health",
+                    },
+                },
+                "methodology": "2"
+            },
+            {
+                "createdBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "createdDate": "2020-02-25 12:00:00",
+                "lastModifiedBy": {
+                    "userId": 1,
+                    "username": "Anchal C"
+                },
+                "lastModifiedDate": "2020-02-25 12:00:00",
+                "active": true,
+                "forecastMethodId": 1,
+                "label": {
+                    "createdBy": null,
+                    "createdDate": null,
+                    "lastModifiedBy": null,
+                    "lastModifiedDate": null,
+                    "active": true,
+                    "labelId": 126,
+                    "label_en": "Hybrid",
+                    "label_sp": "",
+                    "label_fr": "Consommation reélle",
+                    "label_pr": ""
+                },
+                "realm": {
+                    "id": 1,
+                    "label": {
+                        "label_en": "Global Health",
+                    },
+                },
+                "methodology": "2"
             }
         ];
         this.setState({
@@ -864,7 +986,7 @@ class forecastMethod extends Component {
             selSource: templist
         },
             () => {
-                this.buildJexcel()
+                // this.buildJexcel()
             })
     }
 
@@ -883,10 +1005,12 @@ class forecastMethod extends Component {
         var json = this.el.getJson(null, false);
         var data = [];
         data[0] = 0;
-        data[1] = "";
+        data[1] = 1;
         data[2] = "";
         data[3] = "";
-        data[4] = 1;
+        data[4] = "";
+        data[5] = "";
+        data[6] = 1;
 
         this.el.insertRow(
             data, 0, 1
@@ -1012,16 +1136,37 @@ class forecastMethod extends Component {
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
         //Forecast Method
-        if (x == 1) {
+        if (x == 2) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+
+        //Methodlogy
+        if (x == 3) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -1045,7 +1190,7 @@ class forecastMethod extends Component {
 
     onedit = function (instance, cell, x, y, value) {
         console.log("------------onedit called")
-        this.el.setValueFromCoords(7, y, 1, true);
+        this.el.setValueFromCoords(6, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
@@ -1053,11 +1198,11 @@ class forecastMethod extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(7, y);
+            var value = this.el.getValueFromCoords(5, y);
             if (parseInt(value) == 1) {
                 //Region
                 var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("B").concat(parseInt(y) + 1);
+                var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
                 console.log("value-----", value);
                 if (value == "") {
@@ -1118,7 +1263,7 @@ class forecastMethod extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

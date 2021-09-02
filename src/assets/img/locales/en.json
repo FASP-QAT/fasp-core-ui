@@ -1777,10 +1777,10 @@
     "static.usagePeriod.usagePeriod": "Usage Period",
     "static.scaleUpType.scaleUpType": "ScaleUp Type",
     "static.program.healthareas": "Technical Areas",
-    "static.usagePeriod.conversionFactor": "Conversion Factor",
+    "static.usagePeriod.conversionFactor": "Conversion Factor To Month",
     "static.equivalancyUnit.equivalancyUnit": "Equivalancy Unit",
     "static.forecastProgram.customField1": "Custom Field 1",
-    "static.forecastProgram.customField2": "Custom Field 2",
+    "static.forecastProgram.MaxvalueofStockoutdays": "Max Value Of Stock Out Days",
     "static.forecastProgram.customField3": "Custom Field 3",
     "static.graphUnit.graphUnit": "Graph Unit",
     "static.mapForecastingUnitToEquivalancyUnit.mapForecastingUnitToEquivalancyUnit": "Map Forecasting Unit To Equivalancy Unit",
@@ -1789,5 +1789,9 @@
     "static.graphUnit.graphUnittext": "Enter Graph Unit",
     "static.dataSet.dataSettext": "Enter DataSet",
     "static.program.datasetDisplayName": "Dataset Display Name",
-    "static.program.useRegions": "Use Regions?"
+    "static.program.useRegions": "Use Regions?",
+    "static.forecastMethod.methodology": "Methodology",
+    "static.forecastMethod.historicalData": "Historical Data",
+    "static.forecastMethod.tree": "Theoretical data",
+    "static.program.validRegionstext": "Select regions"
 }

@@ -158,7 +158,7 @@ export default class ProgramList extends Component {
                 },
                 {
                     title: i18n.t('static.program.realm'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true
                 },
                 {
@@ -387,7 +387,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "yes"
+            "useRegions": "Yes"
         }
 
         let programJson2 = {
@@ -450,7 +450,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "no"
+            "useRegions": "No"
         }
 
         let programJson3 = {
@@ -513,7 +513,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "no"
+            "useRegions": "No"
         }
 
         this.setState({

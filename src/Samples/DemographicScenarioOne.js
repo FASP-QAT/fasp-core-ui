@@ -46,6 +46,7 @@ let initialValues = {
     realmCountryId: '',
     healthAreaId: [],
     organisationId: '',
+    regionsId: [],
     programName: '',
     programCode: '',
     programCode1: '',
@@ -78,6 +79,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validmanagertext')),
         customField3: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
+        regionsId: Yup.string()
+            .required(i18n.t('static.program.validRegionstext')),
     })
 }
 
@@ -239,9 +242,10 @@ export default class DemographicScenarioOne extends Component {
                 programNotes: 'Benin PRH,Condoms Forecast Dataset',
                 healthAreaArray: [],
                 customField1: 'customField1',
-                customField2: 'customField2',
+                customField2: '10',
                 customField3: 'customField3',
-
+                regionsArray: [],
+                active: true,
 
             },
             lang: localStorage.getItem('lang'),
@@ -253,6 +257,9 @@ export default class DemographicScenarioOne extends Component {
                 { value: 2, label: "b" },
                 { value: 3, label: "c" },
             ],
+            regionsList: [
+                { value: 1, label: "National" },
+            ],
             programManagerList: [],
             message: '',
             loading: true,
@@ -260,6 +267,7 @@ export default class DemographicScenarioOne extends Component {
             organisationCode: '',
             realmCountryCode: '',
             healthAreaId: '1,2',
+            regionsId: '1',
 
         }
 
@@ -1098,7 +1106,8 @@ export default class DemographicScenarioOne extends Component {
             healthAreaId: true,
             customField1: true,
             customField2: true,
-            customField3: true
+            customField3: true,
+            regionsId: true,
         }
         )
         this.validateForm(errors)
@@ -1183,6 +1192,7 @@ export default class DemographicScenarioOne extends Component {
                                             realmCountryId: this.state.program.realmCountry.realmCountryId,
                                             healthAreaId: this.state.healthAreaId,
                                             organisationId: this.state.program.organisation.id,
+                                            regionsId: this.state.regionsId,
                                             programName: this.state.program.label.label_en,
                                             programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
                                             programCode1: this.state.uniqueCode,
@@ -1279,7 +1289,7 @@ export default class DemographicScenarioOne extends Component {
 
                                                         <FormGroup>
 
-                                                            <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                            {/* <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label> */}
 
                                                             <Input
                                                                 valid={!errors.realmId && this.state.program.realm.realmId != ''}
@@ -1287,7 +1297,7 @@ export default class DemographicScenarioOne extends Component {
                                                                 bsSize="sm"
                                                                 // className="col-md-4"
                                                                 onBlur={handleBlur}
-                                                                type="select" name="realmId" id="realmId"
+                                                                type="hidden" name="realmId" id="realmId"
                                                                 value={this.state.program.realm.realmId}
                                                                 disabled={true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -1380,6 +1390,32 @@ export default class DemographicScenarioOne extends Component {
                                                                 id="programName" />
                                                             <FormFeedback>{errors.programName}</FormFeedback>
                                                         </FormGroup>
+
+                                                        <FormGroup>
+                                                            <Label htmlFor="select">{i18n.t('static.dashboard.region')}<span class="red Reqasterisk">*</span></Label>
+                                                            <Select
+                                                                bsSize="sm"
+                                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                    { 'is-valid': !errors.regionsId && this.state.regionsId.length != 0 },
+                                                                    { 'is-invalid': (touched.regionsId && !!errors.regionsId) }
+                                                                )}
+                                                                name="regionsId"
+                                                                id="regionsId"
+                                                                onChange={(e) => {
+                                                                    handleChange(e);
+                                                                    setFieldValue("regionsId", e);
+                                                                    this.updateFieldData(e);
+                                                                    // this.generateHealthAreaCode(e)
+
+                                                                }}
+                                                                onBlur={() => setFieldTouched("regionsId", true)}
+                                                                multi
+                                                                options={this.state.regionsList}
+                                                                value={this.state.regionsId}
+                                                            />
+                                                            <FormFeedback className="red">{errors.regionsId}</FormFeedback>
+                                                        </FormGroup>
+
                                                         <FormGroup style={{ display: 'flex' }}>
                                                             <Col xs="6" className="pl-0">
                                                                 <FormGroup >
@@ -1433,10 +1469,10 @@ export default class DemographicScenarioOne extends Component {
 
                                                         </FormGroup>
                                                         <FormGroup>
-                                                            <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label>
+                                                            {/* <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label> */}
                                                             <Input
                                                                 bsSize="sm"
-                                                                type="text" name="customField1"
+                                                                type="hidden" name="customField1"
                                                                 valid={!errors.customField1 && this.state.program.customField1 != ''}
                                                                 invalid={touched.customField1 && !!errors.customField1}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -1446,7 +1482,7 @@ export default class DemographicScenarioOne extends Component {
                                                             <FormFeedback className="red">{errors.customField1}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup>
-                                                            <Label htmlFor="customField2">{i18n.t('static.forecastProgram.customField2')}<span class="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="customField2">{i18n.t('static.forecastProgram.MaxvalueofStockoutdays')}<span class="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 bsSize="sm"
                                                                 type="text" name="customField2"
@@ -1486,6 +1522,43 @@ export default class DemographicScenarioOne extends Component {
                                                             <FormFeedback>{errors.programNotes}</FormFeedback>
 
                                                         </FormGroup>
+
+                                                        <FormGroup>
+                                                            <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active1"
+                                                                    name="active"
+                                                                    value={true}
+                                                                    checked={this.state.program.active === true}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio1">
+                                                                    {i18n.t('static.common.active')}
+                                                                </Label>
+                                                            </FormGroup>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active2"
+                                                                    name="active"
+                                                                    value={false}
+                                                                    checked={this.state.program.active === false}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2">
+                                                                    {i18n.t('static.common.disabled')}
+                                                                </Label>
+                                                            </FormGroup>
+                                                        </FormGroup>
+
 
 
 
