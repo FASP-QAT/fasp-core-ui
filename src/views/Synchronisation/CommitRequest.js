@@ -120,6 +120,7 @@ export default class CommitRequest extends React.Component {
                     allowExport: false,
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
+                    editable:false,
                     filters: true,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
