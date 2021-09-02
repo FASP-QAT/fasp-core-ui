@@ -197,7 +197,7 @@ class ProcurementAgentExport extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -463,7 +463,7 @@ class ProcurementAgentExport extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -1166,10 +1166,19 @@ class ProcurementAgentExport extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programJson = JSON.parse(programData);
+                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                            var shipmentList=[];
+                            for(var pu=0;pu<planningUnitDataList.length;pu++){
+                                var planningUnitData=planningUnitDataList[pu];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                var sList=programJson.shipmentList;
+                                shipmentList=shipmentList.concat(sList);
+                            }
 
                             var programTransaction = db1.transaction(['program'], 'readwrite');
                             var programOs = programTransaction.objectStore('program');
@@ -1193,7 +1202,7 @@ class ProcurementAgentExport extends Component {
                                     }
                                 }
 
-                                var shipmentList = (programJson.shipmentList);
+                                // var shipmentList = (programJson.shipmentList);
                                 console.log("shipmentList----*********----", shipmentList);
 
                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
@@ -1489,9 +1498,20 @@ class ProcurementAgentExport extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programJson = JSON.parse(programData);
+
+                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                            var shipmentList=[];
+                            for(var pu=0;pu<planningUnitDataList.length;pu++){
+                                var planningUnitData=planningUnitDataList[pu];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                var sList=programJson.shipmentList;
+                                shipmentList=shipmentList.concat(sList);
+                            }
 
 
                             var programTransaction = db1.transaction(['program'], 'readwrite');
@@ -1516,7 +1536,7 @@ class ProcurementAgentExport extends Component {
                                     }
                                 }
 
-                                var shipmentList = (programJson.shipmentList);
+                                // var shipmentList = (programJson.shipmentList);
 
                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 // const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
@@ -1805,9 +1825,20 @@ class ProcurementAgentExport extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programJson = JSON.parse(programData);
+
+                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                            var shipmentList=[];
+                            for(var pu=0;pu<planningUnitDataList.length;pu++){
+                                var planningUnitData=planningUnitDataList[pu];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                var sList=programJson.shipmentList;
+                                shipmentList=shipmentList.concat(sList);
+                            }
 
 
                             var programTransaction = db1.transaction(['program'], 'readwrite');
@@ -1832,7 +1863,7 @@ class ProcurementAgentExport extends Component {
                                     }
                                 }
 
-                                var shipmentList = (programJson.shipmentList);
+                                // var shipmentList = (programJson.shipmentList);
 
                                 const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
