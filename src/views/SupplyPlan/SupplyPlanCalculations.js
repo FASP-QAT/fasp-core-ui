@@ -1059,6 +1059,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.consumptionPage == "consumptionDataEntry") {
                                         props.formSubmit(props.items.planningUnit, props.items.rangeValue);
                                     }
+                                    if (props.consumptionPage == "whatIf") {
+                                        props.updateState("programModified", 1);
+                                    }
                                     props.updateState("loading", false);
                                     props.hideFirstComponent();
                                 } else if (page == "inventory") {
@@ -1088,6 +1091,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         }
                                         props.formSubmit(props.items.planningUnit, props.items.rangeValue);
                                     }
+                                    if (props.inventoryPage == "whatIf") {
+                                        props.updateState("programModified", 1);
+                                    }
                                     props.updateState("loading", false);
                                     props.hideFirstComponent();
                                 } else if (page == "shipment") {
@@ -1108,6 +1114,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     if (props.shipmentPage == "shipmentDataEntry") {
                                         props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                    }
+                                    if (props.shipmentPage == "whatIf") {
+                                        props.updateState("programModified", 1);
                                     }
                                     props.updateState("loading", false);
                                     props.hideFirstComponent()
