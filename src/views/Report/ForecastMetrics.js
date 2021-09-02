@@ -688,7 +688,7 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.error'),
-          type:'numeric',
+          type: 'numeric',
           mask: '#,##%',
         },
         {
@@ -786,7 +786,7 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-
+      console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
           console.log(JSON.stringify(response.data));
