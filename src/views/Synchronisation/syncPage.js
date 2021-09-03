@@ -1200,35 +1200,35 @@ export default class syncPage extends Component {
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
-          if(proList.length>0){
-          if (proList.length == 1) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: proList[0].value
-            }, () => {
-              // this.getDataForCompare(proList[0]);
-              this.checkLastModifiedDateForProgram(proList[0]);
-            })
-          } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: localStorage.getItem("sesProgramId")
-            }, () => {
-              // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-              this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-            })
-          } else {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              loading: false
-            })
+          if (proList.length > 0) {
+            if (proList.length == 1) {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                // loading: false,
+                programId: proList[0].value
+              }, () => {
+                // this.getDataForCompare(proList[0]);
+                this.checkLastModifiedDateForProgram(proList[0]);
+              })
+            } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                // loading: false,
+                programId: localStorage.getItem("sesProgramId")
+              }, () => {
+                // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+                this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              })
+            } else {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                loading: false
+              })
+            }
           }
-        }
         })
           .catch(
             error => {
@@ -3005,49 +3005,49 @@ export default class syncPage extends Component {
                           setFieldTouched,
                           setFieldError
                         }) => (
-                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
-                              <Col md="12 pl-0 pt-3">
-                                <div className="d-md-flex">
-                                  <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="select"
-                                          bsSize="sm"
-                                          name="versionType" id="versionType" onChange={this.versionTypeChanged}>
-                                          {versionTypes}
-                                        </Input>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="textarea"
-                                          name="notes"
-                                          // maxLength={600} 
-                                          id="notes"
-                                          valid={!errors.notes && this.state.notes != ''}
-                                          invalid={touched.notes && !!errors.notes}
-                                          onChange={(e) => { handleChange(e); this.notesChange(e); }}
-                                          onBlur={handleBlur}
-                                          value={this.state.notes}
-                                        >
-                                        </Input>
-                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="tab-ml-1 mt-4">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
-                                    &nbsp;
-                </FormGroup>
-                                </div>
-                              </Col>
-                            </Form>
-                          )} />
+                          <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                            <Col md="12 pl-0 pt-3">
+                              <div className="d-md-flex">
+                                <FormGroup className="col-md-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="select"
+                                        bsSize="sm"
+                                        name="versionType" id="versionType" onChange={this.versionTypeChanged}>
+                                        {versionTypes}
+                                      </Input>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="textarea"
+                                        name="notes"
+                                        // maxLength={600} 
+                                        id="notes"
+                                        valid={!errors.notes && this.state.notes != ''}
+                                        invalid={touched.notes && !!errors.notes}
+                                        onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                        onBlur={handleBlur}
+                                        value={this.state.notes}
+                                      >
+                                      </Input>
+                                      <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-4">
+                                  <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  &nbsp;
+                                </FormGroup>
+                              </div>
+                            </Col>
+                          </Form>
+                        )} />
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -3279,7 +3279,7 @@ export default class syncPage extends Component {
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
         moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
@@ -3308,224 +3308,303 @@ export default class syncPage extends Component {
             var programJson = JSON.parse(programData);
 
             var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
-                var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
-                var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
-                programQPLDetailsGetRequest.onsuccess = function (event) {
-                  var programQPLDetails=programQPLDetailsGetRequest.result;
-            // var planningUnitList = [];
-            // var consumptionData = [];
-            // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-            // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-            // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-            // for (var c = 0; c < consumptionJson.length; c++) {
-            //   if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   }
-            // }
-            // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+            var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+            var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
+            programQPLDetailsGetRequest.onsuccess = function (event) {
+              var programQPLDetails = programQPLDetailsGetRequest.result;
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              //   if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              //     consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              //   } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              //     consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              //   }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-            // var inventoryData = [];
-            // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-            // var oldProgramDataInventory = this.state.oldProgramDataInventory;
-            // var latestProgramDataInventory = this.state.latestProgramDataInventory;
-            // for (var c = 0; c < inventoryJson.length; c++) {
-            //   if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   }
-            // }
-            // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              //   if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              //     inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              //   } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              //     inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              //   }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-            // var shipmentData = [];
-            // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-            // var oldProgramDataShipment = this.state.oldProgramDataShipment;
-            // var latestProgramDataShipment = this.state.latestProgramDataShipment;
-            // for (var c = 0; c < shipmentJson.length; c++) {
-            //   if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   }
-            // }
-            // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              //   if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              //     shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              //   } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              //     shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              //   }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
-            var problemReportList = [];
-            var problemJson = (this.state.mergedProblemListJexcel).getJson();
-            var oldProgramDataProblem = this.state.oldProgramDataProblemList;
-            var latestProgramDataProblem = this.state.latestProgramDataProblemList;
-            for (var c = 0; c < problemJson.length; c++) {
-              if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
-                problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
-              } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
-                problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              var problemReportList = [];
+              var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              for (var c = 0; c < problemJson.length; c++) {
+                if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+                  problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+                  problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                }
               }
-            }
-            problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-            problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
-            // programJson.consumptionList = consumptionData;
-            // programJson.inventoryList = inventoryData;
-            // programJson.shipmentList = shipmentData;
-            programJson.problemReportList = problemReportList;
-            console.log("ProgramJson.consumption+++", programJson.consumptionList);
-            // programJson.problemReportList = [];
-            programJson.versionType = { id: document.getElementById("versionType").value };
-            programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-            programJson.notes = document.getElementById("notes").value;
-            ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
-              if (response.status == 200) {
-                if (response.data == this.state.comparedLatestVersion) {
-                  ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
-                    if (response1.status == 200) {
-                      if(response1.data==false){
-                  ProgramService.saveProgramData(programJson).then(response => {
-                    if (response.status == 200) {
-                      // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-                      // var programDataOs1 = programDataTransaction1.objectStore('programData');
-                      // var programRequest1 = programDataOs1.delete((this.state.programId).value);
+              problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+              problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
+              // programJson.consumptionList = consumptionData;
+              // programJson.inventoryList = inventoryData;
+              // programJson.shipmentList = shipmentData;
+              programJson.problemReportList = problemReportList;
+              console.log("ProgramJson.consumption+++", programJson.consumptionList);
+              // programJson.problemReportList = [];
+              programJson.versionType = { id: document.getElementById("versionType").value };
+              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+              programJson.notes = document.getElementById("notes").value;
+              console.log("ProgramJson+++", programJson);
+              ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+                if (response.status == 200) {
+                  if (response.data == this.state.comparedLatestVersion) {
+                    ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
+                      if (response1.status == 200) {
+                        if (response1.data == false) {
+                          ProgramService.saveProgramData(programJson).then(response => {
+                            if (response.status == 200) {
+                              // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                              // var programDataOs1 = programDataTransaction1.objectStore('programData');
+                              // var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-                      // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-                      // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-                      // var programRequest3 = programDataOs3.delete((this.state.programId).value);
+                              // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                              // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                              // var programRequest3 = programDataOs3.delete((this.state.programId).value);
 
-                      // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                      // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-                      // var programRequest2 = programDataOs2.delete((this.state.programId).value);
+                              // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                              // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                              // var programRequest2 = programDataOs2.delete((this.state.programId).value);
 
-                      // programRequest1.onerror = function (event) {
-                      //   this.setState({
-                      //     supplyPlanError: i18n.t('static.program.errortext')
-                      //   })
-                      // }.bind(this);
-                      // programRequest2.onsuccess = function (e) {
+                              // programRequest1.onerror = function (event) {
+                              //   this.setState({
+                              //     supplyPlanError: i18n.t('static.program.errortext')
+                              //   })
+                              // }.bind(this);
+                              // programRequest2.onsuccess = function (e) {
 
-                      //   var json = response.data;
-                      //   json.actionList = [];
-                      //   var version = json.requestedProgramVersion;
-                      //   if (version == -1) {
-                      //     version = json.currentVersion.versionId
-                      //   }
+                              //   var json = response.data;
+                              //   json.actionList = [];
+                              //   var version = json.requestedProgramVersion;
+                              //   if (version == -1) {
+                              //     version = json.currentVersion.versionId
+                              //   }
 
-                        // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                        // var programSaveData = transactionForSavingData.objectStore('programData');
+                              // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                              // var programSaveData = transactionForSavingData.objectStore('programData');
 
-                      //   var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                      //   var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                              //   var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                              //   var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
 
-                        var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
-                        var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                      //   // for (var i = 0; i < json.length; i++) {
-                      //   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                      //   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                      //   var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                      //   var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                      //   var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                              var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                              var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
+                              //   // for (var i = 0; i < json.length; i++) {
+                              //   var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                              //   var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                              //   var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                              //   var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                              //   var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
 
-                      //   var item = {
-                      //     id: json.programId + "_v" + version + "_uId_" + userId,
-                      //     programId: json.programId,
-                      //     version: version,
-                      //     programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                      //     programData: encryptedText.toString(),
-                      //     userId: userId
-                      //   };
-                        // var programQPLDetails = {
-                        //   id: json.programId + "_v" + version + "_uId_" + userId,
-                        //   programId: json.programId,
-                        //   version: version,
-                        //   userId: userId,
-                        //   programCode: json.programCode,
-                        //   openCount: openCount,
-                        //   addressedCount: addressedCount,
-                        //   programModified: 0
-                        // }
-                        programQPLDetails.readonly=1;
-                        // var putRequest = programSaveData.put(programRequest.result);
-                      //   var putRequest1 = downloadedProgramSaveData.put(item);
-                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                              //   var item = {
+                              //     id: json.programId + "_v" + version + "_uId_" + userId,
+                              //     programId: json.programId,
+                              //     version: version,
+                              //     programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                              //     programData: encryptedText.toString(),
+                              //     userId: userId
+                              //   };
+                              // var programQPLDetails = {
+                              //   id: json.programId + "_v" + version + "_uId_" + userId,
+                              //   programId: json.programId,
+                              //   version: version,
+                              //   userId: userId,
+                              //   programCode: json.programCode,
+                              //   openCount: openCount,
+                              //   addressedCount: addressedCount,
+                              //   programModified: 0
+                              // }
+                              programQPLDetails.readonly = 1;
+                              // var putRequest = programSaveData.put(programRequest.result);
+                              //   var putRequest1 = downloadedProgramSaveData.put(item);
+                              var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
-                      //   this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                        this.redirectToDashbaord();
-                      // }.bind(this)
-                    } else {
-                      this.setState({
-                        message: response.data.messageCode,
-                        color: "red",
-                        loading: false
-                      })
-                      this.hideFirstComponent();
-                    }
-                  })
-                    .catch(
-                      error => {
-                        console.log("@@@Error4", error);
-                        console.log("@@@Error4", error.message);
-                        console.log("@@@Error4", error.response ? error.response.status : "")
-                        if (error.message === "Network Error") {
-                          console.log("+++in catch 7")
-                          this.setState({
-                            message: 'static.common.networkError',
-                            color: "red",
-                            loading: false
-                          }, () => {
-                            this.hideFirstComponent();
-                          });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                              this.props.history.push(`/login/static.message.sessionExpired`)
-                              break;
-                            case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                            case 500:
-                            case 404:
-                            case 406:
+                              //   this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                              this.redirectToDashbaord();
+                              // }.bind(this)
+                            } else {
                               this.setState({
-                                message: error.response.data.messageCode,
+                                message: response.data.messageCode,
                                 color: "red",
                                 loading: false
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                            case 412:
-                              this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false,
-                                color: "red"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                            default:
-                              console.log("+++in catch 8")
-                              this.setState({
-                                message: 'static.unkownError',
-                                loading: false,
-                                color: "red"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
+                              })
+                              this.hideFirstComponent();
+                            }
+                          })
+                            .catch(
+                              error => {
+                                console.log("@@@Error4", error);
+                                console.log("@@@Error4", error.message);
+                                console.log("@@@Error4", error.response ? error.response.status : "")
+                                if (error.message === "Network Error") {
+                                  console.log("+++in catch 7")
+                                  this.setState({
+                                    message: 'static.common.networkError',
+                                    color: "red",
+                                    loading: false
+                                  }, () => {
+                                    this.hideFirstComponent();
+                                  });
+                                } else {
+                                  switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                      this.props.history.push(`/login/static.message.sessionExpired`)
+                                      break;
+                                    case 403:
+                                      this.props.history.push(`/accessDenied`)
+                                      break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        color: "red",
+                                        loading: false
+                                      }, () => {
+                                        this.hideFirstComponent()
+                                      });
+                                      break;
+                                    case 412:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: "red"
+                                      }, () => {
+                                        this.hideFirstComponent()
+                                      });
+                                      break;
+                                    default:
+                                      console.log("+++in catch 8")
+                                      this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "red"
+                                      }, () => {
+                                        this.hideFirstComponent()
+                                      });
+                                      break;
+                                  }
+                                }
+                              }
+                            );
+                        } else {
+                          alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+                          this.setState({
+                            message: i18n.t("static.commitVersion.requestAlreadyExists"),
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                            // this.checkLastModifiedDateForProgram(this.state.programId);
+                          });
+
+                        }
+                      } else {
+                        this.setState({
+                          message: response.data.messageCode,
+                          color: "red",
+                          loading: false
+                        })
+                        this.hideFirstComponent();
+                      }
+                    })
+                      .catch(
+                        error => {
+                          console.log("@@@Error5", error);
+                          console.log("@@@Error5", error.message);
+                          console.log("@@@Error5", error.response ? error.response.status : "")
+                          if (error.message === "Network Error") {
+                            console.log("+++in catch 9")
+                            this.setState({
+                              message: 'static.common.networkError',
+                              color: "red",
+                              loading: false
+                            }, () => {
+                              this.hideFirstComponent();
+                            });
+                          } else {
+                            switch (error.response ? error.response.status : "") {
+
+                              case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                              case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                              case 500:
+                              case 404:
+                              case 406:
+                                this.setState({
+                                  message: error.response.data.messageCode,
+                                  color: "red",
+                                  loading: false
+                                }, () => {
+                                  this.hideFirstComponent()
+                                });
+                                break;
+                              case 412:
+                                this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false,
+                                  color: "red"
+                                }, () => {
+                                  this.hideFirstComponent()
+                                });
+                                break;
+                              default:
+                                console.log("+++in catch 10")
+                                this.setState({
+                                  message: 'static.unkownError',
+                                  loading: false,
+                                  color: "red"
+                                }, () => {
+                                  this.hideFirstComponent()
+                                });
+                                break;
+                            }
                           }
                         }
-                      }
-                    );
+                      );
                   } else {
-                    alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+                    alert(i18n.t("static.commitVersion.versionIsOutDated"));
                     this.setState({
-                      message: i18n.t("static.commitVersion.requestAlreadyExists"),
+                      message: i18n.t("static.commitVersion.versionIsOutDated"),
                       loading: false,
                       color: "red"
                     }, () => {
                       this.hideFirstComponent()
-                      // this.checkLastModifiedDateForProgram(this.state.programId);
+                      this.checkLastModifiedDateForProgram(this.state.programId);
                     });
-  
+
                   }
                 } else {
                   this.setState({
@@ -3552,7 +3631,7 @@ export default class syncPage extends Component {
                       });
                     } else {
                       switch (error.response ? error.response.status : "") {
-  
+
                         case 401:
                           this.props.history.push(`/login/static.message.sessionExpired`)
                           break;
@@ -3593,87 +3672,9 @@ export default class syncPage extends Component {
                     }
                   }
                 );
-                } else {
-                  alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                  this.setState({
-                    message: i18n.t("static.commitVersion.versionIsOutDated"),
-                    loading: false,
-                    color: "red"
-                  }, () => {
-                    this.hideFirstComponent()
-                    this.checkLastModifiedDateForProgram(this.state.programId);
-                  });
-
-                }
-              } else {
-                this.setState({
-                  message: response.data.messageCode,
-                  color: "red",
-                  loading: false
-                })
-                this.hideFirstComponent();
-              }
-            })
-              .catch(
-                error => {
-                  console.log("@@@Error5", error);
-                  console.log("@@@Error5", error.message);
-                  console.log("@@@Error5", error.response ? error.response.status : "")
-                  if (error.message === "Network Error") {
-                    console.log("+++in catch 9")
-                    this.setState({
-                      message: 'static.common.networkError',
-                      color: "red",
-                      loading: false
-                    }, () => {
-                      this.hideFirstComponent();
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      default:
-                        console.log("+++in catch 10")
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                    }
-                  }
-                }
-              );
+            }.bind(this)
           }.bind(this)
         }.bind(this)
-      }.bind(this)
       }
     } else {
       this.setState({ "noFundsBudgetError": i18n.t('static.label.noFundsAvailable'), loading: false });
@@ -3744,7 +3745,7 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
-                  f.region != null && f.region.id !=0 &&
+                  f.region != null && f.region.id != 0 &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
@@ -3820,7 +3821,7 @@ export default class syncPage extends Component {
           var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
           var oldData = ""
           if (oldDataList.length > 0) {
-            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0 ) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[17] = oldData;//Old data //R
           var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
