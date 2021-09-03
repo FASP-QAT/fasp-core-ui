@@ -1791,7 +1791,7 @@
     "static.program.datasetDisplayName": "Dataset Display Name",
     "static.program.useRegions": "Use Regions?",
     "static.forecastMethod.methodology": "Methodology",
-    "static.forecastMethod.historicalData": "Historical Data",
-    "static.forecastMethod.tree": "Theoretical data",
+    "static.forecastMethod.historicalData": "Consumption",
+    "static.forecastMethod.tree": "Tree",
     "static.program.validRegionstext": "Select regions"
 }

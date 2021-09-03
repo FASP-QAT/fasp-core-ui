@@ -532,8 +532,9 @@ class forecastMethod extends Component {
                 },
                 {
                     title: i18n.t('static.product.realm'),
-                    readOnly: true,
+                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? false : true),
                     type: 'autocomplete',
+                    // type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                     source: realmList,
                 },
                 {
