@@ -252,7 +252,7 @@ export default class ImportProgram extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
-                                                var readonly=json.readonly;
+                                                var readonly = json.readonly;
                                                 delete json.readonly;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
@@ -400,7 +400,7 @@ export default class ImportProgram extends Component {
                                                     openCount: openCount,
                                                     addressedCount: addressedCount,
                                                     programModified: programModified,
-                                                    readonly:readonly
+                                                    readonly: readonly
                                                 }
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
@@ -472,7 +472,7 @@ export default class ImportProgram extends Component {
                                                                 delete json.regionList;
                                                                 var budgetList = json.budgetList;
                                                                 delete json.budgetList;
-                                                                var readonly=json.readonly;
+                                                                var readonly = json.readonly;
                                                                 delete json.readonly;
 
                                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
@@ -618,7 +618,7 @@ export default class ImportProgram extends Component {
                                                                     openCount: openCount,
                                                                     addressedCount: addressedCount,
                                                                     programModified: programModified,
-                                                                    readonly:readonly
+                                                                    readonly: readonly
                                                                 }
                                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
@@ -797,61 +797,62 @@ export default class ImportProgram extends Component {
                                 handleChange,
                                 handleBlur,
                             }) => (
-                                    <Form noValidate name='simpleForm'>
-                                        {/* <CardHeader>
+                                <Form noValidate name='simpleForm'>
+                                    {/* <CardHeader>
                                             <strong>{i18n.t('static.program.import')}</strong>
                                         </CardHeader> */}
-                                        <CardBody className="pb-lg-2 pt-lg-2">
-                                            <FormGroup id="fileImportDiv">
-                                                <Col md="3">
-                                                    <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
-                                                </Col>
-                                                <Col xs="12" md="4" className="custom-file">
-                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                    <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
-                                                </Col>
-                                            </FormGroup>
-                                            <FormGroup id="programIdDiv" className="col-md-4">
-                                                <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                <Select
-                                                    bsSize="sm"
-                                                    valid={!errors.programId}
-                                                    invalid={touched.programId && !!errors.programId}
-                                                    onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                    onBlur={handleBlur} name="programId" id="programId"
-                                                    multi
-                                                    options={this.state.programList}
-                                                    value={this.state.programId}
-                                                />
-                                                <FormFeedback>{errors.programId}</FormFeedback>
-                                            </FormGroup>
-                                        </CardBody>
-                                        <div style={{ display: this.state.loading ? "none" : "block" }}></div>
-                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                <div class="align-items-center">
-                                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                    <CardBody className="pb-lg-2 pt-lg-2">
+                                        <FormGroup id="fileImportDiv">
+                                            <Col md="3">
+                                                <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                            </Col>
+                                            <Col xs="12" md="4" className="custom-file">
+                                                {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
+                                                <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
+                                            </Col>
+                                        </FormGroup>
+                                        <FormGroup id="programIdDiv" className="col-md-4">
+                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                            <Select
+                                                bsSize="sm"
+                                                valid={!errors.programId}
+                                                invalid={touched.programId && !!errors.programId}
+                                                onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                onBlur={handleBlur} name="programId" id="programId"
+                                                multi
+                                                options={this.state.programList}
+                                                value={this.state.programId}
+                                            />
+                                            <FormFeedback>{errors.programId}</FormFeedback>
+                                        </FormGroup>
+                                    </CardBody>
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                                    <div class="spinner-border blue ml-4" role="status">
+                                                <div class="spinner-border blue ml-4" role="status">
 
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <CardFooter>
-                                            <FormGroup>
+                                    </div>
 
-                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                    <CardFooter>
+                                        <FormGroup>
 
-                                                <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                &nbsp;
-                                                </FormGroup>
-                                        </CardFooter>
-                                    </Form>
-                                )} />
+                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+
+                                            <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            &nbsp;
+                                        </FormGroup>
+                                    </CardFooter>
+                                </Form>
+                            )} />
                 </Card>
 
 

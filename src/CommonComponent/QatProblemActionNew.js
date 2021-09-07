@@ -252,7 +252,7 @@ export default class QatProblemActionNew extends Component {
                                                     console.log("regionIdArray+++", regionIdArray);
                                                     var problemReportIdForRegion = [];
                                                     problemActionList.filter(c =>
-                                                        c.region!=null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
+                                                        c.region != null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
                                                         map(m => {
                                                             problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                         });
@@ -806,7 +806,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>// moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM") &&
-                                                                                    c.region != null &&
+                                                                                        c.region != null &&
                                                                                         c.region.id == regionList[r].regionId
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                         && c.program.id == programList[pp].programId
@@ -1285,7 +1285,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("actual cause months***", actualCauseMonths);
                                                                             var index = problemActionList.findIndex(
                                                                                 c =>
-                                                                                c.region != null &&
+                                                                                    c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.program.id == programList[pp].programId
@@ -1333,7 +1333,7 @@ export default class QatProblemActionNew extends Component {
                                                     // console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     console.log("*****palash");
-                                                    console.log("problemTransaction+++",problemTransaction);
+                                                    console.log("problemTransaction+++", problemTransaction);
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                                     //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
                                                     // console.log("time taken to get object store+++", problemOs);
@@ -1358,7 +1358,7 @@ export default class QatProblemActionNew extends Component {
                                                         userId: programRequestList[pp].userId,
                                                         programId: programList[pp].programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
-                                                        readonly:programQPLDetailsGetRequest.result.readonly
+                                                        readonly: programQPLDetailsGetRequest.result.readonly
                                                     }
                                                     // console.log("open+++", openCount, "addressed+++", addressedCount);
                                                     // console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
@@ -1368,7 +1368,7 @@ export default class QatProblemActionNew extends Component {
                                                     programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
                                                     // console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 } catch (err) {
-                                                    console.log("In error@@@*******",err)
+                                                    console.log("In error@@@*******", err)
                                                     if (this.props.fetchData != undefined) {
                                                         if (this.props.page == "syncMasterData") {
                                                             this.props.fetchData(1, programId);
