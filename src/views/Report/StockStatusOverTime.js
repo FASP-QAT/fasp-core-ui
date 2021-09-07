@@ -142,7 +142,7 @@ class StockStatusOverTime extends Component {
             planningUnitlines: [],
             lineData: [],
             lineDates: [],
-            monthsInPastForAmc: 0,
+            monthsInPastForAmc: "",
             monthsInFutureForAmc: 0,
             planningUnitMatrix: {
                 date: []
@@ -531,7 +531,7 @@ class StockStatusOverTime extends Component {
             console.log(program)
             if (program.length == 1) {
                 this.setState({
-                    monthsInPastForAmc: 0,
+                    monthsInPastForAmc: "",
                     monthsInFutureForAmc: 0
                 }, () => { this.fetchData() })
 
@@ -873,7 +873,7 @@ class StockStatusOverTime extends Component {
         let monthsInFutureForAmc = this.state.monthsInFutureForAmc
         let monthsInPastForAmc = this.state.monthsInPastForAmc
         console.log(monthsInFutureForAmc, monthsInPastForAmc)
-        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != 0) {
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != "") {
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
@@ -1079,7 +1079,7 @@ class StockStatusOverTime extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "planningUnitIds": planningUnitIds,
-                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
+                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == "" ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
                     "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
                     "startDate": startDate,
                     "stopDate": stopDate
@@ -1123,6 +1123,7 @@ class StockStatusOverTime extends Component {
                         // lineDates = response.data[0].map(ele => (ele.dt))
                         // planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
+                        console.log("RESP-------->", response.data);
                         this.setState({
                             matricsList: response.data,
                             message: '', loading: false
@@ -1207,7 +1208,7 @@ class StockStatusOverTime extends Component {
         } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
 
-        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == 0) {
+        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == "") {
             this.setState({ message: i18n.t('static.realm.monthInPastForAmcText'), matricsList: [] });
 
         } else {
@@ -1671,7 +1672,8 @@ class StockStatusOverTime extends Component {
                                                         value={this.state.monthsInPastForAmc}
                                                         onChange={(e) => { this.changeMonthsForamc(e) }}
                                                     >
-                                                        <option value="0">-</option>
+                                                        <option value="">-</option>
+                                                        <option value="0">{0}</option>
                                                         <option value="1">{1}</option>
                                                         <option value="2">{2}</option>
                                                         <option value="3">{3}</option>
