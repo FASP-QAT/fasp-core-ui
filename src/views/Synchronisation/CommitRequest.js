@@ -70,7 +70,7 @@ export default class CommitRequest extends React.Component {
             stopDate: stopDate,
             programIds: programIds
         }
-        ProgramService.getCommitRequests(json)
+        ProgramService.getCommitRequests(json,-1)
             .then(response => {
                 var responseData = response.data;
                 var json = [];

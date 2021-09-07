@@ -189,8 +189,8 @@ class ProgramService {
         );
     }
 
-    getCommitRequests(json){
-        return axios.post(`${API_URL}/api/getCommitRequest`, json, {}
+    getCommitRequests(json,requestStatus){
+        return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
         );
     }
 
