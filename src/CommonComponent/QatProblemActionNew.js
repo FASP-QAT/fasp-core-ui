@@ -95,12 +95,11 @@ export default class QatProblemActionNew extends Component {
                     var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var planningUnitDataList=getRequest.result.programData.planningUnitDataList;
-                    
+                    var planningUnitDataList = getRequest.result.programData.planningUnitDataList;
 
                     // console.log("programJson+++", programJson);
                     // console.log("program decryption end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                    programList.push({generalData:programJson,planningUnitDataList:planningUnitDataList});
+                    programList.push({ generalData: programJson, planningUnitDataList: planningUnitDataList });
                     programRequestList.push(getRequest.result);
                     versionIDs.push(getRequest.result.version);
                     // console.log("start time bfor taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
@@ -255,7 +254,7 @@ export default class QatProblemActionNew extends Component {
                                                     console.log("regionIdArray+++", regionIdArray);
                                                     var problemReportIdForRegion = [];
                                                     problemActionList.filter(c =>
-                                                        c.region!=null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
+                                                        c.region != null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
                                                         map(m => {
                                                             problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                         });
@@ -290,21 +289,21 @@ export default class QatProblemActionNew extends Component {
                                                     for (var p = 0; p < planningUnitList.length; p++) {
                                                         // console.log("in for+++");
                                                         var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[p].planningUnit.id);
-                    var programJsonForPlanningUnit = {}
-                    if (planningUnitDataIndex != -1) {
-                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id))[0];
-                        var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                        var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
-                        programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
-                    } else {
-                        programJsonForPlanningUnit = {
-                            consumptionList: [],
-                            inventoryList: [],
-                            shipmentList: [],
-                            batchInfoList: [],
-                            supplyPlan: []
-                        }
-                    }
+                                                        var programJsonForPlanningUnit = {}
+                                                        if (planningUnitDataIndex != -1) {
+                                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id))[0];
+                                                            var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                            var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                            programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+                                                        } else {
+                                                            programJsonForPlanningUnit = {
+                                                                consumptionList: [],
+                                                                inventoryList: [],
+                                                                shipmentList: [],
+                                                                batchInfoList: [],
+                                                                supplyPlan: []
+                                                            }
+                                                        }
                                                         var checkPlanningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
                                                         var checkProgramPlanningUnitObj = planningUnitList[p];
                                                         if (checkPlanningUnitObj.active == true && checkProgramPlanningUnitObj.active == true) {
@@ -825,7 +824,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>// moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM") &&
-                                                                                    c.region != null &&
+                                                                                        c.region != null &&
                                                                                         c.region.id == regionList[r].regionId
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                         && c.program.id == programList[pp].generalData.programId
@@ -1304,7 +1303,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("actual cause months***", actualCauseMonths);
                                                                             var index = problemActionList.findIndex(
                                                                                 c =>
-                                                                                c.region != null &&
+                                                                                    c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.program.id == programList[pp].generalData.programId
@@ -1352,7 +1351,7 @@ export default class QatProblemActionNew extends Component {
                                                     // console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     console.log("*****palash");
-                                                    console.log("problemTransaction+++",problemTransaction);
+                                                    console.log("problemTransaction+++", problemTransaction);
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                                     //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
                                                     console.log("time taken to get object store+++", problemOs);
@@ -1386,7 +1385,7 @@ export default class QatProblemActionNew extends Component {
                                                     programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
                                                     console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 } catch (err) {
-                                                    console.log("In error@@@*******",err)
+                                                    console.log("In error@@@*******", err)
                                                     if (this.props.fetchData != undefined) {
                                                         if (this.props.page == "syncMasterData") {
                                                             this.props.fetchData(1, programId);
