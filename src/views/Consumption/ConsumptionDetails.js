@@ -496,7 +496,7 @@ export default class ConsumptionDetails extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         for (var i = 0; i < programJson.regionList.length; i++) {
@@ -541,6 +541,7 @@ export default class ConsumptionDetails extends React.Component {
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
                                 planningUnitListAll: myResult,
+                                generalProgramJson: programJson,
                                 regionList: regionList.sort(function (a, b) {
                                     a = a.name.toLowerCase();
                                     b = b.name.toLowerCase();
@@ -633,9 +634,23 @@ export default class ConsumptionDetails extends React.Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                        var programJson = {};
+                        if (planningUnitDataFilter.length > 0) {
+                            var planningUnitData = planningUnitDataFilter[0]
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
                         var batchInfoList = programJson.batchInfoList;
                         var batchList = [];
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);

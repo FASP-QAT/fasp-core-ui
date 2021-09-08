@@ -145,7 +145,7 @@ class QuantimedImportStepThree extends Component {
                 this.props.hideFirstComponent();
             }.bind(this);
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData.generalData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
 

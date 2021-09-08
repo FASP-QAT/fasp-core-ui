@@ -278,7 +278,28 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     updateFieldData(value) {
-        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0 });
+        var planningUnitDataList=this.state.planningUnitDataList;
+        var planningUnitDataFilter=planningUnitDataList.filter(c=>c.planningUnitId==value.value);
+        var programJson={};
+        if (planningUnitDataFilter.length > 0) {
+            var planningUnitData = planningUnitDataFilter[0]
+            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            programJson = JSON.parse(programData);
+        } else {
+            programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+            }
+        }
+        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0,programJson:programJson },()=>{
+            if(this.state.activeTab[0] === '2'){
+                this.refs.compareChild.formSubmit(this.state.monthCount)
+            }
+        });
 
     }
 
@@ -2413,9 +2434,10 @@ export default class SupplyPlanComponent extends React.Component {
                     this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -2505,12 +2527,13 @@ export default class SupplyPlanComponent extends React.Component {
                                         b = b.name.toLowerCase();
                                         return a < b ? -1 : a > b ? 1 : 0;
                                     }),
-                                    programJson: programJson,
+                                    generalProgramJson: programJson,
+                                    planningUnitDataList:planningUnitDataList,
                                     dataSourceListAll: dataSourceListAll,
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
-                                })
-                                // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                },()=>{
+                                    // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                                 var planningUnitIdProp = '';
                                 if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                     planningUnitIdProp = this.props.match.params.planningUnitId;
@@ -2521,12 +2544,30 @@ export default class SupplyPlanComponent extends React.Component {
                                 }
                                 if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                     var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                    var planningUnitDataFilter=planningUnitDataList.filter(c=>c.planningUnitId==planningUnitIdProp);
+                                    var programJson={};
+                                    if (planningUnitDataFilter.length > 0) {
+                                        var planningUnitData = planningUnitDataFilter[0]
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
+                                    } else {
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
+                                        }
+                                    }
                                     this.setState({
                                         planningUnit: planningUnit,
-                                        planningUnitId: planningUnitIdProp
+                                        planningUnitId: planningUnitIdProp,
+                                        programJson:programJson
                                     })
                                     this.formSubmit(planningUnit, this.state.monthCount);
                                 }
+                                })
 
                             }.bind(this);
                         }.bind(this);
@@ -2646,12 +2687,13 @@ export default class SupplyPlanComponent extends React.Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
+            var generalProgramJson=this.state.generalProgramJson;
             // var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
             // var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
             // var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
             realmRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
@@ -2686,7 +2728,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
-                    versionId: programJson.currentVersion.versionId,
+                    versionId: generalProgramJson.currentVersion.versionId,
                     monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
                     monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
@@ -3195,9 +3237,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 } else {
                                     suggestShipment = false;
                                 }
-                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
+                                    parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                                    parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
                                 var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                 var isEmergencyOrder = 0;
                                 if (expectedDeliveryDate >= currentMonth) {
@@ -4421,9 +4463,10 @@ export default class SupplyPlanComponent extends React.Component {
                     this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    // var programJson = JSON.parse(programData);
+                    var programResult=programRequest.result.programData;
                     var planningUnitData = [];
                     var selectedPlanningUnitdata = {};
                     var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
@@ -4434,6 +4477,22 @@ export default class SupplyPlanComponent extends React.Component {
                     planningunitList.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
+                        var programJson={}
+                        var planningUnitDataFilter=programResult.planningUnitDataList.filter(c=>c.planningUnitId==planningUnit.value);
+                        if (planningUnitDataFilter.length > 0) {
+                            var planningUnitDataFromJson = planningUnitDataFilter[0]
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitDataFromJson.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
                         var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
                         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
                         var regionListFiltered = this.state.regionList;
@@ -4470,7 +4529,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
-                        var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+                        var realmRequest = realmOs.get(this.state.generalProgramJson.realmCountry.realm.realmId);
                         realmRequest.onerror = function (event) {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
@@ -4505,7 +4564,7 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                             var planningUnitInfo = {
                                 shelfLife: programPlanningUnit.shelfLife,
-                                versionId: programJson.currentVersion.versionId,
+                                versionId: this.state.generalProgramJson.currentVersion.versionId,
                                 monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
                                 monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
                                 reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
@@ -4940,9 +4999,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             } else {
                                                 suggestShipment = false;
                                             }
-                                            var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                                parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                                parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                            var addLeadTimes = parseFloat(this.state.generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(this.state.generalProgramJson.submittedToApprovedLeadTime) +
+                                                parseFloat(this.state.generalProgramJson.approvedToShippedLeadTime) + parseFloat(this.state.generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                                                parseFloat(this.state.generalProgramJson.arrivedToDeliveredLeadTime);
                                             var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                             var isEmergencyOrder = 0;
                                             if (expectedDeliveryDate >= currentMonth) {
