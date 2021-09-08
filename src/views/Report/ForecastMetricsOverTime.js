@@ -444,7 +444,7 @@ class ForcastMatrixOverTime extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -563,7 +563,7 @@ class ForcastMatrixOverTime extends Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 
@@ -838,10 +838,27 @@ class ForcastMatrixOverTime extends Component {
           }.bind(this);
           programRequest.onsuccess = function (event) {
             // this.setState({ loading: true })
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            console.log('programJson', programJson)
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+            // console.log('programJson', programJson)
+            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                        var programJson = {}
+                        if (planningUnitDataIndex != -1) {
+                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
