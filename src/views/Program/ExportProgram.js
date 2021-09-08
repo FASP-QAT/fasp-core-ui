@@ -255,7 +255,7 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].programModified = programQPLResultFiltered.programModified;
                                                                                         myResult[i].openCount = programQPLResultFiltered.openCount;
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
-                                                                                        myResult[i].readonly = readonly;
+                                                                                        myResult[i].readonly = programQPLResultFiltered.readonly;
 
                                                                                         var txt = JSON.stringify(myResult[i]);
                                                                                         var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
