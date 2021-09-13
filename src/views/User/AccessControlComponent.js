@@ -1231,16 +1231,16 @@ class AccessControlComponent extends Component {
     }
     filterHealthArea() {
         let realmId = this.state.user.realm.realmId;
+        let selHealthArea;
         if (realmId != 0 && realmId != null) {
-            const selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
-            this.setState({
-                selHealthArea
-            });
+            selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
         } else {
-            this.setState({
-                selHealthArea: this.state.healthAreas
-            });
+            selHealthArea = this.state.healthAreas
         }
+        
+        this.setState({
+            selHealthArea
+        });
     }
     filterOrganisation() {
         let realmId = this.state.user.realm.realmId;
@@ -1757,8 +1757,8 @@ class AccessControlComponent extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             this.setState({
-                                                healthAreas: listArray,
-                                                selHealthArea: listArray
+                                                healthAreas: listArray.filter(c => c.active == true),
+                                                selHealthArea: listArray.filter(c => c.active == true)
                                             });
                                             ProgramService.getProgramList()
                                                 .then(response => {
@@ -2206,7 +2206,7 @@ class AccessControlComponent extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>
