@@ -124,10 +124,13 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 var lastDataEntryDate = moment(maxDate).add((programPlanningUnitList[ppL].monthsInPastForAmc), 'months').format("YYYY-MM-DD");
                                 var lastDate = lastDataEntryDate;
                                 var dateAfterFiveYrs = moment(Date.now()).add(60, 'months').format("YYYY-MM-DD");
+                                var dateAfterTenYrs=moment(Date.now()).add(120, 'months').format("YYYY-MM-DD");
                                 if (moment(dateAfterFiveYrs).format("YYYY-MM-DD") > moment(lastDataEntryDate).format("YYYY-MM-DD")) {
                                     lastDataEntryDate = dateAfterFiveYrs;
                                 }
-
+                                if (moment(dateAfterTenYrs).format("YYYY-MM-DD") < moment(lastDataEntryDate).format("YYYY-MM-DD")) {
+                                    lastDataEntryDate = dateAfterTenYrs;
+                                }
                                 // Filtering supply plan data for excluding the selected planning units
                                 supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
                                 // Looping till the max data entry date
