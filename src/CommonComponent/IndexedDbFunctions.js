@@ -148,6 +148,24 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('programQPLDetails')){
             storeOS = db1.createObjectStore('programQPLDetails', { keyPath: 'id', autoIncrement: true });
         }
+        if(!db1.objectStoreNames.contains('usageType')){
+            storeOS = db1.createObjectStore('usageType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('nodeType')){
+            storeOS = db1.createObjectStore('nodeType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethodType')){
+            storeOS = db1.createObjectStore('forecastMethodType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('usagePeriod')){
+            storeOS = db1.createObjectStore('usagePeriod', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('modelingType')){
+            storeOS = db1.createObjectStore('modelingType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethod')){
+            storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'id', autoIncrement: true });
+        }
         console.log("indexed db completed----------------------")
         
     };
