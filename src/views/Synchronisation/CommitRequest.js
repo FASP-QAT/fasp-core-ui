@@ -54,12 +54,21 @@ export default class CommitRequest extends React.Component {
         this.setState({
             programValues: programIds.map(ele => ele),
         }, () => {
-            this.fetchData();
+            if(programIds.length>0){
+                this.fetchData();
+            }else{
+                if (this.state.tableEl != "" && this.state.tableEl != undefined) {
+                    this.state.tableEl.destroy();
+                }
+            }
         })
 
     }
 
     fetchData() {
+        if (this.state.tableEl != "" && this.state.tableEl != undefined) {
+            this.state.tableEl.destroy();
+        }
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -130,10 +139,13 @@ export default class CommitRequest extends React.Component {
                 };
                 var elVar = jexcel(document.getElementById("tableData"), options);
                 this.el = elVar;
+                this.setState({
+                    tableEl:elVar
+                })
             }).catch(
                 error => {
                     this.setState({
-                        programs: [], loading: false
+                        loading: false
                     })
                     if (error.message === "Network Error") {
                         this.setState({
