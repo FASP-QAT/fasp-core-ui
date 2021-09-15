@@ -235,6 +235,11 @@ const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Re
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
 
+const UsagePeriodList = React.lazy(() => import('./views/UsagePeriod/UsagePeriodList'));
+const ModelingTypeList = React.lazy(() => import('./views/ModelingType/ModelingTypeList'));
+const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
+const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -338,7 +343,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  
+
   { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
@@ -586,5 +591,17 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+
+  { path: '/modelingTypeType/listModelingType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+  { path: '/modelingTypeType/listModelingType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
 ];
 export default routes;

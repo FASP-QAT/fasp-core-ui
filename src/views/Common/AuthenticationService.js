@@ -1265,6 +1265,35 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+
+                    case "/usagePeriod/listUsagePeriod":
+                    case "/usagePeriod/listUsagePeriod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_PERIOD")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastMethod/listForecastMethod":
+                    case "/forecastMethod/listForecastMethod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_METHOD")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/modelingType/listModelingType":
+                    case "/modelingType/listModelingType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_MODELING_TYPE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/equivalancyUnit/listEquivalancyUnit":
+                    case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+
                     default:
                         console.log("default case");
                         return false;

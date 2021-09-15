@@ -5,7 +5,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container,Col, Row,Nav,NavItem,TabPane,NavLink } from 'reactstrap';
+import { Container, Col, Row, Nav, NavItem, TabPane, NavLink } from 'reactstrap';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
 // import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png';
 import IdleTimer from 'react-idle-timer';
@@ -272,6 +272,11 @@ const UploadUserManual = React.lazy(() => import('../../views/UserManual/UploadU
 const AddIntegration = React.lazy(() => import('../../views/Integration/AddIntegrationComponent'));
 const IntegrationList = React.lazy(() => import('../../views/Integration/IntegrationListComponent'));
 const EditIntegration = React.lazy(() => import('../../views/Integration/EditIntegrationComponent'));
+
+const UsagePeriodList = React.lazy(() => import('../../views/UsagePeriod/UsagePeriodList'));
+const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
+const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/ModelingTypeList'));
+const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -635,7 +640,20 @@ const routes = [
   // { path: '/integration/listIntegration/:message', component: IntegrationList },
   { path: '/integration/listIntegration/:color/:message', name: 'static.breadcrum.list', entityname: 'static.integration.integration', component: IntegrationList },
   { path: '/integration/listIntegration/:message', component: IntegrationList },
-  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration }
+  { path: '/integration/editIntegration/:integrationId', name: 'static.breadcrum.edit', entityname: 'static.integration.integration', component: EditIntegration },
+
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.forecastMethod.forecastMethod', component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastMethod.forecastMethod', component: ForecastMethodList },
+
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usagePeriod.usagePeriod', component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: 'static.breadcrum.list', entityname: 'static.usagePeriod.usagePeriod', component: UsagePeriodList },
+
+  { path: '/modelingType/listModelingType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
+  { path: '/modelingType/listModelingType', exact: true, name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
+
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+
 ];
 
 class DefaultLayout extends Component {
@@ -1010,11 +1028,11 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} activeModule={this.state.activeTab[0]==='1'?2:1}/>
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} activeModule={this.state.activeTab[0] === '1' ? 2 : 1} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
-          <AppSidebar fixed display="lg" className={this.state.activeTab[0]==='2'?"module1":"module2"}>
+          <AppSidebar fixed display="lg" className={this.state.activeTab[0] === '2' ? "module1" : "module2"}>
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
@@ -1075,10 +1093,9 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_APPL_MASTERS') ? false : true) },
                         attributes: {
-                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))
-                            ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT'))) && this.state.activeTab[0] === '2') ? false : true)
                         },
                         children: [
                           {
@@ -1170,12 +1187,11 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_REALM_LEVEL_MASTERS') ? false : true) },
                         attributes: {
-                          hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))
-                            ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA'))) && this.state.activeTab[0] === '2') ? false : true)
                         },
                         children: [
                           {
@@ -1311,11 +1327,11 @@ class DefaultLayout extends Component {
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       //Supply Planning Data Module 1
-// {
-// name: "Supply Planning",
-// icon: 'fa fa-list',
-// attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) },
-// children: [
+                      // {
+                      // name: "Supply Planning",
+                      // icon: 'fa fa-list',
+                      // attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) },
+                      // children: [
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         // url: '/program',
@@ -1383,13 +1399,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
                             icon: 'fa fa-cloud-download',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')  && this.state.activeTab[0] === '2') ? false : true) }
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab[0] === '2') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
                             icon: 'fa fa-sign-in',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')  && this.state.activeTab[0] === '2') ? false : true) }
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab[0] === '2') ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.downloadprogram'),
@@ -1889,7 +1905,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatusmain'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT')))  && this.state.activeTab[0] === '2') ? false : true) },
+                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))) && this.state.activeTab[0] === '2') ? false : true) },
                             children: [
                               // {
                               //   name: i18n.t('static.dashboard.stockstatus'),
@@ -1965,7 +1981,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.report.shipmentReports'),
                             icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT')))  && this.state.activeTab[0] === '2') ? false : true) },
+                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab[0] === '2') ? false : true) },
                             children: [
                               {
                                 name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -2061,9 +2077,9 @@ class DefaultLayout extends Component {
 
                             ]
                           },
-                      //   ]
-                      // },
-                     
+                          //   ]
+                          // },
+
 
 
                           // //3) Shipment Reports
@@ -2172,90 +2188,97 @@ class DefaultLayout extends Component {
                         ]
                       },
                       //Forcast Data Module 2
-// {
-//   name: "Forcast Data Module 2",
-//   icon: 'fa fa-list',
-//   attributes: { hidden: (this.state.activeTab[0] === '2' ? false : true) },
-//   children: [
-  {
-  name: "Dataset management",
-  url: 'Dataset management',
-  icon: 'fa fa-list-alt',
-  attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
-  children: [
-  {
-  name: "Load Dataset",
-  url: 'Load Dataset',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: ( this.state.activeTab[0] === '1' ? false : true) }
- 
-  },
-  {
-  name: "Load Cosmption",
-  url: 'Load Cosmption',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
- 
-  },
-  {
-  name: "Commit",
-  url: 'Commit',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
- 
-  },
- 
- 
-  ]
-  },
-  {
-  name: "Tree Design",
-  url: 'Tree Design',
-  icon: 'fa fa-list-alt',
-  attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
-  children: [
-  {
-  name: "High Level",
-  url: 'High Level',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-  },
-  {
-  name: "Lower Level/Dosing",
-  url: 'Lower Level/Dosing',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-  },
-  {
-  name: "Input Reports",
-  url: 'Input Reports',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-  },
-  ]
-  },
-  {
-  name: "Forcast Outputs",
-  url: 'Forcast Outputs',
-  icon: 'fa fa-list-alt',
-  attributes:{hidden:((this.state.activeTab[0] === '1')?false:true)},
-  children: [
-  {
-  name: "Compare Scenarios",
-  url: 'Compare Scenarios',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-  },
-  {
-  name: "Output Reports",
-  url: 'Output Reports',
-  icon: 'fa fa-exchange',
-  attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
-  },
-  ]
-  }
-  // ]
-  // },
+                      // {
+                      //   name: "Forcast Data Module 2",
+                      //   icon: 'fa fa-list',
+                      //   attributes: { hidden: (this.state.activeTab[0] === '2' ? false : true) },
+                      //   children: [
+                      {
+                        name: i18n.t('static.dashboard.applicationmaster'),
+                        icon: 'fa fa-list-alt',
+                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE'))) && this.state.activeTab[0] === '1') ? false : true) },
+                        // attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
+                        children: [
+                          {
+                            name: i18n.t('static.usagePeriod.usagePeriod'),
+                            url: '/usagePeriod/listUsagePeriod',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.modelingType.modelingType'),
+                            url: '/modelingType/listModelingType',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE') ? false : true) }
+                          },
+                        ]
+                      },
+                      {
+                        name: i18n.t('static.dashboard.realmlevelmaster'),
+                        icon: 'fa fa-list-alt',
+                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD'))) && this.state.activeTab[0] === '1') ? false : true) },
+                        // attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
+                        children: [
+                          {
+                            name: i18n.t('static.forecastMethod.forecastMethod'),
+                            url: '/forecastMethod/listForecastMethod',
+                            icon: 'fa fa-money',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') ? false : true) }
+                          },
+                        ]
+                      },
+                      // {
+                      //   name: "Tree Design",
+                      //   url: 'Tree Design',
+                      //   icon: 'fa fa-list-alt',
+                      //   attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
+                      //   children: [
+                      //     {
+                      //       name: "High Level",
+                      //       url: 'High Level',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                      //     },
+                      //     {
+                      //       name: "Lower Level/Dosing",
+                      //       url: 'Lower Level/Dosing',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                      //     },
+                      //     {
+                      //       name: "Input Reports",
+                      //       url: 'Input Reports',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                      //     },
+                      //   ]
+                      // },
+                      // {
+                      //   name: "Forcast Outputs",
+                      //   url: 'Forcast Outputs',
+                      //   icon: 'fa fa-list-alt',
+                      //   attributes: { hidden: ((this.state.activeTab[0] === '1') ? false : true) },
+                      //   children: [
+                      //     {
+                      //       name: "Compare Scenarios",
+                      //       url: 'Compare Scenarios',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                      //     },
+                      //     {
+                      //       name: "Output Reports",
+                      //       url: 'Output Reports',
+                      //       icon: 'fa fa-exchange',
+                      //       attributes: { hidden: (this.state.activeTab[0] === '1' ? false : true) }
+                      //     },
+                      //   ]
+                      // }
+
+
+
+
+                      // ]
+                      // },
 
 
 
@@ -2789,40 +2812,40 @@ class DefaultLayout extends Component {
               }
             </Suspense>
             <Row>
-                      <Col xs="12" md="12">
-                        <Nav tabs className="marginTopTabs" style={{flexDirection: "row",borderBottom:"none"}} >
-                          <NavItem className="bgColourRemoveItem itemWhidth">
-                            <NavLink
-                              className="bgColourRemoveLink tab1"
-                              active={this.state.activeTab[0] === '1'}
-                              onClick={() => { this.toggle(0, '1'); }}
-                              style={{border:"none"}}
-                              title={"Forecast Dataset Module"}
-                            >
-                              <i class="nav-icon fa fa-line-chart tabicon"  style={{ fontSize: '18px', paddingTop: '5px' ,color:'#fff'}} ></i>
-                            
-                            </NavLink>
-                          </NavItem>
-                          <NavItem className="bgColourRemoveItem itemWhidth">
-                            <NavLink
-                            className="bgColourRemoveLink tab2"
-                              active={this.state.activeTab[0] === '2'}
-                              onClick={() => { this.toggle(0, '2'); }}
-                              style={{border:"none"}}
-                              title={"Supply Planning"}
-                            >
-                              {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
-                              <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
-                              {/* <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i> */}
+              <Col xs="12" md="12">
+                <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
+                  <NavItem className="bgColourRemoveItem itemWhidth">
+                    <NavLink
+                      className="bgColourRemoveLink tab1"
+                      active={this.state.activeTab[0] === '1'}
+                      onClick={() => { this.toggle(0, '1'); }}
+                      style={{ border: "none" }}
+                      title={"Forecast Dataset Module"}
+                    >
+                      <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
 
-                            </NavLink>
-                          </NavItem>
-                        </Nav>
-                        {/* <TabContent activeTab={this.state.activeTab[0]}>
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className="bgColourRemoveItem itemWhidth">
+                    <NavLink
+                      className="bgColourRemoveLink tab2"
+                      active={this.state.activeTab[0] === '2'}
+                      onClick={() => { this.toggle(0, '2'); }}
+                      style={{ border: "none" }}
+                      title={"Supply Planning"}
+                    >
+                      {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
+                      <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
+                      {/* <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i> */}
+
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+                {/* <TabContent activeTab={this.state.activeTab[0]}>
                           {this.tabPane()}
                         </TabContent> */}
-                      </Col>
-                    </Row>
+              </Col>
+            </Row>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
           </AppSidebar>
