@@ -37,6 +37,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            duplicateOrderNo: false,
             artmisHistory: [],
             tempNotes: '',
             originalQty: 0,
@@ -151,7 +152,7 @@ export default class ManualTagging extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-        
+
             batchDetails.sort(function (a, b) {
                 var dateA = new Date(a.expiryDate).getTime();
                 var dateB = new Date(b.expiryDate).getTime();
@@ -1122,8 +1123,11 @@ export default class ManualTagging extends Component {
                         });
                     }
                     if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
+                        console.log("Going to link shipment-----", changedmtList);
                         ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                             .then(response => {
+                                console.log("linking response---", response);
+
                                 this.setState({
                                     message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
                                     color: 'green',
@@ -1132,15 +1136,18 @@ export default class ManualTagging extends Component {
                                     planningUnitIdUpdated: ''
                                 },
                                     () => {
+
                                         this.hideSecondComponent();
                                         this.toggleLarge();
 
                                         (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
                                     })
+                                // }
 
                             }).catch(
                                 error => {
+                                    console.log("Linking error-----------", error);
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
@@ -1187,6 +1194,7 @@ export default class ManualTagging extends Component {
                                     }
                                 }
                             );
+                        // }
                     }
                 }
             }
@@ -3216,6 +3224,7 @@ export default class ManualTagging extends Component {
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                                    <strong>{this.state.duplicateOrderNo && 'Already Linked'}</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
