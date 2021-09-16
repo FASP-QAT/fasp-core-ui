@@ -645,6 +645,7 @@ class ApplicationDashboard extends Component {
 
   render() {
     const checkOnline = localStorage.getItem('sessionType');
+    const activeTab1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;
@@ -912,7 +913,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        {checkOnline === 'Online' && this.state.id == 1 &&
+        {checkOnline === 'Online' && this.state.id == 1 && activeTab1 == 2 &&
           <Row className="mt-2">
 
             <Col xs="12" sm="6" lg="3">
@@ -1031,7 +1032,7 @@ class ApplicationDashboard extends Component {
 
           </Row>
         }
-        {checkOnline === 'Online' && this.state.id == 2 &&
+        {checkOnline === 'Online' && this.state.id == 2 && activeTab1 == 2 &&
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
@@ -1281,7 +1282,7 @@ class ApplicationDashboard extends Component {
         }
         <Row className="mt-2">
           {
-            this.state.programList.length > 0 &&
+            this.state.programList.length > 0 && activeTab1 == 2 &&
             this.state.programList.map((item) => (
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">

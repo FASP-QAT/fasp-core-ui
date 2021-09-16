@@ -83,10 +83,10 @@ class EquivalancyUnit extends Component {
                 data[0] = papuList[j].equivalencyUnitMappingId
                 data[1] = papuList[j].tracerCategory.id
                 data[2] = papuList[j].forecastingUnit.id
-                data[3] = papuList[j].equivalencyUnit.id
+                data[3] = papuList[j].equivalencyUnit.equivalencyUnitId
                 data[4] = papuList[j].convertToFu
                 data[5] = papuList[j].notes
-                data[6] = 1 //Type
+                data[6] = (papuList[j].program == null ? 0 : papuList[j].program) //Type
                 data[7] = papuList[j].active
                 data[8] = papuList[j].lastModifiedBy.username;
                 data[9] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
@@ -132,12 +132,13 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.tracerCategory.tracerCategory'),
                     type: 'autocomplete',
                     source: this.state.tracerCategoryList,
-                    filter: this.filterForecastingUnitBasedOnTracerCategory
+
                 },
                 {
                     title: i18n.t('static.forecastingUnit.forecastingUnit'),
                     type: 'autocomplete',
                     source: this.state.forecastingUnitList,
+                    filter: this.filterForecastingUnitBasedOnTracerCategory
                 },
                 {
                     title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
@@ -383,7 +384,7 @@ class EquivalancyUnit extends Component {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[1];
         if (value > 0) {
-            mylist = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == value && c.active.toString() == "true");
+            mylist = this.state.forecastingUnitList.filter(c => c.id == value && c.active.toString() == "true");
         }
         return mylist.sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -499,6 +500,7 @@ class EquivalancyUnit extends Component {
                         // loading: false
                     },
                         () => {
+                            console.log("TracerCategory------->", this.state.tracerCategoryList)
                             this.getForecastingUnit();
                         })
                 } else {
@@ -810,6 +812,7 @@ class EquivalancyUnit extends Component {
 
     componentDidMount() {
         // this.getEquivalancyUnitMappingData();
+        // console.log("USER------->", localStorage.getItem('curUser'));
         this.getTracerCategory();
     }
 

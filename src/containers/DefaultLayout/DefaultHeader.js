@@ -67,7 +67,7 @@ class DefaultHeader extends Component {
     </NavItem>*/}
           <NavItem className="px-3">
             {console.log("Inside header called---", this)}
-            <NavLink to="#" className={this.props.activeModule==1?"nav-link titleColorModule1":"nav-link titleColorModule2"} ><b>{this.props.activeModule==1?"SUPPLY PLANNING MODULE":"FORECASTING MODULE"}</b><br></br><b>{this.props.title}</b></NavLink>
+            <NavLink to="#" className={this.props.activeModule==2?"nav-link titleColorModule1":"nav-link titleColorModule2"} ><b>{this.props.activeModule==2?i18n.t('static.module.supplyPlanningModule'):i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
@@ -93,7 +93,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                   {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
@@ -107,7 +107,7 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && this.props.activeModule == 2 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -122,7 +122,7 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') &&
+          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
