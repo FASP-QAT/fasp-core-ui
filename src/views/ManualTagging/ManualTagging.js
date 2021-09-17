@@ -1835,6 +1835,7 @@ export default class ManualTagging extends Component {
                         data[13] = erpDataList[j].erpPlanningUnit.id;
 
                     } else {
+                        console.log("order no ---",erpDataList[j].orderNo +" active---",erpDataList[j].active)
                         data[0] = erpDataList[j].active;
                         data[1] = erpDataList[j].erpOrderId;
                         data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
