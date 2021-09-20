@@ -1152,6 +1152,7 @@ import {
 } from 'reactstrap';
 import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
 import ProgramService from "../../api/ProgramService";
+import DatasetService from "../../api/DatasetService";
 import ProductService from "../../api/ProductService"
 import OrganisationService from "../../api/OrganisationService"
 import HealthAreaService from "../../api/HealthAreaService"
@@ -1281,7 +1282,8 @@ class AccessControlComponent extends Component {
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
                 var paJson = {
-                    name: getLabelText(selProgram[i].label, this.state.lang),
+                    name: (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')) + "" + getLabelText(selProgram[i].label, this.state.lang),
+                    // name: (getLabelText(selProgram[i].label, this.state.lang)),
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
@@ -1763,54 +1765,97 @@ class AccessControlComponent extends Component {
                                             ProgramService.getProgramList()
                                                 .then(response => {
                                                     if (response.status == "200") {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        // ProgramService.getProgramList()
-                                                        // .then(response => {
-                                                        //     if (response.status == "200") {
-                                                        //         var listArray = response.data;
-                                                        //         listArray.sort((a, b) => {
-                                                        //             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                        //             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                        //             return itemLabelA > itemLabelB ? 1 : -1;
-                                                        //         });
-                                                        //         this.setState({
-                                                        //             programs: listArray,
-                                                        //             selProgram: listArray
-                                                        //         });
-                                                        //     }
-
-                                                        this.setState({
-                                                            programs: listArray,
-                                                            selProgram: listArray
-                                                        });
-
-                                                        UserService.getUserByUserId(this.props.match.params.userId)
-                                                            .then(response => {
-                                                                if (response.status == 200) {
-                                                                    this.setState({
-                                                                        user: response.data,
-                                                                        rows: response.data.userAclList
-                                                                    }, (
-                                                                    ) => {
-                                                                        this.filterData();
-                                                                        this.filterOrganisation();
-                                                                        this.filterHealthArea();
-                                                                        this.filterProgram();
-                                                                        this.buildJexcel();
+                                                        //                                                         var listArray = [...response.data]
+                                                        //                                                         var arr = [];
+                                                        // for (var i = 0; i <= response.data.length; i++) {
+                                                        //     response.data[i].programTypeId = 1;
+                                                        // }
+                                                        // var listArray = response.data;
+                                                        // listArray.sort((a, b) => {
+                                                        //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                        //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                        //     return itemLabelA > itemLabelB ? 1 : -1;
+                                                        // });
+                                                        DatasetService.getDatasetList()
+                                                            .then(response1 => {
+                                                                if (response1.status == "200") {
+                                                                    
+                                                                    var listArray = [...response.data, ...response1.data]
+                                                                    listArray.sort((a, b) => {
+                                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                                        return itemLabelA > itemLabelB ? 1 : -1;
                                                                     });
-                                                                } else {
                                                                     this.setState({
-                                                                        message: response.data.messageCode
-                                                                    },
-                                                                        () => {
-                                                                            this.hideSecondComponent();
-                                                                        })
+                                                                        programs: listArray,
+                                                                        selProgram: listArray
+                                                                    });
                                                                 }
+
+
+
+                                                                UserService.getUserByUserId(this.props.match.params.userId)
+                                                                    .then(response => {
+                                                                        if (response.status == 200) {
+                                                                            this.setState({
+                                                                                user: response.data,
+                                                                                rows: response.data.userAclList
+                                                                            }, (
+                                                                            ) => {
+                                                                                this.filterData();
+                                                                                this.filterOrganisation();
+                                                                                this.filterHealthArea();
+                                                                                this.filterProgram();
+                                                                                this.buildJexcel();
+                                                                            });
+                                                                        } else {
+                                                                            this.setState({
+                                                                                message: response.data.messageCode
+                                                                            },
+                                                                                () => {
+                                                                                    this.hideSecondComponent();
+                                                                                })
+                                                                        }
+                                                                    }).catch(
+                                                                        error => {
+                                                                            if (error.message === "Network Error") {
+                                                                                this.setState({
+                                                                                    message: 'static.unkownError',
+                                                                                    loading: false
+                                                                                });
+                                                                            } else {
+                                                                                switch (error.response ? error.response.status : "") {
+
+                                                                                    case 401:
+                                                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                        break;
+                                                                                    case 403:
+                                                                                        this.props.history.push(`/accessDenied`)
+                                                                                        break;
+                                                                                    case 500:
+                                                                                    case 404:
+                                                                                    case 406:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    case 412:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    default:
+                                                                                        this.setState({
+                                                                                            message: 'static.unkownError',
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    );
                                                             }).catch(
                                                                 error => {
                                                                     if (error.message === "Network Error") {
@@ -2222,7 +2267,7 @@ class AccessControlComponent extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>
