@@ -238,161 +238,8 @@ class forecastMethod extends Component {
             license: JEXCEL_PRO_KEY,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? true : false),
             contextMenu: function (obj, x, y, e) {
-                var items = [];
-                //Add consumption batch info
-
-
-                if (y == null) {
-                    // Insert a new column
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnBefore,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 1);
-                            }
-                        });
-                    }
-
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnAfter,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 0);
-                            }
-                        });
-                    }
-
-                    // Delete a column
-                    // if (obj.options.allowDeleteColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.deleteSelectedColumns,
-                    //         onclick: function () {
-                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                    //         }
-                    //     });
-                    // }
-
-                    // Rename column
-                    // if (obj.options.allowRenameColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.renameThisColumn,
-                    //         onclick: function () {
-                    //             obj.setHeader(x);
-                    //         }
-                    //     });
-                    // }
-
-                    // Sorting
-                    if (obj.options.columnSorting == true) {
-                        // Line
-                        items.push({ type: 'line' });
-
-                        items.push({
-                            title: obj.options.text.orderAscending,
-                            onclick: function () {
-                                obj.orderBy(x, 0);
-                            }
-                        });
-                        items.push({
-                            title: obj.options.text.orderDescending,
-                            onclick: function () {
-                                obj.orderBy(x, 1);
-                            }
-                        });
-                    }
-                } else {
-                    // Insert new row before
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowBefore'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = true;
-                                data[4] = "";
-                                data[5] = "";
-                                data[6] = 0;
-                                data[7] = 1;
-                                obj.insertRow(data, parseInt(y), 1);
-                            }.bind(this)
-                        });
-                    }
-                    // after
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowAfter'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = true;
-                                data[4] = "";
-                                data[5] = "";
-                                data[6] = 0;
-                                data[7] = 1;
-                                obj.insertRow(data, parseInt(y));
-                            }.bind(this)
-                        });
-                    }
-                    // Delete a row
-                    if (obj.options.allowDeleteRow == true) {
-                        // region id
-                        if (obj.getRowData(y)[0] == 0) {
-                            items.push({
-                                title: i18n.t("static.common.deleterow"),
-                                onclick: function () {
-                                    obj.deleteRow(parseInt(y));
-                                }
-                            });
-                        }
-                    }
-
-                    if (x) {
-                        // if (obj.options.allowComments == true) {
-                        //     items.push({ type: 'line' });
-
-                        //     var title = obj.records[y][x].getAttribute('title') || '';
-
-                        //     items.push({
-                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                        //         onclick: function () {
-                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                        //         }
-                        //     });
-
-                        //     if (title) {
-                        //         items.push({
-                        //             title: obj.options.text.clearComments,
-                        //             onclick: function () {
-                        //                 obj.setComments([x, y], '');
-                        //             }
-                        //         });
-                        //     }
-                        // }
-                    }
-                }
-
-                // Line
-                items.push({ type: 'line' });
-
-                // // Save
-                // if (obj.options.allowExport) {
-                //     items.push({
-                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                //         shortcut: 'Ctrl + S',
-                //         onclick: function () {
-                //             obj.download(true);
-                //         }
-                //     });
-                // }
-
-
-
-                return items;
-            }.bind(this)
+                return [];
+            }.bind(this),
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
@@ -769,6 +616,7 @@ class forecastMethod extends Component {
 
         var validation = this.checkValidation();
         if (validation == true) {
+            this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
@@ -813,7 +661,8 @@ class forecastMethod extends Component {
                             })
                     } else {
                         this.setState({
-                            message: response.data.messageCode
+                            message: response.data.messageCode,
+                            color: "red", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
