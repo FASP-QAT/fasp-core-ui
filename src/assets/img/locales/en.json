@@ -1802,4 +1802,7 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.common.programAndDataset": "Program/Dataset",
+    "static.common.pr": "PR - ",
+    "static.common.fr": "FR - "
 }
