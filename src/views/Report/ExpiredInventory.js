@@ -565,7 +565,8 @@ export default class ExpiredInventory extends Component {
             // "shipmentStatusId": document.getElementById("shipmentStatusId").value,
             "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
             "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-            "includePlannedShipment": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0
+            "includePlannedShipment": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0,
+            "includePlannedShipments": document.getElementById("includePlanningShipments").value.toString() == 'true' ? 1 : 0
 
         }
 

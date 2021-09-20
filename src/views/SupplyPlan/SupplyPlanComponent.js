@@ -2281,7 +2281,7 @@ export default class SupplyPlanComponent extends React.Component {
                     supplyPlanType = 'shippedShipments'
                 } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'orderedShipments'
-                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
+                } else if ((shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
                     supplyPlanType = 'plannedShipments'
                 } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
                     supplyPlanType = 'deliveredErpShipments'
@@ -2289,7 +2289,7 @@ export default class SupplyPlanComponent extends React.Component {
                     supplyPlanType = 'shippedErpShipments'
                 } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'orderedErpShipments'
-                } else if ((shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
+                } else if ((shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
                     supplyPlanType = 'plannedErpShipments'
                 }
                 if (supplyPlanType != "") {
