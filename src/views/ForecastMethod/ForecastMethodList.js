@@ -653,7 +653,7 @@ class forecastMethod extends Component {
                         console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -837,7 +837,6 @@ class forecastMethod extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
                         <CardBody className="p-0">
 
@@ -872,7 +871,6 @@ class forecastMethod extends Component {
                             }
                         </CardFooter>
                     </Card>
-                </div>
 
             </div>
         )
