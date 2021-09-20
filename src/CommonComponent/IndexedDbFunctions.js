@@ -158,13 +158,13 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('forecastMethodType', { keyPath: 'id', autoIncrement: true });
         }
         if(!db1.objectStoreNames.contains('usagePeriod')){
-            storeOS = db1.createObjectStore('usagePeriod', { keyPath: 'id', autoIncrement: true });
+            storeOS = db1.createObjectStore('usagePeriod', { keyPath: 'usagePeriodId', autoIncrement: true });
         }
         if(!db1.objectStoreNames.contains('modelingType')){
-            storeOS = db1.createObjectStore('modelingType', { keyPath: 'id', autoIncrement: true });
+            storeOS = db1.createObjectStore('modelingType', { keyPath: 'modelingTypeId', autoIncrement: true });
         }
         if(!db1.objectStoreNames.contains('forecastMethod')){
-            storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'id', autoIncrement: true });
+            storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'forecastMethodId', autoIncrement: true });
         }
         console.log("indexed db completed----------------------")
         
