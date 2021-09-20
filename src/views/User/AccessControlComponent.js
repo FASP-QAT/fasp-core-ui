@@ -1418,7 +1418,7 @@ class AccessControlComponent extends Component {
 
                 },
                 {
-                    title: i18n.t('static.dataSource.program'),
+                    title: i18n.t('static.common.programAndDataset'),
                     type: 'autocomplete',
                     source: programList,
                     // filter: this.filterProgram
@@ -1769,10 +1769,26 @@ class AccessControlComponent extends Component {
                                                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                                             return itemLabelA > itemLabelB ? 1 : -1;
                                                         });
+                                                        // ProgramService.getProgramList()
+                                                        // .then(response => {
+                                                        //     if (response.status == "200") {
+                                                        //         var listArray = response.data;
+                                                        //         listArray.sort((a, b) => {
+                                                        //             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                        //             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                        //             return itemLabelA > itemLabelB ? 1 : -1;
+                                                        //         });
+                                                        //         this.setState({
+                                                        //             programs: listArray,
+                                                        //             selProgram: listArray
+                                                        //         });
+                                                        //     }
+
                                                         this.setState({
                                                             programs: listArray,
                                                             selProgram: listArray
                                                         });
+
                                                         UserService.getUserByUserId(this.props.match.params.userId)
                                                             .then(response => {
                                                                 if (response.status == 200) {
