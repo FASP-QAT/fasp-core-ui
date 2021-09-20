@@ -17,10 +17,22 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+
+    getDataSetList() {
+        return axios.get(`${API_URL}/api/dataset/`, {
+        });
+    }
+
     getProgramListAll() {
         return axios.get(`${API_URL}/api/program/all`, {
         });
     }
+
+    getDataSetListAll() {
+        return axios.get(`${API_URL}/api/dataset/all`, {
+        });
+    }
+
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
