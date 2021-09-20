@@ -445,7 +445,7 @@ class UsagePeriod extends Component {
                         console.log(response);
                         // window.location.reload();
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -659,8 +659,7 @@ class UsagePeriod extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
-                <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>                
                     <Card>
                         <CardBody className="p-0">
 
@@ -695,8 +694,7 @@ class UsagePeriod extends Component {
                                 </FormGroup>
                             }
                         </CardFooter>
-                    </Card>
-                </div>
+                    </Card>                
 
             </div>
         )
