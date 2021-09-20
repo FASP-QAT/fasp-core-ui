@@ -278,10 +278,12 @@ const UsagePeriodList = React.lazy(() => import('../../views/UsagePeriod/UsagePe
 const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
 const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/ModelingTypeList'));
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
+const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-
+  
+  { path: '/dataSet/loadDeleteDataSet', name: 'Load Delete DataSet', component: LoadDeleteDataSet },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -2265,6 +2267,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-money',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true) }
                           },
+                          {
+                            name: "LoadDeleteDataset",
+                            url: '/dataSet/loadDeleteDataSet',
+                            icon: 'fa fa-money',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true) }
+                          }
                         ]
                       },
                       // {

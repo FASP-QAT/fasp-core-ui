@@ -1274,6 +1274,7 @@ class AuthenticationService {
                         break;
 
                     case "/forecastMethod/listForecastMethod":
+                    case "/dataSet/loadDeleteDataSet":
                     case "/forecastMethod/listForecastMethod/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_FORECAST_METHOD")) {
                             return true;
