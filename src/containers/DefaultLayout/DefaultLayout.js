@@ -2877,7 +2877,7 @@ class DefaultLayout extends Component {
                       {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
                       <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
                       <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px',paddingTop: '0px'}} /></i>
-                      <h6 className="tabtext">S.PLANNING</h6>
+                      <h6 className="tabtext">SUPPLY PLANNING</h6>
                     </NavLink>
                   </NavItem>
                 </Nav>
