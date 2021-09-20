@@ -567,6 +567,7 @@
     "static.mt.originalQty": "Original QAT Quantity",
     "static.planningunit.forecastingunit": "Forecasting Unit",
     "static.breadcrum.list": "{{entityname}}",
+    "static.common.programAndDataset": "Program/Dataset",
     "static.program.deleteLocalProgram": "Delete Local Program",
     "static.message.user.passwordSuccess": "Password updated successfully",
     "static.product.product": "Planning unit",
@@ -910,6 +911,10 @@
     "static.planningunit.maxGtin": "Max 14 digits allowed",
     "static.program.import": "Import program data",
     "static.forecastMethod.historicalData": "Consumption",
+<<<<<<< HEAD
+=======
+    "static.common.pr": "PR - ",
+>>>>>>> c632ee7abbd14a104bcbe90d7660e88f9ce708d6
     "static.message.login.invalidCredentials": "Incorrect login or password",
     "static.message.inventorySaved": "Inventory data saved",
     "static.month.dec": "Dec",
@@ -1022,6 +1027,7 @@
     "static.supplyPlan.scrollToRight": "Scroll to right",
     "static.programHead.program": "Update Program Info",
     "static.message.newPasswordNumber": "Password must contain at least one number",
+    "static.common.fr": "FR - ",
     "static.report.adjustmentQty": "Adjustment Quantity",
     "static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD": "Expiry date must be greater than received date",
     "static.mt.noDetailsFound": "No matches found",

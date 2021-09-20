@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Col, Row, FormFeedback, Form
-
+    CardFooter, Button, Table, Col, Row, FormFeedback, Form,
+    Modal, ModalBody, ModalFooter, ModalHeader,
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -11,7 +11,7 @@ import i18n from '../../i18n'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -24,7 +24,9 @@ import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import ProgramService from '../../api/ProgramService';
-import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
+import CryptoJS from 'crypto-js';
+import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
+// import { Modal } from "bootstrap";
 
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnit')
 
@@ -41,6 +43,12 @@ class EquivalancyUnit extends Component {
             tracerCategoryList: [],
             forecastingUnitList: [],
             equivalancyUnitList: [],
+            roleArray: [],
+            isModalOpen: false,
+            equivalancyUnitAllList: [],
+            eqUnitTableEl: "",
+            table1Instance: "",
+            table2Instance: "",
 
             loading: true
         }
@@ -54,20 +62,475 @@ class EquivalancyUnit extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
 
+        //jumper
         this.getTracerCategory = this.getTracerCategory.bind(this);
         this.getForecastingUnit = this.getForecastingUnit.bind(this);
         this.getType = this.getType.bind(this);
         this.getEquivalancyUnit = this.getEquivalancyUnit.bind(this);
+        this.modelOpenClose = this.modelOpenClose.bind(this);
+        this.getEquivalancyUnitAll = this.getEquivalancyUnitAll.bind(this);
+        this.buildJexcel1 = this.buildJexcel1.bind(this);
 
+        this.changed = this.changed.bind(this);
+        this.onPaste = this.onPaste.bind(this);
+        this.oneditionend1 = this.oneditionend1.bind(this);
+        this.addRow1 = this.addRow1.bind(this);
+        this.formSubmit1 = this.formSubmit1.bind(this);
+        this.checkValidation1 = this.checkValidation1.bind(this);
 
     }
+
+    loaded1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        // tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+
+    }
+
+    oneditionend1 = function (instance, cell, x, y, value) {
+        // var elInstance = instance.jexcel;'
+        var elInstance = this.state.table2Instance;
+        var rowData = elInstance.getRowData(y);
+
+        elInstance.setValueFromCoords(7, y, 1, true);
+
+    }
+
+    onPaste1(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+                var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
+                if (index == "" || index == null || index == undefined) {
+                    (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    z = data[i].y;
+                }
+            }
+        }
+    }
+
+    changed1 = function (instance, cell, x, y, value) {
+        var elInstance = this.state.table2Instance;
+        var rowData = elInstance.getRowData(y);
+        console.log("LOG---------->2", elInstance);
+
+        //Equivalancy Unit
+        if (x == 1) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        //Active
+        if (x != 7) {
+            elInstance.setValueFromCoords(7, y, 1, true);
+        }
+    }.bind(this);
+
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    buildJexcel1() {
+        var papuList = this.state.equivalancyUnitAllList;
+        var data = [];
+        var papuDataArr = [];
+
+        var count = 0;
+        if (papuList.length != 0) {
+            for (var j = 0; j < papuList.length; j++) {
+
+                data = [];
+                data[0] = papuList[j].equivalencyUnitId
+                data[1] = getLabelText(papuList[j].label, this.state.lang)
+                data[2] = getLabelText(papuList[j].realm.label, this.state.lang)
+                data[3] = papuList[j].notes
+                data[4] = papuList[j].active
+                data[5] = papuList[j].lastModifiedBy.username;
+                data[6] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+                data[7] = 0
+                papuDataArr[count] = data;
+                count++;
+            }
+        }
+
+        // if (papuDataArr.length == 0) {
+        //     data = [];
+        //     data[0] = 0;
+        //     data[1] = "";
+        //     data[2] = "";
+        //     data[3] = "";
+        //     data[4] = true;
+        //     data[5] = "";
+        //     data[6] = "";
+        //     data[7] = 1;
+
+        //     papuDataArr[0] = data;
+        // }
+
+        // if (this.state.eqUnitTableEl != "" && this.state.eqUnitTableEl != undefined) {
+        //     this.state.eqUnitTableEl.destroy();
+        // }
+        if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
+            this.state.table2Instance.destroy();
+        }
+        var json = [];
+        var data = papuDataArr;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [100, 100, 100, 100, 100],
+            columns: [
+
+                {
+                    title: 'equivalancyUnitId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                    type: 'text',
+                    // readOnly: true
+                    textEditor: true,
+                },
+                {
+                    title: i18n.t('static.equivalancyUnit.type'),
+                    type: 'text',
+                    readOnly: true
+                    // textEditor: true,
+                },
+                {
+                    title: i18n.t('static.common.notes'),
+                    type: 'text',
+                    // readOnly: true
+                    textEditor: true,
+                },
+                {
+                    title: i18n.t('static.checkbox.active'),
+                    type: 'checkbox',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
+                },
+                {
+                    title: 'isChange',
+                    type: 'hidden'
+                },
+
+            ],
+            // pagination: localStorage.getItem("sesRecordCount"),
+            // filters: true,
+            // search: true,
+            // pagination: false,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            onchange: this.changed1,
+            // oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowManualInsertRow: false,
+            parseFormulas: true,
+            onpaste: this.onPaste1,
+            oneditionend: this.oneditionend1,
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded1,
+            license: JEXCEL_PRO_KEY,
+            editable: true,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                //Add consumption batch info
+
+
+                if (y == null) {
+                    // Insert a new column
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnBefore,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 1);
+                            }
+                        });
+                    }
+
+                    if (obj.options.allowInsertColumn == true) {
+                        items.push({
+                            title: obj.options.text.insertANewColumnAfter,
+                            onclick: function () {
+                                obj.insertColumn(1, parseInt(x), 0);
+                            }
+                        });
+                    }
+
+                    // Delete a column
+                    // if (obj.options.allowDeleteColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.deleteSelectedColumns,
+                    //         onclick: function () {
+                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                    //         }
+                    //     });
+                    // }
+
+                    // Rename column
+                    // if (obj.options.allowRenameColumn == true) {
+                    //     items.push({
+                    //         title: obj.options.text.renameThisColumn,
+                    //         onclick: function () {
+                    //             obj.setHeader(x);
+                    //         }
+                    //     });
+                    // }
+
+                    // Sorting
+                    if (obj.options.columnSorting == true) {
+                        // Line
+                        items.push({ type: 'line' });
+
+                        items.push({
+                            title: obj.options.text.orderAscending,
+                            onclick: function () {
+                                obj.orderBy(x, 0);
+                            }
+                        });
+                        items.push({
+                            title: obj.options.text.orderDescending,
+                            onclick: function () {
+                                obj.orderBy(x, 1);
+                            }
+                        });
+                    }
+                } else {
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowBefore'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = true;
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = 1;
+                                obj.insertRow(data, parseInt(y), 1);
+                            }.bind(this)
+                        });
+                    }
+                    // after
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.insertNewRowAfter'),
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = true;
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = 1;
+                                obj.insertRow(data, parseInt(y));
+                            }.bind(this)
+                        });
+                    }
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[0] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                        }
+                    }
+
+                    if (x) {
+                        // if (obj.options.allowComments == true) {
+                        //     items.push({ type: 'line' });
+
+                        //     var title = obj.records[y][x].getAttribute('title') || '';
+
+                        //     items.push({
+                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                        //         onclick: function () {
+                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                        //         }
+                        //     });
+
+                        //     if (title) {
+                        //         items.push({
+                        //             title: obj.options.text.clearComments,
+                        //             onclick: function () {
+                        //                 obj.setComments([x, y], '');
+                        //             }
+                        //         });
+                        //     }
+                        // }
+                    }
+                }
+
+                // Line
+                items.push({ type: 'line' });
+
+                // // Save
+                // if (obj.options.allowExport) {
+                //     items.push({
+                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                //         shortcut: 'Ctrl + S',
+                //         onclick: function () {
+                //             obj.download(true);
+                //         }
+                //     });
+                // }
+
+                return items;
+            }.bind(this)
+        };
+
+        var table2Instance = jexcel(document.getElementById("eqUnitInfoTable"), options);
+        this.el = table2Instance;
+        this.setState({
+            table2Instance: table2Instance,
+            loading: false
+        },
+            () => {
+                console.log("eqUnitTableEl---------->", this.state.eqUnitTableEl);
+            })
+    }
+
+    getEquivalancyUnitAll() {
+        EquivalancyUnitService.getEquivalancyUnitList().then(response => {
+            if (response.status == 200) {
+                console.log("EQ1------->ALL", response.data);
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                this.setState({
+                    equivalancyUnitAllList: listArray,
+                    // loading: false
+                },
+                    () => {
+                        this.buildJexcel1();
+                    })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red",
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    modelOpenClose() {
+        if (!this.state.isModalOpen) { //didM
+            this.getEquivalancyUnitAll();
+        }
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+            // loading: false
+        },
+            () => {
+
+            })
     }
 
     buildJexcel() {
@@ -86,34 +549,43 @@ class EquivalancyUnit extends Component {
                 data[3] = papuList[j].equivalencyUnit.equivalencyUnitId
                 data[4] = papuList[j].convertToFu
                 data[5] = papuList[j].notes
-                data[6] = (papuList[j].program == null ? 0 : papuList[j].program) //Type
+                data[6] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
                 data[7] = papuList[j].active
                 data[8] = papuList[j].lastModifiedBy.username;
                 data[9] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
                 data[10] = 0;
+                data[11] = papuList[j].forecastingUnit.id
+                data[12] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
                 papuDataArr[count] = data;
                 count++;
             }
         }
 
-        if (papuDataArr.length == 0) {
-            data = [];
-            data[0] = 0;
-            data[1] = "";
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
-            data[5] = "";
-            data[6] = "";
-            data[7] = true;
-            data[8] = "";
-            data[9] = "";
-            data[10] = 1;
-            papuDataArr[0] = data;
+        // if (papuDataArr.length == 0) {
+        //     data = [];
+        //     data[0] = 0;
+        //     data[1] = "";
+        //     data[2] = "";
+        //     data[3] = "";
+        //     data[4] = "";
+        //     data[5] = "";
+        //     data[6] = "";
+        //     data[7] = true;
+        //     data[8] = "";
+        //     data[9] = "";
+        //     data[10] = 1;
+        //     data[11] = 0;
+        //     data[12] = 0;
+        //     papuDataArr[0] = data;
+        // }
+
+        if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
+            this.state.table1Instance.destroy();
         }
 
-        this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
+            this.state.table2Instance.destroy();
+        }
         var json = [];
         var data = papuDataArr;
 
@@ -129,13 +601,13 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tracerCategory.tracerCategory'),
+                    title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     source: this.state.tracerCategoryList,
 
                 },
                 {
-                    title: i18n.t('static.forecastingUnit.forecastingUnit'),
+                    title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory
@@ -181,9 +653,123 @@ class EquivalancyUnit extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden'
+                },
+                {
+                    title: 'forecastingUnitId',
+                    type: 'hidden'
+                },
+                {
+                    title: 'typeId',
+                    type: 'hidden'
                 }
 
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el.jexcel;
+                    var rowData = elInstance.getRowData(y);
+                    // var productCategoryId = rowData[0];
+                    var forecastingUnitId = rowData[11];
+                    var typeId = rowData[12];
+                    console.log("updateTable------>", rowData[11]);
+                    if (forecastingUnitId == 0) {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell2.classList.remove('readonly');
+
+
+                    } else {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell2.classList.add('readonly');
+
+
+                    }
+
+
+                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                    console.log("decryptedUser=====>", decryptedUser);
+
+                    var roleList = decryptedUser.roleList;
+                    var roleArray = []
+                    for (var r = 0; r < roleList.length; r++) {
+                        roleArray.push(roleList[r].roleId)
+                    }
+
+
+
+                    if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    }
+                    // if (this.state.roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1) {
+                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    //     var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    // }
+
+
+
+                }
+            },
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -293,6 +879,8 @@ class EquivalancyUnit extends Component {
                                 data[8] = "";
                                 data[9] = "";
                                 data[10] = 1;
+                                data[11] = 0;
+                                data[12] = 0;
                                 obj.insertRow(data, parseInt(y), 1);
                             }.bind(this)
                         });
@@ -314,6 +902,8 @@ class EquivalancyUnit extends Component {
                                 data[8] = "";
                                 data[9] = "";
                                 data[10] = 1;
+                                data[11] = 0;
+                                data[12] = 0;
                                 obj.insertRow(data, parseInt(y));
                             }.bind(this)
                         });
@@ -374,8 +964,10 @@ class EquivalancyUnit extends Component {
             }.bind(this)
         };
 
-        this.el = jexcel(document.getElementById("paputableDiv"), options);
+        var table1Instance = jexcel(document.getElementById("paputableDiv"), options);
+        this.el = table1Instance;
         this.setState({
+            table1Instance: table1Instance,
             loading: false
         })
     }
@@ -384,8 +976,11 @@ class EquivalancyUnit extends Component {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[1];
         if (value > 0) {
-            mylist = this.state.forecastingUnitList.filter(c => c.id == value && c.active.toString() == "true");
+            mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
+        // console.log("myList--------->1", value);
+        // console.log("myList--------->2", mylist);
+        // console.log("myList--------->3", this.state.forecastingUnitList);
         return mylist.sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
@@ -397,18 +992,11 @@ class EquivalancyUnit extends Component {
         this.hideSecondComponent();
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
-
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                console.log("response.data---->", response.data);
 
                 this.setState({
-                    equivalancyUnitMappingList: listArray,
-                    selSource: listArray,
+                    equivalancyUnitMappingList: response.data,
+                    selSource: response.data,
                 },
                     () => {
                         this.buildJexcel()
@@ -556,7 +1144,7 @@ class EquivalancyUnit extends Component {
 
     getForecastingUnit() {
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            console.log("response------->" + response);
+            console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -572,6 +1160,7 @@ class EquivalancyUnit extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].forecastingUnitId),
                             active: listArray[i].active,
+                            tracerCategoryId: listArray[i].tracerCategory.id
                         }
                         tempList[i] = paJson
                     }
@@ -637,7 +1226,7 @@ class EquivalancyUnit extends Component {
     }
 
     getType() {
-        ProgramService.getProgramList()
+        ProgramService.getDataSetList()
             .then(response => {
                 console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
@@ -659,11 +1248,23 @@ class EquivalancyUnit extends Component {
                             tempProgramList[i] = paJson
                         }
                     }
-                    tempProgramList.unshift({
-                        name: 'Realm level',
-                        id: 0,
-                        active: true,
-                    });
+
+                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                    // console.log("decryptedUser=====>", decryptedUser);
+
+                    var roleList = decryptedUser.roleList;
+                    var roleArray = []
+                    for (var r = 0; r < roleList.length; r++) {
+                        roleArray.push(roleList[r].roleId)
+                    }
+                    if (roleArray.includes('ROLE_REALM_ADMIN')) {
+                        tempProgramList.unshift({
+                            name: 'All',
+                            id: -1,
+                            active: true,
+                        });
+                    }
 
                     this.setState({
                         typeList: tempProgramList,
@@ -684,7 +1285,7 @@ class EquivalancyUnit extends Component {
                 error => {
                     this.setState({
                         programs: [], loading: false
-                    }, () => { this.consolidatedProgramList() })
+                    }, () => { })
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
@@ -728,6 +1329,7 @@ class EquivalancyUnit extends Component {
     getEquivalancyUnit() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
+                console.log("EQ1------->", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -813,19 +1415,44 @@ class EquivalancyUnit extends Component {
     componentDidMount() {
         // this.getEquivalancyUnitMappingData();
         // console.log("USER------->", localStorage.getItem('curUser'));
+
         this.getTracerCategory();
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        // var elInstance = instance.jexcel;
+        var elInstance = this.state.table1Instance;
         var rowData = elInstance.getRowData(y);
 
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        }
 
-        this.el.setValueFromCoords(10, y, 1, true);
+        elInstance.setValueFromCoords(10, y, 1, true);
 
     }
+
+    addRow1 = function () {
+        var elInstance = this.state.table2Instance;
+        var json = elInstance.getJson(null, false);
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = true;
+        data[5] = "";
+        data[6] = "";
+        data[7] = 1;
+
+        elInstance.insertRow(
+            data, 0, 1
+        );
+    };
+
     addRow = function () {
-        var json = this.el.getJson(null, false);
+        var elInstance = this.state.table1Instance;
+        var json = elInstance.getJson(null, false);
         var data = [];
         data[0] = 0;
         data[1] = "";
@@ -838,8 +1465,10 @@ class EquivalancyUnit extends Component {
         data[8] = "";
         data[9] = "";
         data[10] = 1;
+        data[11] = 0;
+        data[12] = 0;
 
-        this.el.insertRow(
+        elInstance.insertRow(
             data, 0, 1
         );
     };
@@ -853,29 +1482,143 @@ class EquivalancyUnit extends Component {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(7, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
                     z = data[i].y;
                 }
             }
         }
     }
 
-    formSubmit = function () {
+    formSubmit1 = function () {
 
-        var validation = this.checkValidation();
+        var validation = this.checkValidation1();
+        var elInstance = this.state.table2Instance
+        console.log("validation------->", validation)
         if (validation == true) {
-            var tableJson = this.el.getJson(null, false);
+            this.setState({ loading: true })
+            var tableJson = elInstance.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("5 map---" + map1.get("10"))
-                if (parseInt(map1.get("10")) === 1) {
+                console.log("7 map---" + map1.get("7"))
+                if (parseInt(map1.get("7")) === 1) {
                     let json = {
-                        modelingTypeId: parseInt(map1.get("0")),
+
+                        equivalencyUnitId: parseInt(map1.get("0")),
                         label: {
                             label_en: map1.get("1"),
                         },
-                        active: map1.get("2"),
+                        active: map1.get("4"),
+
+                        
+                    }
+                    changedpapuList.push(json);
+                }
+            }
+            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            EquivalancyUnitService.addUpdateEquivalancyUnit(changedpapuList)
+                .then(response => {
+                    console.log(response.data);
+                    if (response.status == "200") {
+                        console.log(response);
+                        // window.location.reload();
+                        this.setState({
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                                // this.getUsagePeriodData();
+                            })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode,
+                            color: "red", loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+
+                })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: "red",
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        color: "red",
+                                        // message: i18n.t('static.region.duplicateGLN'),
+                                        loading: false
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: "red",
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                        })
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "red",
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+
+    formSubmit = function () {
+
+        var validation = this.checkValidation();
+        var elInstance = this.state.table1Instance;
+        if (validation == true) {
+            var tableJson = elInstance.getJson(null, false);
+            console.log("tableJson---", tableJson);
+            let changedpapuList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("10 map---" + map1.get("10"))
+                if (parseInt(map1.get("10")) === 1) {
+                    let json = {
+                        equivalencyUnitMappingId: parseInt(map1.get("0")),
+                        tracerCategory: { id: parseInt(map1.get("1")) },
+                        forecastingUnit: { id: parseInt(map1.get("2")) },
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("3")) },
+                        convertToFu: map1.get("4").toString().replace(/,/g, ""),
+                        notes: map1.get("5"),
+                        program: (parseInt(map1.get("6")) == -1 ? null : { id: parseInt(map1.get("6")) }),
+                        active: map1.get("7"),
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -902,7 +1645,8 @@ class EquivalancyUnit extends Component {
                         },
                             () => {
                                 this.hideSecondComponent();
-                                this.getEquivalancyUnitMappingData();
+                                // this.getEquivalancyUnitMappingData();
+                                this.getTracerCategory();
                             })
                     } else {
                         this.setState({
@@ -976,35 +1720,130 @@ class EquivalancyUnit extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
-        tr.children[6].classList.add('AsteriskTheadtrTd');
+        // tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
-        //Forecast Method
+        var elInstance = this.state.table1Instance;
+        console.log("LOG---------->1", elInstance);
+        //Tracer Category
         if (x == 1) {
+            console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
+            elInstance.setValueFromCoords(2, y, '', true);
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (!(budgetRegx.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        //Forecasting Unit
+        if (x == 2) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        //Equivalancy Unit
+        if (x == 3) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        //conversion To FU 14,4
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = DECIMAL_NO_REGEX;
+            var reg = /^\d{1,14}(\.\d{1,4})?$/;
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                } else {
+                    if (isNaN(Number.parseInt(value)) || value <= 0) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+                    } else {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+
+                }
+
+            }
+        }
+
+        //Type
+        if (x == 6) {
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
             }
         }
 
         //Active
         if (x != 10) {
-            this.el.setValueFromCoords(10, y, 1, true);
+            elInstance.setValueFromCoords(10, y, 1, true);
         }
 
 
@@ -1012,34 +1851,133 @@ class EquivalancyUnit extends Component {
     }.bind(this);
     // -----end of changed function
 
-    checkValidation = function () {
+    checkValidation1 = function () {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var elInstance = this.state.table2Instance;
+        var json = elInstance.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(10, y);
+            var value = elInstance.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
-                //Region
+                //UsagePeriod
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var value = elInstance.getValueFromCoords(1, y);
                 console.log("value-----", value);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
                     if (!(budgetRegx.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.spacetext'));
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.message.spacetext'));
                         valid = false;
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
                     }
                 }
+
+
+            }
+        }
+        return valid;
+    }
+
+    checkValidation = function () {
+        var valid = true;
+        var elInstance = this.state.table1Instance;
+        var json = elInstance.getJson(null, false);
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+            var value = elInstance.getValueFromCoords(10, y);
+            if (parseInt(value) == 1) {
+
+                //TracerCategory
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(1, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+                //ForecastingUnit
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+                //Equivalancy Unit
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(3, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+                //conversion to FU decimal 14,4
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(4, y);
+                var reg = /^\d{1,14}(\.\d{1,4})?$/;
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!(reg.test(value))) {
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                    } else {
+                        if (isNaN(Number.parseInt(value)) || value <= 0) {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", "yellow");
+                            elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+                        } else {
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setComments(col, "");
+                        }
+                    }
+                }
+
+
+                //Type
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(6, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
 
 
             }
@@ -1057,6 +1995,18 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Card>
+
+                        <div className="Card-header-addicon problemListMarginTop">
+                            <div className="card-header-actions">
+                                <div className="card-header-action">
+                                    <a className="card-header-action">
+                                        {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}> <i className="fa fa-plus"></i>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
@@ -1088,7 +2038,31 @@ class EquivalancyUnit extends Component {
 
                         </CardFooter>
                     </Card>
+
+
                 </div>
+
+                <Modal isOpen={this.state.isModalOpen}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader>
+                        <strong>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red" id="div3"></h6>
+                        <div className="table-responsive">
+                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight">
+                            </div>
+                        </div>
+                        <br />
+                    </ModalBody>
+                    <ModalFooter>
+                        <div className="mr-0">
+                            <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                        </div>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
 
             </div>
         )
