@@ -652,29 +652,32 @@ console.log("this.props.match.params.message",this.props.params)
                                                         <li>
                                                             <input type="checkbox" id={"c1-".concat(item.realmCountry.id)} />
                                                             <label htmlFor={"c1-".concat(item.realmCountry.id)} className="tree_label">{getLabelText(item.realmCountry.label, this.state.lang)}</label>
-                                                            <ul>
+                                                            {/* <ul>
                                                                 {
                                                                     item.healthAreaList.map(item1 => (
                                                                         <li>
                                                                             <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
-                                                                            <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
+                                                                            <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label> */}
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).filter(c => c.healthArea.id == item1.id).map(item2 => (
+                                                                                    this.state.prgList.filter(c => 
+                                                                                        c.realmCountry.id == item.realmCountry.id)
+                                                                                        // .filter(c => c.healthArea.id == item1.id)
+                                                                                        .map(item2 => (
 
                                                                                         <li>
                                                                                             {/* {item2} */}
                                                                                             <span className="tree_label">
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
-                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")} />
-                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
+                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
                                                                                                         {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)} />
-                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id)}></label>
+                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
+                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
                                                                                             <ul>
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
@@ -683,8 +686,8 @@ console.log("this.props.match.params.message",this.props.params)
                                                                                                                 <li><span className="tree_label">
                                                                                                                     <span className="">
                                                                                                                         <div className="checkbox m-0">
-                                                                                                                            <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item1.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                            <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
                                                                                                                             {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
                                                                                                                         </div>
                                                                                                                     </span>
@@ -715,9 +718,9 @@ console.log("this.props.match.params.message",this.props.params)
                                                                         </li>
 
                                                                     ))}
-                                                            </ul>
+                                                            {/* </ul>
                                                         </li>
-                                                    ))}
+                                                    ))} */}
                                             </ul>
                                         </li>
                                     </ul>
