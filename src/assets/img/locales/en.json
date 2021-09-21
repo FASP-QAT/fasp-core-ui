@@ -251,7 +251,7 @@
     "static.common.million": "Million",
     "static.procurementUnit.heightQtyText": "Enter Height Quantity",
     "static.fundingsource.validsubfundingsource": "Enter sub-funding source",
-    "static.message.commitSuccess": "Version committed successfully",
+    "static.message.commitSuccess": "Commit request has been generated will notify you once the request is completed",
     "static.translation.pourtegese": "Portuguese",
     "static.procurementUnit.multiplierText": "Enter Conversion Factor (How many Planning Units are in 1 Procurement Unit?)",
     "static.report.mos": "MOS",
