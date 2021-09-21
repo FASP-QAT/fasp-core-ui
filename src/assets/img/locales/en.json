@@ -911,10 +911,7 @@
     "static.planningunit.maxGtin": "Max 14 digits allowed",
     "static.program.import": "Import program data",
     "static.forecastMethod.historicalData": "Consumption",
-<<<<<<< HEAD
-=======
     "static.common.pr": "PR - ",
->>>>>>> c632ee7abbd14a104bcbe90d7660e88f9ce708d6
     "static.message.login.invalidCredentials": "Incorrect login or password",
     "static.message.inventorySaved": "Inventory data saved",
     "static.month.dec": "Dec",
@@ -1257,6 +1254,7 @@
     "static.program.errorSelectAtleastOneProgram": "Select at least one program to load",
     "static.problemReport.resolved": "Resolved",
     "static.whatIf.validScenario": "Select Scenario",
+    "static.module.forecasting": "FORECASTING",
     "static.roleHead.role": "Role",
     "static.programOnboarding.programDisplayName": "Program Display Name",
     "static.report.stockout": "Stocked Out",
@@ -1442,6 +1440,7 @@
     "static.message.suggestedShipmentsSaved": "Suggested shipments saved",
     "static.supplyPlan.monthsOfStock": "Months of Stock",
     "static.supplyPlanFormula.suggestedOrderQty": "Suggested Order Qty",
+    "static.module.supplyPlanningMod": "SUPPLY PLANNING",
     "static.supplyPlanFormula.endingBalance1": "Projected Inventory = Opening balance + Adjustments + Shipments in account - Consumptions - Expired stock",
     "static.currency.currency": "Currency (English)",
     "static.message.invaliddate": "Invalid Date",
@@ -1807,7 +1806,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.common.programAndDataset": "Program/Dataset",
     "static.common.pr": "PR - ",
     "static.common.fr": "FR - "
