@@ -77,6 +77,7 @@ class ScaleUpType extends Component {
                 data[3] = papuList[j].lastModifiedBy.username;
                 data[4] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
                 data[5] = 0;
+                data[6] = 0;
                 papuDataArr[count] = data;
                 count++;
             }
@@ -90,6 +91,7 @@ class ScaleUpType extends Component {
             data[3] = "";
             data[4] = "";
             data[5] = 1;
+            data[6] = 1;
             papuDataArr[0] = data;
         }
 
@@ -118,7 +120,7 @@ class ScaleUpType extends Component {
                 {
                     title: i18n.t('static.checkbox.active'),
                     type: 'checkbox',
-                    readOnly: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE')  || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE'))? false : true)
+                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? false : true)
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -134,9 +136,31 @@ class ScaleUpType extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden'
+                },
+                {
+                    title: 'addNewRow',
+                    type: 'hidden'
                 }
 
+
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el.jexcel;
+                    var rowData = elInstance.getRowData(y);
+                    var addRowId = rowData[6];
+                    console.log("addRowId------>", addRowId);
+                    if (addRowId == 1) {//active grade out
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    } else {
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                    }
+
+
+                }
+            },
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -153,7 +177,7 @@ class ScaleUpType extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onpaste: this.onPaste,
+            // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -162,7 +186,7 @@ class ScaleUpType extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            editable: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? true : false),
+            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? true : false),
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -391,6 +415,7 @@ class ScaleUpType extends Component {
         data[3] = "";
         data[4] = "";
         data[5] = 1;
+        data[6] = 1;
 
         this.el.insertRow(
             data, 0, 1
@@ -406,6 +431,7 @@ class ScaleUpType extends Component {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(5, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(6, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -605,40 +631,40 @@ class ScaleUpType extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
-                    <Card>
-                        <CardBody className="p-0">
+                <Card>
+                    <CardBody className="p-0">
 
-                            <Col xs="12" sm="12">
+                        <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}>
-                                </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                            <div class="spinner-border blue ml-4" role="status">
+                                        <div class="spinner-border blue ml-4" role="status">
 
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                            </Col>
-                        </CardBody>
-                        <CardFooter>
-                            {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE')) &&
-                                <FormGroup>
-                                    {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') &&
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                                    }
-                                    &nbsp;
-                                </FormGroup>
-                            }
-                        </CardFooter>
-                    </Card>
+                        </Col>
+                    </CardBody>
+                    <CardFooter>
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE')) &&
+                            <FormGroup>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') &&
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                }
+                                &nbsp;
+                            </FormGroup>
+                        }
+                    </CardFooter>
+                </Card>
 
             </div>
         )

@@ -2888,10 +2888,10 @@ class DefaultLayout extends Component {
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
                       style={{ border: "none" }}
-                      title={i18n.t('static.module.forecastDatasetModule')}
+                      title={i18n.t('static.module.forecasting')}
                     >
                       <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
-                      <h6 className="tabtext">FORECASTING</h6>
+                      <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
                     </NavLink>
                   </NavItem>
                   <NavItem className="bgColourRemoveItem itemWhidth">
@@ -2900,12 +2900,12 @@ class DefaultLayout extends Component {
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
                       style={{ border: "none" }}
-                      title={i18n.t('static.module.supplyPlanning')}
+                      title={i18n.t('static.module.supplyPlanningMod')}
                     >
                       {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
                       <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
                       <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
-                      <h6 className="tabtext">SUPPLY PLANNING</h6>
+                      <h6 className="tabtext">{i18n.t('static.module.supplyPlanningMod')}</h6>
                     </NavLink>
                   </NavItem>
                 </Nav>
