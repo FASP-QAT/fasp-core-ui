@@ -46,6 +46,27 @@ export default class ListTreeComponent extends Component {
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.buildTree=this.buildTree.bind(this);
+        this.onTemplateChange=this.onTemplateChange.bind(this);
+    }
+
+
+    onTemplateChange(event){
+
+        this.props.history.push({
+            pathname: `/dataSet/buildTree/${event.target.value}`,
+            // state: { role }
+        });
+
+    }
+
+    buildTree(){
+
+        this.props.history.push({
+            pathname: `/dataSet/buildTree/`,
+            // state: { role }
+        });
+
     }
     buildJexcel() {
         let treeList = this.state.treeList;
@@ -146,6 +167,20 @@ export default class ListTreeComponent extends Component {
 
                             }.bind(this)
                         });
+
+                        items.push({
+                            title: i18n.t('static.common.copyRow'),
+                            onclick: function () {
+                                var rowData = obj.getRowData(y);
+                                console.log("rowData===>", rowData);
+                                rowData[0]="";
+                                rowData[1]="";
+                                var data = rowData;
+                                this.el.insertRow(
+                                    data, 0, 1
+                                );
+                            }.bind(this)
+                        });
                     }
                 }
 
@@ -184,14 +219,15 @@ export default class ListTreeComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-            if (this.state.selSource.length != 0) {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
-                    this.props.history.push({
-                        pathname: `/diamension/editDiamension/${this.el.getValueFromCoords(0, x)}`,
-                        // state: { role }
-                    });
-                }
-            }
+
+            var treeId = this.el.getValueFromCoords(0, x);
+            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
+            this.props.history.push({
+                pathname: `/dataSet/buildTree/${treeId}`,
+                // state: { role }
+            });
+            // }
+
         }
     }.bind(this);
 
@@ -220,7 +256,7 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                
+
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                     // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                     <Col md="3" className="pl-0">
@@ -230,12 +266,13 @@ export default class ListTreeComponent extends Component {
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="realmId"
-                                                        id="realmId"
+                                                        name="templateId"
+                                                        id="templateId"
                                                         bsSize="sm"
-                                                        onChange={this.filterData}
+                                                        onChange={(e)=>{this.onTemplateChange(e)}}
                                                     >
                                                         <option value="0">{i18n.t('static.common.all')}</option>
+                                                        <option value="1">Demographic TreeTemplate</option>
                                                         {/* {realmList} */}
                                                     </Input>
                                                 </InputGroup>
@@ -244,7 +281,7 @@ export default class ListTreeComponent extends Component {
                                     </Col>
                                 }
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
                                 }
                             </div>
                         </div>

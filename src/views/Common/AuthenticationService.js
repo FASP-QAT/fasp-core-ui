@@ -1294,6 +1294,10 @@ class AuthenticationService {
                         }
                         break;
                     case "/dataset/listTree":
+                    case "/dataSet/buildTree/:treeId":
+                    case "/dataSet/buildTree/":
+                    case "/dataset/createTreeTemplate/":
+                    case "/dataSet/buildTree/:templateId":
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                             return true;

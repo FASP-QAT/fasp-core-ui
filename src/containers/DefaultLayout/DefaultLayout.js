@@ -280,10 +280,15 @@ const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/Model
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
+const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
+const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/TreeTemplateComponent'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-
+  {path:'/dataset/createTreeTemplate/',name:'static.common.createTreeTemplate',component:CreateTreeTemplate},
+  { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/:templateId',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -1404,6 +1409,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.listtree'),
                             url: '/dataset/listTree',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.common.createTreeTemplate'),
+                            url: '/dataset/createTreeTemplate',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           }
