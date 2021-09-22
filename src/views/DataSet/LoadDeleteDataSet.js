@@ -594,7 +594,7 @@ class LoadDeleteDataSet extends Component {
                     </option>
                 )
             }, this);
-console.log("this.props.match.params.message",this.props.params)
+        console.log("this.props.match.params.message", this.props.params)
         return (
             <div className="animated fadeIn">
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
@@ -613,6 +613,9 @@ console.log("this.props.match.params.message",this.props.params)
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+
+                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>Keep latest  version of program and delete older versions.</li>
+                                    <li><i title="Delete" className="ml-1 fa fa-trash">Delete the version</i></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -645,7 +648,8 @@ console.log("this.props.match.params.message",this.props.params)
                                     <ul className="tree">
                                         <li>
                                             <input type="checkbox" id="c1" />
-                                            <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label>
+                                            {/* <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label> */}
+                                            <label className="tree_label" htmlFor="c1">{AuthenticationService.getLoggedInUserRealm().label.label_en}</label>
                                             <ul>
                                                 {
                                                     this.state.countryList.map(item => (
@@ -658,51 +662,51 @@ console.log("this.props.match.params.message",this.props.params)
                                                                         <li>
                                                                             <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
                                                                             <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label> */}
-                                                                            <ul>
-                                                                                {
-                                                                                    this.state.prgList.filter(c => 
-                                                                                        c.realmCountry.id == item.realmCountry.id)
-                                                                                        // .filter(c => c.healthArea.id == item1.id)
-                                                                                        .map(item2 => (
+                                                            <ul>
+                                                                {
+                                                                    this.state.prgList.filter(c =>
+                                                                        c.realmCountry.id == item.realmCountry.id)
+                                                                        // .filter(c => c.healthArea.id == item1.id)
+                                                                        .map(item2 => (
 
-                                                                                        <li>
-                                                                                            {/* {item2} */}
-                                                                                            <span className="tree_label">
-                                                                                                <span className="">
-                                                                                                    <div className="checkbox m-0">
-                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
-                                                                                                        <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
-                                                                                                        {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
-                                                                                                    </div>
-                                                                                                </span>
-                                                                                            </span>
-                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
-                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
-                                                                                            <ul>
-                                                                                                {
-                                                                                                    this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
-                                                                                                        (item3.versionList).map((item4, count) => (
-                                                                                                            <>
-                                                                                                                <li><span className="tree_label">
-                                                                                                                    <span className="">
-                                                                                                                        <div className="checkbox m-0">
-                                                                                                                            <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
-                                                                                                                        </div>
-                                                                                                                    </span>
-                                                                                                                </span>
-                                                                                                                </li>
+                                                                            <li>
+                                                                                {/* {item2} */}
+                                                                                <span className="tree_label">
+                                                                                    <span className="">
+                                                                                        <div className="checkbox m-0">
+                                                                                            <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
+                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
+                                                                                        </div>
+                                                                                    </span>
+                                                                                </span>
+                                                                                <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
+                                                                                <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
+                                                                                <ul>
+                                                                                    {
+                                                                                        this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
+                                                                                            (item3.versionList).map((item4, count) => (
+                                                                                                <>
+                                                                                                    <li><span className="tree_label">
+                                                                                                        <span className="">
+                                                                                                            <div className="checkbox m-0">
+                                                                                                                <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
+                                                                                                            </div>
+                                                                                                        </span>
+                                                                                                    </span>
+                                                                                                    </li>
 
-                                                                                                                {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
-                                                                                                            </>
+                                                                                                    {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                </>
 
-                                                                                                        ))
-                                                                                                    ))
-                                                                                                }
+                                                                                            ))
+                                                                                        ))
+                                                                                    }
 
-                                                                                            </ul>
-                                                                                            {/* <ul>
+                                                                                </ul>
+                                                                                {/* <ul>
 
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
@@ -711,14 +715,14 @@ console.log("this.props.match.params.message",this.props.params)
                                                                                                         ))
                                                                                                     ))}
                                                                                             </ul> */}
-                                                                                        </li>
+                                                                            </li>
 
-                                                                                    ))}
-                                                                            </ul>
-                                                                        </li>
+                                                                        ))}
+                                                            </ul>
+                                                        </li>
 
-                                                                    ))}
-                                                            {/* </ul>
+                                                    ))}
+                                                {/* </ul>
                                                         </li>
                                                     ))} */}
                                             </ul>
@@ -885,96 +889,145 @@ console.log("this.props.match.params.message",this.props.params)
     }
 
     deleteLocalVersionUsingProgramId(programId) {
-        this.setState({
-            loading: true
-        })
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
-        var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            for (var i = 0; i < listOfProgramVersion.length; i++) {
-                var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                programTransaction.delete(id);
-            }
-            transaction.oncomplete = function (event) {
-                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
-                for (var i = 0; i < listOfProgramVersion.length; i++) {
-                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                    programTransaction1.delete(id);
-                }
-                transaction1.oncomplete = function (event) {
-                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                    for (var i = 0; i < listOfProgramVersion.length; i++) {
-                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                        programTransaction2.delete(id);
-                    }
-                    transaction2.oncomplete = function (event) {
+        confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
+            message: "Do you want to delete",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
                         this.setState({
-                            loading: false,
-                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                            color: 'green'
-                        }, () => {
+                            loading: true
+                        })
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
+                        var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction = db1.transaction(['programData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('programData');
+                            for (var i = 0; i < listOfProgramVersion.length; i++) {
+                                var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                                programTransaction.delete(id);
+                            }
+                            transaction.oncomplete = function (event) {
+                                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                                for (var i = 0; i < listOfProgramVersion.length; i++) {
+                                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                                    programTransaction1.delete(id);
+                                }
+                                transaction1.oncomplete = function (event) {
+                                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                                        programTransaction2.delete(id);
+                                    }
+                                    transaction2.oncomplete = function (event) {
+                                        this.setState({
+                                            loading: false,
+                                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
+                                    }.bind(this)
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }
+                }, {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        this.setState({
+                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                        })
+                        this.setState({ loading: false, color: "red" }, () => {
                             this.hideFirstComponent()
                         })
-                        this.getPrograms();
-                        this.getLocalPrograms();
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        }.bind(this)
+                        this.props.history.push(`/dataSet/loadDeleteDataSet`)
+                    }
+                }
+            ]
+        })
+
+
+
     }
 
     deleteLocalVersion(programId, versionId) {
-        this.setState({
-            loading: true
-        })
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        var id = programId + "_v" + versionId + "_uId_" + userId;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var deleteRequest = programTransaction.delete(id);
-            deleteRequest.onsuccess = function (event) {
-                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
-                var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
-                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                    var deleteRequest2 = programTransaction2.delete(id);
-                    deleteRequest2.onsuccess = function (event) {
+
+        confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
+            message: "Do you want to delete this version",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
                         this.setState({
-                            loading: false,
-                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                            color: 'green'
-                        }, () => {
+                            loading: true
+                        })
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var id = programId + "_v" + versionId + "_uId_" + userId;
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction = db1.transaction(['programData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('programData');
+                            var deleteRequest = programTransaction.delete(id);
+                            deleteRequest.onsuccess = function (event) {
+                                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                                var deleteRequest1 = programTransaction1.delete(id);
+                                deleteRequest1.onsuccess = function (event) {
+                                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    var deleteRequest2 = programTransaction2.delete(id);
+                                    deleteRequest2.onsuccess = function (event) {
+                                        this.setState({
+                                            loading: false,
+                                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
+
+                                    }.bind(this)
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }
+                }, {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        this.setState({
+                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                        })
+                        this.setState({ loading: false, color: "red" }, () => {
                             this.hideFirstComponent()
                         })
-                        this.getPrograms();
-                        this.getLocalPrograms();
+                        this.props.history.push(`/dataSet/loadDeleteDataSet`)
+                    }
+                }
+            ]
+        })
 
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        }.bind(this)
     }
 
     downloadClicked() {
