@@ -1293,6 +1293,13 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataset/listTree":
+                    case "/dataset/listTree/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
+                            return true;
+                        }
+                        break;
+
 
                     default:
                         console.log("default case");

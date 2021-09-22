@@ -240,6 +240,8 @@ const ModelingTypeList = React.lazy(() => import('./views/ModelingType/ModelingT
 const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
 const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
 
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -603,5 +605,8 @@ const routes = [
 
   { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
   { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 export default routes;

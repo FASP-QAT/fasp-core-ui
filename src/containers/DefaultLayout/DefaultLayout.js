@@ -279,6 +279,8 @@ const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/F
 const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/ModelingTypeList'));
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 
+const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -655,6 +657,8 @@ const routes = [
   { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
   { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
 
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 
 class DefaultLayout extends Component {
@@ -1388,6 +1392,21 @@ class DefaultLayout extends Component {
                           // },
 
 
+                        ]
+                      },
+                      {
+                        name: i18n.t('static.common.datasetmanagement'),
+                        icon: 'fa fa-list',
+                        attributes: {
+                          hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        },
+                        children: [
+                          {
+                            name: i18n.t('static.common.listtree'),
+                            url: '/dataset/listTree',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          }
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
