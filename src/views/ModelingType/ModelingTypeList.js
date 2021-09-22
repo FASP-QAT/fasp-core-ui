@@ -189,8 +189,32 @@ class ScaleUpType extends Component {
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? true : false),
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
+                var items = [];
+                //Add consumption batch info
+
+
+                if (y == null) {
+
+                } else {
+
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[0] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                            // Line
+                            // items.push({ type: 'line' });
+                        } 
+                    }
+                }
+
+                return items;
+            }.bind(this)
         };
 
         this.el = jexcel(document.getElementById("paputableDiv"), options);
@@ -628,6 +652,7 @@ class ScaleUpType extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
+                <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
