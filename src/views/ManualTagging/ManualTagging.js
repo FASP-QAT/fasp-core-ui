@@ -151,7 +151,7 @@ export default class ManualTagging extends Component {
         console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
-        
+
             batchDetails.sort(function (a, b) {
                 var dateA = new Date(a.expiryDate).getTime();
                 var dateB = new Date(b.expiryDate).getTime();
@@ -1124,23 +1124,29 @@ export default class ManualTagging extends Component {
                     if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
                         ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                             .then(response => {
-                                this.setState({
-                                    message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
-                                    color: 'green',
-                                    loading: false,
-                                    loading1: false,
-                                    planningUnitIdUpdated: ''
-                                },
-                                    () => {
-                                        this.hideSecondComponent();
-                                        this.toggleLarge();
+                                if (response.status == 200) {
+                                    console.log("ERP Linking success---");
+                                    this.setState({
+                                        message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
+                                        color: 'green',
+                                        loading: false,
+                                        loading1: false,
+                                        planningUnitIdUpdated: ''
+                                    },
+                                        () => {
+                                            this.hideSecondComponent();
+                                            this.toggleLarge();
 
-                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+                                            (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
 
-                                    })
+                                        })
+                                }else{
+                                    console.log("ERP Linking failed---",response);
+                                }
 
                             }).catch(
                                 error => {
+                                    console.log("ERP Linking error---",error);
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
