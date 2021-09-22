@@ -235,7 +235,7 @@ export default class ListTreeComponent extends Component {
                                                         bsSize="sm"
                                                         onChange={this.filterData}
                                                     >
-                                                        <option value="0">{i18n.t('static.common.createTreeFromTemplate')}</option>
+                                                        <option value="0">{i18n.t('static.common.all')}</option>
                                                         {/* {realmList} */}
                                                     </Input>
                                                 </InputGroup>
