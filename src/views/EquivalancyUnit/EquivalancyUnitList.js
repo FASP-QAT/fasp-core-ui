@@ -3,7 +3,7 @@ import {
     Card, CardBody,
     Label, Input, FormGroup,
     CardFooter, Button, Table, Col, Row, FormFeedback, Form,
-    Modal, ModalBody, ModalFooter, ModalHeader,
+    Modal, ModalBody, ModalFooter, ModalHeader, InputGroup
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -41,6 +41,7 @@ class EquivalancyUnit extends Component {
 
             typeList: [{ id: 1, name: 'Realm' }, { id: 2, name: 'DataSet' }],
             tracerCategoryList: [],
+            tracerCategoryList1: [],
             forecastingUnitList: [],
             equivalancyUnitList: [],
             roleArray: [],
@@ -49,8 +50,10 @@ class EquivalancyUnit extends Component {
             eqUnitTableEl: "",
             table1Instance: "",
             table2Instance: "",
+            selSource: [],
 
-            loading: true
+            loading1: true,
+            loading2: true
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -62,6 +65,7 @@ class EquivalancyUnit extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.filterData = this.filterData.bind(this);
 
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
 
@@ -110,6 +114,7 @@ class EquivalancyUnit extends Component {
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -172,6 +177,7 @@ class EquivalancyUnit extends Component {
                 data[5] = papuList[j].lastModifiedBy.username;
                 data[6] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
                 data[7] = 0
+                data[8] = 0
                 papuDataArr[count] = data;
                 count++;
             }
@@ -249,8 +255,27 @@ class EquivalancyUnit extends Component {
                     title: 'isChange',
                     type: 'hidden'
                 },
+                {
+                    title: 'addNewRow',
+                    type: 'hidden'
+                }
 
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el.jexcel;
+                    var rowData = elInstance.getRowData(y);
+                    var addRowId = rowData[8];
+                    console.log("addRowId------>", addRowId);
+                    if (addRowId == 1) {//active grade out
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    } else {
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                    }
+                }
+            },
             // pagination: localStorage.getItem("sesRecordCount"),
             // filters: true,
             // search: true,
@@ -268,7 +293,7 @@ class EquivalancyUnit extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onpaste: this.onPaste1,
+            // onpaste: this.onPaste1,
             oneditionend: this.oneditionend1,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -285,100 +310,9 @@ class EquivalancyUnit extends Component {
 
 
                 if (y == null) {
-                    // Insert a new column
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnBefore,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 1);
-                            }
-                        });
-                    }
 
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnAfter,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 0);
-                            }
-                        });
-                    }
-
-                    // Delete a column
-                    // if (obj.options.allowDeleteColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.deleteSelectedColumns,
-                    //         onclick: function () {
-                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                    //         }
-                    //     });
-                    // }
-
-                    // Rename column
-                    // if (obj.options.allowRenameColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.renameThisColumn,
-                    //         onclick: function () {
-                    //             obj.setHeader(x);
-                    //         }
-                    //     });
-                    // }
-
-                    // Sorting
-                    if (obj.options.columnSorting == true) {
-                        // Line
-                        items.push({ type: 'line' });
-
-                        items.push({
-                            title: obj.options.text.orderAscending,
-                            onclick: function () {
-                                obj.orderBy(x, 0);
-                            }
-                        });
-                        items.push({
-                            title: obj.options.text.orderDescending,
-                            onclick: function () {
-                                obj.orderBy(x, 1);
-                            }
-                        });
-                    }
                 } else {
-                    // Insert new row before
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowBefore'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = "";
-                                data[4] = true;
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = 1;
-                                obj.insertRow(data, parseInt(y), 1);
-                            }.bind(this)
-                        });
-                    }
-                    // after
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowAfter'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = "";
-                                data[4] = true;
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = 1;
-                                obj.insertRow(data, parseInt(y));
-                            }.bind(this)
-                        });
-                    }
+
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
                         // region id
@@ -389,47 +323,11 @@ class EquivalancyUnit extends Component {
                                     obj.deleteRow(parseInt(y));
                                 }
                             });
+                            // Line
+                            // items.push({ type: 'line' });
                         }
                     }
-
-                    if (x) {
-                        // if (obj.options.allowComments == true) {
-                        //     items.push({ type: 'line' });
-
-                        //     var title = obj.records[y][x].getAttribute('title') || '';
-
-                        //     items.push({
-                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                        //         onclick: function () {
-                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                        //         }
-                        //     });
-
-                        //     if (title) {
-                        //         items.push({
-                        //             title: obj.options.text.clearComments,
-                        //             onclick: function () {
-                        //                 obj.setComments([x, y], '');
-                        //             }
-                        //         });
-                        //     }
-                        // }
-                    }
                 }
-
-                // Line
-                items.push({ type: 'line' });
-
-                // // Save
-                // if (obj.options.allowExport) {
-                //     items.push({
-                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                //         shortcut: 'Ctrl + S',
-                //         onclick: function () {
-                //             obj.download(true);
-                //         }
-                //     });
-                // }
 
                 return items;
             }.bind(this)
@@ -556,6 +454,7 @@ class EquivalancyUnit extends Component {
                 data[10] = 0;
                 data[11] = papuList[j].forecastingUnit.id
                 data[12] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
+                data[13] = 0;
                 papuDataArr[count] = data;
                 count++;
             }
@@ -660,6 +559,10 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: 'typeId',
+                    type: 'hidden'
+                },
+                {
+                    title: 'addNewRow',
                     type: 'hidden'
                 }
 
@@ -768,6 +671,17 @@ class EquivalancyUnit extends Component {
 
 
 
+                    var addRowId = rowData[13];
+                    console.log("addRowId------>", addRowId);
+                    if (addRowId == 1) {//active grade out
+                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    } else {
+                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                    }
+
+
                 }
             },
             pagination: localStorage.getItem("sesRecordCount"),
@@ -786,7 +700,7 @@ class EquivalancyUnit extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onpaste: this.onPaste,
+            // onpaste: this.onPaste,
             oneditionend: this.oneditionend,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -804,110 +718,9 @@ class EquivalancyUnit extends Component {
 
 
                 if (y == null) {
-                    // Insert a new column
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnBefore,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 1);
-                            }
-                        });
-                    }
 
-                    if (obj.options.allowInsertColumn == true) {
-                        items.push({
-                            title: obj.options.text.insertANewColumnAfter,
-                            onclick: function () {
-                                obj.insertColumn(1, parseInt(x), 0);
-                            }
-                        });
-                    }
-
-                    // Delete a column
-                    // if (obj.options.allowDeleteColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.deleteSelectedColumns,
-                    //         onclick: function () {
-                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                    //         }
-                    //     });
-                    // }
-
-                    // Rename column
-                    // if (obj.options.allowRenameColumn == true) {
-                    //     items.push({
-                    //         title: obj.options.text.renameThisColumn,
-                    //         onclick: function () {
-                    //             obj.setHeader(x);
-                    //         }
-                    //     });
-                    // }
-
-                    // Sorting
-                    if (obj.options.columnSorting == true) {
-                        // Line
-                        items.push({ type: 'line' });
-
-                        items.push({
-                            title: obj.options.text.orderAscending,
-                            onclick: function () {
-                                obj.orderBy(x, 0);
-                            }
-                        });
-                        items.push({
-                            title: obj.options.text.orderDescending,
-                            onclick: function () {
-                                obj.orderBy(x, 1);
-                            }
-                        });
-                    }
                 } else {
-                    // Insert new row before
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowBefore'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = "";
-                                data[4] = "";
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = true;
-                                data[8] = "";
-                                data[9] = "";
-                                data[10] = 1;
-                                data[11] = 0;
-                                data[12] = 0;
-                                obj.insertRow(data, parseInt(y), 1);
-                            }.bind(this)
-                        });
-                    }
-                    // after
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.insertNewRowAfter'),
-                            onclick: function () {
-                                var data = [];
-                                data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = "";
-                                data[4] = "";
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = true;
-                                data[8] = "";
-                                data[9] = "";
-                                data[10] = 1;
-                                data[11] = 0;
-                                data[12] = 0;
-                                obj.insertRow(data, parseInt(y));
-                            }.bind(this)
-                        });
-                    }
+
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
                         // region id
@@ -918,47 +731,11 @@ class EquivalancyUnit extends Component {
                                     obj.deleteRow(parseInt(y));
                                 }
                             });
+                            // Line
+                            // items.push({ type: 'line' });
                         }
                     }
-
-                    if (x) {
-                        // if (obj.options.allowComments == true) {
-                        //     items.push({ type: 'line' });
-
-                        //     var title = obj.records[y][x].getAttribute('title') || '';
-
-                        //     items.push({
-                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                        //         onclick: function () {
-                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                        //         }
-                        //     });
-
-                        //     if (title) {
-                        //         items.push({
-                        //             title: obj.options.text.clearComments,
-                        //             onclick: function () {
-                        //                 obj.setComments([x, y], '');
-                        //             }
-                        //         });
-                        //     }
-                        // }
-                    }
                 }
-
-                // Line
-                items.push({ type: 'line' });
-
-                // // Save
-                // if (obj.options.allowExport) {
-                //     items.push({
-                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                //         shortcut: 'Ctrl + S',
-                //         onclick: function () {
-                //             obj.download(true);
-                //         }
-                //     });
-                // }
 
                 return items;
             }.bind(this)
@@ -1085,6 +862,7 @@ class EquivalancyUnit extends Component {
 
                     this.setState({
                         tracerCategoryList: tempList,
+                        tracerCategoryList1: response.data
                         // loading: false
                     },
                         () => {
@@ -1444,6 +1222,7 @@ class EquivalancyUnit extends Component {
         data[5] = "";
         data[6] = "";
         data[7] = 1;
+        data[8] = 1;
 
         elInstance.insertRow(
             data, 0, 1
@@ -1467,6 +1246,7 @@ class EquivalancyUnit extends Component {
         data[10] = 1;
         data[11] = 0;
         data[12] = 0;
+        data[13] = 1;
 
         elInstance.insertRow(
             data, 0, 1
@@ -1484,6 +1264,7 @@ class EquivalancyUnit extends Component {
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -1512,7 +1293,7 @@ class EquivalancyUnit extends Component {
                         },
                         active: map1.get("4"),
 
-                        
+
                     }
                     changedpapuList.push(json);
                 }
@@ -1528,8 +1309,10 @@ class EquivalancyUnit extends Component {
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
                         },
                             () => {
+                                this.modelOpenClose();
                                 this.hideSecondComponent();
                                 // this.getUsagePeriodData();
+                                this.getTracerCategory();
                             })
                     } else {
                         this.setState({
@@ -1537,6 +1320,7 @@ class EquivalancyUnit extends Component {
                             color: "red", loading: false
                         },
                             () => {
+                                this.modelOpenClose();
                                 this.hideSecondComponent();
                             })
                     }
@@ -1569,6 +1353,7 @@ class EquivalancyUnit extends Component {
                                         loading: false
                                     },
                                         () => {
+                                            this.modelOpenClose();
                                             this.hideSecondComponent();
                                         })
                                     break;
@@ -1579,6 +1364,7 @@ class EquivalancyUnit extends Component {
                                         color: "red",
                                     },
                                         () => {
+                                            this.modelOpenClose();
                                             this.hideSecondComponent();
                                         })
                                     break;
@@ -1603,6 +1389,7 @@ class EquivalancyUnit extends Component {
         var validation = this.checkValidation();
         var elInstance = this.state.table1Instance;
         if (validation == true) {
+            this.setState({ loading: true })
             var tableJson = elInstance.getJson(null, false);
             console.log("tableJson---", tableJson);
             let changedpapuList = [];
@@ -1985,62 +1772,145 @@ class EquivalancyUnit extends Component {
         return valid;
     }
 
+    filterData() {
+        let tracerCategoryId = document.getElementById("tracerCategoryId").value;
+        let typeId = document.getElementById("typeId").value;
+
+        if (typeId != 0 && tracerCategoryId != 0) {
+            const selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null) && c.tracerCategory.id == tracerCategoryId)
+            this.setState({
+                selSource
+            },
+                () => { this.buildJexcel() });
+        } else if (typeId != 0) {
+            const selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null))
+
+            this.setState({
+                selSource
+            },
+                () => { this.buildJexcel() });
+        } else if (tracerCategoryId != 0) {
+            const selSource = this.state.equivalancyUnitMappingList.filter(c => c.tracerCategory.id == tracerCategoryId)
+            this.setState({
+                selSource
+            },
+                () => { this.buildJexcel() });
+        } else {
+            this.setState({
+                selSource: this.state.equivalancyUnitMappingList
+            },
+                () => { this.buildJexcel() });
+        }
+    }
+
 
     render() {
+
+        const { tracerCategoryList1 } = this.state;
+        let tracerCategoryTempList = tracerCategoryList1.length > 0
+            && tracerCategoryList1.map((item, i) => {
+                return (
+                    <option key={i} value={item.tracerCategoryId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
+                <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
-                <div style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Card>
+                <Card>
 
-                        <div className="Card-header-addicon problemListMarginTop">
-                            <div className="card-header-actions">
-                                <div className="card-header-action">
-                                    <a className="card-header-action">
-                                        {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}> <i className="fa fa-plus"></i>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
-                                    </a>
+                    <div className="Card-header-addicon problemListMarginTop">
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a className="card-header-action">
+                                    {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}> <i className="fa fa-plus"></i>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <CardBody className="p-0">
+
+                        <Col md="6 pl-0">
+                            <div className="d-md-flex Selectdiv2">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {tracerCategoryTempList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.type')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="typeId"
+                                                id="typeId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.dashboard.realmheader')}</option>
+                                                <option value="2">{i18n.t('static.forecastProgram.forecastProgram')}</option>
+                                                {/* {dataSourceTypeList} */}
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
+
+                        <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                    <div class="spinner-border blue ml-4" role="status">
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <CardBody className="p-0">
 
-                            <Col xs="12" sm="12">
+                    </CardBody>
+                    <CardFooter>
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
-                                </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                        <FormGroup>
+                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                            &nbsp;
+                        </FormGroup>
 
-                                            <div class="spinner-border blue ml-4" role="status">
+                    </CardFooter>
+                </Card>
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </Col>
-                        </CardBody>
-                        <CardFooter>
-
-                            <FormGroup>
-                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                                &nbsp;
-                            </FormGroup>
-
-                        </CardFooter>
-                    </Card>
-
-
-                </div>
 
                 <Modal isOpen={this.state.isModalOpen}
                     className={'modal-lg ' + this.props.className, "modalWidth"}>

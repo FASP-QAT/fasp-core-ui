@@ -1135,7 +1135,7 @@ class DefaultLayout extends Component {
                         attributes: {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE')))) ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE')))) ? false : true)
                         },
                         children: [
                           {
@@ -1187,12 +1187,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true) }
                           },
                           // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
-                          {
-                            name: i18n.t('static.usagePeriod.usagePeriod'),
-                            url: '/usagePeriod/listUsagePeriod',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true) }
-                          },
+
                           {
                             name: i18n.t('static.userHead.user'),
                             url: '/user/listUser',
@@ -1245,7 +1240,7 @@ class DefaultLayout extends Component {
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')))) ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')))) ? false : true)
                         },
                         children: [
                           {
@@ -1368,6 +1363,13 @@ class DefaultLayout extends Component {
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-medkit',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.usagePeriod.usagePeriod'),
+                            url: '/usagePeriod/listUsagePeriod',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true) }
                           },
 
                           {
@@ -2888,10 +2890,10 @@ class DefaultLayout extends Component {
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
                       style={{ border: "none" }}
-                      title={i18n.t('static.module.forecastDatasetModule')}
+                      title={i18n.t('static.module.forecasting')}
                     >
                       <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
-                      <h6 className="tabtext">FORECASTING</h6>
+                      <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
                     </NavLink>
                   </NavItem>
                   <NavItem className="bgColourRemoveItem itemWhidth">
@@ -2900,12 +2902,12 @@ class DefaultLayout extends Component {
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
                       style={{ border: "none" }}
-                      title={i18n.t('static.module.supplyPlanning')}
+                      title={i18n.t('static.module.supplyPlanningMod')}
                     >
                       {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}
                       <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
                       <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
-                      <h6 className="tabtext">SUPPLY PLANNING</h6>
+                      <h6 className="tabtext">{i18n.t('static.module.supplyPlanningMod')}</h6>
                     </NavLink>
                   </NavItem>
                 </Nav>
