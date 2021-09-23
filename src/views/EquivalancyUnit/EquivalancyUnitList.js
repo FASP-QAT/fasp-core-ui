@@ -1826,7 +1826,7 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
 
-                    <div className="Card-header-addicon problemListMarginTop">
+                    <div className="Card-header-addicon pb-lg-0">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
