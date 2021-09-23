@@ -256,11 +256,12 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-
+                            <Col md="12 pl-0">
+                            <div className="d-md-flex">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                     // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
-                                    <Col md="3" className="pl-0">
-                                        <FormGroup className="Selectdiv">
+                                    // <Col md="3" className="pl-0">
+                                        <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label> */}
                                             <div className="controls SelectGo">
                                                 <InputGroup>
@@ -278,11 +279,15 @@ export default class ListTreeComponent extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                    </Col>
+                                    // </Col>
                                 }
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                 <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
+                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                    </FormGroup>
                                 }
+                                </div>
+                                </Col>
                             </div>
                         </div>
 
