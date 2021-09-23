@@ -1,38 +1,494 @@
 import React, { Component } from 'react';
+import { OrgDiagram } from 'basicprimitivesreact';
+import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
+import { DndProvider, DropTarget, DragSource } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faTrash, faEdit, faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
+import i18n from '../../i18n'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import TreeData from '../../Samples/TreeData';
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../../views/Forms/ValidationForms/ValidationForms.css'
+import classnames from 'classnames';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-class BuildTree extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state={
-            treeId:this.props.match.params.treeId,
-            templateId:this.props.match.params.templateId
-        }
-
-    }
-
-    componentDidMount() {
-
-    }
-
-    render() {
-
-        return (
-
-            <>
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} loading={(loading) => {
-                    this.setState({ loading: loading })
-                }} />
-                <h3>Hello User {this.state.treeId} {this.state.templateId}</h3>
-            </>
-
-        );
-
-    }
-
+const ItemTypes = {
+    NODE: 'node'
 }
 
-export default BuildTree;
+let initialValues = {
+    forecastMethod: "",
+    treeName: "",
+    regions: ""
+}
+
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        forecastMethod: Yup.string()
+            .required(i18n.t('static.user.validlanguage')),
+
+    })
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
+const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
+    const opacity = isDragging ? 0.4 : 1
+    let itemTitleColor = Colors.RoyalBlue;
+    if (isOver) {
+        if (canDrop) {
+            itemTitleColor = "green";
+        } else {
+            itemTitleColor = "red";
+        }
+    }
+
+    return connectDropTarget(connectDragSource(
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+            <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
+                <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+            </div>
+            <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
+            {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
+        </div>
+    ))
+}
+
+const NodeDragSource = DragSource(
+    ItemTypes.NODE,
+    {
+        beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
+        endDrag(props, monitor) {
+            const { onMoveItem } = props;
+            const item = monitor.getItem()
+            const dropResult = monitor.getDropResult()
+            if (dropResult) {
+                onMoveItem(dropResult.id, item.id);
+            }
+        },
+    },
+    (connect, monitor) => ({
+        connectDragSource: connect.dragSource(),
+        isDragging: monitor.isDragging(),
+    }),
+)(Node);
+const NodeDragDropSource = DropTarget(
+    ItemTypes.NODE,
+    {
+        drop: ({ itemConfig }) => ({ id: itemConfig.id }),
+        canDrop: ({ canDropItem, itemConfig }, monitor) => {
+            const { id } = monitor.getItem();
+            return canDropItem(itemConfig.id, id);
+        },
+    },
+    (connect, monitor) => ({
+        connectDropTarget: connect.dropTarget(),
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+    }),
+)(NodeDragSource);
+
+export default class BuildTree extends Component {
+    constructor() {
+        super();
+        this.onRemoveItem = this.onRemoveItem.bind(this);
+        this.canDropItem = this.canDropItem.bind(this);
+        this.onMoveItem = this.onMoveItem.bind(this);
+
+        this.onAddButtonClick = this.onAddButtonClick.bind(this);
+        this.onRemoveButtonClick = this.onRemoveButtonClick.bind(this);
+        this.onHighlightChanged = this.onHighlightChanged.bind(this);
+        this.onCursoChanged = this.onCursoChanged.bind(this);
+        this.resetTree = this.resetTree.bind(this);
+
+        this.dataChange = this.dataChange.bind(this);
+        this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+        this.state = {
+            modalOpen: false,
+            title: '',
+            cursorItem: 0,
+            highlightItem: 0,
+            items: TreeData.demographic_scenario_two,
+            currentItemConfig: {}
+        }
+    }
+    resetTree() {
+        this.setState({ items: TreeData.demographic_scenario_two });
+    }
+    dataChange(event) {
+        // alert("hi");
+        let { currentItemConfig } = this.state;
+        if (event.target.name === "nodeTitle") {
+            currentItemConfig.title = event.target.value;
+        }
+        if (event.target.name === "nodeValueType") {
+            currentItemConfig.valueType = event.target.value;
+        }
+        this.setState({ currentItemConfig: currentItemConfig });
+    }
+    onAddButtonClick(itemConfig) {
+        const { items } = this.state;
+        var newItem = {
+            id: parseInt(items.length + 1),
+            parent: itemConfig.id,
+            title: "New Title",
+            description: "New Description"
+            // image: "/react/photos/z.png"
+        };
+
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: newItem.id
+        });
+    }
+    onRemoveButtonClick(itemConfig) {
+        const { items } = this.state;
+
+        this.setState(this.getDeletedItems(items, [itemConfig.id]));
+    }
+    onMoveItem(parentid, itemid) {
+        const { items } = this.state;
+
+        this.setState({
+            cursorItem: itemid,
+            items: (items.map(item => {
+                if (item.id === itemid) {
+                    return {
+                        ...item,
+                        parent: parentid
+                    }
+                }
+                return item;
+            }))
+        })
+    }
+    canDropItem(parentid, itemid) {
+        const { items } = this.state;
+        const tree = this.getTree(items);
+        let result = parentid !== itemid;
+        tree.loopParents(this, parentid, function (id, node) {
+            if (id === itemid) {
+                result = false;
+                return true;
+            }
+        });
+        return result;
+    }
+    onRemoveItem(id) {
+        const { items } = this.state;
+
+        this.setState(this.getDeletedItems(items, [id]));
+    }
+    getDeletedItems(items = [], deletedItems = []) {
+        const tree = this.getTree(items);
+        const hash = deletedItems.reduce((agg, itemid) => {
+            agg.add(itemid.toString());
+            return agg;
+        }, new Set());
+        const cursorParent = this.getDeletedItemsParent(tree, deletedItems, hash);
+        const result = [];
+        tree.loopLevels(this, (nodeid, node) => {
+            if (hash.has(nodeid.toString())) {
+                return tree.SKIP;
+            }
+            result.push(node);
+        });
+
+        return {
+            items: result,
+            cursorItem: cursorParent
+        };
+    }
+    getDeletedItemsParent(tree, deletedItems, deletedHash) {
+        let result = null;
+        const lca = LCA(tree);
+        result = deletedItems.reduce((agg, itemid) => {
+            if (agg == null) {
+                agg = itemid;
+            } else {
+                agg = lca.getLowestCommonAncestor(agg, itemid);
+            }
+            return agg;
+        }, null);
+
+        if (deletedHash.has(result.toString())) {
+            result = tree.parentid(result);
+        }
+        return result;
+    }
+
+    getTree(items = []) {
+        const tree = Tree();
+
+        for (let index = 0; index < items.length; index += 1) {
+            const item = items[index];
+            tree.add(item.parent, item.id, item);
+        }
+
+        return tree;
+    }
+
+    onHighlightChanged(event, data) {
+        const { context: item } = data;
+        const { config } = this.state;
+        // console.log("data1---", item.title);
+        // console.log("data2---", item.id);
+        // item.id
+        if (item != null) {
+
+            this.setState({
+                title: item.title,
+                config: {
+                    ...config,
+                    // highlightItem: item.id,
+                    // cursorItem: item.id
+                },
+                highlightItem: item.id,
+                cursorItem: item.id
+            }, () => {
+                console.log("highlighted item---", this.state)
+            })
+        }
+    };
+    onCursoChanged(event, data) {
+        const { context: item } = data;
+        const { config } = this.state;
+        // console.log("data1---", item.title);
+        // console.log("data2---", item.id);
+        // item.id
+        if (item != null) {
+
+            this.setState({
+                title: item.title,
+                config: {
+                    ...config,
+                    // highlightItem: item.id,
+                    // cursorItem: item.id
+                },
+                highlightItem: item.id,
+                cursorItem: item.id
+            }, () => {
+                console.log("highlighted item---", this.state)
+            })
+        }
+    };
+
+    updateNodeInfoInJson(currentItemConfig) {
+        var nodes = this.state.items;
+        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
+        nodes[findNodeIndex].title = currentItemConfig.title;
+        nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+        this.setState({
+            items: nodes,
+            modalOpen: false,
+        }, () => {
+            console.log("updated tree data+++", this.state);
+        });
+    }
+
+
+    render() {
+        console.log("this.state+++", this.state);
+        let treeLevel = this.state.items.length;
+        const treeLevelItems = []
+        for (var i = 0; i <= treeLevel; i++) {
+            if (i == 0) {
+                treeLevelItems.push({
+                    annotationType: AnnotationType.Level,
+                    levels: [0],
+                    title: "Level 0",
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Dotted
+                });
+            }
+            else if (i % 2 == 0) {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Solid
+                })
+                );
+            }
+            else {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: Colors.RoyalBlue,
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0.08,
+                    borderColor: Colors.Gray,
+                    fillColor: Colors.Gray,
+                    lineType: LineType.Dotted
+                }));
+            }
+            console.log("level json***", treeLevelItems);
+        }
+
+        const config = {
+            ...this.state,
+            // pageFitMode: PageFitMode.Enabled,
+            pageFitMode: PageFitMode.None,
+            // highlightItem: 0,
+            hasSelectorCheckbox: Enabled.False,
+            hasButtons: Enabled.True,
+            buttonsPanelSize: 40,
+            orientationType: OrientationType.Top,
+            defaultTemplateName: "contactTemplate",
+            linesColor: Colors.Black,
+            annotations: treeLevelItems,
+            // itemTitleFirstFontColor: Colors.White,
+            templates: [{
+                name: "contactTemplate",
+                itemSize: { width: 190, height: 75 },
+                minimizedItemSize: { width: 2, height: 2 },
+                highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
+                onItemRender: ({ context: itemConfig }) => {
+                    return <NodeDragDropSource
+                        itemConfig={itemConfig}
+                        onRemoveItem={this.onRemoveItem}
+                        canDropItem={this.canDropItem}
+                        onMoveItem={this.onMoveItem}
+                    />;
+                }
+            }]
+        }
+        return <div className="animated fadeIn">
+            <Row>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                    <Card className="mb-lg-0">
+                        <CardBody>
+                            <div className="container">
+
+                                <Formik
+                                    enableReinitialize={true}
+                                    initialValues={initialValues}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
+
+
+                                    }}
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset,
+                                            setFieldValue,
+                                            setFieldTouched
+                                        }) => (
+                                            <>
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                                    <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                        <div className="col-md-12 pl-lg-0">
+                                                            <Row>
+                                                                {/* <FormGroup className=""> */}
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="pl-3"> */}
+                                                                <FormGroup className="col-md-3">
+                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="pl-3"> */}
+
+                                                                {/* </FormGroup> */}
+                                                            </Row>
+                                                        </div>
+                                                    </CardBody>
+                                                </Form>
+                                                <div class="sample">
+                                                    <Provider>
+                                                        <div className="placeholder" style={{ clear: 'both' }} >
+                                                            {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
+                                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                        </div>
+                                                    </Provider>
+                                                </div>
+                                            </>
+                                        )} />
+                            </div>
+                        </CardBody>
+                        <CardFooter>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                        </CardFooter>
+                    </Card></Col></Row>
+        </div>
+    }
+}

@@ -4533,3 +4533,10 @@ padding-bottom: 30px !important;
     color: #BA0c2f !important;
 }
 }
+.placeholder {
+  position: relative;
+  overflow: auto;
+  width: 100%;
+  height: 480px;
+  border-width: 1px;
+  border-style: dotted; }
