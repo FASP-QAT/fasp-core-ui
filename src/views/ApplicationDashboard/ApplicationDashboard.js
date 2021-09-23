@@ -913,7 +913,7 @@ class ApplicationDashboard extends Component {
           this.setState({ message: message })
         }} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        {checkOnline === 'Online' && this.state.id == 1 && activeTab1 == 2 &&
+        {checkOnline === 'Online' && this.state.id == 1 &&
           <Row className="mt-2">
 
             <Col xs="12" sm="6" lg="3">
@@ -1004,31 +1004,34 @@ class ApplicationDashboard extends Component {
                 </CardBody>
               </Card>
             </Col>
-            <Col xs="12" sm="6" lg="3">
-              <Card className=" CardHeight">
-                <CardBody className="box-p">
-                  <div class="h1 text-muted text-left mb-2  ">
-                    <i class="fa fa-calculator  icon-color"></i>
 
-                    <ButtonGroup className="float-right">
-                      <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
-                        <DropdownToggle caret className="p-0" color="transparent">
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+            {activeTab1 == 2 &&
+              <Col xs="12" sm="6" lg="3">
+                <Card className=" CardHeight">
+                  <CardBody className="box-p">
+                    <div class="h1 text-muted text-left mb-2  ">
+                      <i class="fa fa-calculator  icon-color"></i>
 
-                        </DropdownMenu>
-                      </Dropdown>
-                    </ButtonGroup>
-                  </div>
+                      <ButtonGroup className="float-right">
+                        <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                          <DropdownToggle caret className="p-0" color="transparent">
+                          </DropdownToggle>
+                          <DropdownMenu right>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
 
-                  <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
-                  <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
-                  <div className="chart-wrapper mt-4 pb-2" >
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </ButtonGroup>
+                    </div>
+
+                    <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
+                    <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
+                    <div className="chart-wrapper mt-4 pb-2" >
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+            }
 
           </Row>
         }
