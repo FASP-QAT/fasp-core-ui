@@ -8,6 +8,11 @@ class UsagePeriodService {
         });
     }
 
+    getUsagePeriod() {
+        return axios.get(`${API_URL}/api/usagePeriod`, {
+        });
+    }
+
     addUpdateUsagePeriod(json) {
         return axios.post(`${API_URL}/api/usagePeriod`, json, {});
     }

@@ -278,6 +278,7 @@ const UsagePeriodList = React.lazy(() => import('../../views/UsagePeriod/UsagePe
 const ForecastMethodList = React.lazy(() => import('../../views/ForecastMethod/ForecastMethodList'));
 const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/ModelingTypeList'));
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
+const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -654,6 +655,9 @@ const routes = [
 
   { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
   { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+
+  { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
+  { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
 
 ];
 

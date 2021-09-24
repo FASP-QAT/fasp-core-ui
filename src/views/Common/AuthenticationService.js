@@ -1294,6 +1294,13 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/usageTemplate/listUsageTemplate":
+                    case "/usageTemplate/listUsageTemplate/:color/:message":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+
                     default:
                         console.log("default case");
                         return false;
