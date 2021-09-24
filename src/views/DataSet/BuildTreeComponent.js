@@ -17,6 +17,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, 
 import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 
 const ItemTypes = {
     NODE: 'node'
@@ -374,6 +375,50 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onButtonsRender: (({ context: itemConfig }) => {
+                return <>  <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        this.onAddButtonClick(itemConfig);
+                    }}>
+                    <FontAwesomeIcon icon={faPlus} />
+                </button>
+                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}>
+                        <FontAwesomeIcon icon={faArrowsAlt} />
+                    </button>
+                    {itemConfig.parent != null &&
+                        <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                confirmAlert({
+                                    message: "Are you sure you want to delete this node.",
+                                    buttons: [
+                                        {
+                                            label: i18n.t('static.program.yes'),
+                                            onClick: () => {
+                                                this.onRemoveButtonClick(itemConfig);
+                                            }
+                                        },
+                                        {
+                                            label: i18n.t('static.program.no')
+                                        }
+                                    ]
+                                });
+                            }}>
+                            <FontAwesomeIcon icon={faTrash} />
+                        </button>}
+
+                </>
+            }),
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
@@ -464,10 +509,25 @@ export default class BuildTree extends Component {
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
-                                                                {/* </FormGroup> */}
-                                                                {/* <FormGroup className="pl-3"> */}
-
-                                                                {/* </FormGroup> */}
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
                                                             </Row>
                                                         </div>
                                                     </CardBody>
@@ -489,6 +549,49 @@ export default class BuildTree extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
+                    {/* Modal start------------------- */}
+            <Modal isOpen={this.state.openAddNodeModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Node</strong>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <Row>
+                        <Col xs="12" md="12" className="mb-4">
+                            <Nav tabs>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '1'}
+                                        onClick={() => { this.toggleModal(0, '1'); }}
+                                    >
+                                        Node Data
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '2'}
+                                        onClick={() => { this.toggleModal(0, '2'); }}
+                                    >
+                                        Scaling/Transfer
+                                    </NavLink>
+                                </NavItem>
+
+                            </Nav>
+                            <TabContent activeTab={this.state.activeTab1[0]}>
+                                {this.tabPane1()}
+                            </TabContent>
+                        </Col>
+                    </Row>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Scenario Modal end------------------------ */}
+
         </div>
     }
 }
