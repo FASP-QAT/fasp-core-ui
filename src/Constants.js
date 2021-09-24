@@ -10,6 +10,9 @@ export const API_URL='http://localhost:8084'
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
 
+export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
+export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
+
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
 export const TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 18
