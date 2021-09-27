@@ -73,13 +73,27 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
-            <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
+        // return connectDropTarget(connectDragSource(
+            <div className="ContactTemplate" style={{ opacity,backgroundColor: itemConfig.nodeBackgroundColor,borderColor: itemConfig.nodeBorderColor }}>
+              <div className="ContactTitleBackground" 
+                // style={{ backgroundColor: itemTitleColor }}
+              >
                 <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+              </div>
+              {/* <div className="ContactPhotoFrame">
+                <img className="ContactPhoto" src={itemConfig.image} alt={itemConfig.title} />
+              </div> */}
+              <div className="ContactPhone">{itemConfig.nodeValue}</div>
+              {/* <div className="ContactEmail">{itemConfig.nodeValue}</div>
+              <div className="ContactDescription">{itemConfig.nodeValue}</div> */}
             </div>
-            <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
-            {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
-        </div>
+        // <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+        //     <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
+        //         <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+        //     </div>
+        //     <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
+        //     {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
+        // </div>
     ))
 }
 
@@ -922,7 +936,7 @@ export default class BuildTree extends Component {
                                                                     // value={this.state.user.language.languageId}
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{'Demographic'}</option>
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
@@ -960,7 +974,7 @@ export default class BuildTree extends Component {
                                                                     // value={this.state.user.language.languageId}
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{'Region A'}</option>
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
@@ -993,7 +1007,7 @@ export default class BuildTree extends Component {
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Date'}</Label>
                                                                     <Input
                                                                         type="text"
                                                                         name="languageId"
