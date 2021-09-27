@@ -4,7 +4,7 @@ import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotati
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faTrash, faEdit, faArrowsAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faEdit, faArrowsAlt,faCopy } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -13,7 +13,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
 import classnames from 'classnames';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -608,7 +608,7 @@ export default class BuildTree extends Component {
                                     <td></td>
                                 </tr>
                             </table></div><br />
-                        <div style={{clear:'both'}}>
+                        <div style={{ clear: 'both' }}>
                             <table border="1">
                                 <tr>
                                     <td># of FU / patient</td>
@@ -625,6 +625,45 @@ export default class BuildTree extends Component {
                             </table>
                         </div>
                         <div>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
+                        <div>
+                            <table border="1">
+                                <tr>
+                                    <td>Forecasting unit</td>
+                                    <td>no logo condoms</td>
+                                </tr>
+                                <tr>
+                                    <td># of FU / month / Clients</td>
+                                    <td>10.83</td>
+                                    <td>condom</td>
+                                </tr>
+                                <tr>
+                                    <td>Planning Unit</td>
+                                    <td>No logo condoms, Pack of 10 condoms</td>
+                                </tr>
+                                <tr>
+                                    <td>Conversion Factor (FU:PU)</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td># of PU / month / </td>
+                                    <td>1.08</td>
+                                    <td>packs</td>
+                                </tr>
+                                <tr>
+                                    <td>QAT estimate for interval (Every _ months)</td>
+                                    <td>0.92</td>
+                                </tr>
+                                <tr>
+                                    <td>Consumption interval (Every X months)</td>
+                                    <td>2.00</td>
+                                </tr>
+                                <tr>
+                                    <td>How many PU per interval per ?</td>
+                                    <td>2.17</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</div>
                     </Row>
 
                 </TabPane>
@@ -698,26 +737,30 @@ export default class BuildTree extends Component {
             linesColor: Colors.Black,
             annotations: treeLevelItems,
             onButtonsRender: (({ context: itemConfig }) => {
-                return <>  <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                return <>
+                    {/* <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
                     onClick={(event) => {
                         event.stopPropagation();
                         this.onAddButtonClick(itemConfig);
                     }}>
                     <FontAwesomeIcon icon={faPlus} />
-                </button>
-                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                </button> */}
+                    {/* <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
                         onClick={(event) => {
                             event.stopPropagation();
                         }}>
                         <FontAwesomeIcon icon={faEdit} />
-                    </button>
+                    </button> */}
+                      {itemConfig.parent != null &&
+                      <>
                     <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
                         onClick={(event) => {
                             event.stopPropagation();
                         }}>
-                        <FontAwesomeIcon icon={faArrowsAlt} />
+                        <FontAwesomeIcon icon={faCopy} />
                     </button>
-                    {itemConfig.parent != null &&
+                  
+                  
                         <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
                             onClick={(event) => {
                                 event.stopPropagation();
@@ -737,7 +780,7 @@ export default class BuildTree extends Component {
                                 });
                             }}>
                             <FontAwesomeIcon icon={faTrash} />
-                        </button>}
+                        </button></>}
 
                 </>
             }),
@@ -790,6 +833,54 @@ export default class BuildTree extends Component {
                                             <>
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                        <div className="col-md-12 pl-lg-0">
+                                                            <Row>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    {/* <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label> */}
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        required
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{'BEN-Con/PRH-MOH[Condoms - Demographic]'}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={false}
+                                                                        // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        <b>{'Hide Planning Unit'}</b>
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={false}
+                                                                        // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </Row>
+                                                        </div>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
                                                                 {/* <FormGroup className=""> */}
@@ -847,6 +938,51 @@ export default class BuildTree extends Component {
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+
+                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <InputGroup>
+                                                                        {/* <InputGroupAddon addonType="append">
+                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                    </InputGroupAddon> */}
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="sm"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            <option value="">{'Scenario 1'}</option>
+                                                                        </Input>
+                                                                        <InputGroupAddon addonType="append">
+                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3">
+                                                                    <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
