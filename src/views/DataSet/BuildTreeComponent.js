@@ -511,22 +511,8 @@ export default class BuildTree extends Component {
                     </Form>
                     
                     <div className="row">
-                        <FormGroup className="col-md-6">
-                            <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Continuous</option>
-                                <option value="2">Discrete</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
+                      
+                        <FormGroup className="col-md-4">
                             <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
@@ -541,7 +527,7 @@ export default class BuildTree extends Component {
                                 <option value="2">Discrete</option>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-6">
+                        <FormGroup className="col-md-4">
                             <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
@@ -556,8 +542,23 @@ export default class BuildTree extends Component {
                                 <option value="2">Discrete</option>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-6">
+                        <FormGroup className="col-md-4">
                             <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Continuous</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-6">
+                            <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
                                 name="nodeTypeId"
@@ -579,8 +580,11 @@ export default class BuildTree extends Component {
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup>
-                        <div>
-                            <table border="1">
+
+                        {/* <FormGroup className="col-md-6"> */}
+                        <div className="col-md-12">
+                            <div style={{width:'100%'}}>
+                            <table border="1" className="table">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -611,9 +615,11 @@ export default class BuildTree extends Component {
                                     <td>month(s)</td>
                                     <td></td>
                                 </tr>
-                            </table></div><br />
-                        <div style={{clear:'both'}}>
-                            <table border="1">
+                            </table>
+                            </div>
+                            <br />
+                        <div tyle={{clear:'both'}}>
+                            <table border="1" className="table">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -628,8 +634,13 @@ export default class BuildTree extends Component {
                                 </tr>
                             </table>
                         </div>
-                        <div>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
+                        <div className="pt-2">
+                            <p>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</p>
+
+                            </div>
+                        </div>
                     </div>
+                    {/* </FormGroup> */}
 
                 </TabPane>
                 <TabPane tabId="2">
