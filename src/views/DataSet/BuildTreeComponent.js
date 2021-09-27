@@ -579,6 +579,56 @@ export default class BuildTree extends Component {
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup>
+                        <div>
+                            <table border="1">
+                                <tr>
+                                    <td>Every</td>
+                                    <td>4</td>
+                                    <td>Patient</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>requires</td>
+                                    <td>1</td>
+                                    <td>mask</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Single use</td>
+                                    <td>No</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>1</td>
+                                    <td>times per</td>
+                                    <td>week(s)</td>
+                                </tr>
+                                <tr>
+                                    <td>for</td>
+                                    <td>2</td>
+                                    <td>month(s)</td>
+                                    <td></td>
+                                </tr>
+                            </table></div><br />
+                        <div style={{clear:'both'}}>
+                            <table border="1">
+                                <tr>
+                                    <td># of FU / patient</td>
+                                    <td>0.25</td>
+                                </tr>
+                                <tr>
+                                    <td># of FU / month / patient</td>
+                                    <td>1.08</td>
+                                </tr>
+                                <tr>
+                                    <td># of FU required</td>
+                                    <td>2.17</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
                     </div>
 
                 </TabPane>
