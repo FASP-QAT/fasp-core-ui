@@ -586,7 +586,7 @@ export default class BuildTree extends Component {
                         {/* <FormGroup className="col-md-6"> */}
                         <div className="col-md-12">
                             <div style={{width:'100%'}}>
-                            <table border="1" className="table">
+                            <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -619,7 +619,7 @@ export default class BuildTree extends Component {
                                 </tr>
                             </table></div><br />
                         <div style={{ clear: 'both' }}>
-                            <table border="1" className="table">
+                            <table className="table table-bordered">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -635,8 +635,8 @@ export default class BuildTree extends Component {
                             </table>
                         </div>
                         <div className="pt-2">Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
-                        <div>
-                            <table border="1" className="table">
+                        <div className="pt-2">
+                            <table  className="table table-bordered">
                                 <tr>
                                     <td>Forecasting unit</td>
                                     <td>no logo condoms</td>
@@ -673,7 +673,7 @@ export default class BuildTree extends Component {
                                 </tr>
                             </table>
                         </div>
-                        <div>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</div>
+                        <div className="pt-2">For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</div>
                     </div>
 
                 </TabPane>
@@ -827,7 +827,7 @@ export default class BuildTree extends Component {
                                 </div>
                             </div>
                         </div>
-                        <CardBody>
+                        <CardBody className="pt-lg-0">
                             <div className="container">
 
                                 <Formik
@@ -858,7 +858,7 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                <FormGroup className="col-md-3 pl-lg-0" style={{marginBottom:'0px'}}>
                                                                     {/* <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label> */}
                                                                     <Input
                                                                         type="select"
@@ -904,7 +904,7 @@ export default class BuildTree extends Component {
                                                                 </FormGroup>
                                                             </Row>
                                                         </div>
-                                                        <div className="col-md-12 pl-lg-0">
+                                                        <div className="col-md-12 pl-lg-0 pt-lg-3">
                                                             <Row>
                                                                 {/* <FormGroup className=""> */}
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -992,7 +992,7 @@ export default class BuildTree extends Component {
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3">
+                                                                <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="text"
