@@ -10,6 +10,9 @@ export const API_URL = 'https://uat-api.quantificationanalytics.org'
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
 
+export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
+export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
+
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
 export const TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 18
@@ -78,7 +81,7 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
-export const APP_VERSION_REACT = "[4962]"
+export const APP_VERSION_REACT = "[4966]"
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
 export const JEXCEL_PAGINATION_OPTION = [15, 25, 50, 5000000]
