@@ -1815,7 +1815,6 @@ class EquivalancyUnit extends Component {
                     </option>
                 )
             }, this);
-            
 
         return (
             <div className="animated fadeIn">
@@ -1826,18 +1825,18 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
 
-                    <div className="Card-header-addicon pb-lg-0">
+                    <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
-                                     {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}> {i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
+                                    {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <CardBody className="pl-2 pr-2">
+                    <CardBody className="p-0">
 
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
