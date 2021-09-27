@@ -130,15 +130,49 @@ export default class BuildTree extends Component {
 
         this.dataChange = this.dataChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+        this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.state = {
             modalOpen: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
             items: TreeData.demographic_scenario_two,
-            currentItemConfig: {}
+            currentItemConfig: {},
+            activeTab1: new Array(2).fill('1')
         }
     }
+
+    nodeTypeChange(event) {
+        var nodeTypeId = event.target.value;
+        console.log("node type value---", nodeTypeId)
+        if (nodeTypeId == 1) {
+
+        } else if (nodeTypeId == 2) {
+            console.log("case 2")
+            this.setState({
+                displayParentData: true
+            });
+        }
+        else if (nodeTypeId == 3) {
+            this.setState({
+                displayUsage: true
+            });
+        }
+        else if (nodeTypeId == 4) {
+            this.setState({
+                displayPlanningUnit: true
+            });
+        }
+    }
+
+    toggleModal(tabPane, tab) {
+        const newArray = this.state.activeTab1.slice()
+        newArray[tabPane] = tab
+        this.setState({
+            activeTab1: newArray,
+        });
+    }
+
     resetTree() {
         this.setState({ items: TreeData.demographic_scenario_two });
     }
@@ -154,19 +188,20 @@ export default class BuildTree extends Component {
         this.setState({ currentItemConfig: currentItemConfig });
     }
     onAddButtonClick(itemConfig) {
-        const { items } = this.state;
-        var newItem = {
-            id: parseInt(items.length + 1),
-            parent: itemConfig.id,
-            title: "New Title",
-            description: "New Description"
-            // image: "/react/photos/z.png"
-        };
+        this.setState({ openAddNodeModal: true });
+        // const { items } = this.state;
+        // var newItem = {
+        //     id: parseInt(items.length + 1),
+        //     parent: itemConfig.id,
+        //     title: "New Title",
+        //     description: "New Description"
+        //     // image: "/react/photos/z.png"
+        // };
 
-        this.setState({
-            items: [...items, newItem],
-            cursorItem: newItem.id
-        });
+        // this.setState({
+        //     items: [...items, newItem],
+        //     cursorItem: newItem.id
+        // });
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
@@ -278,26 +313,24 @@ export default class BuildTree extends Component {
         }
     };
     onCursoChanged(event, data) {
-        const { context: item } = data;
-        const { config } = this.state;
-        // console.log("data1---", item.title);
-        // console.log("data2---", item.id);
-        // item.id
-        if (item != null) {
+        this.setState({ openAddNodeModal: true });
+        // const { context: item } = data;
+        // const { config } = this.state;
+        // if (item != null) {
 
-            this.setState({
-                title: item.title,
-                config: {
-                    ...config,
-                    // highlightItem: item.id,
-                    // cursorItem: item.id
-                },
-                highlightItem: item.id,
-                cursorItem: item.id
-            }, () => {
-                console.log("highlighted item---", this.state)
-            })
-        }
+        //     this.setState({
+        //         title: item.title,
+        //         config: {
+        //             ...config,
+        //             // highlightItem: item.id,
+        //             // cursorItem: item.id
+        //         },
+        //         highlightItem: item.id,
+        //         cursorItem: item.id
+        //     }, () => {
+        //         console.log("highlighted item---", this.state)
+        //     })
+        // }
     };
 
     updateNodeInfoInJson(currentItemConfig) {
@@ -313,6 +346,245 @@ export default class BuildTree extends Component {
         });
     }
 
+    tabPane1() {
+        return (
+            <>
+                <TabPane tabId="1">
+                    <Row>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Scenario<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                readOnly={true}
+                                // value={this.state.currentItemConfig.title}>
+                                value={'Scenario 1'}>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Parent<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                readOnly={true}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'Country Population'}
+                            >
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                // value={'People with malaria'}></Input>
+                                value={'Aggregation Node'}></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Number Node</option>
+                                <option value="2">Percentage Node</option>
+                                <option value="3">Aggregation Node</option>
+                                <option value="4">Forecasting Unit Node</option>
+                                <option value="5">Planning Unit Node</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Patients</option>
+                                <option value="2">Clients</option>
+                                <option value="3">Customers</option>
+                                <option value="4">People</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Month<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'Jan-21'}></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Percentage of Parent(month start)<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'65%'}></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Parent Value For Jan-21<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'100,829,000'}></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Node Value For Jan-21<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'65,538,850'}></Input>
+                        </FormGroup>
+
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
+                            <Input type="textarea"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                value={this.state.currentItemConfig.title}></Input>
+                        </FormGroup>
+                        {/* {this.state.displayUsage &&
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Usage<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeValueType"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Condoms</option>
+                            </Input>
+                        </FormGroup>
+                    }
+                    {this.state.displayPlanningUnit &&
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Planning Unit<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeValueType"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">No logo condoms pack of 500</option>
+                            </Input>
+                        </FormGroup>
+                    }
+
+                    {this.state.displayParentData &&
+                        <>
+
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    readOnly={true}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.currentItemConfig.title}></Input>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Percentage Of Parent<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.currentItemConfig.title}></Input>
+                            </FormGroup></>} */}
+                    </Row>
+                    <Row>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Continuous</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Continuous</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Continuous</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">Continuous</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                name="nodeTitle"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'0'}></Input>
+                        </FormGroup>
+                    </Row>
+
+                </TabPane>
+                <TabPane tabId="2">
+
+                </TabPane>
+
+            </>
+        );
+    }
 
     render() {
         console.log("this.state+++", this.state);
@@ -549,7 +821,7 @@ export default class BuildTree extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
-                    {/* Modal start------------------- */}
+            {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-md '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
@@ -559,6 +831,7 @@ export default class BuildTree extends Component {
                 <ModalBody>
                     <Row>
                         <Col xs="12" md="12" className="mb-4">
+
                             <Nav tabs>
                                 <NavItem>
                                     <NavLink
