@@ -324,17 +324,17 @@ export default class DemographicScenarioTwo extends Component {
 
         const config = {
             ...this.state,
-            // pageFitMode: PageFitMode.Enabled,
-            pageFitMode: PageFitMode.None,
+            pageFitMode: PageFitMode.Enabled,
+            // pageFitMode: PageFitMode.None,
             // highlightItem: 0,
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
-            buttonsPanelSize: 40,
+            buttonsPanelSize: 30,
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
             linesColor:Colors.Black,
             annotations: treeLevelItems,
-            // itemTitleFirstFontColor: Colors.White,
+            itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
                 itemSize: { width: 190, height: 75 },

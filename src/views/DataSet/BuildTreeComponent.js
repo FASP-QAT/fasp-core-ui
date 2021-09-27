@@ -138,7 +138,7 @@ export default class BuildTree extends Component {
             title: '',
             cursorItem: 0,
             highlightItem: 0,
-            items: TreeData.demographic_scenario_two,
+            items: TreeData.demographic_scenario_one,
             currentItemConfig: {},
             activeTab1: new Array(2).fill('1')
         }
