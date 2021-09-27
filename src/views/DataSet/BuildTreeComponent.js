@@ -580,7 +580,7 @@ export default class BuildTree extends Component {
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup>
-
+                        </div>
                         {/* <FormGroup className="col-md-6"> */}
                         <div className="col-md-12">
                             <div style={{width:'100%'}}>
@@ -617,7 +617,7 @@ export default class BuildTree extends Component {
                                 </tr>
                             </table></div><br />
                         <div style={{ clear: 'both' }}>
-                            <table border="1">
+                            <table border="1" className="table">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -632,9 +632,9 @@ export default class BuildTree extends Component {
                                 </tr>
                             </table>
                         </div>
-                        <div>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
+                        <div className="pt-2">Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
                         <div>
-                            <table border="1">
+                            <table border="1" className="table">
                                 <tr>
                                     <td>Forecasting unit</td>
                                     <td>no logo condoms</td>
