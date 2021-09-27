@@ -828,10 +828,10 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-2">
+                        <div className="Card-header-reporticon pb-lg-0" style={{display:'contents'}}>
                             <div className="card-header-actions">
 
-                                <div className="card-header-actions">
+                                <div className="card-header-actions pr-4 pt-1">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} 
                                     // onClick={() => this.exportPDF(columns)} 
                                     />
@@ -841,8 +841,8 @@ export default class BuildTree extends Component {
                                 </div>
                             </div>
                         </div>
-                        <CardBody className="pt-lg-0">
-                            <div className="container">
+                        <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
+                            <div className="container-fluid">
 
                                 <Formik
                                     enableReinitialize={true}
