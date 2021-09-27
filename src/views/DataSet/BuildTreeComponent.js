@@ -4,7 +4,7 @@ import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotati
 import { DndProvider, DropTarget, DragSource } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faTrash, faEdit, faArrowsAlt,faCopy } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faEdit, faArrowsAlt, faCopy } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -18,6 +18,8 @@ import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import csvicon from '../../assets/img/csv.png'
+import pdfIcon from '../../assets/img/pdf.png';
 
 const ItemTypes = {
     NODE: 'node'
@@ -759,36 +761,36 @@ export default class BuildTree extends Component {
                         }}>
                         <FontAwesomeIcon icon={faEdit} />
                     </button> */}
-                      {itemConfig.parent != null &&
-                      <>
-                    <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                        }}>
-                        <FontAwesomeIcon icon={faCopy} />
-                    </button>
-                  
-                  
-                        <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                confirmAlert({
-                                    message: "Are you sure you want to delete this node.",
-                                    buttons: [
-                                        {
-                                            label: i18n.t('static.program.yes'),
-                                            onClick: () => {
-                                                this.onRemoveButtonClick(itemConfig);
+                    {itemConfig.parent != null &&
+                        <>
+                            <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                }}>
+                                <FontAwesomeIcon icon={faCopy} />
+                            </button>
+
+
+                            <button key="3" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    confirmAlert({
+                                        message: "Are you sure you want to delete this node.",
+                                        buttons: [
+                                            {
+                                                label: i18n.t('static.program.yes'),
+                                                onClick: () => {
+                                                    this.onRemoveButtonClick(itemConfig);
+                                                }
+                                            },
+                                            {
+                                                label: i18n.t('static.program.no')
                                             }
-                                        },
-                                        {
-                                            label: i18n.t('static.program.no')
-                                        }
-                                    ]
-                                });
-                            }}>
-                            <FontAwesomeIcon icon={faTrash} />
-                        </button></>}
+                                        ]
+                                    });
+                                }}>
+                                <FontAwesomeIcon icon={faTrash} />
+                            </button></>}
 
                 </>
             }),
@@ -812,6 +814,15 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
+                        <div className="Card-header-reporticon pb-2">
+                            <div className="card-header-actions">
+
+                                <div className="card-header-actions">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                </div>
+                            </div>
+                        </div>
                         <CardBody>
                             <div className="container">
 
@@ -864,7 +875,7 @@ export default class BuildTree extends Component {
                                                                         id="active6"
                                                                         name="active"
                                                                         checked={false}
-                                                                        // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
@@ -879,7 +890,7 @@ export default class BuildTree extends Component {
                                                                         id="active6"
                                                                         name="active"
                                                                         checked={false}
-                                                                        // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
