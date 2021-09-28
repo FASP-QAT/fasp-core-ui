@@ -147,6 +147,7 @@ export default class BuildTree extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
+        this.addScenario = this.addScenario.bind(this);
         this.state = {
             modalOpen: false,
             title: '',
@@ -157,7 +158,26 @@ export default class BuildTree extends Component {
             activeTab1: new Array(2).fill('1')
         }
     }
-
+    addScenario() {
+        const { tabList } = this.state;
+        const { scenario } = this.state;
+        var newTabObject = {
+            scenarioId: parseInt(tabList.length) + 1,
+            scenarioName: scenario.scenarioName,
+            scenarioDesc: scenario.scenarioDesc,
+            active: true
+        };
+        // console.log("tab data---", newTabObject);
+        var tabList1 = [...tabList, newTabObject];
+        // console.log("tabList---", tabList1)
+        this.setState({
+            tabList: [...tabList, newTabObject],
+            activeTab: parseInt(tabList.length),
+            openAddScenarioModal: false
+        }, () => {
+            console.log("final tab list---", this.state);
+        });
+    }
     nodeTypeChange(event) {
         var nodeTypeId = event.target.value;
         console.log("node type value---", nodeTypeId)
@@ -368,7 +388,7 @@ export default class BuildTree extends Component {
                 <TabPane tabId="1">
                     <Form>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Scenario<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">Scenario</Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 bsSize="sm"
@@ -378,13 +398,14 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Parent<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">Parent</Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 bsSize="sm"
                                 readOnly={true}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'Country Population'}
+                                value={'Surgical masks'}
+                                // value={''}
                             >
                             </Input>
                         </FormGroup>
@@ -396,7 +417,7 @@ export default class BuildTree extends Component {
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 // value={'People with malaria'}></Input>
-                                value={'Aggregation Node'}></Input>
+                                value={'Surgical mask, pack of 5'}></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
@@ -424,6 +445,7 @@ export default class BuildTree extends Component {
                                 bsSize="sm"
                                 onChange={(e) => { this.nodeTypeChange(e) }}
                                 required
+                                readOnly={true}
                                 value={this.state.currentItemConfig.valueType}
                             >
                                 <option value="-1">Nothing Selected</option>
@@ -431,6 +453,8 @@ export default class BuildTree extends Component {
                                 <option value="2">Clients</option>
                                 <option value="3">Customers</option>
                                 <option value="4">People</option>
+                                <option value="5">Condom</option>
+                                <option value="6">Packs</option>
                             </Input>
                         </FormGroup>
                         <FormGroup>
@@ -442,12 +466,12 @@ export default class BuildTree extends Component {
                                 value={'Jan-21'}></Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Percentage of Parent(month start)<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'65%'}></Input>
+                                value={'90.0%'}></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Parent Value For Jan-21<span class="red Reqasterisk">*</span></Label>
@@ -455,19 +479,19 @@ export default class BuildTree extends Component {
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'100,829,000'}></Input>
+                                value={'16,702,403'}></Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Node Value For Jan-21<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">Node Value for Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'65,538,850'}></Input>
+                                value={'15,032,163'}></Input>
                         </FormGroup>
 
                         <FormGroup>
-                            <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">Notes</Label>
                             <Input type="textarea"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
@@ -528,7 +552,7 @@ export default class BuildTree extends Component {
                     
                     <div className="row">
                       
-                        <FormGroup className="col-md-4">
+                        {/* <FormGroup className="col-md-4">
                             <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
@@ -554,8 +578,8 @@ export default class BuildTree extends Component {
                                 value={this.state.currentItemConfig.valueType}
                             >
                                 <option value="-1">Nothing Selected</option>
-                                <option value="1">Continuous</option>
-                                <option value="2">Discrete</option>
+                                <option value="1">no logo condoms</option>
+                                <option value="2">surgical mask, 1 mask</option>
                             </Input>
                         </FormGroup>
                         <FormGroup className="col-md-4">
@@ -569,11 +593,11 @@ export default class BuildTree extends Component {
                                 value={this.state.currentItemConfig.valueType}
                             >
                                 <option value="-1">Nothing Selected</option>
-                                <option value="1">Continuous</option>
+                                <option value="1">IUDs</option>
                                 <option value="2">Discrete</option>
                             </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
+                        </FormGroup> */}
+                        <FormGroup className="col-md-12">
                             <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
@@ -588,19 +612,40 @@ export default class BuildTree extends Component {
                                 <option value="2">Discrete</option>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-6">
+                        {/* <FormGroup className="col-md-6">
                             <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
-                        </FormGroup>
+                        </FormGroup> */}
                         </div>
                         {/* <FormGroup className="col-md-6"> */}
                         <div className="col-md-12">
                             <div style={{width:'100%'}}>
-                            <table className="table table-bordered">
+                            {/* <table className="table table-bordered">
+                                <tr>
+                                    <td>Every</td>
+                                    <td>1</td>
+                                    <td>Clients</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>requires</td>
+                                    <td>130</td>
+                                    <td>condom</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>every</td>
+                                    <td>1</td>
+                                    <td>year(s)</td>
+                                    <td>indefinitely</td>
+                                </tr>
+                                
+                            </table> */}
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -631,9 +676,10 @@ export default class BuildTree extends Component {
                                     <td>month(s)</td>
                                     <td></td>
                                 </tr>
-                            </table></div><br />
-                        <div style={{ clear: 'both' }}>
-                            <table className="table table-bordered">
+                            </table> */}
+                            </div><br />
+                        {/* <div style={{ clear: 'both' }}> */}
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -646,11 +692,58 @@ export default class BuildTree extends Component {
                                     <td># of FU required</td>
                                     <td>2.17</td>
                                 </tr>
-                            </table>
-                        </div>
-                        <div className="pt-2">Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</div>
+                            </table> */}
+                             {/* <table className="table table-bordered">
+                                <tr>
+                                    <td># of FU required for period</td>
+                                    <td>130</td>
+                                </tr>
+                                <tr>
+                                    <td># of months in period</td>
+                                    <td>12.00</td>
+                                </tr>
+                                <tr>
+                                    <td># of FU / month / Patient</td>
+                                    <td>10.83</td>
+                                </tr>
+                            </table> */}
+                        {/* </div> */}
+                        {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
+                        {/* <div className="pt-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div> */}
                         <div className="pt-2">
                             <table  className="table table-bordered">
+                                <tr>
+                                    <td>Forecasting unit</td>
+                                    <td>surgical mask, 1 mask</td>
+                                </tr>
+                                <tr>
+                                    <td># of FU / usage / Patient</td>
+                                    <td>2.17</td>
+                                    <td>mask</td>
+                                </tr>
+                                <tr>
+                                    <td>Planning Unit</td>
+                                    <td>Surgical mask, pack of 5</td>
+                                </tr>
+                                <tr>
+                                    <td>Conversion Factor (FU:PU)</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td># of PU / usage / </td>
+                                    <td>0.43</td>
+                                    <td>packs</td>
+                                </tr>
+                                <tr>
+                                    <td>Will Clients share one PU?</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td>How many PU per usage per ?</td>
+                                    <td>1.00</td>
+                                </tr>
+                            </table>
+                            {/* <table  className="table table-bordered">
                                 <tr>
                                     <td>Forecasting unit</td>
                                     <td>no logo condoms</td>
@@ -685,9 +778,10 @@ export default class BuildTree extends Component {
                                     <td>How many PU per interval per ?</td>
                                     <td>2.17</td>
                                 </tr>
-                            </table>
+                            </table> */}
                         </div>
-                        <div className="pt-2">For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</div>
+                        {/* <div className="pt-2"><b>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</b></div> */}
+                        <div className="pt-2"><b>For each  - we need 1.00 [Surgical mask, pack of 5]</b></div>
                     </div>
 
                 </TabPane>

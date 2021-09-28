@@ -272,7 +272,7 @@ export default class ListTreeComponent extends Component {
                                                         bsSize="sm"
                                                         onChange={(e)=>{this.onTemplateChange(e)}}
                                                     >
-                                                        <option value="0">{i18n.t('static.common.all')}</option>
+                                                        <option value="0">{'Select Template'}</option>
                                                         <option value="1">Demographic TreeTemplate</option>
                                                         {/* {realmList} */}
                                                     </Input>
