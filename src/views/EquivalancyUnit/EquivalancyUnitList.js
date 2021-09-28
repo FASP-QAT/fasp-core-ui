@@ -39,7 +39,7 @@ class EquivalancyUnit extends Component {
             message: '',
             selSource: [],
 
-            typeList: [{ id: 1, name: 'Realm' }, { id: 2, name: 'DataSet' }],
+            typeList: [],
             tracerCategoryList: [],
             tracerCategoryList1: [],
             forecastingUnitList: [],
@@ -276,6 +276,7 @@ class EquivalancyUnit extends Component {
                     }
                 }
             },
+
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -289,7 +290,6 @@ class EquivalancyUnit extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed1,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
