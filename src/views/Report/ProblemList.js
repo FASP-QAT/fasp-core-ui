@@ -1333,8 +1333,13 @@ export default class ConsumptionDetails extends React.Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
         var listLength = transList.length;
         return transList[listLength - 1].notes;
+        } 
     }
     handleProblemStatusChange = (event) => {
 
