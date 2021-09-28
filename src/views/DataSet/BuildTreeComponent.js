@@ -816,14 +816,23 @@ export default class BuildTree extends Component {
                     <Card className="mb-lg-0">
                         <div className="Card-header-reporticon pb-lg-0" style={{display:'contents'}}>
                             <div className="card-header-actions">
-
                                 <div className="card-header-actions pr-4 pt-1">
+                                <Col md="12 pl-0">
+                            <div className="d-md-flex">
+                            <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
+                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                    </FormGroup>
+                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} 
                                     // onClick={() => this.exportPDF(columns)} 
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} 
                                     // onClick={() => this.exportCSV(columns)} 
                                     />
+                                    </FormGroup>
+                                   
+                                    </div>
+                                    </Col>
                                 </div>
                             </div>
                         </div>
@@ -859,7 +868,7 @@ export default class BuildTree extends Component {
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{marginBottom:'0px'}}>
-                                                                    {/* <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label> */}
+                                                                    <Label htmlFor="languageId" style={{visibility:'hidden'}}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
                                                                         name="languageId"
@@ -869,98 +878,6 @@ export default class BuildTree extends Component {
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         <option value="">{'BEN-Con/PRH-MOH[Condoms - Demographic]'}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                </FormGroup>
-                                                                <FormGroup check inline>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2">
-                                                                        <b>{'Hide Planning Unit'}</b>
-                                                                    </Label>
-                                                                </FormGroup>
-                                                                <FormGroup check inline>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2">
-                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                    </Label>
-                                                                </FormGroup>
-                                                            </Row>
-                                                        </div>
-                                                        <div className="col-md-12 pl-lg-0 pt-lg-3">
-                                                            <Row>
-                                                                {/* <FormGroup className=""> */}
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                </FormGroup>
-                                                                {/* </FormGroup> */}
-                                                                {/* <FormGroup className="pl-3"> */}
-                                                                <FormGroup className="col-md-3">
-                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
@@ -1009,8 +926,164 @@ export default class BuildTree extends Component {
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
+                                                                <FormGroup className="col-md-3" >
+                                                                    <div className="check inline  pl-lg-1 pt-lg-3">
+                                                                        <div>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={false}
+                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{fontSize:'12px'}}>
+                                                                        <b>{'Hide Planning Unit'}</b>
+                                                                    </Label>
+                                                                    </div>
+                                                                    <div>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={false}
+                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{fontSize:'12px'}}>
+                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                    </Label>
+                                                                    </div>
+                                                                    </div>
+                                                                </FormGroup>
+                                                                {/* <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="active6"
+                                                                        name="active"
+                                                                        checked={false}
+                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                    </Label>
+                                                                </FormGroup> */}
                                                             </Row>
                                                         </div>
+                                                        {/* <div className="col-md-12 pl-lg-0 pt-lg-3"> */}
+                                                            {/* <Row> */}
+                                                                {/* <FormGroup className=""> */}
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                {/* </FormGroup> */} 
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="pl-3"> */}
+                                                                {/* <FormGroup className="col-md-3">
+                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                {/* </FormGroup> */} 
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                    </Input> */}
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+
+                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <InputGroup>
+                                                                        {/* <InputGroupAddon addonType="append">
+                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                    </InputGroupAddon> */}
+                                                                        {/* <Input
+                                                                            type="select"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="sm"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            // required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            <option value="">{'Scenario 1'}</option>
+                                                                        </Input>
+                                                                        <InputGroupAddon addonType="append">
+                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup> */} 
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                {/* </FormGroup> */}
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        // required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    > */}
+                                                                    {/* </Input> */}
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                {/* </FormGroup> */}
+                                                            {/* </Row> */}
+                                                        {/* </div> */}
                                                     </CardBody>
                                                 </Form>
                                                 <div class="sample">
