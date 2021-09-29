@@ -283,9 +283,11 @@ const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate=React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
+const LoadDeleteDataSet=React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
   {path:'/dataset/listTreeTemplate/',name:'List Tree Template',component:ListTreeTemplate},
   {path:'/dataset/createTreeTemplate/',name:'Create Tree Template',component:CreateTreeTemplate},
   { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
@@ -1408,6 +1410,12 @@ class DefaultLayout extends Component {
                           hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         },
                         children: [
+                          {
+                            name: i18n.t('static.common.loadDeleteDataSet'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: i18n.t('static.common.listtree'),
                             url: '/dataset/listTree',
