@@ -1124,6 +1124,8 @@ export default class ManualTagging extends Component {
                     }
                     if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
                         console.log("Going to link shipment-----", changedmtList);
+                        // for (var i = 0; i <= 2; i++) {
+                        // console.log("for loop -----",i);
                         ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                             .then(response => {
                                 console.log("linking response---", response);
@@ -1167,12 +1169,21 @@ export default class ManualTagging extends Component {
                                             case 500:
                                             case 404:
                                             case 406:
+                                                console.log("500 error--------");
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
                                                     color: 'red',
-                                                });
+                                                },
+                                                    () => {
+
+                                                        this.hideSecondComponent();
+                                                        this.toggleLarge();
+
+                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+                                                    });
                                                 break;
                                             case 412:
                                                 this.setState({
@@ -1180,7 +1191,15 @@ export default class ManualTagging extends Component {
                                                     loading: false,
                                                     loading1: false,
                                                     color: 'red',
-                                                });
+                                                },
+                                                    () => {
+
+                                                        this.hideSecondComponent();
+                                                        this.toggleLarge();
+
+                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+                                                    });
                                                 break;
                                             default:
                                                 this.setState({
@@ -1835,7 +1854,7 @@ export default class ManualTagging extends Component {
                         data[13] = erpDataList[j].erpPlanningUnit.id;
 
                     } else {
-                        console.log("order no ---",erpDataList[j].orderNo +" active---",erpDataList[j].active)
+                        console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
                         data[0] = erpDataList[j].active;
                         data[1] = erpDataList[j].erpOrderId;
                         data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
