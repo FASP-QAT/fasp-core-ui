@@ -281,11 +281,13 @@ const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
-const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const ListTreeTemplate=React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  {path:'/dataset/createTreeTemplate/',name:'static.common.createTreeTemplate',component:CreateTreeTemplate},
+  {path:'/dataset/listTreeTemplate/',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/createTreeTemplate/',name:'Create Tree Template',component:CreateTreeTemplate},
   { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:templateId',exact: true, name: 'static.common.buildTree', component: BuildTree },
@@ -1413,8 +1415,8 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.common.createTreeTemplate'),
-                            url: '/dataset/createTreeTemplate',
+                            name: 'List Tree Template',
+                            url: '/dataset/listTreeTemplate',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           }

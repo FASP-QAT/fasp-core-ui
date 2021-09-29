@@ -16,30 +16,15 @@ export default class ListTreeTemplate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            treeList: [{
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Demographic',
-                treeName: 'Condoms Demographic Tree',
-                region: 'Region A',
-                scenarioName: 'High,Medium',
+            treeTemplateList: [{
+                templateName: 'Condoms - Demographic',
+                forecastMethod: 'Demographic method',
                 status: 'Active'
             }, {
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Consumption',
-                treeName: 'Condoms Consumption Tree',
-                region: 'Region B',
-                scenarioName: 'Medium',
-                status: 'Active'
-            },
-            {
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Morbidity',
-                treeName: 'Condoms Morbidity Tree',
-                region: 'Region C',
-                scenarioName: 'High,Medium,Low',
+                templateName: 'Condoms - Morbidity',
+                forecastMethod: 'Morbidity method',
                 status: 'Active'
             }
-
             ],
             message: '',
             loading: true
@@ -47,14 +32,14 @@ export default class ListTreeTemplate extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.buildTree = this.buildTree.bind(this);
-        this.onTemplateChange = this.onTemplateChange.bind(this);
+        this.addTreeTemplate = this.addTreeTemplate.bind(this);
     }
 
 
-    onTemplateChange(event) {
+    addTreeTemplate(event) {
 
         this.props.history.push({
-            pathname: `/dataSet/buildTree/${event.target.value}`,
+            pathname: `/dataSet/createTreeTemplate`,
             // state: { role }
         });
 
@@ -69,19 +54,17 @@ export default class ListTreeTemplate extends Component {
 
     }
     buildJexcel() {
-        let treeList = this.state.treeList;
+        let treeTemplateList = this.state.treeTemplateList;
         // console.log("dataSourceList---->", dataSourceList);
-        let treeArray = [];
+        let treeTemplateArray = [];
         let count = 0;
 
-        for (var j = 0; j < treeList.length; j++) {
+        for (var j = 0; j < treeTemplateList.length; j++) {
             data = [];
-            data[0] = treeList[j].treeName
-            data[1] = treeList[j].region
-            data[2] = treeList[j].forecastMethod
-            data[3] = treeList[j].scenarioName
-            data[4] = treeList[j].status;
-            treeArray[count] = data;
+            data[0] = treeTemplateList[j].templateName
+            data[1] = treeTemplateList[j].forecastMethod
+            data[2] = treeTemplateList[j].status;
+            treeTemplateArray[count] = data;
             count++;
         }
         // if (dataSourceList.length == 0) {
@@ -92,7 +75,7 @@ export default class ListTreeTemplate extends Component {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
-        var data = treeArray;
+        var data = treeTemplateArray;
 
         var options = {
             data: data,
@@ -101,23 +84,12 @@ export default class ListTreeTemplate extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.common.treeName'),
+                    title: 'Template name',
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.common.region'),
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: i18n.t('static.forecastMethod.forecastMethod'),
-                    type: 'text',
-                    readOnly: true
-                },
-
-                {
-                    title: i18n.t('static.common.scenarioName'),
+                    title: 'Forecast method',
                     type: 'text',
                     readOnly: true
                 },
@@ -255,63 +227,16 @@ export default class ListTreeTemplate extends Component {
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <Col md="12 pl-0">
-                                    <div className="d-md-flex">
+                            <div className="card-header-action">        
                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                            // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
-                                            // <Col md="3" className="pl-0">
-                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label> */}
-                                                <div className="controls SelectGo">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="templateId"
-                                                            id="templateId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.onTemplateChange(e) }}
-                                                        >
-                                                            <option value="0">{'Select Template'}</option>
-                                                            <option value="1">Demographic TreeTemplate</option>
-                                                            {/* {realmList} */}
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            // </Col>
+                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addTreeTemplate}><i className="fa fa-plus-square"></i></a>
                                         }
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                            <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
-                                                <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
-                                            </FormGroup>
-                                        }
-                                    </div>
-                                </Col>
+                                  
                             </div>
                         </div>
 
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="3" className="pl-0">
-                            <FormGroup className="Selectdiv">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmId"
-                                            id="realmId"
-                                            bsSize="sm"
-                                            onChange={this.filterData}
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {/* {realmList} */}
-                                        </Input>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col>
                         {/* <div id="loader" className="center"></div> */}
                         <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
