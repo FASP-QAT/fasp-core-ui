@@ -923,19 +923,21 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-lg-0" style={{ display: 'contents' }}>
+                        <div className="pb-lg-0">
                             <div className="card-header-actions">
-                                <div className="card-header-actions pr-4 pt-1">
+                                <div className="card-header-action pr-4 pt-lg-0">
+                                {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a> */}
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
                                             {/* <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 "> */}
-                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a>
+                                            {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a> */}
                                             {/* </FormGroup> */}
-                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                            <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a>
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',marginTop:'-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                 // onClick={() => this.exportPDF(columns)} 
                                                 />
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')}
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',marginTop:'-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')}
                                                 // onClick={() => this.exportCSV(columns)} 
                                                 />
                                             </FormGroup>
