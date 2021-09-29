@@ -148,7 +148,9 @@ export default class BuildTree extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
+        this.addTreeData = this.addTreeData.bind(this);
         this.state = {
+            openTreeDataModal : false,
             modalOpen: false,
             title: '',
             cursorItem: 0,
@@ -158,6 +160,11 @@ export default class BuildTree extends Component {
             currentItemConfig: {},
             activeTab1: new Array(2).fill('1')
         }
+    }
+    addTreeData(){
+        this.setState({
+
+        });
     }
     addScenario() {
         const { tabList } = this.state;
@@ -929,7 +936,11 @@ export default class BuildTree extends Component {
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
                                             {/* <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 "> */}
-                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a>
+                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={()=>{
+                                                this.setState({
+                                                    openTreeDataModal : true
+                                                })
+                                            }}><i className="fa fa-plus-square"></i></a>
                                             {/* </FormGroup> */}
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
@@ -1212,20 +1223,21 @@ export default class BuildTree extends Component {
                             </div>
                         </CardBody>
                         <CardFooter>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
 
             {/* tree fields Modal start------------------- */}
-            <Modal isOpen={this.state.openTreeFieldsModal}
+            <Modal isOpen={this.state.openTreeDataModal}
                 className={'modal-md '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>Add/Edit Tree Data</strong>
-                    <Button size="md" onClick={() => this.setState({ openTreeFieldsModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
                         <Input
                             type="select"
@@ -1240,7 +1252,7 @@ export default class BuildTree extends Component {
                             <option value="2">surgical mask, 1 mask</option>
                         </Input>
                     </FormGroup>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
                             id="scenarioDesc"
@@ -1249,7 +1261,7 @@ export default class BuildTree extends Component {
                         // value={this.state.scenario.scenarioDesc}
                         ></Input>
                     </FormGroup>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
                         <Input
                             type="select"
