@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
@@ -53,7 +53,9 @@ export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       realms: [],
       productCategories: [],
@@ -72,7 +74,8 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true,
