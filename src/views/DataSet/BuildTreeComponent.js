@@ -74,19 +74,19 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
 
     return connectDropTarget(connectDragSource(
         // return connectDropTarget(connectDragSource(
-            <div className="ContactTemplate" style={{ opacity,backgroundColor: itemConfig.nodeBackgroundColor,borderColor: itemConfig.nodeBorderColor }}>
-              <div className="ContactTitleBackground" 
-                // style={{ backgroundColor: itemTitleColor }}
-              >
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+            <div className="ContactTitleBackground"
+            // style={{ backgroundColor: itemTitleColor }}
+            >
                 <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
-              </div>
-              {/* <div className="ContactPhotoFrame">
+            </div>
+            {/* <div className="ContactPhotoFrame">
                 <img className="ContactPhoto" src={itemConfig.image} alt={itemConfig.title} />
               </div> */}
-              <div className="ContactPhone">{itemConfig.nodeValue}</div>
-              {/* <div className="ContactEmail">{itemConfig.nodeValue}</div>
+            <div className="ContactPhone">{itemConfig.nodeValue}</div>
+            {/* <div className="ContactEmail">{itemConfig.nodeValue}</div>
               <div className="ContactDescription">{itemConfig.nodeValue}</div> */}
-            </div>
+        </div>
         // <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
         //     <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
         //         <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
@@ -152,6 +152,7 @@ export default class BuildTree extends Component {
             modalOpen: false,
             title: '',
             cursorItem: 0,
+            openAddScenarioModal: false,
             highlightItem: 0,
             items: TreeData.demographic_scenario_one,
             currentItemConfig: {},
@@ -405,7 +406,7 @@ export default class BuildTree extends Component {
                                 readOnly={true}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'Surgical masks'}
-                                // value={''}
+                            // value={''}
                             >
                             </Input>
                         </FormGroup>
@@ -549,9 +550,9 @@ export default class BuildTree extends Component {
                                     value={this.state.currentItemConfig.title}></Input>
                             </FormGroup></>} */}
                     </Form>
-                    
+
                     <div className="row">
-                      
+
                         {/* <FormGroup className="col-md-4">
                             <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                             <Input
@@ -620,10 +621,10 @@ export default class BuildTree extends Component {
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup> */}
-                        </div>
-                        {/* <FormGroup className="col-md-6"> */}
-                        <div className="col-md-12">
-                            <div style={{width:'100%'}}>
+                    </div>
+                    {/* <FormGroup className="col-md-6"> */}
+                    <div className="col-md-12">
+                        <div style={{ width: '100%' }}>
                             {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
@@ -677,9 +678,9 @@ export default class BuildTree extends Component {
                                     <td></td>
                                 </tr>
                             </table> */}
-                            </div><br />
+                        </div><br />
                         {/* <div style={{ clear: 'both' }}> */}
-                            {/* <table className="table table-bordered">
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -693,7 +694,7 @@ export default class BuildTree extends Component {
                                     <td>2.17</td>
                                 </tr>
                             </table> */}
-                             {/* <table className="table table-bordered">
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td># of FU required for period</td>
                                     <td>130</td>
@@ -711,7 +712,7 @@ export default class BuildTree extends Component {
                         {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
                         {/* <div className="pt-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div> */}
                         <div className="pt-2">
-                            <table  className="table table-bordered">
+                            <table className="table table-bordered">
                                 <tr>
                                     <td>Forecasting unit</td>
                                     <td>surgical mask, 1 mask</td>
@@ -922,24 +923,24 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-lg-0" style={{display:'contents'}}>
+                        <div className="Card-header-reporticon pb-lg-0" style={{ display: 'contents' }}>
                             <div className="card-header-actions">
                                 <div className="card-header-actions pr-4 pt-1">
-                                <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                            <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
-                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
-                                    </FormGroup>
-                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} 
-                                    // onClick={() => this.exportPDF(columns)} 
-                                    />
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} 
-                                    // onClick={() => this.exportCSV(columns)} 
-                                    />
-                                    </FormGroup>
-                                   
-                                    </div>
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            {/* <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 "> */}
+                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a>
+                                            {/* </FormGroup> */}
+                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                // onClick={() => this.exportPDF(columns)} 
+                                                />
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')}
+                                                // onClick={() => this.exportCSV(columns)} 
+                                                />
+                                            </FormGroup>
+
+                                        </div>
                                     </Col>
                                 </div>
                             </div>
@@ -975,8 +976,8 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{marginBottom:'0px'}}>
-                                                                    <Label htmlFor="languageId" style={{visibility:'hidden'}}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
+                                                                    <Label htmlFor="languageId" style={{ visibility: 'hidden' }}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
                                                                         name="languageId"
@@ -1012,7 +1013,11 @@ export default class BuildTree extends Component {
                                                                             <option value="">{'Scenario 1'}</option>
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={() => {
+                                                                                this.setState({
+                                                                                    openAddScenarioModal: true
+                                                                                })
+                                                                            }} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
@@ -1037,35 +1042,35 @@ export default class BuildTree extends Component {
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
                                                                         <div>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{fontSize:'12px'}}>
-                                                                        <b>{'Hide Planning Unit'}</b>
-                                                                    </Label>
-                                                                    </div>
-                                                                    <div>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{fontSize:'12px'}}>
-                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                    </Label>
-                                                                    </div>
+                                                                            <Input
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="active6"
+                                                                                name="active"
+                                                                                checked={false}
+                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Hide Planning Unit'}</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="active6"
+                                                                                name="active"
+                                                                                checked={false}
+                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                            </Label>
+                                                                        </div>
                                                                     </div>
                                                                 </FormGroup>
                                                                 {/* <FormGroup check inline>
@@ -1086,9 +1091,9 @@ export default class BuildTree extends Component {
                                                             </Row>
                                                         </div>
                                                         {/* <div className="col-md-12 pl-lg-0 pt-lg-3"> */}
-                                                            {/* <Row> */}
-                                                                {/* <FormGroup className=""> */}
-                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                        {/* <Row> */}
+                                                        {/* <FormGroup className=""> */}
+                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -1106,10 +1111,10 @@ export default class BuildTree extends Component {
                                                                         <option value="">{'Demographic'}</option>
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                {/* </FormGroup> */} 
-                                                                {/* </FormGroup> */}
-                                                                {/* <FormGroup className="pl-3"> */}
-                                                                {/* <FormGroup className="col-md-3">
+                                                        {/* </FormGroup> */}
+                                                        {/* </FormGroup> */}
+                                                        {/* <FormGroup className="pl-3"> */}
+                                                        {/* <FormGroup className="col-md-3">
                                                                     <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="text"
@@ -1125,8 +1130,8 @@ export default class BuildTree extends Component {
                                                                     >
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                {/* </FormGroup> */} 
-                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                        {/* </FormGroup> */}
+                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -1144,15 +1149,15 @@ export default class BuildTree extends Component {
                                                                         <option value="">{'Region A'}</option>
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                {/* </FormGroup> */}
-                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                        {/* </FormGroup> */}
+                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
 
                                                                     <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
                                                                     <InputGroup>
                                                                         {/* <InputGroupAddon addonType="append">
                                                                         <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
                                                                     </InputGroupAddon> */}
-                                                                        {/* <Input
+                                                        {/* <Input
                                                                             type="select"
                                                                             name="languageId"
                                                                             id="languageId"
@@ -1170,10 +1175,10 @@ export default class BuildTree extends Component {
                                                                         <InputGroupAddon addonType="append">
                                                                             <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
-                                                                    </InputGroup> */} 
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                {/* </FormGroup> */}
-                                                                {/* <FormGroup className="col-md-3 pl-lg-0">
+                                                                    </InputGroup> */}
+                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                        {/* </FormGroup> */}
+                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Date'}</Label>
                                                                     <Input
                                                                         type="text"
@@ -1186,11 +1191,11 @@ export default class BuildTree extends Component {
                                                                         // onBlur={handleBlur}
                                                                         // required
                                                                     // value={this.state.user.language.languageId}
-                                                                    > */} 
-                                                                    {/* </Input> */}
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                {/* </FormGroup> */}
-                                                            {/* </Row> */}
+                                                                    > */}
+                                                        {/* </Input> */}
+                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                        {/* </FormGroup> */}
+                                                        {/* </Row> */}
                                                         {/* </div> */}
                                                     </CardBody>
                                                 </Form>
@@ -1211,6 +1216,94 @@ export default class BuildTree extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
+
+            {/* tree fields Modal start------------------- */}
+            <Modal isOpen={this.state.openTreeFieldsModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Tree Data</strong>
+                    <Button size="md" onClick={() => this.setState({ openTreeFieldsModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup className="col-md-4">
+                        <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeTypeId"
+                            bsSize="sm"
+                            onChange={(e) => { this.nodeTypeChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Demographic Method</option>
+                            <option value="2">surgical mask, 1 mask</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup className="col-md-4">
+                        <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="scenarioDesc"
+                            name="scenarioDesc"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioDesc}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup className="col-md-4">
+                        <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeTypeId"
+                            bsSize="sm"
+                            onChange={(e) => { this.nodeTypeChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Region A</option>
+                            <option value="2">surgical mask, 1 mask</option>
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeFieldsModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Scenario Modal start------------------- */}
+            <Modal isOpen={this.state.openAddScenarioModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Scenario</strong>
+                    <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="scenarioName"
+                            name="scenarioName"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioName}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Notes</Label>
+                        <Input type="text"
+                            id="scenarioDesc"
+                            name="scenarioDesc"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioDesc}
+                        ></Input>
+                    </FormGroup>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-lg '} >
