@@ -281,7 +281,7 @@ const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
-const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/TreeTemplateComponent'));
+const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
