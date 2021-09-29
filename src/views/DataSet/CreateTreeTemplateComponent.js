@@ -555,15 +555,97 @@ export default class CreateTreeTemplate extends Component {
                             <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
+                                bsSize="sm"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup>
                     </div>
                     {/* <FormGroup className="col-md-6"> */}
-                    <div className="col-md-12">
-                        <div style={{ width: '100%' }}>
-                            <table className="table table-bordered">
+                    <div className="row">
+
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'1'}>
+
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'Clients'}>
+
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'130'}></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'condom'}>
+
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'1'}></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">year(s)</option>
+                                <option value="2">Discrete</option>
+                            </Input>
+                        </FormGroup>
+
+
+                        {/* <div style={{ width: '100%' }}> */}
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>1</td>
@@ -616,8 +698,8 @@ export default class CreateTreeTemplate extends Component {
                                     <td>indefinitely</td>
                                 </tr>
 
-                            </table>
-                            {/* <table className="table table-bordered">
+                            </table> */}
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -649,7 +731,7 @@ export default class CreateTreeTemplate extends Component {
                                     <td></td>
                                 </tr>
                             </table> */}
-                        </div><br />
+                        {/* </div><br /> */}
                         {/* <div style={{ clear: 'both' }}> */}
                         {/* <table className="table table-bordered">
                                 <tr>
@@ -681,7 +763,7 @@ export default class CreateTreeTemplate extends Component {
                             </table> */}
                         {/* </div> */}
                         {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
-                        <div className="pt-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div>
+                        <div className="pt-2 pl-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div>
                         {/* <div className="pt-2">
                             <table className="table table-bordered">
                                 <tr>
@@ -1137,7 +1219,7 @@ export default class CreateTreeTemplate extends Component {
                             </div>
                         </CardBody>
                         <CardFooter>
-                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
