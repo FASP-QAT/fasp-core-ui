@@ -2762,8 +2762,13 @@ export default class syncPage extends Component {
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
-    var listLength = transList.length;
-    return transList[listLength - 1].notes;
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
+        var listLength = transList.length;
+        return transList[listLength - 1].notes;
+        }
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
