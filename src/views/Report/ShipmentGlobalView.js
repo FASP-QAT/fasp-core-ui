@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -358,7 +358,9 @@ class ShipmentGlobalView extends Component {
         this.toggledata = this.toggledata.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
@@ -401,7 +403,8 @@ class ShipmentGlobalView extends Component {
             table1Body: [],
             table1Headers: [],
             viewby: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,

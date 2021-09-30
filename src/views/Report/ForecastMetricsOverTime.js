@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -101,7 +101,9 @@ class ForcastMatrixOverTime extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       loading: true,
       matricsList: [],
@@ -115,7 +117,8 @@ class ForcastMatrixOverTime extends Component {
       countries: [],
       show: false,
       singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
@@ -874,7 +877,7 @@ class ForcastMatrixOverTime extends Component {
                 var absvalue = 0;
                 var currentActualconsumption = null;
                 var currentForcastConsumption = null;
-                for (var i = month, j = 0; j <= monthInCalc; i-- , j++) {
+                for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
                   if (i == 0) {
                     i = 12;
                     year = year - 1

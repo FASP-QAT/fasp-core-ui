@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -210,7 +210,9 @@ class ShipmentSummery extends Component {
 
         this.toggle = this.toggle.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             planningUnitValues: [],
             planningUnitLabels: [],
@@ -234,7 +236,8 @@ class ShipmentSummery extends Component {
             shipmentDetailsMonthList: [],
             message: '',
             viewById: 1,
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
