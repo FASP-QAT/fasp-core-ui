@@ -9,7 +9,7 @@ class IntegrationSerice {
     }
 
     getIntegrationListAll() {
-        return axios.get(`${API_URL}/api/integration`, {
+        return axios.get(`${API_URL}/api/integration/`, {
         });
     }
 

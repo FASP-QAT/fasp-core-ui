@@ -32,7 +32,7 @@ class ReportService {
         );
     }
     getProgramVersionList(programId, realmCountryId, versionStatusId, versionTypeId, startDate, stopDate) {
-        return axios.get(`${API_URL}/api/programVersion/programId/${programId}/versionId/-1/realmCountryId/${realmCountryId}/healthAreaId/-1/organisationId/-1/versionTypeId/${versionTypeId}/versionStatusId/${versionStatusId}/dates/${startDate}/${stopDate}`, {}
+        return axios.get(`${API_URL}/api/programData/programVersion/programId/${programId}/versionId/-1/realmCountryId/${realmCountryId}/healthAreaId/-1/organisationId/-1/versionTypeId/${versionTypeId}/versionStatusId/${versionStatusId}/dates/${startDate}/${stopDate}`, {}
         );
     }
 

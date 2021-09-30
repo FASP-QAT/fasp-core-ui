@@ -28,7 +28,7 @@ class JiraTicketService {
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
         console.log(mainObject);
-        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        return axios.post(`${API_URL}/api/jira/addIssue`, mainObject, {}
         );
     }
 
@@ -57,7 +57,7 @@ class JiraTicketService {
         mainObject.fields = fields;
         
         console.log(mainObject);
-        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        return axios.post(`${API_URL}/api/jira/addIssue`, mainObject, {}
         );
     }
 
@@ -87,7 +87,7 @@ class JiraTicketService {
         mainObject.fields = fields;
         
         console.log(mainObject);
-        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        return axios.post(`${API_URL}/api/jira/addIssue`, mainObject, {}
         );
     }
 
@@ -95,7 +95,7 @@ class JiraTicketService {
         if(issueId != '') {                        
             let formData = new FormData();
             formData.append("file", json.file);
-            return axios.post(`${API_URL}/api/ticket/addIssueAttachment/${issueId}`, formData, {headers : { "Content-Type": "multipart/form-data",}}
+            return axios.post(`${API_URL}/api/jira/addIssueAttachment/${issueId}`, formData, {headers : { "Content-Type": "multipart/form-data",}}
             );
         }
     }
@@ -123,7 +123,7 @@ class JiraTicketService {
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
         console.log(mainObject);
-        return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
+        return axios.post(`${API_URL}/api/jira/addIssue`, mainObject, {}
         );
     }
 

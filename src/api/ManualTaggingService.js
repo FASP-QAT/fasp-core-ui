@@ -4,64 +4,64 @@ import { API_URL } from '../Constants.js';
 class ManualTaggingSerice {
 
     getShipmentListForManualTagging(json) {
-        return axios.post(`${API_URL}/api/manualTagging/`, json, {
+        return axios.post(`${API_URL}/api/program/manualTagging/`, json, {
         });
     }
 
     getShipmentLinkingNotification(json) {
-        return axios.post(`${API_URL}/api/shipmentLinkingNotification/`, json, {
+        return axios.post(`${API_URL}/api/program/shipmentLinkingNotification/`, json, {
         });
     }
 
     updateNotification(json) {
-        return axios.post(`${API_URL}/api/updateNotification/`, json, {
+        return axios.post(`${API_URL}/api/program/updateNotification/`, json, {
         });
     }
 
     getNotLinkedShipmentListForManualTagging(programId, linkingType) {
-        return axios.get(`${API_URL}/api/manualTagging/notLinkedShipments/${programId}/${linkingType}`, {
+        return axios.get(`${API_URL}/api/program/manualTagging/notLinkedShipments/${programId}/${linkingType}`, {
         });
     }
 
     getARTMISHistory(orderNo, primeLineNo) {
-        return axios.get(`${API_URL}/api/artmisHistory/${orderNo}/${primeLineNo}`, {
+        return axios.get(`${API_URL}/api/program/artmisHistory/${orderNo}/${primeLineNo}`, {
         });
     }
 
     getNotificationCount() {
-        return axios.get(`${API_URL}/api/getNotificationCount`, {
+        return axios.get(`${API_URL}/api/program/getNotificationCount`, {
         });
     }
     getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
         console.log("parentShipmentId----", parentShipmentId);
-        return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
+        return axios.get(`${API_URL}/api/program/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
         });
     }
     linkShipmentWithARTMIS(json) {
         console.log("my json------", json);
-        return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, json, {}
+        return axios.post(`${API_URL}/api/program/linkShipmentWithARTMIS/`, json, {}
         );
     }
     delinkShipment(shipmentId, notes, programId) {
-        return axios.post(`${API_URL}/api/delinkShipment/`, { shipmentId, notes, programId }, {}
+        return axios.post(`${API_URL}/api/program/delinkShipment/`, { shipmentId, notes, programId }, {}
         );
     }
     getShipmentListForDelinking(programId, planningUnitId) {
-        return axios.get(`${API_URL}/api/shipmentListForDelinking/${programId}/${planningUnitId}`, {
+        return axios.get(`${API_URL}/api/program/shipmentListForDelinking/${programId}/${planningUnitId}`, {
         });
     }
 
     searchErpOrderData(term, programId, erpPlanningUnitId, linkingType) {
-        return axios.get(`${API_URL}/api/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
+        return axios.get(`${API_URL}/api/program/searchErpOrderData/${term}/${programId}/${erpPlanningUnitId}/${linkingType}`, {
         });
     }
     getShipmentDetailsByParentShipmentId(parentShipmentId) {
-        return axios.post(`${API_URL}/api/getShipmentDetailsByParentShipmentId/`, { parentShipmentId }, {}
+        return axios.post(`${API_URL}/api/program/getShipmentDetailsByParentShipmentId/`, { parentShipmentId }, {}
         );
     }
 
     getNotificationSummary() {
-        return axios.get(`${API_URL}/api/getNotificationSummary/`, {
+        return axios.get(`${API_URL}/api/program/getNotificationSummary/`, {
         });
     }
 

@@ -44,11 +44,11 @@ class PlanningUnitService {
         );
     }
     getPlanningUnitByProgramIds(json) {
-        return axios.post(`${API_URL}/api/planningUnit/programs`, json, {}
+        return axios.post(`${API_URL}/api/program/planningUnit/programs`, json, {}
         );
     }
     getPlanningUnitByTracerCategory(planningUnitId, procurementAgentId, term) {
-        return axios.get(`${API_URL}/api/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
+        return axios.get(`${API_URL}/api/planningUnit/getPlanningUnitByTracerCategory/planningUnitId/${planningUnitId}/${procurementAgentId}/${term}`, {}
         );
     }
     getActivePlanningUnitByProductCategoryId(json) {

@@ -9,7 +9,7 @@ class ProgramService {
     }
 
     getAllProgramData(json) {
-        return axios.post(`${API_URL}/api/programData`, json, {
+        return axios.post(`${API_URL}/api/programData/`, json, {
         });
     }
 
@@ -22,11 +22,11 @@ class ProgramService {
         });
     }
     loadProgramList() {
-        return axios.get(`${API_URL}/api/loadProgram/`, {
+        return axios.get(`${API_URL}/api/program/loadProgram/`, {
         });
     }
     loadMoreProgramList(programId, page) {
-        return axios.get(`${API_URL}/api/loadProgram/programId/${programId}/page/${page}`, {
+        return axios.get(`${API_URL}/api/program/loadProgram/programId/${programId}/page/${page}`, {
         });
     }
 
@@ -114,7 +114,7 @@ class ProgramService {
         );
     }
     getVersionStatusList() {
-        return axios.get(`${API_URL}/api/versionStatus`, {}
+        return axios.get(`${API_URL}/api/programData/versionStatus`, {}
         );
     }
     updateProgramStatus(json, reviewedProblemList) {
@@ -124,12 +124,12 @@ class ProgramService {
             notes: json.currentVersion.notes
         }
 
-        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
+        return axios.put(`${API_URL}/api/programData/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}/`, obj, {}
         );
     }
 
     getVersionTypeList() {
-        return axios.get(`${API_URL}/api/versionType`, {}
+        return axios.get(`${API_URL}/api/programData/versionType`, {}
         );
     }
 
@@ -160,7 +160,7 @@ class ProgramService {
     }
 
     getProblemStatusList() {
-        return axios.get(`${API_URL}/api/problemStatus`, {}
+        return axios.get(`${API_URL}/api/problem/problemStatus`, {}
         );
     }
 

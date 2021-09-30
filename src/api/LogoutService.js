@@ -4,7 +4,7 @@ import { API_URL } from '../Constants.js';
 class LogoutService {
 
     logout() {
-        return axios.get(`${API_URL}/api/logout/`, {}
+        return axios.get(`${API_URL}/api/user/logout/`, {}
         );
     }    
 

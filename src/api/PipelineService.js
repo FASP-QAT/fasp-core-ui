@@ -3,7 +3,7 @@ import { API_URL } from '../Constants.js'
 
 class PipelineService {
     savePipelineJson(json, fileName) {
-        return axios.post(`${API_URL}/api/pipelineJson/${fileName}`, json, {}
+        return axios.post(`${API_URL}/api/pipeline/pipelineJson/${fileName}`, json, {}
         );
     }
     getPipelineProgramList() {
@@ -16,12 +16,12 @@ class PipelineService {
         );
     }
     addProgramToQatTempTable(json, pipelineId) {
-        return axios.post(`${API_URL}/api/qatTemp/program/${pipelineId}`, json, {}
+        return axios.post(`${API_URL}/api/pipeline/qatTemp/program/${pipelineId}`, json, {}
         );
     }
 
     getQatTempPorgramByPipelineId(json) {
-        return axios.get(`${API_URL}/api/qatTemp/program/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/program/${json}`, {}
         );
     }
 
@@ -42,7 +42,7 @@ class PipelineService {
 
     getQatTempPlanningUnitList(json) {
 
-        return axios.get(`${API_URL}/api/qatTemp/planningUnitList/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/planningUnitList/${json}`, {}
         );
     }
 
@@ -51,7 +51,7 @@ class PipelineService {
         );
     }
     getQatTempProgramregion(json) {
-        return axios.get(`${API_URL}/api/qatTemp/regions/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/regions/${json}`, {}
         );
     }
 
@@ -66,7 +66,7 @@ class PipelineService {
     }
 
     getQatTempConsumptionById(json) {
-        return axios.get(`${API_URL}/api/qatTemp/consumption/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/consumption/${json}`, {}
         );
     }
     submitShipmentData(pipelineId, json) {
@@ -85,7 +85,7 @@ class PipelineService {
     }
 
     getPlanningUnitListWithFinalInventry(json) {
-        return axios.get(`${API_URL}/api/qatTemp/planningUnitListFinalInventry/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/planningUnitListFinalInventry/${json}`, {}
         );
     }
     submitProgram(pipelineId) {
@@ -94,7 +94,7 @@ class PipelineService {
     }
     getQatTempDataSourceList(json) {
 
-        return axios.get(`${API_URL}/api/qatTemp/datasource/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/datasource/${json}`, {}
         );
     }
 
@@ -103,7 +103,7 @@ class PipelineService {
         );
     }
     getQatTempFundingSourceList(json) {
-        return axios.get(`${API_URL}/api/qatTemp/fundingsource/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/fundingsource/${json}`, {}
         );
     }
 
@@ -112,7 +112,7 @@ class PipelineService {
         );
     }
     getQatTempProcurementAgentList(json) {
-        return axios.get(`${API_URL}/api/qatTemp/procurementagent/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/qatTemp/procurementagent/${json}`, {}
         );
     }
 

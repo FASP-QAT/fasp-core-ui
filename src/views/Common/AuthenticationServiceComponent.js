@@ -61,7 +61,7 @@ export default class AuthenticationServiceComponent extends Component {
                     if (result1 == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
                         console.log("offline 7---------------")
                     }
-                    else if (!url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
+                    else if (!url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/user/updateExpiredPassword/") && !url.includes("/api/user/forgotPassword/") && !url.includes("/api/user/confirmForgotPasswordToken/") && !url.includes("/api/user/updatePassword/")) {
                         this.props.history.push(result1)
                     }
                     

@@ -13,7 +13,7 @@ class ShipmentStatusService{
         });
     }
     getShipmentStatusListActive(){
-        return axios.get(`${API_URL}/api/getShipmentStatusListActive`, {
+        return axios.get(`${API_URL}/api/shipmentStatus/getShipmentStatusListActive`, {
         });
     }
     editShipmentStatus(json) {

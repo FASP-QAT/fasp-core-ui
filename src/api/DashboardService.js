@@ -26,7 +26,7 @@ class DashboardService {
     }
 
     openIssues() {
-        return axios.get(`${API_URL}/api/ticket/openIssues/`, {
+        return axios.get(`${API_URL}/api/jira/openIssues/`, {
         });
     }
 }
