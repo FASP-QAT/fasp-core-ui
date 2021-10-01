@@ -280,6 +280,10 @@ const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/Model
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
+const AddDataSet = React.lazy(() => import('../../views/DataSet/AddDataSet'));
+const DataSetList = React.lazy(() => import('../../views/DataSet/DataSetList'));
+const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -658,6 +662,11 @@ const routes = [
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
+
+  { path: '/dataSet/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataSet.dataSet', component: AddDataSet },
+  { path: '/dataSet/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataSet.dataSet', component: DataSetList },
+  { path: '/dataSet/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataSet.dataSet', component: DataSetList },
+  { path: '/dataSet/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataSet.dataSet', component: EditDataSet },
 
 ];
 

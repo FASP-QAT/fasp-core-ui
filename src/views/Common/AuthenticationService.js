@@ -1301,6 +1301,23 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/dataSet/addDataSet":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+                    case "/dataSet/editDataSet/:dataSetId":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+                    case "/dataSet/listDataSet":
+                    case "/dataSet/listDataSet/:color/:message":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+
                     default:
                         console.log("default case");
                         return false;
