@@ -1841,11 +1841,11 @@ class EquivalancyUnit extends Component {
                         </div>
                     </div>
 
-                    <CardBody className="p-0">
+                    <CardBody className="pl-lg-3 pr-lg-3 pt-lg-0">
 
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -1924,15 +1924,10 @@ class EquivalancyUnit extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3"></h6>
-                        <div>
-                        <div id="eqUnitInfoTable" className="RemoveStriped">
-                                        </div>
-                                        </div>
-                                        
-                        {/* <div className="table-responsive"> */}
-                            {/* <div id="eqUnitInfoTable" className="AddListbatchtrHeight">
-                            </div> */}
-                        {/* </div> */}
+                         <div>
+                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
+                            </div>
+                         </div>
                         <br />
                     </ModalBody>
                     <ModalFooter>
