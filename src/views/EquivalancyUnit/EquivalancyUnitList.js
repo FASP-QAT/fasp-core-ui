@@ -87,7 +87,12 @@ class EquivalancyUnit extends Component {
 
     }
 
+    // loaded1 = function (instance, cell, x, y, value) {
+    //     jExcelLoadedFunction(instance, 0);
+    // }
+
     loaded1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
@@ -1909,7 +1914,7 @@ class EquivalancyUnit extends Component {
                         </FormGroup>
 
                     </CardFooter>
-                </Card>
+                
 
 
                 <Modal isOpen={this.state.isModalOpen}
@@ -1919,10 +1924,15 @@ class EquivalancyUnit extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3"></h6>
-                        <div className="table-responsive">
-                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight">
-                            </div>
-                        </div>
+                        <div>
+                        <div id="eqUnitInfoTable" className="RemoveStriped">
+                                        </div>
+                                        </div>
+                                        
+                        {/* <div className="table-responsive"> */}
+                            {/* <div id="eqUnitInfoTable" className="AddListbatchtrHeight">
+                            </div> */}
+                        {/* </div> */}
                         <br />
                     </ModalBody>
                     <ModalFooter>
@@ -1933,7 +1943,7 @@ class EquivalancyUnit extends Component {
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
-
+                </Card>
             </div>
         )
     }
