@@ -135,3 +135,5 @@ export const polling = {url: API_URL}
 export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
 export const PROBLEM_STATUS_IN_COMPLIANCE=4
 export const MAX_PROGRAM_CODE_LENGTH = 50;
+export const REPORT_DATEPICKER_START_MONTH = 6;
+export const REPORT_DATEPICKER_END_MONTH = 0;

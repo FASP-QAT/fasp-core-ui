@@ -619,8 +619,8 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-            var program = transaction.objectStore('downloadedProgramData');
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -633,17 +633,19 @@ export default class SupplyPlanComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                console.log("MyResult+++",myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
+                        console.log("In if")
                         // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
-                            name: programJson1.programCode + "~v" + myResult[i].version,
+                            name: myResult[i].programCode + "~v" + myResult[i].version,
                             id: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -690,9 +692,10 @@ export default class SupplyPlanComponent extends React.Component {
                     })
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -773,12 +776,15 @@ export default class SupplyPlanComponent extends React.Component {
                                     programPlanningUnitList: myResult,
                                     planningUnitListAll: myResult,
                                     regionList: regionList,
-                                    programJson: programJson,
+                                    generalProgramJson: programJson,
+                                    planningUnitDataList:planningUnitDataList,
                                     dataSourceListAll: dataSourceListAll,
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
+                                },()=>{
+                                    this.formSubmit(this.props.items.monthCount)
                                 })
-                                this.formSubmit(this.props.items.monthCount)
+                                
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
@@ -815,7 +821,24 @@ export default class SupplyPlanComponent extends React.Component {
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnitName = this.props.items.planningUnitName;
-
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        console.log("this.state.planningUnitDataList+++",this.state.planningUnitDataList);
+        var planningUnitDataFilter=this.state.planningUnitDataList.filter(c=>c.planningUnitId==planningUnitId);
+        var programJsonForPlanningUnit={};
+        if (planningUnitDataFilter.length > 0) {
+            var planningUnitData = planningUnitDataFilter[0]
+            var programDataBytesForPlanningUnit = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            var programDataForPlanningUnit = programDataBytesForPlanningUnit.toString(CryptoJS.enc.Utf8);
+            programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+        } else {
+            programJsonForPlanningUnit = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+            }
+        }
         var actualProgramId = this.state.programList.filter(c => c.id == document.getElementById("programId").value)[0].programId;
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitId))[0];
         var regionListFiltered = this.state.regionList;
@@ -873,7 +896,8 @@ export default class SupplyPlanComponent extends React.Component {
             // programRequest.onsuccess = function (e) {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = this.state.programJson;
+            var programJson = programJsonForPlanningUnit;
+            var generalProgramJson=this.state.generalProgramJson;
             var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) &&  c.active.toString() == "true")
             var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate))  && c.active.toString() == "true")
             var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
@@ -882,7 +906,7 @@ export default class SupplyPlanComponent extends React.Component {
             })
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
             realmRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
@@ -917,7 +941,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
-                    versionId: programJson.currentVersion.versionId,
+                    versionId: generalProgramJson.currentVersion.versionId,
                     monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
                     monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
@@ -927,6 +951,7 @@ export default class SupplyPlanComponent extends React.Component {
                     inList: invList,
                     coList: conList,
                     shList: shiList,
+                    programJson:programJsonForPlanningUnit
                 })
 
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
@@ -1420,9 +1445,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 } else {
                                     suggestShipment = false;
                                 }
-                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
+                                    parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                                    parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
                                 var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                 var isEmergencyOrder = 0;
                                 if (expectedDeliveryDate >= currentMonth) {
