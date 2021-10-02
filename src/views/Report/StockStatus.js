@@ -943,16 +943,38 @@ class StockStatus extends Component {
           }.bind(this);
           programRequest.onsuccess = function (event) {
 
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+
+            var programDataJson = programRequest.result.programData;
+            var planningUnitDataList = programDataJson.planningUnitDataList;
+            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+            }
+          }
+            var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+            var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+            var generalProgramJson = JSON.parse(generalProgramData);
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
 
 
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
             realmRequest.onerror = function (event) {
               this.setState({
                 loading: false,
@@ -1357,12 +1379,18 @@ class StockStatus extends Component {
         }.bind(this);
         programRequest.onsuccess = function (event) {
 
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
+          // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          // var programJson = JSON.parse(programData);
+
+          var programDataJson = programRequest.result.programData;
+          var planningUnitDataList = programDataJson.planningUnitDataList;
+          var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+          var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+          var generalProgramJson = JSON.parse(generalProgramData);
           var realmTransaction = db1.transaction(['realm'], 'readwrite');
           var realmOs = realmTransaction.objectStore('realm');
-          var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+          var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
           realmRequest.onerror = function (event) {
             this.setState({
               loading: false,
@@ -1413,6 +1441,22 @@ class StockStatus extends Component {
                   var pcnt = 0
                   console.log('planningunitList', planningunitList)
                   planningunitList.map(pu => {
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == pu.planningUnit.id);
+          var programJson = {}
+          if (planningUnitDataIndex != -1) {
+            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == pu.planningUnit.id))[0];
+            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            programJson = JSON.parse(programData);
+          } else {
+            programJson = {
+              consumptionList: [],
+              inventoryList: [],
+              shipmentList: [],
+              batchInfoList: [],
+              supplyPlan: []
+          }
+        }                    
                     console.log('**pu', pu)
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
@@ -1447,7 +1491,7 @@ class StockStatus extends Component {
 
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
+                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == pu.planningUnit.id && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                     var firstMonthRegionCount = 1;
                     var firstMonthRegionCountForStock = 0;
                     if (prevMonthSupplyPlan.length > 0) {
@@ -2503,7 +2547,7 @@ class StockStatus extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -2633,7 +2677,7 @@ class StockStatus extends Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 

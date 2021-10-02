@@ -161,12 +161,13 @@ class AnnualShipmentCost extends Component {
                         programRequest.onsuccess = function (e) {
                             // this.setState({ loading: true })
                             console.log("2----", programRequest)
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
 
-                            var programJson = JSON.parse(programData);
-                            console.log("3----", programJson);
+                            // var programJson = JSON.parse(programData);
+                            // console.log("3----", programJson);
 
+                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgent');
                             var papuRequest = papuOs.getAll();
@@ -195,12 +196,28 @@ class AnnualShipmentCost extends Component {
                                     var fsResult = [];
                                     fsResult = fsRequest.result;
                                     var outPutList = [];
-                                    var shipmentList = [];
-                                    shipmentList = programJson.shipmentList;
-                                    shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                     this.state.planningUnitValues.map(p => {
                                         console.log("P+++++++++++", p);
                                         var planningUnitId = p.value;
+                                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                                        var programJson = {}
+                                        if (planningUnitDataIndex != -1) {
+                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+                                        var shipmentList = [];
+                                        shipmentList = programJson.shipmentList;
+                                        shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                         var planningUnitLabel = p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
 
@@ -440,7 +457,7 @@ class AnnualShipmentCost extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -945,7 +962,7 @@ class AnnualShipmentCost extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 

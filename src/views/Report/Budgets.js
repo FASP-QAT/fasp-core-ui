@@ -519,13 +519,23 @@ class Budgets extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
-                            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
+                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            // var programJson = JSON.parse(programData);
+                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                            var shipmentList=[];
+                            for(var pu=0;pu<planningUnitDataList.length;pu++){
+                                var planningUnitData=planningUnitDataList[pu];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                var programJson = JSON.parse(programData);
+                                var sList=programJson.shipmentList;
+                                shipmentList=shipmentList.concat(sList);
+                            }
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                var shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                                var shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                                shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
                                 (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
@@ -804,7 +814,7 @@ class Budgets extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -925,7 +935,7 @@ class Budgets extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
