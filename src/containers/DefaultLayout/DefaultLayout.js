@@ -280,9 +280,20 @@ const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/Model
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
+const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
+const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
+const ListTreeTemplate=React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const CreateTreeTemplate=React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
+const LoadDeleteDataSet=React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-
+  {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/listTreeTemplate/',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/createTreeTemplate/',name:'Create Tree Template',component:CreateTreeTemplate},
+  { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/:templateId',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -659,6 +670,8 @@ const routes = [
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
 
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 
 class DefaultLayout extends Component {
@@ -1392,6 +1405,33 @@ class DefaultLayout extends Component {
                           // },
 
 
+                        ]
+                      },
+                      {
+                        name: i18n.t('static.common.datasetmanagement'),
+                        icon: 'fa fa-list',
+                        attributes: {
+                          hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        },
+                        children: [
+                          {
+                            name: i18n.t('static.common.loadDeleteDataSet'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.common.listtree'),
+                            url: '/dataset/listTree',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'List Tree Template',
+                            url: '/dataset/listTreeTemplate',
+                            icon: 'fa fa-globe',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          }
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
