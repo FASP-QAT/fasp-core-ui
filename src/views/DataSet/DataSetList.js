@@ -20,7 +20,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 
-const entityname = i18n.t('static.program.programMaster');
+const entityname = i18n.t('static.dataSet.dataSet');
 export default class ProgramList extends Component {
 
     constructor(props) {
@@ -126,7 +126,7 @@ export default class ProgramList extends Component {
             data[2] = getLabelText(programList[j].label, this.state.lang)
             data[3] = programList[j].programCode;
             data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
-            data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
+            data[5] = programList[j].organisation.code
             data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
             data[7] = programList[j].useRegions
             data[8] = programList[j].lastModifiedBy.username;
@@ -187,7 +187,7 @@ export default class ProgramList extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.useRegions'),
+                    title: i18n.t('static.dashboard.region'),
                     type: 'text',
                     readOnly: true
                 },
@@ -340,7 +340,7 @@ export default class ProgramList extends Component {
             "lastModifiedDate": "2021-02-20 12:00:00",
             "active": true,
             "programId": 1,
-            "programCode": "BEN-CONPRHCON-MOH",
+            "programCode": "BEN-PRHCON-MOH",
             "realmCountry": {
                 "realmCountryId": 5,
                 "country": {
@@ -387,7 +387,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "Yes"
+            "useRegions": "National"
         }
 
         let programJson2 = {
@@ -403,7 +403,7 @@ export default class ProgramList extends Component {
             "lastModifiedDate": "2021-02-20 12:00:00",
             "active": true,
             "programId": 2,
-            "programCode": "BEN-ARVRTK-MOH",
+            "programCode": "BEN-ARV/RTK-MOH",
             "realmCountry": {
                 "realmCountryId": 5,
                 "country": {
@@ -450,7 +450,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "No"
+            "useRegions": "National"
         }
 
         let programJson3 = {
@@ -513,7 +513,7 @@ export default class ProgramList extends Component {
             "shippedToArrivedByAirLeadTime": 1,
             "shippedToArrivedBySeaLeadTime": 0.25,
             "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "No"
+            "useRegions": "North,South"
         }
 
         this.setState({

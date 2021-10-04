@@ -938,7 +938,7 @@ export default class AddForecastProgram extends Component {
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.dataSet.dataSetManager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         value={this.state.program.programManager.userId}
                                                         bsSize="sm"
@@ -954,46 +954,6 @@ export default class AddForecastProgram extends Component {
                                                     <FormFeedback>{errors.userId}</FormFeedback>
 
                                                 </FormGroup>
-                                                <FormGroup>
-                                                    {/* <Label htmlFor="customField1">{i18n.t('static.forecastProgram.customField1')}<span class="red Reqasterisk">*</span></Label> */}
-                                                    <Input
-                                                        bsSize="sm"
-                                                        type="hidden" name="customField1"
-                                                        valid={!errors.customField1 && this.state.program.customField1 != ''}
-                                                        invalid={touched.customField1 && !!errors.customField1}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                        onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
-                                                        value={this.state.program.customField1}
-                                                        id="customField1" />
-                                                    <FormFeedback className="red">{errors.customField1}</FormFeedback>
-                                                </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="customField2">{i18n.t('static.forecastProgram.MaxvalueofStockoutdays')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        bsSize="sm"
-                                                        type="text" name="customField2"
-                                                        valid={!errors.customField2 && this.state.program.customField2 != ''}
-                                                        invalid={touched.customField2 && !!errors.customField2}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                        onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
-                                                        value={this.state.program.customField2}
-                                                        id="customField2" />
-                                                    <FormFeedback className="red">{errors.customField2}</FormFeedback>
-                                                </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="customField3">{i18n.t('static.forecastProgram.customField3')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        bsSize="sm"
-                                                        type="text" name="customField3"
-                                                        valid={!errors.customField3 && this.state.program.customField3 != ''}
-                                                        invalid={touched.customField3 && !!errors.customField3}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                        onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
-                                                        value={this.state.program.customField3}
-                                                        id="customField3" />
-                                                    <FormFeedback className="red">{errors.customField3}</FormFeedback>
-                                                </FormGroup>
-
                                                 <FormGroup>
 
                                                     <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
