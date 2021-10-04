@@ -87,7 +87,12 @@ class EquivalancyUnit extends Component {
 
     }
 
+    // loaded1 = function (instance, cell, x, y, value) {
+    //     jExcelLoadedFunction(instance, 0);
+    // }
+
     loaded1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
         jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
@@ -1836,11 +1841,11 @@ class EquivalancyUnit extends Component {
                         </div>
                     </div>
 
-                    <CardBody className="p-0">
+                    <CardBody className="pl-lg-3 pr-lg-3 pt-lg-0">
 
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -1909,7 +1914,7 @@ class EquivalancyUnit extends Component {
                         </FormGroup>
 
                     </CardFooter>
-                </Card>
+                
 
 
                 <Modal isOpen={this.state.isModalOpen}
@@ -1919,10 +1924,10 @@ class EquivalancyUnit extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3"></h6>
-                        <div className="table-responsive">
-                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight">
+                         <div>
+                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
                             </div>
-                        </div>
+                         </div>
                         <br />
                     </ModalBody>
                     <ModalFooter>
@@ -1933,7 +1938,7 @@ class EquivalancyUnit extends Component {
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
-
+                </Card>
             </div>
         )
     }
