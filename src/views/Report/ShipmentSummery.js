@@ -2244,7 +2244,7 @@ class ShipmentSummery extends Component {
 
             }, {
                 label: i18n.t('static.report.arrived'),
-                backgroundColor: '#436e94',
+                backgroundColor: '#006789',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2259,7 +2259,7 @@ class ShipmentSummery extends Component {
                 label: i18n.t('static.report.shipped'),
                 stack: 1,
                 // backgroundColor: '#1d97c2',
-                backgroundColor: '#006789',
+                backgroundColor: '#49a4a1',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2271,7 +2271,7 @@ class ShipmentSummery extends Component {
             },
             {
                 label: i18n.t('static.supplyPlan.ordered'),
-                backgroundColor: '#669cdf',
+                backgroundColor: '#0067B9',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2286,7 +2286,7 @@ class ShipmentSummery extends Component {
             {
                 label: i18n.t('static.report.submitted'),
                 stack: 1,
-                backgroundColor: '#20a8d8',
+                backgroundColor: '#25A7FF',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2299,7 +2299,7 @@ class ShipmentSummery extends Component {
             {
                 label: i18n.t('static.report.planned'),
                 // backgroundColor: '#a5c5ec',
-                backgroundColor: '#a7c6ed',
+                backgroundColor: '#A7C6ED',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2313,7 +2313,7 @@ class ShipmentSummery extends Component {
             {
                 label: i18n.t('static.report.hold'),
                 stack: 1,
-                backgroundColor: '#7372cb',
+                backgroundColor: '#6C6463',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
