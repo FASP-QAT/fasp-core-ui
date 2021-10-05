@@ -1540,6 +1540,32 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+
+                      {
+                        name: i18n.t('static.dashboard.programmaster'),
+                        // url: '/program',
+                        icon: 'fa fa-list',
+                        attributes: {
+                          hidden: (((
+                            (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT'))) && this.state.activeTab == 1
+                          ) ? false : true)
+                        },
+                        children: [
+                          {
+                            name: i18n.t('static.dataSet.dataSet'),
+                            url: '/dataSet/listDataSet',
+                            icon: 'fa fa-list-ol',
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1) ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                            url: '/equivalancyUnit/listEquivalancyUnit',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT') && this.state.activeTab == 1) ? false : true) }
+                          }
+                        ]
+                      },
                       // {
                       //   name: i18n.t('static.pipeline.programData'),
                       //   icon: 'fa fa-list',

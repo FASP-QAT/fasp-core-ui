@@ -17,23 +17,20 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import { MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 
 
-const entityname = i18n.t('static.program.programMaster');
+const entityname = i18n.t('static.dataSet.dataSet');
 let initialValues = {
+    programName: '',
     realmId: '',
     realmCountryId: '',
-    healthAreaId: [],
     organisationId: '',
-    regionsId: [],
-    programName: '',
-    programCode: '',
-    programCode1: '',
     userId: '',
-    customField1: '',
-    customField2: '',
-    customField3: '',
+    healthAreaId: [],
     programNotes: '',
+    regionId: [],
+    programCode1: ''
 }
 
 const validationSchema = function (values) {
@@ -41,16 +38,33 @@ const validationSchema = function (values) {
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.program.validprogramtext')),
+        realmId: Yup.string()
+            .required(i18n.t('static.common.realmtext')),
+        realmCountryId: Yup.string()
+            .required(i18n.t('static.program.validcountrytext')),
+        organisationId: Yup.string()
+            .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        customField1: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        customField2: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        customField3: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        regionsId: Yup.string()
-            .required(i18n.t('static.program.validRegionstext')),
+
+        healthAreaId: Yup.string()
+            .required(i18n.t('static.program.validhealthareatext')),
+        // programNotes: Yup.string()
+        //     .required(i18n.t('static.program.validnotestext'))
+        regionId: Yup.string()
+            .required(i18n.t('static.common.regiontext')),
+        // uniqueCode: Yup.string()
+        //     .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
+        //     .required(i18n.t('static.programOnboarding.validprogramCode')),
+        programCode1: Yup.string()
+            .test('programCode', i18n.t('static.programValidation.programCode'),
+                function (value) {
+                    if (parseInt(document.getElementById("programCode").value.length + value.length) > MAX_PROGRAM_CODE_LENGTH) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
     })
 }
 
@@ -85,28 +99,28 @@ export default class EditProgram extends Component {
             program: {
                 programCode: '<%RC%>-<%TA%>-<%OR%>-',
                 label: {
-                    label_en: 'Benin ARV Forecast Dataset',
+                    label_en: '',
                     label_sp: '',
                     label_pr: '',
                     label_fr: ''
                 },
                 realm: {
-                    realmId: 1,
+                    realmId: '',
                 },
                 realmCountry: {
-                    realmCountryId: 5,
+                    realmCountryId: '',
                     country: {
                         label: {
-                            label_en: "Benin",
+                            label_en: '',
                             label_sp: '',
                             label_pr: '',
                             label_fr: ''
                         }
                     },
                     realm: {
-                        realmId: 1,
+                        realmId: '',
                         label: {
-                            label_en: 'Global Health',
+                            label_en: '',
                             label_sp: '',
                             label_pr: '',
                             label_fr: ''
@@ -114,9 +128,9 @@ export default class EditProgram extends Component {
                     }
                 },
                 organisation: {
-                    id: 1,
+                    id: '',
                     label: {
-                        label_en: 'Ministry of Health',
+                        label_en: '',
                         label_sp: '',
                         label_pr: '',
                         label_fr: ''
@@ -124,43 +138,46 @@ export default class EditProgram extends Component {
 
                 },
                 programManager: {
-                    userId: 2,
+                    userId: '',
                     label: {
-                        label_en: 'Alan George',
+                        label_en: '',
                         label_sp: '',
                         label_pr: '',
                         label_fr: ''
                     }
                 },
-                programNotes: 'Benin ARV Forecast Dataset',
-                healthAreaArray: [],
-                regionsArray: [],
-                active: true,
+                healthArea: {
+                    id: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                programNotes: '',
+                regionArray: [],
+                healthAreaArray: []
+
 
             },
-
+            // regionList: [{ value: '1', label: 'R1' },
+            // { value: '2', label: 'R2' },
+            // { value: '3', label: 'R3' }],
+            regionId: '',
+            healthAreaId: '',
             lang: localStorage.getItem('lang'),
-            message: '',
-            loading: true,
             realmList: [],
             realmCountryList: [],
             organisationList: [],
-            healthAreaList: [
-                { value: 1, label: "a" },
-                { value: 2, label: "b" },
-                { value: 3, label: "c" },
-            ],
-            regionsList: [
-                { value: 1, label: "National" },
-            ],
+            healthAreaList: [],
             programManagerList: [],
+            regionList: [],
             message: '',
             loading: true,
             healthAreaCode: '',
             organisationCode: '',
-            realmCountryCode: '',
-            healthAreaId: '1,6',
-            regionsId: '1',
+            realmCountryCode: ''
 
         }
 
@@ -171,13 +188,9 @@ export default class EditProgram extends Component {
         this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
-        this.dataChange = this.dataChange.bind(this);
-        this.generateCode = this.generateCode.bind(this);
-        this.realmList = this.realmList.bind(this);
-        this.getRealmCountryList = this.getRealmCountryList.bind(this);
-        this.getProgramManagerList = this.getProgramManagerList.bind(this);
-        this.getHealthAreaList = this.getHealthAreaList.bind(this);
-        this.getOrganisationList = this.getOrganisationList.bind(this);
+        this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
+        this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
     }
 
     changeMessage(message) {
@@ -193,340 +206,353 @@ export default class EditProgram extends Component {
         }, 8000);
     }
 
-    generateCode() {
-        this.realmList();
-        this.getRealmCountryList(1);
-        this.getProgramManagerList(1);
-        this.getHealthAreaList(5);
-        this.getOrganisationList(5);
-    }
-
-    getRealmCountryList(realmId) {
-        console.log("in get realmCOuntry list----->", realmId);
-        ProgramService.getRealmCountryList(realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    // var realmCountries = response.data.filter(c => c.active == true );
-                    var listArray = response.data.filter(c => c.active == true);
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        realmCountryList: listArray
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-
-    getProgramManagerList(realmId) {
-        ProgramService.getProgramManagerList(realmId)
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        programManagerList: listArray
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-
-    getHealthAreaList(realmCountryId) {
-        ProgramService.getHealthAreaListByRealmCountryId(realmCountryId)
-            .then(response => {
-                if (response.status == 200) {
-                    console.log("response------>0", response.data);
-                    var json = (response.data).filter(c => c.active == true);
-                    var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
-                    }
-                    console.log("response------>1", regList);
-                    var listArray = regList;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    console.log("response------>2", listArray);
-                    this.setState({
-                        healthAreaList: listArray
-                    }, (
-                    ) => {
-                        console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-
-    getOrganisationList(realmCountryId) {
-        ProgramService.getOrganisationListByRealmCountryId(realmCountryId)
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        organisationList: listArray
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-
-
-    realmList() {
-        HealthAreaService.getRealmList()
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        realmList: listArray,
-                        loading: false
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    }
-
     Capitalize(str) {
         let { program } = this.state
         program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
-
     componentDidMount() {
-        this.generateCode();
+        // AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
+            console.log("program obj===>", response.data);
+            var proObj = response.data;
+            // var healthAreaArrayDummy=[];
+            // healthAreaArrayDummy.push(response.data.healthArea.id);
+            // proObj.healthAreaArray=healthAreaArrayDummy;
+
+            var programCode = response.data.programCode;
+            var splitCode = programCode.split("-");
+            var uniqueCode = splitCode[3];
+            var realmCountryCode = splitCode[0];
+            var healthAreaCode = splitCode[1];
+            var organisationCode = splitCode[2];
+            if (uniqueCode == undefined) {
+                uniqueCode = ""
+            }
+            this.setState({
+                program: proObj,
+                loading: false,
+                uniqueCode: uniqueCode,
+                healthAreaCode: healthAreaCode,
+                organisationCode: organisationCode,
+                realmCountryCode: realmCountryCode
+            })
+
+            // AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+                .then(response => {
+                    console.log("realm list---", response.data);
+                    if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.username.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            programManagerList: response.data, loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        console.log("region list---", response.data);
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                        }
+                        regList.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            regionList: regList, loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            organisationList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+            ProgramService.getHealthAreaListByRealmCountryId(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var haList = [];
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                            var json = response.data;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                            }
+                        } else {
+                            var json = this.state.program.healthAreaList;
+                            for (var i = 0; i < json.length; i++) {
+                                haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                            }
+                        }
+
+                        var listArray = haList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            healthAreaId: '',
+                            healthAreaList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+
     }
 
+    generateHealthAreaCode(value) {
+        var healthAreaId = value;
+        let healthAreaCode = ''
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
+        }
+        this.setState({
+            healthAreaCode: healthAreaCode.slice(0, -1)
+        })
+    }
+
+    generateOrganisationCode(event) {
+        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        this.setState({
+            organisationCode: organisationCode
+        })
+    }
 
     updateFieldData(value) {
         let { program } = this.state;
@@ -539,7 +565,17 @@ export default class EditProgram extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
-
+    updateFieldDataHealthArea(value) {
+        let { program } = this.state;
+        this.setState({ healthAreaId: value });
+        var healthAreaId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
+        this.setState({ program: program });
+    }
     dataChange(event) {
         let { program } = this.state;
         if (event.target.name == "programName") {
@@ -550,9 +586,8 @@ export default class EditProgram extends Component {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
             program.organisation.id = event.target.value;
-        } if (event.target.name == 'healthAreaId') {
-            program.healthArea.id = event.target.value;
-        } if (event.target.name == 'userId') {
+        }
+        if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
         if (event.target.name === "active") {
@@ -577,8 +612,10 @@ export default class EditProgram extends Component {
             realmCountryId: true,
             organisationId: true,
             userId: true,
+            airFreightPerc: true,
             healthAreaId: true,
             regionId: true,
+            programCode1: true
             // uniqueCode:''
         }
         )
@@ -600,28 +637,6 @@ export default class EditProgram extends Component {
     }
 
     render() {
-
-        const { realmList } = this.state;
-        let realms = realmList.length > 0
-            && realmList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
-        const { realmCountryList } = this.state;
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                        {/* {item.country.countryCode} */}
-                    </option>
-                )
-            }, this);
-
         const { programManagerList } = this.state;
         let programManagers = programManagerList.length > 0
             && programManagerList.map((item, i) => {
@@ -631,16 +646,16 @@ export default class EditProgram extends Component {
                     </option>
                 )
             }, this);
-        const { healthAreaList } = this.state;
-        let realmHealthArea = healthAreaList.length > 0
-            && healthAreaList.map((item, i) => {
-                return (
-                    <option key={i} value={item.healthAreaId}>
-                        {/* {item.healthAreaCode} */}
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { healthAreaList } = this.state;
+        // let realmHealthArea = healthAreaList.length > 0
+        //     && healthAreaList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.healthAreaId}>
+        //                 {/* {item.healthAreaCode} */}
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         const { organisationList } = this.state;
         let realmOrganisation = organisationList.length > 0
@@ -665,16 +680,18 @@ export default class EditProgram extends Component {
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
-                                    realmId: this.state.program.realm.realmId,
+                                    programName: getLabelText(this.state.program.label, lang),
+                                    realmId: this.state.program.realmCountry.realm.realmId,
                                     realmCountryId: this.state.program.realmCountry.realmCountryId,
-                                    healthAreaId: this.state.healthAreaId,
                                     organisationId: this.state.program.organisation.id,
-                                    regionsId: this.state.regionsId,
-                                    programName: this.state.program.label.label_en,
-                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
-                                    programCode1: this.state.uniqueCode,
                                     userId: this.state.program.programManager.userId,
+                                    healthAreaId: this.state.program.healthAreaArray,
+                                    healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
+                                    regionArray: this.state.program.regionArray,
+                                    regionId: this.state.program.regionArray,
+                                    programCode1: this.state.uniqueCode,
+                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -685,9 +702,9 @@ export default class EditProgram extends Component {
                                     let pro = this.state.program;
                                     pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
                                     console.log("Pro=---------------->+++", pro)
-                                    ProgramService.editProgram(pro).then(response => {
+                                    ProgramService.editDataset(pro).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode, loading: false
@@ -760,72 +777,50 @@ export default class EditProgram extends Component {
                                                     <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
                                                 </CardHeader> */}
                                             <CardBody>
-                                                <FormGroup>
 
-                                                    {/* <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label> */}
-
-                                                    <Input
-                                                        valid={!errors.realmId && this.state.program.realm.realmId != ''}
-                                                        invalid={touched.realmId && !!errors.realmId}
-                                                        bsSize="sm"
-                                                        // className="col-md-4"
-                                                        onBlur={handleBlur}
-                                                        type="hidden" name="realmId" id="realmId"
-                                                        value={this.state.program.realm.realmId}
-                                                        disabled={true}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {realms}
-                                                    </Input>
-                                                    <FormFeedback>{errors.realmId}</FormFeedback>
-
-                                                </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
 
                                                     <Input
-                                                        valid={!errors.realmCountryId && this.state.program.realmCountry.realmCountryId != ''}
-                                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
                                                         bsSize="sm"
-                                                        // className="col-md-4"
+                                                        valid={!errors.realmCountryId}
+                                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        disabled={true}
-                                                        value={this.state.program.realmCountry.realmCountryId}
-                                                        type="select" name="realmCountryId" id="realmCountryId">
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {realmCountries}
+                                                        disabled
+                                                        type="text" name="realmCountryId" id="realmCountryId">
+
                                                     </Input>
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
-
                                                 </FormGroup>
+
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.healthareas')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
-                                                        bsSize="sm"
-                                                        className={
-                                                            // classNames('form-control', 'd-block', 'w-100', 'bg-secondary',
-                                                            classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.healthAreaId && this.state.healthAreaId.length != 0 },
-                                                            { 'is-invalid': (touched.healthAreaId && !!errors.healthAreaId) }
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.healthAreaId },
+                                                            { 'is-invalid': (touched.healthAreaId && !!errors.healthAreaId || this.state.program.healthAreaArray.length == 0) }
                                                         )}
-                                                        name="healthAreaId"
-                                                        id="healthAreaId"
+                                                        bsSize="sm"
                                                         onChange={(e) => {
                                                             handleChange(e);
                                                             setFieldValue("healthAreaId", e);
-                                                            // this.updateFieldData(e);
-
+                                                            this.updateFieldDataHealthArea(e);
+                                                            this.generateHealthAreaCode(e);
                                                         }}
                                                         onBlur={() => setFieldTouched("healthAreaId", true)}
                                                         multi
-                                                        // disabled={true}
                                                         options={this.state.healthAreaList}
-                                                        value={this.state.healthAreaId}
+                                                        value={this.state.program.healthAreaArray}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        name="healthAreaId"
+                                                        id="healthAreaId"
+
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
+
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -836,10 +831,9 @@ export default class EditProgram extends Component {
                                                         type="select"
                                                         name="organisationId"
                                                         id="organisationId"
-                                                        // disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
-                                                        // disabled={true}
+                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
                                                         value={this.state.program.organisation.id}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {realmOrganisation}
@@ -848,62 +842,54 @@ export default class EditProgram extends Component {
 
                                                     <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                                 </FormGroup>
+
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.regionId },
+                                                            { 'is-invalid': (touched.regionId && !!errors.regionId || this.state.program.regionArray.length == 0) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("regionId", e);
+                                                            this.updateFieldData(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("regionId", true)}
+                                                        multi
+                                                        options={this.state.regionList}
+                                                        value={this.state.program.regionArray}
+                                                    />
+                                                    <FormFeedback>{errors.regionId}</FormFeedback>
+                                                </FormGroup>
+
                                                 <FormGroup>
-
-                                                    <Label htmlFor="company">{i18n.t('static.forecastProgram.forecastProgram')}<span class="red Reqasterisk">*</span></Label>
-
+                                                    <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName}
                                                         bsSize="sm"
                                                         // invalid={touched.programName && !!errors.programName || this.state.program.label.label_en == ''}
-                                                        // invalid={touched.programName && !!errors.programName || !!errors.programName}
-                                                        valid={!errors.programName && this.state.program.label.label_en != ''}
-                                                        invalid={touched.programName && !!errors.programName}
+                                                        invalid={touched.programName && !!errors.programName || !!errors.programName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.program.label.label_en}
                                                         id="programName" />
                                                     <FormFeedback>{errors.programName}</FormFeedback>
                                                 </FormGroup>
-
-                                                <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.dashboard.region')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Select
-                                                        bsSize="sm"
-                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.regionsId && this.state.regionsId.length != 0 },
-                                                            { 'is-invalid': (touched.regionsId && !!errors.regionsId) }
-                                                        )}
-                                                        name="regionsId"
-                                                        id="regionsId"
-                                                        onChange={(e) => {
-                                                            handleChange(e);
-                                                            setFieldValue("regionsId", e);
-                                                            this.updateFieldData(e);
-                                                            // this.generateHealthAreaCode(e)
-
-                                                        }}
-                                                        disabled={true}
-                                                        onBlur={() => setFieldTouched("regionsId", true)}
-                                                        multi
-                                                        options={this.state.regionsList}
-                                                        value={this.state.regionsId}
-                                                    />
-                                                    <FormFeedback className="red">{errors.regionsId}</FormFeedback>
-                                                </FormGroup>
-
                                                 <FormGroup style={{ display: 'flex' }}>
                                                     <Col xs="6" className="pl-0">
                                                         <FormGroup >
-                                                            <Label htmlFor="company">{i18n.t('static.program.datasetDisplayName')}</Label>
+                                                            <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
                                                             <Input
                                                                 type="text" name="programCode"
+                                                                valid={!errors.programCode1 && this.state.uniqueCode != ''}
+                                                                invalid={touched.programCode1 && !!errors.programCode1}
                                                                 bsSize="sm"
                                                                 disabled
-                                                                // value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
-                                                                value="BEN-ARV/RTK-MOH"
+                                                                value={this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode}
                                                                 id="programCode" />
-                                                            <FormFeedback className="red">{errors.programCode}</FormFeedback>
+                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                                         </FormGroup>
                                                     </Col>
                                                     <Col xs="1" className="" style={{ marginTop: '32px' }}>
@@ -921,22 +907,25 @@ export default class EditProgram extends Component {
                                                                 type="text"
                                                                 maxLength={6}
                                                                 value={this.state.uniqueCode}
-                                                                disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                                disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
                                                                 name="programCode1" id="programCode1" />
-                                                            <FormFeedback className="red">{errors.programCode1}</FormFeedback>
+                                                            {/* <FormFeedback className="red">{errors.programCode1}</FormFeedback> */}
                                                         </FormGroup>
                                                     </Col>
                                                 </FormGroup>
+
+
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.dataSet.dataSetManager')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         value={this.state.program.programManager.userId}
                                                         bsSize="sm"
-                                                        valid={!errors.userId && this.state.program.programManager.userId != ''}
-                                                        invalid={touched.userId && !!errors.userId}
+                                                        valid={!errors.userId}
+                                                        invalid={touched.userId && !!errors.userId || this.state.program.programManager.userId == ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
                                                         {/* <option value="0">Please select</option> */}
+                                                        {/* <option value="1">Anchal</option> */}
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         {programManagers}
 
@@ -944,7 +933,6 @@ export default class EditProgram extends Component {
                                                     <FormFeedback>{errors.userId}</FormFeedback>
 
                                                 </FormGroup>
-
                                                 <FormGroup>
 
                                                     <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
@@ -996,7 +984,6 @@ export default class EditProgram extends Component {
                                                     </FormGroup>
                                                 </FormGroup>
 
-
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
@@ -1032,24 +1019,39 @@ export default class EditProgram extends Component {
 
     resetClicked() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramById(2007).then(response => {
+        ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
             var programCode = response.data.programCode;
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
+            var realmCountryCode = splitCode[0];
+            var healthAreaCode = splitCode[1];
+            var organisationCode = splitCode[2];
+            if (uniqueCode == undefined) {
+                uniqueCode = ""
+            }
+            var proObj = response.data;
+            // var healthAreaArrayDummy=[];
+            // healthAreaArrayDummy.push(response.data.healthArea.id);
+            // proObj.healthAreaArray=healthAreaArrayDummy;
+
             this.setState({
-                program: response.data,
-                uniqueCode: uniqueCode
+                program: proObj,
+                uniqueCode: uniqueCode,
+                healthAreaCode: healthAreaCode,
+                organisationCode: organisationCode,
+                realmCountryCode: realmCountryCode
             })
             initialValues = {
-                programName: getLabelText(this.state.program.label, this.state.lang),
+                programName: getLabelText(this.state.program.label, lang),
                 realmId: this.state.program.realmCountry.realm.realmId,
                 realmCountryId: this.state.program.realmCountry.realmCountryId,
                 organisationId: this.state.program.organisation.id,
                 userId: this.state.program.programManager.userId,
-                healthAreaId: this.state.program.healthArea.id,
+                healthAreaArray: this.state.program.healthAreaArray,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
-                uniqueCode: this.state.uniqueCode
+                uniqueCode: this.state.uniqueCode,
+                healthAreaArray: this.state.program.healthAreaArray
             }
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)

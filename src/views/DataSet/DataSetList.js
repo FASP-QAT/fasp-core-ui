@@ -36,8 +36,6 @@ export default class ProgramList extends Component {
         }
         this.editProgram = this.editProgram.bind(this);
         this.addNewProgram = this.addNewProgram.bind(this);
-        this.buttonFormatter = this.buttonFormatter.bind(this);
-        this.addProductMapping = this.addProductMapping.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -105,7 +103,7 @@ export default class ProgramList extends Component {
     }
 
     editProgram(program) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
             this.props.history.push({
                 pathname: `/program/editProgram/${program.programId}`,
                 // state: { program }
@@ -120,6 +118,18 @@ export default class ProgramList extends Component {
         let count = 0;
 
         for (var j = 0; j < programList.length; j++) {
+            let healthAreaLabels = programList[j].healthAreaList;
+            let haValues = [];
+            healthAreaLabels.map(c => {
+                haValues.push(getLabelText(c.label, this.state.lang));
+            })
+
+            let regionLabels = programList[j].regionList;
+            let reValues = [];
+            regionLabels.map(c => {
+                reValues.push(getLabelText(c.label, this.state.lang));
+            })
+
             data = [];
             data[0] = programList[j].programId
             data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
@@ -127,8 +137,8 @@ export default class ProgramList extends Component {
             data[3] = programList[j].programCode;
             data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
             data[5] = programList[j].organisation.code
-            data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
-            data[7] = programList[j].useRegions
+            data[6] = haValues.toString();
+            data[7] = reValues.toString();
             data[8] = programList[j].lastModifiedBy.username;
             data[9] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
@@ -149,7 +159,7 @@ export default class ProgramList extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 200, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -247,12 +257,12 @@ export default class ProgramList extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
                 this.props.history.push({
                     pathname: `/dataSet/editDataSet/${this.el.getValueFromCoords(0, x)}`,
                     // pathname: `/demographic/scenarioOne`,
                 });
-            // }
+            }
         }
     }.bind(this);
 
@@ -266,263 +276,261 @@ export default class ProgramList extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
 
-        // ProgramService.getProgramListAll().then(response => {
-        //   if (response.status == 200) {
-        //     console.log("resp--------------------", response.data);
-        //     this.setState({
-        //       programList: response.data,
-        //       selProgram: response.data,
-        //       // loading: false
+        ProgramService.getDataSetListAll().then(response => {
+            if (response.status == 200) {
+                console.log("resp--------------------", response.data);
+                this.setState({
+                    programList: response.data,
+                    selProgram: response.data,
+                },
+                    () => {
+                        this.filterData();
+                    })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+
+        // let programJson1 = {
+        //     "createdBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
         //     },
-        //       () => {
-        //         // this.buildJExcel();
+        //     "createdDate": "2021-02-20 11:00:00",
+        //     "lastModifiedBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
+        //     },
+        //     "lastModifiedDate": "2021-02-20 12:00:00",
+        //     "active": true,
+        //     "programId": 1,
+        //     "programCode": "BEN-PRHCON-MOH",
+        //     "realmCountry": {
+        //         "realmCountryId": 5,
+        //         "country": {
+        //             "countryId": 19,
+        //             "countryCode": "BEN",
+        //             "countryCode2": null,
+        //             "label": {
+        //                 "labelId": 216,
+        //                 "label_en": "Benin",
+        //             },
+        //         },
+        //         "realm": {
+        //             "realmId": 1,
+        //             "label": {
+        //                 "labelId": 4,
+        //                 "label_en": "Global Health",
+        //             },
+        //             "realmCode": "GHR",
+        //         },
+        //     },
+        //     "organisation": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Ministry of Health",
+        //         },
+        //         "code": "MOH"
+        //     },
+        //     "healthArea": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Condoms,PRH/Condoms",
+        //         },
+        //         "code": "ARV"
+        //     },
+        //     "label": {
+        //         "label_en": "Benin PRH,Condoms Forecast Dataset",
+        //     },
+        //     "programNotes": "",
+        //     "airFreightPerc": 25,
+        //     "seaFreightPerc": 8,
+        //     "plannedToSubmittedLeadTime": 0.5,
+        //     "submittedToApprovedLeadTime": 1.25,
+        //     "approvedToShippedLeadTime": 0.75,
+        //     "shippedToArrivedByAirLeadTime": 1,
+        //     "shippedToArrivedBySeaLeadTime": 0.25,
+        //     "arrivedToDeliveredLeadTime": 0.5,
+        //     "useRegions": "National"
+        // }
+
+        // let programJson2 = {
+        //     "createdBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
+        //     },
+        //     "createdDate": "2021-02-20 11:00:00",
+        //     "lastModifiedBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
+        //     },
+        //     "lastModifiedDate": "2021-02-20 12:00:00",
+        //     "active": true,
+        //     "programId": 2,
+        //     "programCode": "BEN-ARV/RTK-MOH",
+        //     "realmCountry": {
+        //         "realmCountryId": 5,
+        //         "country": {
+        //             "countryId": 19,
+        //             "countryCode": "BEN",
+        //             "countryCode2": null,
+        //             "label": {
+        //                 "labelId": 216,
+        //                 "label_en": "Benin",
+        //             },
+        //         },
+        //         "realm": {
+        //             "realmId": 1,
+        //             "label": {
+        //                 "labelId": 4,
+        //                 "label_en": "Global Health",
+        //             },
+        //             "realmCode": "GHR",
+        //         },
+        //     },
+        //     "organisation": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Ministry of Health",
+        //         },
+        //         "code": "MOH"
+        //     },
+        //     "healthArea": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Antiretrovirals,HIV rapid test kits",
+        //         },
+        //         "code": "ARV"
+        //     },
+        //     "label": {
+        //         "label_en": "Benin ARV Forecast Dataset",
+        //     },
+        //     "programNotes": "",
+        //     "airFreightPerc": 25,
+        //     "seaFreightPerc": 8,
+        //     "plannedToSubmittedLeadTime": 0.5,
+        //     "submittedToApprovedLeadTime": 1.25,
+        //     "approvedToShippedLeadTime": 0.75,
+        //     "shippedToArrivedByAirLeadTime": 1,
+        //     "shippedToArrivedBySeaLeadTime": 0.25,
+        //     "arrivedToDeliveredLeadTime": 0.5,
+        //     "useRegions": "National"
+        // }
+
+        // let programJson3 = {
+        //     "createdBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
+        //     },
+        //     "createdDate": "2021-02-20 11:00:00",
+        //     "lastModifiedBy": {
+        //         "userId": 8,
+        //         "username": "Shubham D"
+        //     },
+        //     "lastModifiedDate": "2021-02-20 12:00:00",
+        //     "active": true,
+        //     "programId": 3,
+        //     "programCode": "BEN-MAL-MOH",
+        //     "realmCountry": {
+        //         "realmCountryId": 5,
+        //         "country": {
+        //             "countryId": 19,
+        //             "countryCode": "BEN",
+        //             "countryCode2": null,
+        //             "label": {
+        //                 "labelId": 216,
+        //                 "label_en": "Benin",
+        //             },
+        //         },
+        //         "realm": {
+        //             "realmId": 1,
+        //             "label": {
+        //                 "labelId": 4,
+        //                 "label_en": "Global Health",
+        //             },
+        //             "realmCode": "GHR",
+        //         },
+        //     },
+        //     "organisation": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Ministry of Health",
+        //         },
+        //         "code": "MOH"
+        //     },
+        //     "healthArea": {
+        //         "id": 1,
+        //         "label": {
+        //             "label_en": "Malaria",
+        //         },
+        //         "code": "ARV"
+        //     },
+        //     "label": {
+        //         "label_en": "Benin Malaria Forecast Dataset",
+        //     },
+        //     "programNotes": "",
+        //     "airFreightPerc": 25,
+        //     "seaFreightPerc": 8,
+        //     "plannedToSubmittedLeadTime": 0.5,
+        //     "submittedToApprovedLeadTime": 1.25,
+        //     "approvedToShippedLeadTime": 0.75,
+        //     "shippedToArrivedByAirLeadTime": 1,
+        //     "shippedToArrivedBySeaLeadTime": 0.25,
+        //     "arrivedToDeliveredLeadTime": 0.5,
+        //     "useRegions": "North,South"
+        // }
+
+        // this.setState({
+        //     programList: [programJson1, programJson2, programJson3],
+        //     selProgram: [programJson1, programJson2, programJson3],
+        // },
+        //     () => {
         //         this.filterData();
-        //       })
-        //   } else {
-        //     this.setState({
-        //       message: response.data.messageCode, loading: false
-        //     },
-        //       () => {
-        //         this.hideSecondComponent();
-        //       })
-        //   }
-        // }).catch(
-        //   error => {
-        //     if (error.message === "Network Error") {
-        //       this.setState({
-        //         message: 'static.unkownError',
-        //         loading: false
-        //       });
-        //     } else {
-        //       switch (error.response ? error.response.status : "") {
-
-        //         case 401:
-        //           this.props.history.push(`/login/static.message.sessionExpired`)
-        //           break;
-        //         case 403:
-        //           this.props.history.push(`/accessDenied`)
-        //           break;
-        //         case 500:
-        //         case 404:
-        //         case 406:
-        //           this.setState({
-        //             message: error.response.data.messageCode,
-        //             loading: false
-        //           });
-        //           break;
-        //         case 412:
-        //           this.setState({
-        //             message: error.response.data.messageCode,
-        //             loading: false
-        //           });
-        //           break;
-        //         default:
-        //           this.setState({
-        //             message: 'static.unkownError',
-        //             loading: false
-        //           });
-        //           break;
-        //       }
-        //     }
-        //   }
-        // );
-
-        let programJson1 = {
-            "createdBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "createdDate": "2021-02-20 11:00:00",
-            "lastModifiedBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "lastModifiedDate": "2021-02-20 12:00:00",
-            "active": true,
-            "programId": 1,
-            "programCode": "BEN-PRHCON-MOH",
-            "realmCountry": {
-                "realmCountryId": 5,
-                "country": {
-                    "countryId": 19,
-                    "countryCode": "BEN",
-                    "countryCode2": null,
-                    "label": {
-                        "labelId": 216,
-                        "label_en": "Benin",
-                    },
-                },
-                "realm": {
-                    "realmId": 1,
-                    "label": {
-                        "labelId": 4,
-                        "label_en": "Global Health",
-                    },
-                    "realmCode": "GHR",
-                },
-            },
-            "organisation": {
-                "id": 1,
-                "label": {
-                    "label_en": "Ministry of Health",
-                },
-                "code": "MOH"
-            },
-            "healthArea": {
-                "id": 1,
-                "label": {
-                    "label_en": "Condoms,PRH/Condoms",
-                },
-                "code": "ARV"
-            },
-            "label": {
-                "label_en": "Benin PRH,Condoms Forecast Dataset",
-            },
-            "programNotes": "",
-            "airFreightPerc": 25,
-            "seaFreightPerc": 8,
-            "plannedToSubmittedLeadTime": 0.5,
-            "submittedToApprovedLeadTime": 1.25,
-            "approvedToShippedLeadTime": 0.75,
-            "shippedToArrivedByAirLeadTime": 1,
-            "shippedToArrivedBySeaLeadTime": 0.25,
-            "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "National"
-        }
-
-        let programJson2 = {
-            "createdBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "createdDate": "2021-02-20 11:00:00",
-            "lastModifiedBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "lastModifiedDate": "2021-02-20 12:00:00",
-            "active": true,
-            "programId": 2,
-            "programCode": "BEN-ARV/RTK-MOH",
-            "realmCountry": {
-                "realmCountryId": 5,
-                "country": {
-                    "countryId": 19,
-                    "countryCode": "BEN",
-                    "countryCode2": null,
-                    "label": {
-                        "labelId": 216,
-                        "label_en": "Benin",
-                    },
-                },
-                "realm": {
-                    "realmId": 1,
-                    "label": {
-                        "labelId": 4,
-                        "label_en": "Global Health",
-                    },
-                    "realmCode": "GHR",
-                },
-            },
-            "organisation": {
-                "id": 1,
-                "label": {
-                    "label_en": "Ministry of Health",
-                },
-                "code": "MOH"
-            },
-            "healthArea": {
-                "id": 1,
-                "label": {
-                    "label_en": "Antiretrovirals,HIV rapid test kits",
-                },
-                "code": "ARV"
-            },
-            "label": {
-                "label_en": "Benin ARV Forecast Dataset",
-            },
-            "programNotes": "",
-            "airFreightPerc": 25,
-            "seaFreightPerc": 8,
-            "plannedToSubmittedLeadTime": 0.5,
-            "submittedToApprovedLeadTime": 1.25,
-            "approvedToShippedLeadTime": 0.75,
-            "shippedToArrivedByAirLeadTime": 1,
-            "shippedToArrivedBySeaLeadTime": 0.25,
-            "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "National"
-        }
-
-        let programJson3 = {
-            "createdBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "createdDate": "2021-02-20 11:00:00",
-            "lastModifiedBy": {
-                "userId": 8,
-                "username": "Shubham D"
-            },
-            "lastModifiedDate": "2021-02-20 12:00:00",
-            "active": true,
-            "programId": 3,
-            "programCode": "BEN-MAL-MOH",
-            "realmCountry": {
-                "realmCountryId": 5,
-                "country": {
-                    "countryId": 19,
-                    "countryCode": "BEN",
-                    "countryCode2": null,
-                    "label": {
-                        "labelId": 216,
-                        "label_en": "Benin",
-                    },
-                },
-                "realm": {
-                    "realmId": 1,
-                    "label": {
-                        "labelId": 4,
-                        "label_en": "Global Health",
-                    },
-                    "realmCode": "GHR",
-                },
-            },
-            "organisation": {
-                "id": 1,
-                "label": {
-                    "label_en": "Ministry of Health",
-                },
-                "code": "MOH"
-            },
-            "healthArea": {
-                "id": 1,
-                "label": {
-                    "label_en": "Malaria",
-                },
-                "code": "ARV"
-            },
-            "label": {
-                "label_en": "Benin Malaria Forecast Dataset",
-            },
-            "programNotes": "",
-            "airFreightPerc": 25,
-            "seaFreightPerc": 8,
-            "plannedToSubmittedLeadTime": 0.5,
-            "submittedToApprovedLeadTime": 1.25,
-            "approvedToShippedLeadTime": 0.75,
-            "shippedToArrivedByAirLeadTime": 1,
-            "shippedToArrivedBySeaLeadTime": 0.25,
-            "arrivedToDeliveredLeadTime": 0.5,
-            "useRegions": "North,South"
-        }
-
-        this.setState({
-            programList: [programJson1, programJson2, programJson3],
-            selProgram: [programJson1, programJson2, programJson3],
-        },
-            () => {
-                this.filterData();
-            })
+        //     })
 
 
         let realmId = AuthenticationService.getRealmId();
@@ -589,18 +597,7 @@ export default class ProgramList extends Component {
             pathname: "/dataSet/addDataSet"
         });
     }
-    buttonFormatter(cell, row) {
-        // console.log("-----------", cell);
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
-    }
-    addProductMapping(event, cell) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM')) {
-            event.stopPropagation();
-            this.props.history.push({
-                pathname: `/programProduct/addProgramProduct/${cell}`,
-            });
-        }
-    }
+    
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -643,7 +640,7 @@ export default class ProgramList extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SET_UP_PROGRAM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_DATASET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
@@ -711,7 +708,7 @@ export default class ProgramList extends Component {
                             </div>
                         </Col>
 
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROGRAM') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

@@ -29,9 +29,6 @@ let initialValues = {
     programCode: '',
     programCode1: '',
     userId: '',
-    customField1: '',
-    customField2: '',
-    customField3: '',
     programNotes: '',
 }
 
@@ -51,13 +48,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validprogramtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        customField1: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        customField2: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        customField3: Yup.string()
-            .required(i18n.t('static.program.validmanagertext')),
-        regionsId: Yup.string()
+        regionId: Yup.string()
             .required(i18n.t('static.program.validRegionstext')),
     })
 }
@@ -91,7 +82,7 @@ export default class AddForecastProgram extends Component {
             // program: this.props.location.state.program,
             uniqueCode: '',
             program: {
-                programCode: '<%RC%>-<%TA%>-<%OR%>-',
+                programCode: '',
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -142,27 +133,30 @@ export default class AddForecastProgram extends Component {
                 },
                 programNotes: '',
                 healthAreaArray: [],
-                customField1: '',
-                customField2: '',
-                customField3: '',
-                regionsArray: [],
+                regionArray: [],
 
 
             },
             lang: localStorage.getItem('lang'),
+
+            healthAreaId: '',
+            healthAreaList: [],
+            healthAreaCode: '',
+
             realmList: [],
             realmCountryList: [],
+
             organisationList: [],
-            healthAreaList: [],
+
             programManagerList: [],
             message: '',
             loading: true,
-            healthAreaCode: '',
+
             organisationCode: '',
             realmCountryCode: '',
-            healthAreaId: '',
-            regionsList: [],
-            regionsId: [],
+
+            regionList: [],
+            regionId: [],
 
         }
 
@@ -182,6 +176,92 @@ export default class AddForecastProgram extends Component {
         this.getProgramManagerList = this.getProgramManagerList.bind(this);
         this.generateCountryCode = this.generateCountryCode.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+        this.getRegionList = this.getRegionList.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
+    }
+
+    updateFieldDataHealthArea(value) {
+        let { program } = this.state;
+        this.setState({ healthAreaId: value });
+        var healthAreaId = value;
+        var healthAreaIdArray = [];
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaIdArray[i] = healthAreaId[i].value;
+        }
+        program.healthAreaArray = healthAreaIdArray;
+        this.setState({ program: program });
+    }
+
+    getRegionList() {
+
+        // AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getRegionList(document.getElementById('realmCountryId').value)
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var regList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = regList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    let { program } = this.state;
+                    program.regionArray = [];
+                    this.setState({
+                        regionId: '',
+                        regionList: listArray,
+                        program
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
 
     changeMessage(message) {
@@ -332,9 +412,11 @@ export default class AddForecastProgram extends Component {
                 if (response.status == 200) {
                     console.log("response------>0", response.data);
                     var json = (response.data).filter(c => c.active == true);
-                    var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                    // var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                    var regList = [];
                     for (var i = 0; i < json.length; i++) {
-                        regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        // regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                     }
                     console.log("response------>1", regList);
                     var listArray = regList;
@@ -344,8 +426,12 @@ export default class AddForecastProgram extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     console.log("response------>2", listArray);
+                    let { program } = this.state;
+                    program.healthAreaArray = [];
                     this.setState({
-                        healthAreaList: listArray
+                        healthAreaList: listArray,
+                        healthAreaId: '',
+                        program
                     }, (
                     ) => {
                         console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
@@ -398,30 +484,14 @@ export default class AddForecastProgram extends Component {
     }
 
     updateFieldData(value) {
-
-        var selectedArray = [];
-        for (var p = 0; p < value.length; p++) {
-            selectedArray.push(value[p].value);
-        }
-
-        if (selectedArray.includes("-1")) {
-            this.setState({ healthAreaId: [] });
-            var list = this.state.healthAreaList.filter(c => c.value != -1)
-            this.setState({ healthAreaId: list });
-            var healthAreaId = list;
-        } else {
-            this.setState({ healthAreaId: value });
-            var healthAreaId = value;
-        }
-
         let { program } = this.state;
-        // this.setState({ realmCountryId: value });
-        // var realmCountryId = value;
-        var healthAreaIdArray = [];
-        for (var i = 0; i < healthAreaId.length; i++) {
-            healthAreaIdArray[i] = healthAreaId[i].value;
+        this.setState({ regionId: value });
+        var regionId = value;
+        var regionIdArray = [];
+        for (var i = 0; i < regionId.length; i++) {
+            regionIdArray[i] = regionId[i].value;
         }
-        program.healthAreaArray = healthAreaIdArray;
+        program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
 
@@ -435,8 +505,10 @@ export default class AddForecastProgram extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
+                    let { program } = this.state;
+                    program.organisation.id = ''
                     this.setState({
-                        organisationList: listArray
+                        organisationList: listArray, program
                     })
                 } else {
                     this.setState({
@@ -575,19 +647,18 @@ export default class AddForecastProgram extends Component {
             document.getElementById('realmId').disabled = false;
         }
 
-
-
-
-
-
-
     }
 
-    generateHealthAreaCode(event) {
-        // let healthAreaCode = this.state.healthAreaList.filter(c => (c.healthAreaId == event.target.value))[0].healthAreaCode;
-        // this.setState({
-        //     healthAreaCode: healthAreaCode
-        // })
+    generateHealthAreaCode(value) {
+        var healthAreaId = value;
+        let healthAreaCode = ''
+        for (var i = 0; i < healthAreaId.length; i++) {
+            healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
+        }
+
+        this.setState({
+            healthAreaCode: healthAreaCode.slice(0, -1)
+        })
     }
 
     generateOrganisationCode(event) {
@@ -612,10 +683,9 @@ export default class AddForecastProgram extends Component {
 
             this.getHealthAreaList();
             this.getOrganisationList();
+            this.getRegionList();
 
 
-            program.organisation.id = '';
-            program.healthAreaArray = [];
 
         } else if (event.target.name == 'organisationId') {
             program.organisation.id = event.target.value;
@@ -627,12 +697,6 @@ export default class AddForecastProgram extends Component {
             })
         } else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
-        } else if (event.target.name == 'customField1') {
-            program.customField1 = event.target.value;
-        } else if (event.target.name == 'customField2') {
-            program.customField2 = event.target.value;
-        } else if (event.target.name == 'customField3') {
-            program.customField3 = event.target.value;
         }
 
         this.setState({ program }, () => { console.log(this.state) })
@@ -644,12 +708,10 @@ export default class AddForecastProgram extends Component {
             realmId: true,
             realmCountryId: true,
             organisationId: true,
-            regionsId: true,
+            regionId: true,
             userId: true,
             healthAreaId: true,
-            customField1: true,
-            customField2: true,
-            customField3: true
+
         }
         )
         this.validateForm(errors)
@@ -737,25 +799,79 @@ export default class AddForecastProgram extends Component {
                                 initialValues={{
                                     realmId: this.state.program.realm.realmId,
                                     realmCountryId: this.state.program.realmCountry.realmCountryId,
-                                    healthAreaId: this.state.healthAreaId,
+                                    healthAreaId: this.state.program.healthAreaArray,
                                     organisationId: this.state.program.organisation.id,
-                                    regionsId: this.state.regionsId,
+                                    regionId: this.state.program.regionArray,
                                     programName: this.state.program.label.label_en,
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
                                     programCode1: this.state.uniqueCode,
                                     userId: this.state.program.programManager.userId,
-                                    customField1: this.state.program.customField1,
-                                    customField2: this.state.program.customField2,
-                                    customField3: this.state.program.customField3,
                                     programNotes: this.state.program.programNotes,
                                 }}
                                 validate={validate(validationSchema)}
 
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // this.setState({
-                                    //     loading: true
-                                    // })
+                                    this.setState({
+                                        loading: true
+                                    })
                                     // AuthenticationService.setupAxiosInterceptors();
+                                    let pro = this.state.program;
+                                    // pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
+                                    pro.programCode =(this.state.uniqueCode.toString().length > 0 ? (this.state.uniqueCode) : "");
+                                    // console.log("Pro=---------------->+++", pro)
+                                    ProgramService.addDataset(pro).then(response => {
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode, loading: false
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
+                                        }
+
+                                    }
+                                    ).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+
+                                                    case 401:
+                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 403:
+                                                        this.props.history.push(`/accessDenied`)
+                                                        break;
+                                                    case 500:
+                                                    case 404:
+                                                    case 406:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 412:
+                                                        this.setState({
+                                                            message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    default:
+                                                        this.setState({
+                                                            message: 'static.unkownError',
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
 
 
                                 }}
@@ -820,7 +936,7 @@ export default class AddForecastProgram extends Component {
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.healthAreaId && this.state.healthAreaId.length != 0 },
+                                                            { 'is-valid': !errors.healthAreaId && this.state.program.healthAreaArray.length != 0 },
                                                             { 'is-invalid': (touched.healthAreaId && !!errors.healthAreaId) }
                                                         )}
                                                         name="healthAreaId"
@@ -828,14 +944,14 @@ export default class AddForecastProgram extends Component {
                                                         onChange={(e) => {
                                                             handleChange(e);
                                                             setFieldValue("healthAreaId", e);
-                                                            this.updateFieldData(e);
-                                                            this.generateHealthAreaCode(e)
+                                                            this.updateFieldDataHealthArea(e);
+                                                            this.generateHealthAreaCode(e);
 
                                                         }}
                                                         onBlur={() => setFieldTouched("healthAreaId", true)}
                                                         multi
                                                         options={this.state.healthAreaList}
-                                                        value={this.state.healthAreaId}
+                                                        value={this.state.program.healthAreaArray}
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
@@ -866,24 +982,23 @@ export default class AddForecastProgram extends Component {
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.regionsId && this.state.regionsId.length != 0 },
-                                                            { 'is-invalid': (touched.regionsId && !!errors.regionsId) }
+                                                            { 'is-valid': !errors.regionId && this.state.program.regionArray.length != 0 },
+                                                            { 'is-invalid': (touched.regionId && !!errors.regionId) }
                                                         )}
-                                                        name="regionsId"
-                                                        id="regionsId"
+                                                        name="regionId"
+                                                        id="regionId"
                                                         onChange={(e) => {
                                                             handleChange(e);
-                                                            setFieldValue("regionsId", e);
+                                                            setFieldValue("regionId", e);
                                                             this.updateFieldData(e);
-                                                            // this.generateHealthAreaCode(e)
 
                                                         }}
-                                                        onBlur={() => setFieldTouched("regionsId", true)}
+                                                        onBlur={() => setFieldTouched("regionId", true)}
                                                         multi
-                                                        options={this.state.regionsList}
-                                                        value={this.state.regionsId}
+                                                        options={this.state.regionList}
+                                                        value={this.state.program.regionArray}
                                                     />
-                                                    <FormFeedback className="red">{errors.regionsId}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
                                                 </FormGroup>
 
                                                 <FormGroup>
@@ -931,7 +1046,7 @@ export default class AddForecastProgram extends Component {
                                                                 type="text"
                                                                 maxLength={6}
                                                                 value={this.state.uniqueCode}
-                                                                disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
+                                                                // disabled={!AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN") ? true : false}
                                                                 name="programCode1" id="programCode1" />
                                                             <FormFeedback className="red">{errors.programCode1}</FormFeedback>
                                                         </FormGroup>
@@ -1012,13 +1127,16 @@ export default class AddForecastProgram extends Component {
         program.realmCountry.realmCountryId = '';
         program.organisation.id = '';
         this.state.uniqueCode = '';
+        this.state.realmCountryCode = '';
+        this.state.healthAreaCode = '';
+        this.state.organisationCode = '';
+        this.state.programCode1 = '';
         program.programNotes = '';
-        program.customField1 = '';
-        program.customField2 = '';
-        program.customField3 = '';
         program.programManager.userId = '';
-        this.state.healthAreaId = '';
+        this.state.healthAreaList = [];
         program.healthAreaArray = [];
+        this.state.regionList = [];
+        program.regionArray = [];
 
         this.setState({
             program

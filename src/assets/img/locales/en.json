@@ -1035,7 +1035,7 @@
     "static.procurementUnit.onlyalphaNumericText": "GTIN must be zero or 13 digits",
     "static.common.addData": "Add Data",
     "static.accessDenied": "Access Denied",
-    "static.equivalancyUnit.equivalancyUnit": "Equivalancy Unit",
+    "static.equivalancyUnit.equivalancyUnit": "Equivalency Unit",
     "static.supplyPlanFormula.expiredStockNote": "All batches begin with shipments. All expiries assumed to happen at beginning of the month regardless of expiry date. For more details on batch calculations, please see User Manual – Annex on Business Rules.",
     "static.commitVersion.changedInCurrentVersion": " Changed in local version",
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
@@ -1812,5 +1812,8 @@
     "static.usagePeriod.conversionTOFUTest": "Max 14 digit number and 4 digits after decimal are allowed.",
     "static.equivalancyUnit.equivalancyUnits": "Equivalency Units",
     "static.dataSet.dataSet": "Dataset",
-    "static.dataSet.dataSetManager": "Dataset Manager"
+    "static.dataSet.dataSetManager": "Dataset Manager",
+    "static.equivalancyUnit.equivalancyUnitManage": "Manage Equivalency Unit",
+    "static.equivalancyUnit.type": "Type",
+    "static.equivalancyUnit.conversionToFu": "Conversion to FU"
 }

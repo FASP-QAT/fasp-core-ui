@@ -1289,7 +1289,8 @@ class AuthenticationService {
 
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                            // if (true) {
                             return true;
                         }
                         break;
@@ -1302,18 +1303,18 @@ class AuthenticationService {
                         break;
 
                     case "/dataSet/addDataSet":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
                             return true;
                         }
                         break;
                     case "/dataSet/editDataSet/:dataSetId":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
                             return true;
                         }
                         break;
                     case "/dataSet/listDataSet":
                     case "/dataSet/listDataSet/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
                             return true;
                         }
                         break;
