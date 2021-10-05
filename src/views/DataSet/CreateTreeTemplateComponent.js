@@ -162,8 +162,12 @@ export default class CreateTreeTemplate extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
-        // this.getPayloadData = this.getPayloadData.bind(this);
+        this.getNodeValue = this.getNodeValue.bind(this);
+        this.getNotes = this.getNotes.bind(this);
+        this.calculateNodeValue = this.calculateNodeValue.bind(this);
         this.state = {
+            level0: true,
+            numberNode: false,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -232,6 +236,24 @@ export default class CreateTreeTemplate extends Component {
                 break
             }
         }
+    }
+
+    getNodeValue(nodeTypeId) {
+        console.log("get node value---------------------");
+        if (nodeTypeId == 2) {
+            return (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue;
+        }
+        // else {
+        //     var nodeValue = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue * (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue) / 100;
+        //     return nodeValue;
+        // }
+    }
+
+    getNotes() {
+        return (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes;
+    }
+    calculateNodeValue() {
+
     }
     componentDidMount() {
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -446,21 +468,31 @@ export default class CreateTreeTemplate extends Component {
         var nodeTypeId = event.target.value;
         console.log("node type value---", nodeTypeId)
         if (nodeTypeId == 1) {
-
+            this.setState({
+                numberNode: false,
+                aggregationNode : false
+            });
         } else if (nodeTypeId == 2) {
+            // Number node
             console.log("case 2")
             this.setState({
-                displayParentData: true
+                numberNode: false,
+                aggregationNode : true
             });
         }
         else if (nodeTypeId == 3) {
+            // Percentage node
             this.setState({
-                displayUsage: true
+                numberNode: true,
+                aggregationNode : true
+
             });
         }
         else if (nodeTypeId == 4) {
+            // Forecasting unit node
             this.setState({
-                displayPlanningUnit: true
+                numberNode: true,
+                aggregationNode : true
             });
         }
     }
@@ -487,10 +519,22 @@ export default class CreateTreeTemplate extends Component {
             treeTemplate.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTitle") {
-            currentItemConfig.title = event.target.value;
+            currentItemConfig.context.payload.label.label_en = event.target.value;
         }
-        if (event.target.name === "nodeValueType") {
-            currentItemConfig.valueType = event.target.value;
+        if (event.target.name === "nodeTypeId") {
+            currentItemConfig.context.payload.nodeType.id = event.target.value;
+        }
+        if (event.target.name === "nodeUnitId") {
+            currentItemConfig.context.payload.nodeUnit.id = event.target.value;
+        }
+        if (event.target.name === "percentageOfParent") {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+        }
+        if (event.target.name === "nodeValue") {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+        }
+        if (event.target.name === "notes") {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
         }
         this.setState({ currentItemConfig: currentItemConfig });
     }
@@ -631,7 +675,10 @@ export default class CreateTreeTemplate extends Component {
         if (item != null) {
 
             this.setState({
-                currentItemConfig: data
+                currentItemConfig: data,
+                level0: (data.context.level == 0 ? false : true),
+                numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
+                aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true)
                 //         title: item.title,
                 //         config: {
                 //             ...config,
@@ -664,15 +711,16 @@ export default class CreateTreeTemplate extends Component {
             <>
                 <TabPane tabId="1">
                     <Form>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Parent</Label>
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                readOnly={true}
-                                value={this.state.currentItemConfig.parentItem.payload.label.label_en}
-                            ></Input>
-                        </FormGroup>
+                        {this.state.level0 &&
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Parent</Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    readOnly={true}
+                                    value={this.state.currentItemConfig.context.level != 0 && this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                ></Input>
+                            </FormGroup>}
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
@@ -697,7 +745,7 @@ export default class CreateTreeTemplate extends Component {
                                 // valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                 // invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                 // onBlur={handleBlur}
-                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                onChange={(e) => { this.nodeTypeChange(e),this.dataChange(e) }}
                                 required
                                 value={this.state.currentItemConfig.context.payload.nodeType.id}
                             >
@@ -713,242 +761,253 @@ export default class CreateTreeTemplate extends Component {
                             </Input>
                             {/* <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback> */}
                         </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.context.payload.nodeUnit.id}
-                            >
-                                <option value="">{i18n.t('static.common.select')}</option>
-                                {this.state.nodeUnitList.length > 0
-                                    && this.state.nodeUnitList.map((item, i) => {
-                                        return (
-                                            <option key={i} value={item.unitId}>
-                                                {getLabelText(item.label, this.state.lang)}
-                                            </option>
-                                        )
-                                    }, this)}
-                            </Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                            {/* <Input type="text"
+                        {this.state.aggregationNode &&
+                            <>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        type="select"
+                                        id="nodeUnitId"
+                                        name="nodeUnitId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        value={this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {this.state.nodeUnitList.length > 0
+                                            && this.state.nodeUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.unitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                    {/* <Input type="text"
                                 id="month"
                                 name="month"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'Jan-21'}></Input> */}
-                            <div className="controls edit">
-                                <Picker
-                                    id="month"
-                                    name="month"
-                                    ref="pickAMonth2"
-                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                    value={this.state.singleValue2}
-                                    lang={pickerLang.months}
-                                    theme="dark"
-                                    onChange={this.handleAMonthChange2}
-                                    onDismiss={this.handleAMonthDissmis2}
-                                >
-                                    <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-                                </Picker>
-                            </div>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'90.0%'}></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Parent Value For Jan-21<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'16,702,403'}></Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="currencyId">Node Value for Percentage of Parent<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'15,032,163'}></Input>
-                        </FormGroup>
+                                    <div className="controls edit">
+                                        <Picker
+                                            id="month"
+                                            name="month"
+                                            ref="pickAMonth2"
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            value={this.state.singleValue2}
+                                            lang={pickerLang.months}
+                                            theme="dark"
+                                            onChange={this.handleAMonthChange2}
+                                            onDismiss={this.handleAMonthDissmis2}
+                                        >
+                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                        </Picker>
+                                    </div>
+                                </FormGroup>
+                            </>}
+                        {this.state.numberNode &&
+                            <>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="percentageOfParent"
+                                        name="percentageOfParent"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="currencyId">Parent Value For Jan-21<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="parentValue"
+                                        name="parentValue"
+                                        readOnly={true}
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue}
+                                    ></Input>
+                                </FormGroup></>}
+                        {this.state.aggregationNode &&
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    id="nodeValue"
+                                    name="nodeValue"
+                                    readOnly={this.state.numberNode ? true : false}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}></Input>
+                            </FormGroup>}
 
                         <FormGroup>
                             <Label htmlFor="currencyId">Notes</Label>
                             <Input type="textarea"
-                                name="nodeTitle"
+                                id="notes"
+                                name="notes"
                                 onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.currentItemConfig.title}></Input>
+                                value={this.getNotes}
+                            ></Input>
                         </FormGroup>
                     </Form>
+                    {this.state.currentItemConfig.context.payload.nodeType.id == 4 && <div>
+                        <div className="row">
 
-                    <div className="row">
+                            <FormGroup className="col-md-4">
+                                <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
+                                <Input
+                                    type="select"
+                                    name="nodeTypeId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.nodeTypeChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.valueType}
+                                >
+                                    <option value="-1">Nothing Selected</option>
+                                    <option value="1">Continuous</option>
+                                    <option value="2">Discrete</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-4">
+                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                                <Input
+                                    type="select"
+                                    name="nodeTypeId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.nodeTypeChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.valueType}
+                                >
+                                    <option value="-1">Nothing Selected</option>
+                                    <option value="1">no logo condoms</option>
+                                    <option value="2">surgical mask, 1 mask</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-4">
+                                <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
+                                <Input
+                                    type="select"
+                                    name="nodeTypeId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.nodeTypeChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.valueType}
+                                >
+                                    <option value="-1">Nothing Selected</option>
+                                    <option value="1">IUDs</option>
+                                    <option value="2">Discrete</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-6">
+                                <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                <Input
+                                    type="select"
+                                    name="nodeTypeId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.nodeTypeChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.valueType}
+                                >
+                                    <option value="-1">Nothing Selected</option>
+                                    <option value="1">Continuous</option>
+                                    <option value="2">Discrete</option>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-6">
+                                <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'0'}></Input>
+                            </FormGroup>
+                        </div>
+                        <div className="row">
 
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Continuous</option>
-                                <option value="2">Discrete</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">no logo condoms</option>
-                                <option value="2">surgical mask, 1 mask</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">IUDs</option>
-                                <option value="2">Discrete</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                            <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Continuous</option>
-                                <option value="2">Discrete</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                            <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'0'}></Input>
-                        </FormGroup>
-                    </div>
-                    {/* <FormGroup className="col-md-6"> */}
-                    <div className="row">
+                            <FormGroup className="col-md-2">
+                                <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
 
-                        <FormGroup className="col-md-2">
-                            <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    readOnly="readOnly"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'1'}>
 
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                readOnly="readOnly"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'1'}>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'Clients'}>
 
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'Clients'}>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-2">
+                                <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
 
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-2">
-                            <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'130'}></Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    readOnly="readOnly"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'condom'}>
 
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'130'}></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                readOnly="readOnly"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'condom'}>
+                                </Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-2">
+                                <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
 
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-2">
-                            <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
-
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            <Input type="text"
-                                name="nodeTitle"
-                                bsSize="sm"
-                                readOnly="readOnly"
-                                onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'1'}></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-5">
-                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
-                            <Input
-                                type="select"
-                                name="nodeTypeId"
-                                bsSize="sm"
-                                onChange={(e) => { this.nodeTypeChange(e) }}
-                                required
-                                value={this.state.currentItemConfig.valueType}
-                            >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">year(s)</option>
-                                <option value="2">Discrete</option>
-                            </Input>
-                        </FormGroup>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                <Input type="text"
+                                    name="nodeTitle"
+                                    bsSize="sm"
+                                    readOnly="readOnly"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    // value={this.state.currentItemConfig.title}></Input>
+                                    value={'1'}></Input>
+                            </FormGroup>
+                            <FormGroup className="col-md-5">
+                                {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                                <Input
+                                    type="select"
+                                    name="nodeTypeId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.nodeTypeChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.valueType}
+                                >
+                                    <option value="-1">Nothing Selected</option>
+                                    <option value="1">year(s)</option>
+                                    <option value="2">Discrete</option>
+                                </Input>
+                            </FormGroup>
 
 
-                        {/* <div style={{ width: '100%' }}> */}
-                        {/* <table className="table table-bordered">
+                            {/* <div style={{ width: '100%' }}> */}
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>1</td>
@@ -1002,7 +1061,7 @@ export default class CreateTreeTemplate extends Component {
                                 </tr>
 
                             </table> */}
-                        {/* <table className="table table-bordered">
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -1034,9 +1093,9 @@ export default class CreateTreeTemplate extends Component {
                                     <td></td>
                                 </tr>
                             </table> */}
-                        {/* </div><br /> */}
-                        {/* <div style={{ clear: 'both' }}> */}
-                        {/* <table className="table table-bordered">
+                            {/* </div><br /> */}
+                            {/* <div style={{ clear: 'both' }}> */}
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td># of FU / patient</td>
                                     <td>0.25</td>
@@ -1050,7 +1109,7 @@ export default class CreateTreeTemplate extends Component {
                                     <td>2.17</td>
                                 </tr>
                             </table> */}
-                        {/* <table className="table table-bordered">
+                            {/* <table className="table table-bordered">
                                 <tr>
                                     <td># of FU required for period</td>
                                     <td>130</td>
@@ -1064,10 +1123,10 @@ export default class CreateTreeTemplate extends Component {
                                     <td>10.83</td>
                                 </tr>
                             </table> */}
-                        {/* </div> */}
-                        {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
-                        <div className="pt-2 pl-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div>
-                        {/* <div className="pt-2">
+                            {/* </div> */}
+                            {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
+                            <div className="pt-2 pl-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div>
+                            {/* <div className="pt-2">
                             <table className="table table-bordered">
                                 <tr>
                                     <td>Forecasting unit</td>
@@ -1100,7 +1159,7 @@ export default class CreateTreeTemplate extends Component {
                                     <td>1.00</td>
                                 </tr>
                             </table> */}
-                        {/* <table  className="table table-bordered">
+                            {/* <table  className="table table-bordered">
                                 <tr>
                                     <td>Forecasting unit</td>
                                     <td>no logo condoms</td>
@@ -1136,11 +1195,11 @@ export default class CreateTreeTemplate extends Component {
                                     <td>2.17</td>
                                 </tr>
                             </table> */}
-                        {/* </div> */}
-                        {/* <div className="pt-2"><b>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</b></div> */}
-                        {/* <div className="pt-2"><b>For each  - we need 1.00 [Surgical mask, pack of 5]</b></div> */}
-                    </div>
-
+                            {/* </div> */}
+                            {/* <div className="pt-2"><b>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</b></div> */}
+                            {/* <div className="pt-2"><b>For each  - we need 1.00 [Surgical mask, pack of 5]</b></div> */}
+                        </div>
+                    </div>}
                 </TabPane>
                 <TabPane tabId="2">
 
