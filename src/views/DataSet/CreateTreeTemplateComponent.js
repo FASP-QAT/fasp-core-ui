@@ -21,8 +21,17 @@ import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import ForecastMethodService from '../../api/ForecastMethodService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import DatasetService from '../../api/DatasetService.js';
+import UnitService from '../../api/UnitService.js';
 import moment from 'moment';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
 
+
+
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 const ItemTypes = {
     NODE: 'node'
@@ -155,6 +164,9 @@ export default class CreateTreeTemplate extends Component {
         this.addScenario = this.addScenario.bind(this);
         // this.getPayloadData = this.getPayloadData.bind(this);
         this.state = {
+            singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             treeTemplate: {
                 treeTemplateId: 0,
                 label: {
@@ -167,12 +179,34 @@ export default class CreateTreeTemplate extends Component {
                 }
             },
             forecastMethodList: [],
+            nodeTypeList: [],
+            nodeUnitList: [],
             modalOpen: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
             items: [],
-            currentItemConfig: {},
+            currentItemConfig: {
+                context: {
+                    payload: {
+                        label: {
+
+                        },
+                        nodeType: {
+                        },
+                        nodeUnit: {
+
+                        }
+                    }
+                },
+                parentItem: {
+                    payload: {
+                        label: {
+
+                        }
+                    }
+                }
+            },
             activeTab1: new Array(2).fill('1')
         }
     }
@@ -202,7 +236,100 @@ export default class CreateTreeTemplate extends Component {
     componentDidMount() {
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             this.setState({
-                forecastMethodList: response.data,
+                forecastMethodList: response.data
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        UnitService.getUnitListAll().then(response => {
+            this.setState({
+                nodeUnitList: response.data.filter(c => (c.dimension.id == 3 && c.active == true))
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        DatasetService.getNodeTypeList().then(response => {
+            console.log("node type list---", response.data);
+            this.setState({
+                nodeTypeList: response.data,
                 loading: false
             })
         })
@@ -497,23 +624,26 @@ export default class CreateTreeTemplate extends Component {
     };
     onCursoChanged(event, data) {
         this.setState({ openAddNodeModal: true });
-        // const { context: item } = data;
+        console.log("cursor changed called---", data)
+        const { context: item } = data;
+        console.log("cursor changed item---", item);
         // const { config } = this.state;
-        // if (item != null) {
+        if (item != null) {
 
-        //     this.setState({
-        //         title: item.title,
-        //         config: {
-        //             ...config,
-        //             // highlightItem: item.id,
-        //             // cursorItem: item.id
-        //         },
-        //         highlightItem: item.id,
-        //         cursorItem: item.id
-        //     }, () => {
-        //         console.log("highlighted item---", this.state)
-        //     })
-        // }
+            this.setState({
+                currentItemConfig: data
+                //         title: item.title,
+                //         config: {
+                //             ...config,
+                //             // highlightItem: item.id,
+                //             // cursorItem: item.id
+                //         },
+                //         highlightItem: item.id,
+                //         cursorItem: item.id
+            }, () => {
+                console.log("highlighted item---", this.state.currentItemConfig.context)
+            })
+        }
     };
 
     updateNodeInfoInJson(currentItemConfig) {
@@ -540,39 +670,48 @@ export default class CreateTreeTemplate extends Component {
                                 name="nodeTitle"
                                 bsSize="sm"
                                 readOnly={true}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'Surgical masks'}
-                            // value={''}
-                            >
-                            </Input>
+                                value={this.state.currentItemConfig.parentItem.payload.label.label_en}
+                            ></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
+                                id="nodeTitle"
                                 name="nodeTitle"
                                 bsSize="sm"
+                                // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                // invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                // onBlur={handleBlur}
                                 onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                // value={'People with malaria'}></Input>
-                                value={'Surgical mask, pack of 5'}></Input>
+                                value={this.state.currentItemConfig.context.payload.label.label_en}>
+                            </Input>
+                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
+                                id="nodeTypeId"
                                 name="nodeTypeId"
                                 bsSize="sm"
+                                // valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
+                                // invalid={touched.nodeTypeId && !!errors.nodeTypeId}
+                                // onBlur={handleBlur}
                                 onChange={(e) => { this.nodeTypeChange(e) }}
                                 required
-                                value={this.state.currentItemConfig.valueType}
+                                value={this.state.currentItemConfig.context.payload.nodeType.id}
                             >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Number Node</option>
-                                <option value="2">Percentage Node</option>
-                                <option value="3">Aggregation Node</option>
-                                <option value="4">Forecasting Unit Node</option>
-                                <option value="5">Planning Unit Node</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {this.state.nodeTypeList.length > 0
+                                    && this.state.nodeTypeList.map((item, i) => {
+                                        return (
+                                            <option key={i} value={item.id}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                            </option>
+                                        )
+                                    }, this)}
                             </Input>
+                            {/* <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback> */}
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
@@ -582,25 +721,42 @@ export default class CreateTreeTemplate extends Component {
                                 bsSize="sm"
                                 onChange={(e) => { this.nodeTypeChange(e) }}
                                 required
-                                readOnly={true}
-                                value={this.state.currentItemConfig.valueType}
+                                value={this.state.currentItemConfig.context.payload.nodeUnit.id}
                             >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Patients</option>
-                                <option value="2">Clients</option>
-                                <option value="3">Customers</option>
-                                <option value="4">People</option>
-                                <option value="5">Condom</option>
-                                <option value="6">Packs</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {this.state.nodeUnitList.length > 0
+                                    && this.state.nodeUnitList.map((item, i) => {
+                                        return (
+                                            <option key={i} value={item.unitId}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                            </option>
+                                        )
+                                    }, this)}
                             </Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Month<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
+                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                            {/* <Input type="text"
+                                id="month"
+                                name="month"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'Jan-21'}></Input>
+                                value={'Jan-21'}></Input> */}
+                            <div className="controls edit">
+                                <Picker
+                                    id="month"
+                                    name="month"
+                                    ref="pickAMonth2"
+                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                    value={this.state.singleValue2}
+                                    lang={pickerLang.months}
+                                    theme="dark"
+                                    onChange={this.handleAMonthChange2}
+                                    onDismiss={this.handleAMonthDissmis2}
+                                >
+                                    <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                </Picker>
+                            </div>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
@@ -993,6 +1149,24 @@ export default class CreateTreeTemplate extends Component {
             </>
         );
     }
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
+    handleClickMonthBox2 = (e) => {
+        this.refs.pickAMonth2.show()
+    }
+    handleAMonthChange2 = (value, text) => {
+        //
+        //
+    }
+    handleAMonthDissmis2 = (value) => {
+        this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        })
+
+    }
 
     render() {
         const { forecastMethodList } = this.state;
@@ -1005,7 +1179,7 @@ export default class CreateTreeTemplate extends Component {
                 )
             }, this);
 
-        console.log("this.state+++", this.state);
+
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {

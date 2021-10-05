@@ -167,6 +167,7 @@ export default class ListTreeTemplate extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         DatasetService.getTreeTemplateList().then(response => {
+            console.log("tree template list---",response.data)
             this.setState({
                 treeTemplateList: response.data,
                 loading: false

@@ -14,5 +14,10 @@ class DatasetService {
         return axios.get(`${API_URL}/api/treeTemplate/${treeTemplateId}`, {
         });
     }
+    getNodeTypeList() {
+        return axios.get(`${API_URL}/api/nodeType`, {
+        });
+    }
+    
 }
 export default new DatasetService()
