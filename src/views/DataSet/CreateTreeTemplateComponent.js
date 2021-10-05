@@ -18,22 +18,26 @@ import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
-import csvicon from '../../assets/img/csv.png'
-import pdfIcon from '../../assets/img/pdf.png';
+import ForecastMethodService from '../../api/ForecastMethodService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import DatasetService from '../../api/DatasetService.js';
+import moment from 'moment';
+
 
 const ItemTypes = {
     NODE: 'node'
 }
 
 let initialValues = {
-    forecastMethod: "",
-    treeName: "",
-    regions: ""
+    forecastMethodId: "",
+    treeName: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        forecastMethod: Yup.string()
+        forecastMethodId: Yup.string()
+            .required(i18n.t('static.user.validlanguage')),
+        treeName: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
 
     })
@@ -73,30 +77,31 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        // return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
-            // style={{ backgroundColor: itemTitleColor }}
             >
-                <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b></div>
             </div>
-            {/* <div className="ContactPhotoFrame">
-                <img className="ContactPhoto" src={itemConfig.image} alt={itemConfig.title} />
-              </div> */}
-            <div className="ContactPhone">{itemConfig.nodeValue}</div>
-            {/* <div className="ContactEmail">{itemConfig.nodeValue}</div>
-              <div className="ContactDescription">{itemConfig.nodeValue}</div> */}
+            {/* <div className="ContactPhone">{itemConfig.payload.label.label_en}</div> */}
+            <div className="ContactPhone">{getPayloadData(itemConfig)}</div>
+            {/* <div className="ContactPhone">{itemConfig.nodeValue.value}</div> */}
         </div>
-        // <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
-        //     <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
-        //         <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
-        //     </div>
-        //     <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
-        //     {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
-        // </div>
     ))
 }
+function getPayloadData(itemConfig) {
+    console.log("inside get payload");
+    var data = [];
+    data = itemConfig.payload.nodeDataMap;
+    console.log("itemConfig---", data);
+    var curMonth = moment().format("YYYY-MM");
+    console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
+    for (var i = 0; i < data.length; i++) {
+        // var month = moment(data[i].month).format("YYYY-MM");
+        console.log("month---");
+    }
 
+    return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+}
 const NodeDragSource = DragSource(
     ItemTypes.NODE,
     {
@@ -148,15 +153,147 @@ export default class CreateTreeTemplate extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
+        // this.getPayloadData = this.getPayloadData.bind(this);
         this.state = {
+            treeTemplate: {
+                treeTemplateId: 0,
+                label: {
+                    label_en: ""
+                },
+                forecastMethod: {
+                    label: {
+                        label_en: ""
+                    }
+                }
+            },
+            forecastMethodList: [],
             modalOpen: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
-            items: TreeData.demographic_scenario_one,
+            items: [],
             currentItemConfig: {},
             activeTab1: new Array(2).fill('1')
         }
+    }
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            'forecastMethodId': true,
+            'treeName': true
+        }
+        )
+        this.validateForm(errors)
+    }
+    validateForm(errors) {
+        this.findFirstError('dataSourceForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+    componentDidMount() {
+        ForecastMethodService.getActiveForecastMethodList().then(response => {
+            this.setState({
+                forecastMethodList: response.data,
+                loading: false
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        DatasetService.getTreeTemplateById(1).then(response => {
+            this.setState({
+                items: response.data.tree.flatList,
+                loading: false
+            }, () => {
+                console.log("Tree Template---", this.state.items);
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     addScenario() {
         const { tabList } = this.state;
@@ -215,6 +352,13 @@ export default class CreateTreeTemplate extends Component {
     dataChange(event) {
         // alert("hi");
         let { currentItemConfig } = this.state;
+        let { treeTemplate } = this.state;
+        if (event.target.name === "forecastMethodId") {
+            treeTemplate.forecastMethod.id = event.target.value;
+        }
+        if (event.target.name === "treeName") {
+            treeTemplate.label.label_en = event.target.value;
+        }
         if (event.target.name === "nodeTitle") {
             currentItemConfig.title = event.target.value;
         }
@@ -245,8 +389,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]));
     }
     onMoveItem(parentid, itemid) {
+        console.log("on move item called");
         const { items } = this.state;
-
+        console.log("move item items---", items);
+        console.log("move item parentid---", parentid);
+        console.log("move item itemid---", itemid);
         this.setState({
             cursorItem: itemid,
             items: (items.map(item => {
@@ -848,6 +995,16 @@ export default class CreateTreeTemplate extends Component {
     }
 
     render() {
+        const { forecastMethodList } = this.state;
+        let forecastMethods = forecastMethodList.length > 0
+            && forecastMethodList.map((item, i) => {
+                return (
+                    <option key={i} value={item.forecastMethodId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         console.log("this.state+++", this.state);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
@@ -1018,33 +1175,38 @@ export default class CreateTreeTemplate extends Component {
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
+                                                                        name="forecastMethodId"
+                                                                        id="forecastMethodId"
                                                                         bsSize="sm"
+                                                                        valid={!errors.forecastMethodId && this.state.treeTemplate.forecastMethod.id != ''}
+                                                                        invalid={touched.forecastMethodId && !!errors.forecastMethodId}
+                                                                        onBlur={handleBlur}
                                                                         required
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.treeTemplate.forecastMethod.id}
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Demographic Method'}</option>
+                                                                        {forecastMethods}
                                                                     </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
                                                                 </FormGroup>
 
                                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
+                                                                        name="treeName"
+                                                                        id="treeName"
                                                                         bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
+                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
+                                                                        invalid={touched.treeName && !!errors.treeName}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
                                                                         required
-                                                                    // value={this.state.user.language.languageId}
+                                                                        value={this.state.treeTemplate.label.label_en}
                                                                     >
                                                                     </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
@@ -1080,149 +1242,32 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
-                                                                {/* <FormGroup check inline>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2">
-                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                    </Label>
-                                                                </FormGroup> */}
+
                                                             </Row>
                                                         </div>
-                                                        {/* <div className="col-md-12 pl-lg-0 pt-lg-3"> */}
-                                                        {/* <Row> */}
-                                                        {/* <FormGroup className=""> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Demographic'}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="pl-3"> */}
-                                                        {/* <FormGroup className="col-md-3">
-                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Region A'}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
 
-                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <InputGroup>
-                                                                        {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-                                                        {/* <Input
-                                                                            type="select"
-                                                                            name="languageId"
-                                                                            id="languageId"
-                                                                            bsSize="sm"
-                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                            // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                            // onBlur={handleBlur}
-                                                                            // required
-                                                                        // value={this.state.user.language.languageId}
-                                                                        >
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                            <option value="">{'Scenario 1'}</option>
-                                                                        </Input>
-                                                                        <InputGroupAddon addonType="append">
-                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                        </InputGroupAddon>
-                                                                    </InputGroup> */}
-                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Date'}</Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        // required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    > */}
-                                                        {/* </Input> */}
-                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* </Row> */}
-                                                        {/* </div> */}
                                                     </CardBody>
+                                                    <div class="sample">
+                                                        <Provider>
+                                                            <div className="placeholder" style={{ clear: 'both' }} >
+                                                                {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
+                                                                <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                            </div>
+                                                        </Provider>
+                                                    </div>
+                                                    <CardFooter>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                                                    </CardFooter>
                                                 </Form>
-                                                <div class="sample">
-                                                    <Provider>
-                                                        <div className="placeholder" style={{ clear: 'both' }} >
-                                                            {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
-                                                        </div>
-                                                    </Provider>
-                                                </div>
+
                                             </>
                                         )} />
                             </div>
                         </CardBody>
-                        <CardFooter>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                        </CardFooter>
+
                     </Card></Col></Row>
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}

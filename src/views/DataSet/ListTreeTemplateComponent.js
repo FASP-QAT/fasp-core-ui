@@ -16,16 +16,7 @@ export default class ListTreeTemplate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            treeTemplateList: [{
-                templateName: 'Condoms - Demographic',
-                forecastMethod: 'Demographic method',
-                status: 'Active'
-            }, {
-                templateName: 'Condoms - Morbidity',
-                forecastMethod: 'Morbidity method',
-                status: 'Active'
-            }
-            ],
+            treeTemplateList: [],
             message: '',
             loading: true
         }
@@ -55,23 +46,18 @@ export default class ListTreeTemplate extends Component {
     }
     buildJexcel() {
         let treeTemplateList = this.state.treeTemplateList;
-        // console.log("dataSourceList---->", dataSourceList);
+        console.log("treeTemplateList---->", treeTemplateList);
         let treeTemplateArray = [];
         let count = 0;
 
         for (var j = 0; j < treeTemplateList.length; j++) {
             data = [];
-            data[0] = treeTemplateList[j].templateName
-            data[1] = treeTemplateList[j].forecastMethod
+            data[0] = getLabelText(treeTemplateList[j].label, this.state.lang)
+            data[1] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
             data[2] = treeTemplateList[j].status;
             treeTemplateArray[count] = data;
             count++;
         }
-        // if (dataSourceList.length == 0) {
-        //     data = [];
-        //     dataSourceArray[0] = data;
-        // }
-        // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
@@ -180,7 +166,53 @@ export default class ListTreeTemplate extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        this.buildJexcel();
+        DatasetService.getTreeTemplateList().then(response => {
+            this.setState({
+                treeTemplateList: response.data,
+                loading: false
+            }, () => { this.buildJexcel() })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -227,11 +259,11 @@ export default class ListTreeTemplate extends Component {
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
-                            <div className="card-header-action">        
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                            <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addTreeTemplate}><i className="fa fa-plus-square"></i></a>
-                                        }
-                                  
+                            <div className="card-header-action">
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                    <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addTreeTemplate}><i className="fa fa-plus-square"></i></a>
+                                }
+
                             </div>
                         </div>
 
