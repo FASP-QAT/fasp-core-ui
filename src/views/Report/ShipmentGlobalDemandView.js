@@ -2243,14 +2243,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#205493',
+                backgroundColor: '#0067B9',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#a7c6ed',
+                backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }
             ]

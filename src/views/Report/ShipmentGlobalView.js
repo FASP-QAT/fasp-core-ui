@@ -1827,14 +1827,14 @@ class ShipmentGlobalView extends Component {
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
                 // backgroundColor: '#6a82a8',
-                backgroundColor: '#205493',
+                backgroundColor: '#0067B9',
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
                 // backgroundColor: '#dee7f8',
-                backgroundColor: '#a7c6ed',
+                backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }
             ]
