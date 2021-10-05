@@ -148,7 +148,9 @@ export default class BuildTree extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
+        this.addTreeData = this.addTreeData.bind(this);
         this.state = {
+            openTreeDataModal: false,
             modalOpen: false,
             title: '',
             cursorItem: 0,
@@ -158,6 +160,11 @@ export default class BuildTree extends Component {
             currentItemConfig: {},
             activeTab1: new Array(2).fill('1')
         }
+    }
+    addTreeData() {
+        this.setState({
+
+        });
     }
     addScenario() {
         const { tabList } = this.state;
@@ -405,7 +412,7 @@ export default class BuildTree extends Component {
                                 bsSize="sm"
                                 readOnly={true}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'Surgical masks'}
+                                value={'Men who use Condoms'}
                             // value={''}
                             >
                             </Input>
@@ -418,7 +425,7 @@ export default class BuildTree extends Component {
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 // value={'People with malaria'}></Input>
-                                value={'Surgical mask, pack of 5'}></Input>
+                                value={'No logo condoms	'}></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
@@ -470,25 +477,28 @@ export default class BuildTree extends Component {
                             <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
+                                readOnly={true}
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'90.0%'}></Input>
+                                value={'36.8%'}></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Parent Value For Jan-21<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
+                                readOnly={true}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'16,702,403'}></Input>
+                                value={'45,373,410'}></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Value for Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
+                                readOnly={true}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'15,032,163'}></Input>
+                                value={'16,702,403'}></Input>
                         </FormGroup>
 
                         <FormGroup>
@@ -616,176 +626,271 @@ export default class BuildTree extends Component {
                         {/* <FormGroup className="col-md-6">
                             <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
+                                bsSize="sm"
                                 name="nodeTitle"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
                                 value={'0'}></Input>
                         </FormGroup> */}
                     </div>
-                    {/* <FormGroup className="col-md-6"> */}
-                    <div className="col-md-12">
-                        <div style={{ width: '100%' }}>
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td>Every</td>
-                                    <td>1</td>
-                                    <td>Clients</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>requires</td>
-                                    <td>130</td>
-                                    <td>condom</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>every</td>
-                                    <td>1</td>
-                                    <td>year(s)</td>
-                                    <td>indefinitely</td>
-                                </tr>
-                                
-                            </table> */}
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td>Every</td>
-                                    <td>4</td>
-                                    <td>Patient</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>requires</td>
-                                    <td>1</td>
-                                    <td>mask</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Single use</td>
-                                    <td>No</td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>1</td>
-                                    <td>times per</td>
-                                    <td>week(s)</td>
-                                </tr>
-                                <tr>
-                                    <td>for</td>
-                                    <td>2</td>
-                                    <td>month(s)</td>
-                                    <td></td>
-                                </tr>
-                            </table> */}
-                        </div><br />
+                    <div className="row">
+
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+
+                        <FormGroup className="col-md-10">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'surgical mask, 1 mask'}>
+
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId"># of FU / usage / Patient<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'2.17'}></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'mask'}></Input>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Planning Unit<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-10">
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Surgical mask,pack of 5</option>
+                                <option value="1">Yes</option>
+                                <option value="2">No</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-10">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input
+                                type="text"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={'5'}
+                            >
+
+                            </Input>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId"># of PU / usage / <span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'0.43'}></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input type="text"
+                                name="nodeTitle1"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'packs'}>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Will Clients share one PU?<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-10">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={''}
+                            >
+                                <option>No</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">How many PU per usage per ?	<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-10">
+                            {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                            <Input
+                                type="text"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                readOnly={true}
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={'1.00'}
+                            >
+
+                            </Input>
+                        </FormGroup>
+                        
+                    </div>
+                    {/* <div className="row">
+
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'1'}>
+
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-5">
+                             <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> 
+                    {/* <Input type="text" */}
+                    {/* name="nodeTitle" */}
+                    {/* bsSize="sm" */}
+                    {/* onChange={(e) => { this.dataChange(e) }} */}
+                    {/* // value={this.state.currentItemConfig.title}></Input> */}
+                    {/* value={'Clients'}> */}
+
+                    {/* </Input>
+                </FormGroup>
+                <FormGroup className="col-md-2"> */}
+                    {/* <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label> */}
+
+                    {/* </FormGroup>
+                <FormGroup className="col-md-5">
+                    <Input type="text"
+                        name="nodeTitle"
+                        bsSize="sm"
+                        onChange={(e) => { this.dataChange(e) }}
+                        // value={this.state.currentItemConfig.title}></Input>
+                        value={'130'}></Input>
+                </FormGroup> */}
+                    {/* <FormGroup className="col-md-5">
+                    {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
+                    {/* <Input type="text"
+                        name="nodeTitle"
+                        bsSize="sm"
+                        readOnly="readOnly"
+                        onChange={(e) => { this.dataChange(e) }}
+                        // value={this.state.currentItemConfig.title}></Input>
+                        value={'condom'}>
+
+                    </Input>
+                </FormGroup>
+                <FormGroup className="col-md-2">
+                    <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
+
+                </FormGroup>
+                <FormGroup className="col-md-5">
+                    <Input type="text"
+                        name="nodeTitle"
+                        bsSize="sm"
+                        readOnly="readOnly"
+                        onChange={(e) => { this.dataChange(e) }}
+                        // value={this.state.currentItemConfig.title}></Input>
+                        value={'1'}></Input>
+                </FormGroup>
+                <FormGroup className="col-md-5">
+                   
+                    <Input
+                        type="select"
+                        name="nodeTypeId"
+                        bsSize="sm"
+                        onChange={(e) => { this.nodeTypeChange(e) }}
+                        required
+                        value={this.state.currentItemConfig.valueType}
+                    >
+                        <option value="-1">Nothing Selected</option>
+                        <option value="1">year(s)</option>
+                        <option value="2">Discrete</option>
+                    </Input>
+                </FormGroup> 
+            </div>  */}
+                    < div className="col-md-12" >
+
                         {/* <div style={{ clear: 'both' }}> */}
                         {/* <table className="table table-bordered">
-                                <tr>
-                                    <td># of FU / patient</td>
-                                    <td>0.25</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / patient</td>
-                                    <td>1.08</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU required</td>
-                                    <td>2.17</td>
-                                </tr>
-                            </table> */}
+                            <tr>
+                                <td># of FU / patient</td>
+                                <td>0.25</td>
+                            </tr>
+                            <tr>
+                                <td># of FU / month / patient</td>
+                                <td>1.08</td>
+                            </tr>
+                            <tr>
+                                <td># of FU required</td>
+                                <td>2.17</td>
+                            </tr>
+                        </table> */}
                         {/* <table className="table table-bordered">
-                                <tr>
-                                    <td># of FU required for period</td>
-                                    <td>130</td>
-                                </tr>
-                                <tr>
-                                    <td># of months in period</td>
-                                    <td>12.00</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / Patient</td>
-                                    <td>10.83</td>
-                                </tr>
-                            </table> */}
-                        {/* </div> */}
-                        {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
-                        {/* <div className="pt-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div> */}
-                        <div className="pt-2">
-                            <table className="table table-bordered">
-                                <tr>
-                                    <td>Forecasting unit</td>
-                                    <td>surgical mask, 1 mask</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / usage / Patient</td>
-                                    <td>2.17</td>
-                                    <td>mask</td>
-                                </tr>
-                                <tr>
-                                    <td>Planning Unit</td>
-                                    <td>Surgical mask, pack of 5</td>
-                                </tr>
-                                <tr>
-                                    <td>Conversion Factor (FU:PU)</td>
-                                    <td>5</td>
-                                </tr>
-                                <tr>
-                                    <td># of PU / usage / </td>
-                                    <td>0.43</td>
-                                    <td>packs</td>
-                                </tr>
-                                <tr>
-                                    <td>Will Clients share one PU?</td>
-                                    <td>No</td>
-                                </tr>
-                                <tr>
-                                    <td>How many PU per usage per ?</td>
-                                    <td>1.00</td>
-                                </tr>
-                            </table>
-                            {/* <table  className="table table-bordered">
-                                <tr>
-                                    <td>Forecasting unit</td>
-                                    <td>no logo condoms</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / Clients</td>
-                                    <td>10.83</td>
-                                    <td>condom</td>
-                                </tr>
-                                <tr>
-                                    <td>Planning Unit</td>
-                                    <td>No logo condoms, Pack of 10 condoms</td>
-                                </tr>
-                                <tr>
-                                    <td>Conversion Factor (FU:PU)</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <td># of PU / month / </td>
-                                    <td>1.08</td>
-                                    <td>packs</td>
-                                </tr>
-                                <tr>
-                                    <td>QAT estimate for interval (Every _ months)</td>
-                                    <td>0.92</td>
-                                </tr>
-                                <tr>
-                                    <td>Consumption interval (Every X months)</td>
-                                    <td>2.00</td>
-                                </tr>
-                                <tr>
-                                    <td>How many PU per interval per ?</td>
-                                    <td>2.17</td>
-                                </tr>
-                            </table> */}
-                        </div>
+            <tr>
+                <td># of FU required for period</td>
+                <td>130</td>
+            </tr>
+            <tr>
+                <td># of months in period</td>
+                <td>12.00</td>
+            </tr>
+            <tr>
+                <td># of FU / month / Patient</td>
+                <td>10.83</td>
+            </tr>
+        </table>  */}
+
                         {/* <div className="pt-2"><b>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</b></div> */}
                         <div className="pt-2"><b>For each  - we need 1.00 [Surgical mask, pack of 5]</b></div>
-                    </div>
+                    </div >
 
-                </TabPane>
+                </TabPane >
                 <TabPane tabId="2">
 
                 </TabPane>
@@ -926,18 +1031,22 @@ export default class BuildTree extends Component {
                         <div className="pb-lg-0">
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
-                                {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a> */}
+                                    {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a> */}
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
                                             {/* <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 "> */}
                                             {/* <a href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a> */}
                                             {/* </FormGroup> */}
                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
-                                            <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={this.buildTree}><i className="fa fa-plus-square"></i></a>
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',marginTop:'-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                    this.setState({
+                                                        openTreeDataModal: true
+                                                    })
+                                                }}><i className="fa fa-plus-square"></i></a>
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                 // onClick={() => this.exportPDF(columns)} 
                                                 />
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',marginTop:'-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')}
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')}
                                                 // onClick={() => this.exportCSV(columns)} 
                                                 />
                                             </FormGroup>
@@ -1214,20 +1323,21 @@ export default class BuildTree extends Component {
                             </div>
                         </CardBody>
                         <CardFooter>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                         </CardFooter>
                     </Card></Col></Row>
 
             {/* tree fields Modal start------------------- */}
-            <Modal isOpen={this.state.openTreeFieldsModal}
+            <Modal isOpen={this.state.openTreeDataModal}
                 className={'modal-md '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>Add/Edit Tree Data</strong>
-                    <Button size="md" onClick={() => this.setState({ openTreeFieldsModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
                         <Input
                             type="select"
@@ -1242,7 +1352,7 @@ export default class BuildTree extends Component {
                             <option value="2">surgical mask, 1 mask</option>
                         </Input>
                     </FormGroup>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
                         <Input type="text"
                             id="scenarioDesc"
@@ -1251,7 +1361,7 @@ export default class BuildTree extends Component {
                         // value={this.state.scenario.scenarioDesc}
                         ></Input>
                     </FormGroup>
-                    <FormGroup className="col-md-4">
+                    <FormGroup className="col-md-12">
                         <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
                         <Input
                             type="select"

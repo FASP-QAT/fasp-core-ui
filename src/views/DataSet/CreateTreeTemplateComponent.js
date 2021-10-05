@@ -18,22 +18,35 @@ import Provider from '../../Samples/Provider'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
-import csvicon from '../../assets/img/csv.png'
-import pdfIcon from '../../assets/img/pdf.png';
+import ForecastMethodService from '../../api/ForecastMethodService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import DatasetService from '../../api/DatasetService.js';
+import UnitService from '../../api/UnitService.js';
+import moment from 'moment';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+
+
+
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 const ItemTypes = {
     NODE: 'node'
 }
 
 let initialValues = {
-    forecastMethod: "",
-    treeName: "",
-    regions: ""
+    forecastMethodId: "",
+    treeName: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        forecastMethod: Yup.string()
+        forecastMethodId: Yup.string()
+            .required(i18n.t('static.user.validlanguage')),
+        treeName: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
 
     })
@@ -73,30 +86,31 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        // return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
-            // style={{ backgroundColor: itemTitleColor }}
             >
-                <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b></div>
             </div>
-            {/* <div className="ContactPhotoFrame">
-                <img className="ContactPhoto" src={itemConfig.image} alt={itemConfig.title} />
-              </div> */}
-            <div className="ContactPhone">{itemConfig.nodeValue}</div>
-            {/* <div className="ContactEmail">{itemConfig.nodeValue}</div>
-              <div className="ContactDescription">{itemConfig.nodeValue}</div> */}
+            {/* <div className="ContactPhone">{itemConfig.payload.label.label_en}</div> */}
+            <div className="ContactPhone">{getPayloadData(itemConfig)}</div>
+            {/* <div className="ContactPhone">{itemConfig.nodeValue.value}</div> */}
         </div>
-        // <div className="ContactTemplate" style={{ opacity, backgroundColor: itemConfig.nodeBackgroundColor, borderColor: itemConfig.nodeBorderColor }}>
-        //     <div className="ContactTitleBackground" style={{ backgroundColor: itemConfig.itemTitleColor }}>
-        //         <div className="ContactTitle" style={{ color: itemConfig.titleTextColor }}><b>{itemConfig.title}</b></div>
-        //     </div>
-        //     <div className="ContactPhone" style={{ color: itemConfig.nodeValueColor, left: '2px', top: '31px', width: '95%', height: '36px' }}>{itemConfig.nodeValue}</div>
-        //     {/* <div className="ContactLabel" style={{right:'13px'}}>{itemConfig.label}</div> */}
-        // </div>
     ))
 }
+function getPayloadData(itemConfig) {
+    console.log("inside get payload");
+    var data = [];
+    data = itemConfig.payload.nodeDataMap;
+    console.log("itemConfig---", data);
+    var curMonth = moment().format("YYYY-MM");
+    console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
+    for (var i = 0; i < data.length; i++) {
+        // var month = moment(data[i].month).format("YYYY-MM");
+        console.log("month---");
+    }
 
+    return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+}
 const NodeDragSource = DragSource(
     ItemTypes.NODE,
     {
@@ -148,15 +162,265 @@ export default class CreateTreeTemplate extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
+        // this.getPayloadData = this.getPayloadData.bind(this);
         this.state = {
+            singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            treeTemplate: {
+                treeTemplateId: 0,
+                label: {
+                    label_en: ""
+                },
+                forecastMethod: {
+                    label: {
+                        label_en: ""
+                    }
+                }
+            },
+            forecastMethodList: [],
+            nodeTypeList: [],
+            nodeUnitList: [],
             modalOpen: false,
             title: '',
             cursorItem: 0,
             highlightItem: 0,
-            items: TreeData.demographic_scenario_one,
-            currentItemConfig: {},
+            items: [],
+            currentItemConfig: {
+                context: {
+                    payload: {
+                        label: {
+
+                        },
+                        nodeType: {
+                        },
+                        nodeUnit: {
+
+                        }
+                    }
+                },
+                parentItem: {
+                    payload: {
+                        label: {
+
+                        }
+                    }
+                }
+            },
             activeTab1: new Array(2).fill('1')
         }
+    }
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            'forecastMethodId': true,
+            'treeName': true
+        }
+        )
+        this.validateForm(errors)
+    }
+    validateForm(errors) {
+        this.findFirstError('dataSourceForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+    componentDidMount() {
+        ForecastMethodService.getActiveForecastMethodList().then(response => {
+            this.setState({
+                forecastMethodList: response.data
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        UnitService.getUnitListAll().then(response => {
+            this.setState({
+                nodeUnitList: response.data.filter(c => (c.dimension.id == 3 && c.active == true))
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        DatasetService.getNodeTypeList().then(response => {
+            console.log("node type list---", response.data);
+            this.setState({
+                nodeTypeList: response.data,
+                loading: false
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        DatasetService.getTreeTemplateById(1).then(response => {
+            this.setState({
+                items: response.data.tree.flatList,
+                loading: false
+            }, () => {
+                console.log("Tree Template---", this.state.items);
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     addScenario() {
         const { tabList } = this.state;
@@ -215,6 +479,13 @@ export default class CreateTreeTemplate extends Component {
     dataChange(event) {
         // alert("hi");
         let { currentItemConfig } = this.state;
+        let { treeTemplate } = this.state;
+        if (event.target.name === "forecastMethodId") {
+            treeTemplate.forecastMethod.id = event.target.value;
+        }
+        if (event.target.name === "treeName") {
+            treeTemplate.label.label_en = event.target.value;
+        }
         if (event.target.name === "nodeTitle") {
             currentItemConfig.title = event.target.value;
         }
@@ -245,8 +516,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]));
     }
     onMoveItem(parentid, itemid) {
+        console.log("on move item called");
         const { items } = this.state;
-
+        console.log("move item items---", items);
+        console.log("move item parentid---", parentid);
+        console.log("move item itemid---", itemid);
         this.setState({
             cursorItem: itemid,
             items: (items.map(item => {
@@ -350,23 +624,26 @@ export default class CreateTreeTemplate extends Component {
     };
     onCursoChanged(event, data) {
         this.setState({ openAddNodeModal: true });
-        // const { context: item } = data;
+        console.log("cursor changed called---", data)
+        const { context: item } = data;
+        console.log("cursor changed item---", item);
         // const { config } = this.state;
-        // if (item != null) {
+        if (item != null) {
 
-        //     this.setState({
-        //         title: item.title,
-        //         config: {
-        //             ...config,
-        //             // highlightItem: item.id,
-        //             // cursorItem: item.id
-        //         },
-        //         highlightItem: item.id,
-        //         cursorItem: item.id
-        //     }, () => {
-        //         console.log("highlighted item---", this.state)
-        //     })
-        // }
+            this.setState({
+                currentItemConfig: data
+                //         title: item.title,
+                //         config: {
+                //             ...config,
+                //             // highlightItem: item.id,
+                //             // cursorItem: item.id
+                //         },
+                //         highlightItem: item.id,
+                //         cursorItem: item.id
+            }, () => {
+                console.log("highlighted item---", this.state.currentItemConfig.context)
+            })
+        }
     };
 
     updateNodeInfoInJson(currentItemConfig) {
@@ -393,39 +670,48 @@ export default class CreateTreeTemplate extends Component {
                                 name="nodeTitle"
                                 bsSize="sm"
                                 readOnly={true}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                value={'Surgical masks'}
-                            // value={''}
-                            >
-                            </Input>
+                                value={this.state.currentItemConfig.parentItem.payload.label.label_en}
+                            ></Input>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
+                                id="nodeTitle"
                                 name="nodeTitle"
                                 bsSize="sm"
+                                // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                // invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                // onBlur={handleBlur}
                                 onChange={(e) => { this.dataChange(e) }}
-                                // value={this.state.currentItemConfig.title}></Input>
-                                // value={'People with malaria'}></Input>
-                                value={'Surgical mask, pack of 5'}></Input>
+                                value={this.state.currentItemConfig.context.payload.label.label_en}>
+                            </Input>
+                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
+                                id="nodeTypeId"
                                 name="nodeTypeId"
                                 bsSize="sm"
+                                // valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
+                                // invalid={touched.nodeTypeId && !!errors.nodeTypeId}
+                                // onBlur={handleBlur}
                                 onChange={(e) => { this.nodeTypeChange(e) }}
                                 required
-                                value={this.state.currentItemConfig.valueType}
+                                value={this.state.currentItemConfig.context.payload.nodeType.id}
                             >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Number Node</option>
-                                <option value="2">Percentage Node</option>
-                                <option value="3">Aggregation Node</option>
-                                <option value="4">Forecasting Unit Node</option>
-                                <option value="5">Planning Unit Node</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {this.state.nodeTypeList.length > 0
+                                    && this.state.nodeTypeList.map((item, i) => {
+                                        return (
+                                            <option key={i} value={item.id}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                            </option>
+                                        )
+                                    }, this)}
                             </Input>
+                            {/* <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback> */}
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
@@ -435,25 +721,42 @@ export default class CreateTreeTemplate extends Component {
                                 bsSize="sm"
                                 onChange={(e) => { this.nodeTypeChange(e) }}
                                 required
-                                readOnly={true}
-                                value={this.state.currentItemConfig.valueType}
+                                value={this.state.currentItemConfig.context.payload.nodeUnit.id}
                             >
-                                <option value="-1">Nothing Selected</option>
-                                <option value="1">Patients</option>
-                                <option value="2">Clients</option>
-                                <option value="3">Customers</option>
-                                <option value="4">People</option>
-                                <option value="5">Condom</option>
-                                <option value="6">Packs</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {this.state.nodeUnitList.length > 0
+                                    && this.state.nodeUnitList.map((item, i) => {
+                                        return (
+                                            <option key={i} value={item.unitId}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                            </option>
+                                        )
+                                    }, this)}
                             </Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Month<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                name="nodeTitle"
+                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                            {/* <Input type="text"
+                                id="month"
+                                name="month"
                                 onChange={(e) => { this.dataChange(e) }}
                                 // value={this.state.currentItemConfig.title}></Input>
-                                value={'Jan-21'}></Input>
+                                value={'Jan-21'}></Input> */}
+                            <div className="controls edit">
+                                <Picker
+                                    id="month"
+                                    name="month"
+                                    ref="pickAMonth2"
+                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                    value={this.state.singleValue2}
+                                    lang={pickerLang.months}
+                                    theme="dark"
+                                    onChange={this.handleAMonthChange2}
+                                    onDismiss={this.handleAMonthDissmis2}
+                                >
+                                    <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                </Picker>
+                            </div>
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
@@ -564,88 +867,88 @@ export default class CreateTreeTemplate extends Component {
                     {/* <FormGroup className="col-md-6"> */}
                     <div className="row">
 
-                    <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2">
                             <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
-                           
+
                         </FormGroup>
                         <FormGroup className="col-md-5">
-                        <Input type="text"
-                                                name="nodeTitle"
-                                                bsSize="sm"
-                                                readOnly="readOnly"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // value={this.state.currentItemConfig.title}></Input>
-                                                value={'1'}>
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'1'}>
 
-                                                </Input>
+                            </Input>
                         </FormGroup>
                         <FormGroup className="col-md-5">
                             {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
-                                    <Input type="text"
-                                                name="nodeTitle"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // value={this.state.currentItemConfig.title}></Input>
-                                                value={'Clients'}>
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'Clients'}>
 
-                                                </Input>
+                            </Input>
                         </FormGroup>
                         <FormGroup className="col-md-2">
                             <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
-                           
+
                         </FormGroup>
                         <FormGroup className="col-md-5">
-                        <Input type="text"
-                                            name="nodeTitle"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            // value={this.state.currentItemConfig.title}></Input>
-                                            value={'130'}></Input>
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'130'}></Input>
                         </FormGroup>
                         <FormGroup className="col-md-5">
                             {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
-                                    <Input type="text"
-                                                name="nodeTitle"
-                                                bsSize="sm"
-                                                readOnly="readOnly"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // value={this.state.currentItemConfig.title}></Input>
-                                                value={'condom'}>
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'condom'}>
 
-                                                </Input>
+                            </Input>
                         </FormGroup>
                         <FormGroup className="col-md-2">
                             <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
-                           
+
                         </FormGroup>
                         <FormGroup className="col-md-5">
-                        <Input type="text"
-                                            name="nodeTitle"
-                                            bsSize="sm"
-                                             readOnly="readOnly"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            // value={this.state.currentItemConfig.title}></Input>
-                                            value={'1'}></Input>
+                            <Input type="text"
+                                name="nodeTitle"
+                                bsSize="sm"
+                                readOnly="readOnly"
+                                onChange={(e) => { this.dataChange(e) }}
+                                // value={this.state.currentItemConfig.title}></Input>
+                                value={'1'}></Input>
                         </FormGroup>
                         <FormGroup className="col-md-5">
                             {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
                             <Input
-                                            type="select"
-                                            name="nodeTypeId"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.nodeTypeChange(e) }}
-                                            required
-                                            value={this.state.currentItemConfig.valueType}
-                                        >
-                                            <option value="-1">Nothing Selected</option>
-                                            <option value="1">year(s)</option>
-                                            <option value="2">Discrete</option>
-                                        </Input>
+                                type="select"
+                                name="nodeTypeId"
+                                bsSize="sm"
+                                onChange={(e) => { this.nodeTypeChange(e) }}
+                                required
+                                value={this.state.currentItemConfig.valueType}
+                            >
+                                <option value="-1">Nothing Selected</option>
+                                <option value="1">year(s)</option>
+                                <option value="2">Discrete</option>
+                            </Input>
                         </FormGroup>
 
-                    
+
                         {/* <div style={{ width: '100%' }}> */}
-                            {/* <table className="table table-bordered">
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>1</td>
@@ -699,7 +1002,7 @@ export default class CreateTreeTemplate extends Component {
                                 </tr>
 
                             </table> */}
-                            {/* <table className="table table-bordered">
+                        {/* <table className="table table-bordered">
                                 <tr>
                                     <td>Every</td>
                                     <td>4</td>
@@ -846,9 +1149,37 @@ export default class CreateTreeTemplate extends Component {
             </>
         );
     }
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
+    handleClickMonthBox2 = (e) => {
+        this.refs.pickAMonth2.show()
+    }
+    handleAMonthChange2 = (value, text) => {
+        //
+        //
+    }
+    handleAMonthDissmis2 = (value) => {
+        this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        })
+
+    }
 
     render() {
-        console.log("this.state+++", this.state);
+        const { forecastMethodList } = this.state;
+        let forecastMethods = forecastMethodList.length > 0
+            && forecastMethodList.map((item, i) => {
+                return (
+                    <option key={i} value={item.forecastMethodId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
@@ -1018,33 +1349,38 @@ export default class CreateTreeTemplate extends Component {
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
+                                                                        name="forecastMethodId"
+                                                                        id="forecastMethodId"
                                                                         bsSize="sm"
+                                                                        valid={!errors.forecastMethodId && this.state.treeTemplate.forecastMethod.id != ''}
+                                                                        invalid={touched.forecastMethodId && !!errors.forecastMethodId}
+                                                                        onBlur={handleBlur}
                                                                         required
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.treeTemplate.forecastMethod.id}
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Demographic Method'}</option>
+                                                                        {forecastMethods}
                                                                     </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
                                                                 </FormGroup>
 
                                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
+                                                                        name="treeName"
+                                                                        id="treeName"
                                                                         bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
+                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
+                                                                        invalid={touched.treeName && !!errors.treeName}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
                                                                         required
-                                                                    // value={this.state.user.language.languageId}
+                                                                        value={this.state.treeTemplate.label.label_en}
                                                                     >
                                                                     </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
@@ -1080,148 +1416,32 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
-                                                                {/* <FormGroup check inline>
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="active6"
-                                                                        name="active"
-                                                                        checked={false}
-                                                                    // onChange={(e) => { this.dataChangeCheckbox(e) }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2">
-                                                                        <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                    </Label>
-                                                                </FormGroup> */}
+
                                                             </Row>
                                                         </div>
-                                                        {/* <div className="col-md-12 pl-lg-0 pt-lg-3"> */}
-                                                        {/* <Row> */}
-                                                        {/* <FormGroup className=""> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Demographic'}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="pl-3"> */}
-                                                        {/* <FormGroup className="col-md-3">
-                                                                    <Label htmlFor="languageId">{'Tree Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Region'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'Region A'}</option>
-                                                                    </Input>
-                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
 
-                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <InputGroup>
-                                                                        {/* <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon> */}
-                                                        {/* <Input
-                                                                            type="select"
-                                                                            name="languageId"
-                                                                            id="languageId"
-                                                                            bsSize="sm"
-                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                            // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                            // onBlur={handleBlur}
-                                                                            // required
-                                                                        // value={this.state.user.language.languageId}
-                                                                        >
-                                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                                            <option value="">{'Scenario 1'}</option>
-                                                                        </Input>
-                                                                        <InputGroupAddon addonType="append">
-                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                        </InputGroupAddon>
-                                                                    </InputGroup> */}
-                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Date'}</Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="languageId"
-                                                                        id="languageId"
-                                                                        bsSize="sm"
-                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
-                                                                        // invalid={touched.languageId && !!errors.languageId}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        // onBlur={handleBlur}
-                                                                        // required
-                                                                    // value={this.state.user.language.languageId}
-                                                                    > */}
-                                                        {/* </Input> */}
-                                                        {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                        {/* </FormGroup> */}
-                                                        {/* </Row> */}
-                                                        {/* </div> */}
                                                     </CardBody>
+                                                    <div class="sample">
+                                                        <Provider>
+                                                            <div className="placeholder" style={{ clear: 'both' }} >
+                                                                {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
+                                                                <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                            </div>
+                                                        </Provider>
+                                                    </div>
+                                                    <CardFooter>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                                                    </CardFooter>
                                                 </Form>
-                                                <div class="sample">
-                                                    <Provider>
-                                                        <div className="placeholder" style={{ clear: 'both' }} >
-                                                            {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                                            <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
-                                                        </div>
-                                                    </Provider>
-                                                </div>
+
                                             </>
                                         )} />
                             </div>
                         </CardBody>
-                        <CardFooter>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => { console.log("tree json ---", this.state.items) }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                        </CardFooter>
+
                     </Card></Col></Row>
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}

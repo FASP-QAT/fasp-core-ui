@@ -614,7 +614,7 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded'} </span></li>
 
                                     <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>{i18n.t('static.loadProgram.cleanUpText')}</li>
                                     <li><i title="Delete" className="ml-1 fa fa-trash">{i18n.t('static.loadProgram.deleteVersion')}</i></li>
