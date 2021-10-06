@@ -6,6 +6,18 @@ class DatasetService {
         return axios.get(`${API_URL}/api/dataset/`, {
         });
     }
+    loadDataset(){
+        return axios.get(`${API_URL}/api/loadDataset/`, {
+        });
+    }
+    loadMoreDatasetList(programId, page){
+        return axios.get(`${API_URL}/api/loadDataset/programId/${programId}/page/${page}`, {
+        });
+    }
+    getAllDatasetData(json) {
+        return axios.post(`${API_URL}/api/datasetData`, json, {
+        });
+    }
     getDataSetDataById(programId){
         return axios.get(`${API_URL}/api/dataset/${programId}`,{});
     }

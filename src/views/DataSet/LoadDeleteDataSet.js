@@ -65,7 +65,7 @@ class LoadDeleteDataSet extends Component {
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
     getMoreVersions(programId, pageNo) {
-        ProgramService.loadMoreProgramList(programId, pageNo)
+        DatasetService.loadMoreDatasetList(programId, pageNo)
             .then(response => {
                 if (response.status == 200) {
                     var prgList = this.state.prgList;
@@ -141,11 +141,11 @@ class LoadDeleteDataSet extends Component {
     checkNewerVersions(programs) {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestProgram");
-                    localStorage.setItem("sesLatestProgram", response.data);
-                })
+            // ProgramService.checkNewerVersions(programs)
+            //     .then(response => {
+            //         localStorage.removeItem("sesLatestProgram");
+            //         localStorage.setItem("sesLatestProgram", response.data);
+            //     })
         }
     }
     hideSecondComponent() {
@@ -326,10 +326,10 @@ class LoadDeleteDataSet extends Component {
                         //             this.setState({
                         //                 healthAreaList: response.data
                         //             })
-                        DatasetService.getDatasetList()
+                        DatasetService.loadDataset()
                             // getProgramList()
                             .then(response => {
-                                console.log("response]]]", response.data);
+                                console.log(">>>", response);
                                 if (response.status == 200) {
                                     this.setState({
                                         prgList: response.data,
@@ -536,8 +536,8 @@ class LoadDeleteDataSet extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-            var program = transaction.objectStore('programQPLDetails');
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -614,10 +614,10 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded'} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
 
-                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>{i18n.t('static.loadProgram.cleanUpText')}</li>
-                                    <li><i title="Delete" className="ml-1 fa fa-trash">{i18n.t('static.loadProgram.deleteVersion')}</i></li>
+                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>Keep latest  version of program and delete older versions.</li>
+                                    <li><i title="Delete" className="ml-1 fa fa-trash">Delete the version</i></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -667,7 +667,7 @@ class LoadDeleteDataSet extends Component {
                                                             <ul>
                                                                 {
                                                                     this.state.prgList.filter(c =>
-                                                                        c.realmCountry.realmCountryId == item.realmCountry.id)
+                                                                        c.realmCountry.id == item.realmCountry.id)
                                                                         // .filter(c => c.healthArea.id == item1.id)
                                                                         .map(item2 => (
 
@@ -676,35 +676,31 @@ class LoadDeleteDataSet extends Component {
                                                                                 <span className="tree_label">
                                                                                     <span className="">
                                                                                         <div className="checkbox m-0">
-                                                                                            <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.realmCountry.id).concat(item2.programId).concat(".0")} />
-                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.programId && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.programId).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}</label>
-                                                                                            {this.state.programList.filter(c => c.programId == item2.programId).length > 0 && <img width="16" title={i18n.t('static.common.cleanUp')} src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.programId)} className="ml-1"></img>}
+                                                                                            <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
+                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
                                                                                         </div>
                                                                                     </span>
                                                                                 </span>
-                                                                                <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.programId)} />
-                                                                                <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.programId)}></label>
+                                                                                <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
+                                                                                <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
                                                                                 <ul>
                                                                                     {
-                                                                                        this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
-                                                                                            (item3.versionList).sort(function (a, b) {
-                                                                                                a = a.versionId
-                                                                                                b = b.versionId
-                                                                                                return a > b ? -1 : a < b ? 1 : 0;
-                                                                                            }.bind(this)).map((item4, count) => (
+                                                                                        this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
+                                                                                            (item3.versionList).map((item4, count) => (
                                                                                                 <>
                                                                                                     <li><span className="tree_label">
                                                                                                         <span className="">
                                                                                                             <div className="checkbox m-0">
-                                                                                                                <input type="checkbox" data-program-id={item2.programId} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.realmCountry.id).concat(item2.programId).concat(item4.versionId)} />
-                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.programId && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.programId && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.programId).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                {this.state.programList.filter(c => c.programId == item2.programId && c.versionId == item4.versionId).length > 0 && <i title={i18n.t('static.common.delete')} onClick={() => this.deleteLocalVersion(item2.programId, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
+                                                                                                                <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
                                                                                                             </div>
                                                                                                         </span>
                                                                                                     </span>
                                                                                                     </li>
 
-                                                                                                    {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.programId, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                    {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
                                                                                                 </>
 
                                                                                             ))
@@ -871,13 +867,13 @@ class LoadDeleteDataSet extends Component {
                         programTransaction1.delete(id);
                     }
                     transaction1.oncomplete = function (event) {
-                        var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                        var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                        for (var i = 0; i < listOfProgramVersion.length; i++) {
-                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                            programTransaction2.delete(id);
-                        }
-                        transaction2.oncomplete = function (event) {
+                        // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        // var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                        // for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        //     programTransaction2.delete(id);
+                        // }
+                        // transaction2.oncomplete = function (event) {
                             // this.setState({
                             //     loading: false,
                             //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
@@ -887,7 +883,7 @@ class LoadDeleteDataSet extends Component {
                             // })
                             this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
                             window.location.reload();
-                        }.bind(this)
+                        // }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -907,7 +903,7 @@ class LoadDeleteDataSet extends Component {
                         })
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.programId == programId)[0].versionList.map(function (o) { return o.versionId; }))
+                        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
                         var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
                         var db1;
                         getDatabase();
@@ -918,10 +914,8 @@ class LoadDeleteDataSet extends Component {
                             db1 = e.target.result;
                             var transaction = db1.transaction(['datasetData'], 'readwrite');
                             var programTransaction = transaction.objectStore('datasetData');
-                            console.log("listOfProgramVersion[[[",listOfProgramVersion);
                             for (var i = 0; i < listOfProgramVersion.length; i++) {
                                 var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                console.log("id[[[",id);
                                 programTransaction.delete(id);
                             }
                             transaction.oncomplete = function (event) {
@@ -1002,34 +996,22 @@ class LoadDeleteDataSet extends Component {
                                 var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
                                 var deleteRequest1 = programTransaction1.delete(id);
                                 deleteRequest1.onsuccess = function (event) {
-                                    this.setState({
-                                        loading: false,
-                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                                        color: 'green'
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    this.getPrograms();
-                                    this.getLocalPrograms();
+                                    // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    // var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    // var deleteRequest2 = programTransaction2.delete(id);
+                                    // deleteRequest2.onsuccess = function (event) {
+                                        this.setState({
+                                            loading: false,
+                                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
 
+                                    // }.bind(this)
                                 }.bind(this)
-                                // deleteRequest1.onsuccess = function (event) {
-                                //     var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                                //     var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                                //     var deleteRequest2 = programTransaction2.delete(id);
-                                //     deleteRequest2.onsuccess = function (event) {
-                                //         this.setState({
-                                //             loading: false,
-                                //             message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                                //             color: 'green'
-                                //         }, () => {
-                                //             this.hideFirstComponent()
-                                //         })
-                                //         this.getPrograms();
-                                //         this.getLocalPrograms();
-
-                                //     }.bind(this)
-                                // }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }
@@ -1138,20 +1120,18 @@ class LoadDeleteDataSet extends Component {
             // var version = (checkboxesChecked[i]).versionId;
             if (isSiteOnline()) {
                 // AuthenticationService.setupAxiosInterceptors();
-                console.log("datasetAndVersionId]]]", checkboxesChecked);
-                // ProgramService.getAllProgramData(checkboxesChecked)
-                DatasetService.getDataSetDataById(checkboxesChecked[0].programId)
+                console.log(">>>", checkboxesChecked)
+                DatasetService.getAllDatasetData(checkboxesChecked)
                     .then(response => {
-                        var json = []
-                        json.push(response.data);
-                        console.log("response]]]", response.data);
+                        console.log("response>>>",response.data);
+                        var json = response.data;
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
-                        var version = json[r].currentVersion.versionId;
-                        if (version == -1) {
-                            version = json[r].currentVersion.versionId
-                        }
-                        programAndVersionList.push({ programId: json[r].programId, version: version })
+                            var version = json[r].currentVersion.versionId;
+                            if (version == -1) {
+                                version = json[r].currentVersion.versionId
+                            }
+                            programAndVersionList.push({ programId: json[r].programId, version: version })
                         }
 
                         var db1;
@@ -1170,7 +1150,6 @@ class LoadDeleteDataSet extends Component {
                                 var myResult = [];
                                 myResult = getRequest.result;
                                 var programAndVersionListLocal = [];
-                                console.log("myResult>>>", myResult);
                                 for (var i = 0; i < myResult.length; i++) {
                                     // for (var j = 0; j < json.length; j++) {
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -1181,7 +1160,6 @@ class LoadDeleteDataSet extends Component {
                                 }
                                 var isExists = 0;
                                 var downloadProgram = false;
-                                console.log("programVersionListLocal>>>", programAndVersionListLocal);
                                 for (var r = 0; r < programAndVersionList.length; r++) {
                                     var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
                                     if (filterList.length > 0) {
@@ -1189,9 +1167,7 @@ class LoadDeleteDataSet extends Component {
                                     }
 
                                 }
-                                console.log("is exist[[[", isExists);
                                 if (isExists > 0) {
-                                    console.log("in if[[[");
                                     confirmAlert({
                                         title: i18n.t('static.program.confirmsubmit'),
                                         message: i18n.t('static.program.programwithsameversion'),
@@ -1202,39 +1178,14 @@ class LoadDeleteDataSet extends Component {
                                                     var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                                     var programSaveData = transactionForSavingData.objectStore('datasetData');
                                                     for (var r = 0; r < json.length; r++) {
-                                                    json[r].actionList = [];
-                                                    // json[r].openCount = 0;
-                                                    // json[r].addressedCount = 0;
-                                                    // json[r].programCode = json[r].programCode;
-                                                    var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
-                                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                    var version = json[r].currentVersion.versionId;
-                                                    if (version == -1) {
-                                                        version = json[r].currentVersion.versionId
-                                                    }
-                                                    var item = {
-                                                        id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                                        programId: json[r].programId,
-                                                        version: version,
-                                                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                        programData: encryptedText.toString(),
-                                                        userId: userId,
-                                                        programCode: json[r].programCode,
-                                                        // openCount: 0,
-                                                        // addressedCount: 0
-                                                    };
-                                                    var putRequest = programSaveData.put(item);
-
-                                                    }
-                                                    transactionForSavingData.oncomplete = function (event) {
-                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                                                        for (var r = 0; r < json.length; r++) {
+                                                        json[r].actionList = [];
+                                                        // json[r].openCount = 0;
+                                                        // json[r].addressedCount = 0;
+                                                        // json[r].programCode = json[r].programCode;
                                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                        var version = json[r].requestedProgramVersion;
+                                                        var version = json[r].currentVersion.versionId;
                                                         if (version == -1) {
                                                             version = json[r].currentVersion.versionId
                                                         }
@@ -1244,45 +1195,86 @@ class LoadDeleteDataSet extends Component {
                                                             version: version,
                                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                                             programData: encryptedText.toString(),
-                                                            userId: userId
+                                                            userId: userId,
+                                                            programCode: json[r].programCode,
+                                                            // openCount: 0,
+                                                            // addressedCount: 0
                                                         };
-                                                        var putRequest = downloadedProgramSaveData.put(item);
+                                                        var putRequest = programSaveData.put(item);
 
-                                                        }
-                                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                            var programIds = []
-                                                            for (var r = 0; r < json.length; r++) {
-                                                            var programQPLDetailsJson = {
-                                                                id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                    }
+                                                    transactionForSavingData.oncomplete = function (event) {
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                                        var programIds = []
+                                                        for (var r = 0; r < json.length; r++) {
+                                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                            var version = json[r].currentVersion.versionId;
+                                                            if (version == -1) {
+                                                                version = json[r].currentVersion.versionId
+                                                            }
+                                                            var item = {
+                                                                id: json[r].programId + "_v" + version + "_uId_" + userId,
                                                                 programId: json[r].programId,
-                                                                version: json[r].currentVersion.versionId,
-                                                                userId: userId,
-                                                                programCode: json[r].programCode,
-                                                                openCount: 0,
-                                                                addressedCount: 0,
-                                                                programModified: 0
+                                                                version: version,
+                                                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                                programData: encryptedText.toString(),
+                                                                userId: userId
                                                             };
                                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                                            }
-                                                            programQPLDetailsTransaction.oncomplete = function (event) {
-                                                                this.setState({
-                                                                    message: 'static.program.downloadsuccess',
-                                                                    color: 'green',
-                                                                    loading: false
-                                                                }, () => {
-                                                                    this.hideFirstComponent()
-                                                                })
-                                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                                this.setState({ loading: false })
-                                                                // this.refs.programListChild.checkNewerVersions();
-                                                                this.getPrograms();
-                                                                this.getLocalPrograms();
-                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
-                                                            }.bind(this)
-                                                        }.bind(this)
+                                                            var putRequest = downloadedProgramSaveData.put(item);
+
+                                                        }
+                                                        
+                                                            this.setState({
+                                                                message: 'static.program.downloadsuccess',
+                                                                color: 'green',
+                                                                loading: false
+                                                            }, () => {
+                                                                this.hideFirstComponent()
+                                                            })
+                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                            this.setState({ loading: false })
+                                                            // this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
+                                                            this.getLocalPrograms();
+                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                        // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                                        //     // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                        //     // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                        //     // var programIds = []
+                                                        //     // for (var r = 0; r < json.length; r++) {
+                                                        //     //     var programQPLDetailsJson = {
+                                                        //     //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                        //     //         programId: json[r].programId,
+                                                        //     //         version: json[r].currentVersion.versionId,
+                                                        //     //         userId: userId,
+                                                        //     //         programCode: json[r].programCode,
+                                                        //     //         openCount: 0,
+                                                        //     //         addressedCount: 0,
+                                                        //     //         programModified: 0
+                                                        //     //     };
+                                                        //         // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                        //     //     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                        //     // }
+                                                        //     // programQPLDetailsTransaction.oncomplete = function (event) {
+                                                        //         this.setState({
+                                                        //             message: 'static.program.downloadsuccess',
+                                                        //             color: 'green',
+                                                        //             loading: false
+                                                        //         }, () => {
+                                                        //             this.hideFirstComponent()
+                                                        //         })
+                                                        //         // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                        //         this.setState({ loading: false })
+                                                        //         // this.refs.programListChild.checkNewerVersions();
+                                                        //         this.getPrograms();
+                                                        //         this.getLocalPrograms();
+                                                        //         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                            // }.bind(this)
+                                                        // }.bind(this)
                                                     }.bind(this)
                                                 }
                                             }, {
@@ -1294,56 +1286,22 @@ class LoadDeleteDataSet extends Component {
                                                     this.setState({ loading: false, color: "red" }, () => {
                                                         this.hideFirstComponent()
                                                     })
-                                                    this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.actioncancelled'))
+                                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                                 }
                                             }
                                         ]
                                     })
                                 } else {
-                                    console.log("in else[[[");
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
-                                    console.log("in 2 if[[[");
                                     var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('datasetData');
-                                    console.log("bfor for loop [[[");
-                                    console.log("bfor for loop length [[[", json);
                                     for (var r = 0; r < json.length; r++) {
-                                    console.log("in for loop");
-                                    // json[r].actionList = [];
-                                    // json[r].openCount = 0;
-                                    // json[r].addressedCount = 0;
-                                    // json[r].programCode = json[r].programCode;
-                                    var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                    var version = json[r].currentVersion.versionId;
-                                    if (version == -1) {
-                                        version = json[r].currentVersion.versionId
-                                    }
-                                    console.log("m here[[[");
-                                    var item = {
-                                        id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                        programId: json[r].programId,
-                                        version: version,
-                                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                        programData: encryptedText.toString(),
-                                        userId: userId,
-                                        programCode: json[r].programCode,
-                                        // openCount: 0,
-                                        // addressedCount: 0
-                                    };
-                                    console.log("item[[[", item);
-                                    var putRequest = programSaveData.put(item);
-                                    console.log("Done[[[");
-
-                                    }
-                                    transactionForSavingData.oncomplete = function (event) {
-                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                                        var programIds = []
-                                        for (var r = 0; r < json.length; r++) {
+                                        json[r].actionList = [];
+                                        // json[r].openCount = 0;
+                                        // json[r].addressedCount = 0;
+                                        // json[r].programCode = json[r].programCode;
                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -1357,12 +1315,39 @@ class LoadDeleteDataSet extends Component {
                                             version: version,
                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
                                             programData: encryptedText.toString(),
-                                            userId: userId
+                                            userId: userId,
+                                            programCode: json[r].programCode,
+                                            // openCount: 0,
+                                            // addressedCount: 0
                                         };
-                                        var putRequest = downloadedProgramSaveData.put(item);
-                                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                        var putRequest = programSaveData.put(item);
+
+                                    }
+                                    transactionForSavingData.oncomplete = function (event) {
+                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                        var programIds = []
+                                        for (var r = 0; r < json.length; r++) {
+                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                            var version = json[r].currentVersion.versionId;
+                                            if (version == -1) {
+                                                version = json[r].currentVersion.versionId
+                                            }
+                                            var item = {
+                                                id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                programId: json[r].programId,
+                                                version: version,
+                                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                programData: encryptedText.toString(),
+                                                userId: userId
+                                            };
+                                            programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                            var putRequest = downloadedProgramSaveData.put(item);
+                                            
                                         }
-                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                        // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                             // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                             // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                             // var programIds = []
@@ -1377,24 +1362,24 @@ class LoadDeleteDataSet extends Component {
                                             //         addressedCount: 0,
                                             //         programModified: 0
                                             //     };
-                                            // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                            //     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                // var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                             // }
                                             // programQPLDetailsTransaction.oncomplete = function (event) {
-                                            this.setState({
-                                                message: 'static.program.downloadsuccess',
-                                                color: 'green',
-                                                loading: false
-                                            })
-                                            this.hideFirstComponent();
-                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                            this.setState({ loading: false })
-                                            // this.refs.programListChild.checkNewerVersions();
-                                            this.getPrograms();
-                                            this.getLocalPrograms();
-                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                this.setState({
+                                                    message: 'static.program.downloadsuccess',
+                                                    color: 'green',
+                                                    loading: false
+                                                })
+                                                this.hideFirstComponent();
+                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                this.setState({ loading: false })
+                                                // this.refs.programListChild.checkNewerVersions();
+                                                this.getPrograms();
+                                                this.getLocalPrograms();
+                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                             // }.bind(this)
-                                        }.bind(this)
+                                        // }.bind(this)
                                     }.bind(this)
                                 }
                             }.bind(this)
