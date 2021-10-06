@@ -169,8 +169,11 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeValue = this.getNodeValue.bind(this);
         this.getNotes = this.getNotes.bind(this);
         this.calculateNodeValue = this.calculateNodeValue.bind(this);
+        this.filterPlanningUnitNode = this.filterPlanningUnitNode.bind(this);
+        this.filterPlanningUnitAndForecastingUnitNodes = this.filterPlanningUnitAndForecastingUnitNodes.bind(this);
+        // this.getPayloadData = this.getPayloadData.bind(this);
         this.state = {
-            // treeTemplateId: this.props.match.params.templateId,
+            addNodeFlag: false,
             level0: true,
             numberNode: false,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
@@ -225,6 +228,33 @@ export default class CreateTreeTemplate extends Component {
                 }
             },
             activeTab1: new Array(2).fill('1')
+        }
+    }
+
+    filterPlanningUnitNode(e) {
+        console.log(">>>", e.target.checked);
+        if (e.target.checked == true) {
+            var itemsList = this.state.items;
+            var filteredItemList = itemsList.filter(c => c.payload.nodeType.id != 5);
+            console.log(">>>", filteredItemList);
+            this.setState({
+                items: filteredItemList
+            });
+        } else {
+            this.componentDidMount();
+        }
+    }
+    filterPlanningUnitAndForecastingUnitNodes(e) {
+        console.log(">>>", e.target.checked);
+        if (e.target.checked == true) {
+            var itemsList = this.state.items;
+            var filteredItemList = itemsList.filter(c => c.payload.nodeType.id != 5 && c.payload.nodeType.id != 4);
+            console.log(">>>", filteredItemList);
+            this.setState({
+                items: filteredItemList
+            });
+        } else {
+            this.componentDidMount();
         }
     }
 
@@ -586,20 +616,27 @@ export default class CreateTreeTemplate extends Component {
         this.setState({ currentItemConfig: currentItemConfig });
     }
     onAddButtonClick(itemConfig) {
-        this.setState({ openAddNodeModal: true });
-        // const { items } = this.state;
+        console.log("add button clicked---", itemConfig);
+        this.setState({ openAddNodeModal: false });
+        const { items } = this.state;
+        var newItem = itemConfig.context;
+        newItem.parent = itemConfig.context.parent;
+        newItem.id = parseInt(items.length + 1);
+        console.log("add button clicked value after update---", newItem);
         // var newItem = {
         //     id: parseInt(items.length + 1),
         //     parent: itemConfig.id,
-        //     title: "New Title",
+        //     payload: "New Title",
         //     description: "New Description"
         //     // image: "/react/photos/z.png"
         // };
 
-        // this.setState({
-        //     items: [...items, newItem],
-        //     cursorItem: newItem.id
-        // });
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: parseInt(items.length + 1)
+        }, () => {
+            console.log("on add items-------", this.state.items);
+        });
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
@@ -722,6 +759,7 @@ export default class CreateTreeTemplate extends Component {
         if (item != null) {
 
             this.setState({
+                addNodeFlag: false,
                 currentItemConfig: data,
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
@@ -741,7 +779,7 @@ export default class CreateTreeTemplate extends Component {
     };
 
     updateNodeInfoInJson(currentItemConfig) {
-        console.log("update tree node called------------",currentItemConfig);
+        console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
         nodes[findNodeIndex] = currentItemConfig;
@@ -1349,13 +1387,49 @@ export default class CreateTreeTemplate extends Component {
             annotations: treeLevelItems,
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
-                    {/* <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        this.onAddButtonClick(itemConfig);
-                    }}>
-                    <FontAwesomeIcon icon={faPlus} />
-                </button> */}
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 &&
+                        <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                this.setState({
+                                    addNodeFlag: true,
+                                    openAddNodeModal: true,
+                                    currentItemConfig: {
+                                        context: {
+                                            parent: itemConfig.id,
+                                            payload: {
+                                                label: {
+
+                                                },
+                                                nodeType: {
+                                                    id: ''
+                                                },
+                                                nodeUnit: {
+
+                                                },
+                                                nodeDataMap: [
+                                                    [
+                                                        {
+                                                            dataValue: '',
+                                                            notes: ''
+                                                        }
+                                                    ]
+                                                ]
+                                            }
+                                        },
+                                        parentItem: {
+                                            payload: {
+                                                label: {
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                                // this.onAddButtonClick(itemConfig);
+                            }}>
+                            <FontAwesomeIcon icon={faPlus} />
+                        </button>}
                     {/* <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
                         onClick={(event) => {
                             event.stopPropagation();
@@ -1497,9 +1571,9 @@ export default class CreateTreeTemplate extends Component {
                                                                                 className="form-check-input"
                                                                                 type="checkbox"
                                                                                 id="active6"
-                                                                                name="active"
-                                                                                checked={false}
-                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                                name="active6"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                                             />
                                                                             <Label
                                                                                 className="form-check-label"
@@ -1511,10 +1585,10 @@ export default class CreateTreeTemplate extends Component {
                                                                             <Input
                                                                                 className="form-check-input"
                                                                                 type="checkbox"
-                                                                                id="active6"
-                                                                                name="active"
-                                                                                checked={false}
-                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                                id="active7"
+                                                                                name="active7"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                                             />
                                                                             <Label
                                                                                 className="form-check-label"
@@ -1589,7 +1663,9 @@ export default class CreateTreeTemplate extends Component {
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button  size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" onClick={(e) => {
+                        this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
+                    }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>

@@ -166,6 +166,12 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('forecastMethod')){
             storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'forecastMethodId', autoIncrement: true });
         }
+        if(!db1.objectStoreNames.contains('datasetData')){
+            storeOS = db1.createObjectStore('datasetData', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('downloadedDatasetData')){
+            storeOS = db1.createObjectStore('downloadedDatasetData', { keyPath: 'id'});
+        }
         console.log("indexed db completed----------------------")
         
     };

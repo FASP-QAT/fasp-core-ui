@@ -17,6 +17,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmCountryService from "../../api/RealmCountryService"
 import HealthAreaService from "../../api/HealthAreaService"
 import ProgramService from "../../api/ProgramService"
+import DatasetService from "../../api/DatasetService"
 import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from '../../Constants.js'
@@ -64,7 +65,7 @@ class LoadDeleteDataSet extends Component {
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
     }
     getMoreVersions(programId, pageNo) {
-        ProgramService.loadMoreProgramList(programId, pageNo)
+        DatasetService.loadMoreDatasetList(programId, pageNo)
             .then(response => {
                 if (response.status == 200) {
                     var prgList = this.state.prgList;
@@ -140,11 +141,11 @@ class LoadDeleteDataSet extends Component {
     checkNewerVersions(programs) {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestProgram");
-                    localStorage.setItem("sesLatestProgram", response.data);
-                })
+            // ProgramService.checkNewerVersions(programs)
+            //     .then(response => {
+            //         localStorage.removeItem("sesLatestProgram");
+            //         localStorage.setItem("sesLatestProgram", response.data);
+            //     })
         }
     }
     hideSecondComponent() {
@@ -266,8 +267,8 @@ class LoadDeleteDataSet extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-            var program = transaction.objectStore('programQPLDetails');
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -325,9 +326,10 @@ class LoadDeleteDataSet extends Component {
                         //             this.setState({
                         //                 healthAreaList: response.data
                         //             })
-                        ProgramService.loadProgramList()
+                        DatasetService.loadDataset()
                             // getProgramList()
                             .then(response => {
+                                console.log(">>>", response);
                                 if (response.status == 200) {
                                     this.setState({
                                         prgList: response.data,
@@ -534,8 +536,8 @@ class LoadDeleteDataSet extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-            var program = transaction.objectStore('programQPLDetails');
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -612,9 +614,9 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{'Dataset is not loaded'} </span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
 
-                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>Keep latest  version of dataset and delete older versions.</li>
+                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>Keep latest  version of program and delete older versions.</li>
                                     <li><i title="Delete" className="ml-1 fa fa-trash">Delete the version</i></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
@@ -851,27 +853,27 @@ class LoadDeleteDataSet extends Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
                 for (var i = 0; i < listOfProgramVersion.length; i++) {
                     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
                     programTransaction.delete(id);
                 }
                 transaction.oncomplete = function (event) {
-                    var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                    var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                    var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                    var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
                     for (var i = 0; i < listOfProgramVersion.length; i++) {
                         var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
                         programTransaction1.delete(id);
                     }
                     transaction1.oncomplete = function (event) {
-                        var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                        var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                        for (var i = 0; i < listOfProgramVersion.length; i++) {
-                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                            programTransaction2.delete(id);
-                        }
-                        transaction2.oncomplete = function (event) {
+                        // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                        // var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                        // for (var i = 0; i < listOfProgramVersion.length; i++) {
+                        //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                        //     programTransaction2.delete(id);
+                        // }
+                        // transaction2.oncomplete = function (event) {
                             // this.setState({
                             //     loading: false,
                             //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
@@ -879,9 +881,9 @@ class LoadDeleteDataSet extends Component {
                             // }, () => {
                             //     this.hideFirstComponent()
                             // })
-                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+                            this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
                             window.location.reload();
-                        }.bind(this)
+                        // }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -910,27 +912,27 @@ class LoadDeleteDataSet extends Component {
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
-                            var transaction = db1.transaction(['programData'], 'readwrite');
-                            var programTransaction = transaction.objectStore('programData');
+                            var transaction = db1.transaction(['datasetData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('datasetData');
                             for (var i = 0; i < listOfProgramVersion.length; i++) {
                                 var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
                                 programTransaction.delete(id);
                             }
                             transaction.oncomplete = function (event) {
-                                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
                                 for (var i = 0; i < listOfProgramVersion.length; i++) {
                                     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
                                     programTransaction1.delete(id);
                                 }
                                 transaction1.oncomplete = function (event) {
-                                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                                    for (var i = 0; i < listOfProgramVersion.length; i++) {
-                                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                        programTransaction2.delete(id);
-                                    }
-                                    transaction2.oncomplete = function (event) {
+                                    // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    // var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    // for (var i = 0; i < listOfProgramVersion.length; i++) {
+                                    //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                                    //     programTransaction2.delete(id);
+                                    // }
+                                    // transaction2.oncomplete = function (event) {
                                         this.setState({
                                             loading: false,
                                             message: i18n.t("static.program.deleteLocalProgramSuccess"),
@@ -940,7 +942,7 @@ class LoadDeleteDataSet extends Component {
                                         })
                                         this.getPrograms();
                                         this.getLocalPrograms();
-                                    }.bind(this)
+                                    // }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -986,18 +988,18 @@ class LoadDeleteDataSet extends Component {
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
-                            var transaction = db1.transaction(['programData'], 'readwrite');
-                            var programTransaction = transaction.objectStore('programData');
+                            var transaction = db1.transaction(['datasetData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('datasetData');
                             var deleteRequest = programTransaction.delete(id);
                             deleteRequest.onsuccess = function (event) {
-                                var transaction1 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                var programTransaction1 = transaction1.objectStore('downloadedProgramData');
+                                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
                                 var deleteRequest1 = programTransaction1.delete(id);
                                 deleteRequest1.onsuccess = function (event) {
-                                    var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                                    var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                                    var deleteRequest2 = programTransaction2.delete(id);
-                                    deleteRequest2.onsuccess = function (event) {
+                                    // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                    // var programTransaction2 = transaction2.objectStore('programQPLDetails');
+                                    // var deleteRequest2 = programTransaction2.delete(id);
+                                    // deleteRequest2.onsuccess = function (event) {
                                         this.setState({
                                             loading: false,
                                             message: i18n.t("static.program.deleteLocalProgramSuccess"),
@@ -1008,7 +1010,7 @@ class LoadDeleteDataSet extends Component {
                                         this.getPrograms();
                                         this.getLocalPrograms();
 
-                                    }.bind(this)
+                                    // }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -1118,12 +1120,14 @@ class LoadDeleteDataSet extends Component {
             // var version = (checkboxesChecked[i]).versionId;
             if (isSiteOnline()) {
                 // AuthenticationService.setupAxiosInterceptors();
-                ProgramService.getAllProgramData(checkboxesChecked)
+                console.log(">>>", checkboxesChecked)
+                DatasetService.getAllDatasetData(checkboxesChecked)
                     .then(response => {
+                        console.log("response>>>",response.data);
                         var json = response.data;
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
-                            var version = json[r].requestedProgramVersion;
+                            var version = json[r].currentVersion.versionId;
                             if (version == -1) {
                                 version = json[r].currentVersion.versionId
                             }
@@ -1135,8 +1139,8 @@ class LoadDeleteDataSet extends Component {
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
-                            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                            var program = transaction.objectStore('programQPLDetails');
+                            var transaction = db1.transaction(['datasetData'], 'readwrite');
+                            var program = transaction.objectStore('datasetData');
                             var count = 0;
                             var getRequest = program.getAll();
                             getRequest.onerror = function (event) {
@@ -1171,8 +1175,8 @@ class LoadDeleteDataSet extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
-                                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                                    var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
+                                                    var programSaveData = transactionForSavingData.objectStore('datasetData');
                                                     for (var r = 0; r < json.length; r++) {
                                                         json[r].actionList = [];
                                                         // json[r].openCount = 0;
@@ -1181,7 +1185,7 @@ class LoadDeleteDataSet extends Component {
                                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                        var version = json[r].requestedProgramVersion;
+                                                        var version = json[r].currentVersion.versionId;
                                                         if (version == -1) {
                                                             version = json[r].currentVersion.versionId
                                                         }
@@ -1200,13 +1204,14 @@ class LoadDeleteDataSet extends Component {
 
                                                     }
                                                     transactionForSavingData.oncomplete = function (event) {
-                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                                        var programIds = []
                                                         for (var r = 0; r < json.length; r++) {
                                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                            var version = json[r].requestedProgramVersion;
+                                                            var version = json[r].currentVersion.versionId;
                                                             if (version == -1) {
                                                                 version = json[r].currentVersion.versionId
                                                             }
@@ -1218,43 +1223,58 @@ class LoadDeleteDataSet extends Component {
                                                                 programData: encryptedText.toString(),
                                                                 userId: userId
                                                             };
+                                                            programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                                         }
-                                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                            var programIds = []
-                                                            for (var r = 0; r < json.length; r++) {
-                                                                var programQPLDetailsJson = {
-                                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                                                    programId: json[r].programId,
-                                                                    version: json[r].currentVersion.versionId,
-                                                                    userId: userId,
-                                                                    programCode: json[r].programCode,
-                                                                    openCount: 0,
-                                                                    addressedCount: 0,
-                                                                    programModified: 0
-                                                                };
-                                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                                            }
-                                                            programQPLDetailsTransaction.oncomplete = function (event) {
-                                                                this.setState({
-                                                                    message: 'static.program.downloadsuccess',
-                                                                    color: 'green',
-                                                                    loading: false
-                                                                }, () => {
-                                                                    this.hideFirstComponent()
-                                                                })
-                                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                                this.setState({ loading: false })
-                                                                // this.refs.programListChild.checkNewerVersions();
-                                                                this.getPrograms();
-                                                                this.getLocalPrograms();
-                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
-                                                            }.bind(this)
-                                                        }.bind(this)
+                                                        
+                                                            this.setState({
+                                                                message: 'static.program.downloadsuccess',
+                                                                color: 'green',
+                                                                loading: false
+                                                            }, () => {
+                                                                this.hideFirstComponent()
+                                                            })
+                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                            this.setState({ loading: false })
+                                                            // this.refs.programListChild.checkNewerVersions();
+                                                            this.getPrograms();
+                                                            this.getLocalPrograms();
+                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                        // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                                        //     // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                        //     // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                        //     // var programIds = []
+                                                        //     // for (var r = 0; r < json.length; r++) {
+                                                        //     //     var programQPLDetailsJson = {
+                                                        //     //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                        //     //         programId: json[r].programId,
+                                                        //     //         version: json[r].currentVersion.versionId,
+                                                        //     //         userId: userId,
+                                                        //     //         programCode: json[r].programCode,
+                                                        //     //         openCount: 0,
+                                                        //     //         addressedCount: 0,
+                                                        //     //         programModified: 0
+                                                        //     //     };
+                                                        //         // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                        //     //     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                                        //     // }
+                                                        //     // programQPLDetailsTransaction.oncomplete = function (event) {
+                                                        //         this.setState({
+                                                        //             message: 'static.program.downloadsuccess',
+                                                        //             color: 'green',
+                                                        //             loading: false
+                                                        //         }, () => {
+                                                        //             this.hideFirstComponent()
+                                                        //         })
+                                                        //         // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                        //         this.setState({ loading: false })
+                                                        //         // this.refs.programListChild.checkNewerVersions();
+                                                        //         this.getPrograms();
+                                                        //         this.getLocalPrograms();
+                                                        //         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                            // }.bind(this)
+                                                        // }.bind(this)
                                                     }.bind(this)
                                                 }
                                             }, {
@@ -1275,8 +1295,8 @@ class LoadDeleteDataSet extends Component {
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
-                                    var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                                    var programSaveData = transactionForSavingData.objectStore('programData');
+                                    var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
+                                    var programSaveData = transactionForSavingData.objectStore('datasetData');
                                     for (var r = 0; r < json.length; r++) {
                                         json[r].actionList = [];
                                         // json[r].openCount = 0;
@@ -1285,7 +1305,7 @@ class LoadDeleteDataSet extends Component {
                                         var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        var version = json[r].requestedProgramVersion;
+                                        var version = json[r].currentVersion.versionId;
                                         if (version == -1) {
                                             version = json[r].currentVersion.versionId
                                         }
@@ -1304,13 +1324,14 @@ class LoadDeleteDataSet extends Component {
 
                                     }
                                     transactionForSavingData.oncomplete = function (event) {
-                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                        var programIds = []
                                         for (var r = 0; r < json.length; r++) {
                                             var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                            var version = json[r].requestedProgramVersion;
+                                            var version = json[r].currentVersion.versionId;
                                             if (version == -1) {
                                                 version = json[r].currentVersion.versionId
                                             }
@@ -1322,28 +1343,29 @@ class LoadDeleteDataSet extends Component {
                                                 programData: encryptedText.toString(),
                                                 userId: userId
                                             };
+                                            programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                             var putRequest = downloadedProgramSaveData.put(item);
-
+                                            
                                         }
-                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                            var programIds = []
-                                            for (var r = 0; r < json.length; r++) {
-                                                var programQPLDetailsJson = {
-                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                                    programId: json[r].programId,
-                                                    version: json[r].currentVersion.versionId,
-                                                    userId: userId,
-                                                    programCode: json[r].programCode,
-                                                    openCount: 0,
-                                                    addressedCount: 0,
-                                                    programModified: 0
-                                                };
-                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                            }
-                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                        // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                            // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                            // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                            // var programIds = []
+                                            // for (var r = 0; r < json.length; r++) {
+                                            //     var programQPLDetailsJson = {
+                                            //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                            //         programId: json[r].programId,
+                                            //         version: json[r].currentVersion.versionId,
+                                            //         userId: userId,
+                                            //         programCode: json[r].programCode,
+                                            //         openCount: 0,
+                                            //         addressedCount: 0,
+                                            //         programModified: 0
+                                            //     };
+                                                // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                // var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                            // }
+                                            // programQPLDetailsTransaction.oncomplete = function (event) {
                                                 this.setState({
                                                     message: 'static.program.downloadsuccess',
                                                     color: 'green',
@@ -1356,8 +1378,8 @@ class LoadDeleteDataSet extends Component {
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
                                                 this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
-                                            }.bind(this)
-                                        }.bind(this)
+                                            // }.bind(this)
+                                        // }.bind(this)
                                     }.bind(this)
                                 }
                             }.bind(this)

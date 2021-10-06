@@ -289,6 +289,7 @@ const LoadDeleteDataSet=React.lazy(() => import('../../views/DataSet/LoadDeleteD
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/loadDeleteDataSet/:message',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
   {path:'/dataset/listTreeTemplate/',name:'List Tree Template',component:ListTreeTemplate},
   {path:'/dataset/createTreeTemplate/:templateId',name:'Create Tree Template',component:CreateTreeTemplate},
   { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
