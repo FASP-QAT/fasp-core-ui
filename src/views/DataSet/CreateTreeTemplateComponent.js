@@ -162,6 +162,8 @@ export default class CreateTreeTemplate extends Component {
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
+        this.filterPlanningUnitNode = this.filterPlanningUnitNode.bind(this);
+        this.filterPlanningUnitAndForecastingUnitNodes = this.filterPlanningUnitAndForecastingUnitNodes.bind(this);
         // this.getPayloadData = this.getPayloadData.bind(this);
         this.state = {
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
@@ -208,6 +210,33 @@ export default class CreateTreeTemplate extends Component {
                 }
             },
             activeTab1: new Array(2).fill('1')
+        }
+    }
+
+    filterPlanningUnitNode(e) {
+        console.log(">>>", e.target.checked);
+        if (e.target.checked == true) {
+            var itemsList = this.state.items;
+            var filteredItemList = itemsList.filter(c => c.payload.nodeType.id != 5);
+            console.log(">>>", filteredItemList);
+            this.setState({
+                items: filteredItemList
+            });
+        } else {
+            this.componentDidMount();
+        }
+    }
+    filterPlanningUnitAndForecastingUnitNodes(e) {
+        console.log(">>>", e.target.checked);
+        if (e.target.checked == true) {
+            var itemsList = this.state.items;
+            var filteredItemList = itemsList.filter(c => c.payload.nodeType.id != 5 && c.payload.nodeType.id != 4);
+            console.log(">>>", filteredItemList);
+            this.setState({
+                items: filteredItemList
+            });
+        } else {
+            this.componentDidMount();
         }
     }
 
@@ -1389,9 +1418,9 @@ export default class CreateTreeTemplate extends Component {
                                                                                 className="form-check-input"
                                                                                 type="checkbox"
                                                                                 id="active6"
-                                                                                name="active"
-                                                                                checked={false}
-                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                                name="active6"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                                             />
                                                                             <Label
                                                                                 className="form-check-label"
@@ -1403,10 +1432,10 @@ export default class CreateTreeTemplate extends Component {
                                                                             <Input
                                                                                 className="form-check-input"
                                                                                 type="checkbox"
-                                                                                id="active6"
-                                                                                name="active"
-                                                                                checked={false}
-                                                                            // onChange={(e) => { this.dataChangeCheckbox(e) }}
+                                                                                id="active7"
+                                                                                name="active7"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                                             />
                                                                             <Label
                                                                                 className="form-check-label"
