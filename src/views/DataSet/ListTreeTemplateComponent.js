@@ -30,7 +30,7 @@ export default class ListTreeTemplate extends Component {
     addTreeTemplate(event) {
 
         this.props.history.push({
-            pathname: `/dataSet/createTreeTemplate`,
+            pathname: `/dataSet/createTreeTemplate/-1`,
             // state: { role }
         });
 
@@ -52,9 +52,10 @@ export default class ListTreeTemplate extends Component {
 
         for (var j = 0; j < treeTemplateList.length; j++) {
             data = [];
-            data[0] = getLabelText(treeTemplateList[j].label, this.state.lang)
-            data[1] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
-            data[2] = treeTemplateList[j].active;
+            data[0] = treeTemplateList[j].treeTemplateId;
+            data[1] = getLabelText(treeTemplateList[j].label, this.state.lang)
+            data[2] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
+            data[3] = treeTemplateList[j].active;
             treeTemplateArray[count] = data;
             count++;
         }
@@ -69,6 +70,10 @@ export default class ListTreeTemplate extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
+                {
+                    title: 'Template Id',
+                    type: 'hidden',
+                },
                 {
                     title: 'Template name',
                     type: 'text',
@@ -225,10 +230,10 @@ export default class ListTreeTemplate extends Component {
             // console.log("HEADER SELECTION--------------------------");
         } else {
 
-            var treeId = this.el.getValueFromCoords(0, x);
+            var treeTemplateId = this.el.getValueFromCoords(0, x);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
-                pathname: `/dataSet/buildTree/${treeId}`,
+                pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
                 // state: { role }
             });
             // }

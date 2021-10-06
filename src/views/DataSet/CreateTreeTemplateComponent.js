@@ -103,13 +103,17 @@ function getPayloadData(itemConfig) {
     data = itemConfig.payload.nodeDataMap;
     console.log("itemConfig---", data);
     var curMonth = moment().format("YYYY-MM");
-    console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
-    for (var i = 0; i < data.length; i++) {
-        // var month = moment(data[i].month).format("YYYY-MM");
-        console.log("month---");
+    // console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
+    // for (var i = 0; i < data.length; i++) {
+    // var month = moment(data[i].month).format("YYYY-MM");
+    // console.log("month---");
+    // }
+    console.log("data---", data);
+    if (data != null && data[0] != null && (data[0])[0] != null) {
+        return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+    } else {
+        return "";
     }
-
-    return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
 }
 const NodeDragSource = DragSource(
     ItemTypes.NODE,
@@ -166,6 +170,7 @@ export default class CreateTreeTemplate extends Component {
         this.getNotes = this.getNotes.bind(this);
         this.calculateNodeValue = this.calculateNodeValue.bind(this);
         this.state = {
+            // treeTemplateId: this.props.match.params.templateId,
             level0: true,
             numberNode: false,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
@@ -200,7 +205,15 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeUnit: {
 
-                        }
+                        },
+                        nodeDataMap: [
+                            [
+                                {
+                                    dataValue: '',
+                                    notes: ''
+                                }
+                            ]
+                        ]
                     }
                 },
                 parentItem: {
@@ -240,7 +253,7 @@ export default class CreateTreeTemplate extends Component {
 
     getNodeValue(nodeTypeId) {
         console.log("get node value---------------------");
-        if (nodeTypeId == 2) {
+        if (nodeTypeId == 2 && this.state.currentItemConfig.context.payload.nodeDataMap != null && this.state.currentItemConfig.context.payload.nodeDataMap[0] != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0] != null) {
             return (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue;
         }
         // else {
@@ -395,54 +408,82 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
-        DatasetService.getTreeTemplateById(1).then(response => {
+        if (this.props.match.params.templateId != -1) {
+            DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+                this.setState({
+                    items: response.data.tree.flatList,
+                    loading: false
+                }, () => {
+                    console.log("Tree Template---", this.state.items);
+                })
+            })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
             this.setState({
-                items: response.data.tree.flatList,
-                loading: false
+                items: [{
+                    id: 1,
+                    level: 0,
+                    parent: null,
+                    payload: {
+                        label: {
+                            label_en: ''
+                        },
+                        nodeType: {
+                            id: 2
+                        },
+                        nodeUnit: {
+                            id: ''
+                        },
+                        nodeDataMap: [
+                            [{
+                                dataValue: ''
+                            }]
+                        ]
+                    }
+                }]
             }, () => {
                 console.log("Tree Template---", this.state.items);
             })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        }
     }
     addScenario() {
         const { tabList } = this.state;
@@ -470,21 +511,21 @@ export default class CreateTreeTemplate extends Component {
         if (nodeTypeId == 1) {
             this.setState({
                 numberNode: false,
-                aggregationNode : false
+                aggregationNode: false
             });
         } else if (nodeTypeId == 2) {
             // Number node
             console.log("case 2")
             this.setState({
                 numberNode: false,
-                aggregationNode : true
+                aggregationNode: true
             });
         }
         else if (nodeTypeId == 3) {
             // Percentage node
             this.setState({
                 numberNode: true,
-                aggregationNode : true
+                aggregationNode: true
 
             });
         }
@@ -492,7 +533,7 @@ export default class CreateTreeTemplate extends Component {
             // Forecasting unit node
             this.setState({
                 numberNode: true,
-                aggregationNode : true
+                aggregationNode: true
             });
         }
     }
@@ -531,10 +572,16 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
         }
         if (event.target.name === "nodeValue") {
+            // console.log("0----------------", currentItemConfig.context.payload.nodeDataMap);
+            // console.log("1----------------", currentItemConfig.context.payload.nodeDataMap[0]);
+            // console.log("2----------------", (currentItemConfig.context.payload.nodeDataMap[0])[0])
+            // console.log("3----------------", (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue)
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
         }
         if (event.target.name === "notes") {
+            console.log("-------------notes------------");
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
+            this.getNotes();
         }
         this.setState({ currentItemConfig: currentItemConfig });
     }
@@ -694,13 +741,14 @@ export default class CreateTreeTemplate extends Component {
     };
 
     updateNodeInfoInJson(currentItemConfig) {
+        console.log("update tree node called------------",currentItemConfig);
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex].title = currentItemConfig.title;
-        nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+        nodes[findNodeIndex] = currentItemConfig;
+        // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
             items: nodes,
-            modalOpen: false,
+            openAddNodeModal: false,
         }, () => {
             console.log("updated tree data+++", this.state);
         });
@@ -745,7 +793,7 @@ export default class CreateTreeTemplate extends Component {
                                 // valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                 // invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                 // onBlur={handleBlur}
-                                onChange={(e) => { this.nodeTypeChange(e);this.dataChange(e) }}
+                                onChange={(e) => { this.nodeTypeChange(e); this.dataChange(e) }}
                                 required
                                 value={this.state.currentItemConfig.context.payload.nodeType.id}
                             >
@@ -847,7 +895,8 @@ export default class CreateTreeTemplate extends Component {
                                 id="notes"
                                 name="notes"
                                 onChange={(e) => { this.dataChange(e) }}
-                                value={this.getNotes}
+                                // value={this.getNotes}
+                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
                             ></Input>
                         </FormGroup>
                     </Form>
@@ -1540,7 +1589,7 @@ export default class CreateTreeTemplate extends Component {
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button  size="md" onClick={(e) => { this.updateNodeInfoInJson(this.state.currentItemConfig) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>

@@ -1306,7 +1306,7 @@ class AuthenticationService {
                     case "/dataset/loadDeleteDataSet":
                     case "/dataSet/buildTree/:treeId":
                     case "/dataSet/buildTree/":
-                    case "/dataset/createTreeTemplate/":
+                    case "/dataset/createTreeTemplate/:templateId":
                     case "/dataset/listTreeTemplate/":
                     case "/dataSet/buildTree/:templateId":
                     case "/dataset/listTree/:color/:message":
