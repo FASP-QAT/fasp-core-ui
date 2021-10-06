@@ -745,7 +745,7 @@ export default class CreateTreeTemplate extends Component {
                                 // valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                 // invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                 // onBlur={handleBlur}
-                                onChange={(e) => { this.nodeTypeChange(e),this.dataChange(e) }}
+                                onChange={(e) => { this.nodeTypeChange(e);this.dataChange(e) }}
                                 required
                                 value={this.state.currentItemConfig.context.payload.nodeType.id}
                             >

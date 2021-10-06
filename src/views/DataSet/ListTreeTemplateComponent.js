@@ -54,7 +54,7 @@ export default class ListTreeTemplate extends Component {
             data = [];
             data[0] = getLabelText(treeTemplateList[j].label, this.state.lang)
             data[1] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
-            data[2] = treeTemplateList[j].status;
+            data[2] = treeTemplateList[j].active;
             treeTemplateArray[count] = data;
             count++;
         }
