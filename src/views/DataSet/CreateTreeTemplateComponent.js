@@ -200,6 +200,7 @@ export default class CreateTreeTemplate extends Component {
             items: [],
             currentItemConfig: {
                 context: {
+                    level : '',
                     payload: {
                         label: {
 
@@ -441,6 +442,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.props.match.params.templateId != -1) {
             DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
                 this.setState({
+                    treeTemplate : response.data,
                     items: response.data.tree.flatList,
                     loading: false
                 }, () => {
@@ -623,14 +625,6 @@ export default class CreateTreeTemplate extends Component {
         newItem.parent = itemConfig.context.parent;
         newItem.id = parseInt(items.length + 1);
         console.log("add button clicked value after update---", newItem);
-        // var newItem = {
-        //     id: parseInt(items.length + 1),
-        //     parent: itemConfig.id,
-        //     payload: "New Title",
-        //     description: "New Description"
-        //     // image: "/react/photos/z.png"
-        // };
-
         this.setState({
             items: [...items, newItem],
             cursorItem: parseInt(items.length + 1)
@@ -913,7 +907,7 @@ export default class CreateTreeTemplate extends Component {
                                         name="parentValue"
                                         readOnly={true}
                                         onChange={(e) => { this.dataChange(e) }}
-                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue}
+                                        value={this.state.currentItemConfig.context.level != 0 ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
                                     ></Input>
                                 </FormGroup></>}
                         {this.state.aggregationNode &&
@@ -1391,11 +1385,16 @@ export default class CreateTreeTemplate extends Component {
                         <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
                             onClick={(event) => {
                                 event.stopPropagation();
+                                console.log("add node level----",itemConfig.level);
                                 this.setState({
+                                    level0: (itemConfig.level == 0 ? false : true),
+                                    numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
+                                    aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
                                     addNodeFlag: true,
                                     openAddNodeModal: true,
                                     currentItemConfig: {
                                         context: {
+                                            level : itemConfig.level,
                                             parent: itemConfig.id,
                                             payload: {
                                                 label: {
