@@ -43,7 +43,8 @@ let initialValues = {
 }
 let initialValuesNodeData = {
     nodeTypeId: "",
-    nodeTitle: ""
+    nodeTitle: "",
+    nodeUnitId:""
 }
 
 const validationSchema = function (values) {
@@ -61,7 +62,15 @@ const validationSchemaNodeData = function (values) {
             .required(i18n.t('static.user.validlanguage')),
         nodeTitle: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
-
+        nodeUnitId: Yup.string()
+            .test('nodeUnitId', 'This is required',
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 2 && document.getElementById("nodeUnitId").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
     })
 }
 const validate = (getValidationSchema) => {
@@ -77,9 +86,9 @@ const validate = (getValidationSchema) => {
 }
 const validateNodeData = (getValidationSchema) => {
     return (values) => {
-        const validationSchema = getValidationSchema(values)
+        const validationSchemaNodeData = getValidationSchema(values)
         try {
-            validationSchema.validateSync(values, { abortEarly: false })
+            validationSchemaNodeData.validateSync(values, { abortEarly: false })
             return {}
         } catch (error) {
             return getErrorsFromValidationErrorNodeData(error)
@@ -302,12 +311,13 @@ export default class CreateTreeTemplate extends Component {
     touchAllNodeData(setTouched, errors) {
         setTouched({
             nodeTypeId: true,
-            nodeTitle: true
+            nodeTitle: true,
+            nodeUnitId:true
         }
         )
         this.validateFormNodeData(errors)
     }
-   
+
     validateForm(errors) {
         this.findFirstError('dataSourceForm', (fieldName) => {
             return Boolean(errors[fieldName])
@@ -646,6 +656,7 @@ export default class CreateTreeTemplate extends Component {
             treeTemplate.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTitle") {
+            console.log(">>>", event.target.value);
             currentItemConfig.context.payload.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTypeId") {
@@ -866,6 +877,7 @@ export default class CreateTreeTemplate extends Component {
                                 values,
                                 errors,
                                 touched,
+                                handleChange,
                                 handleBlur,
                                 handleSubmit,
                                 isSubmitting,
@@ -873,7 +885,7 @@ export default class CreateTreeTemplate extends Component {
                                 setTouched,
                                 handleReset,
                             }) => (
-                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     {this.state.level0 &&
                                         <FormGroup>
                                             <Label htmlFor="currencyId">Parent</Label>
@@ -893,7 +905,7 @@ export default class CreateTreeTemplate extends Component {
                                             valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
                                             invalid={touched.nodeTitle && !!errors.nodeTitle}
                                             onBlur={handleBlur}
-                                            onChange={(e) => { this.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                             value={this.state.currentItemConfig.context.payload.label.label_en}>
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
@@ -908,7 +920,7 @@ export default class CreateTreeTemplate extends Component {
                                             valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                             invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                             onBlur={handleBlur}
-                                            onChange={(e) => { this.nodeTypeChange(e); this.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.nodeTypeChange(e); this.dataChange(e) }}
                                             required
                                             value={this.state.currentItemConfig.context.payload.nodeType.id}
                                         >
@@ -933,7 +945,10 @@ export default class CreateTreeTemplate extends Component {
                                                     id="nodeUnitId"
                                                     name="nodeUnitId"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
+                                                    invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeUnit.id}
                                                 >
@@ -947,6 +962,7 @@ export default class CreateTreeTemplate extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                                <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
@@ -1022,7 +1038,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
-                                                    name=""
+                                                    name="a"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.nodeTypeChange(e) }}
                                                     required
@@ -1037,7 +1053,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
-                                                    name=""
+                                                    name="s"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.nodeTypeChange(e) }}
                                                     required
@@ -1052,7 +1068,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
-                                                    name=""
+                                                    name="f"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.nodeTypeChange(e) }}
                                                     required
@@ -1067,7 +1083,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
-                                                    name=""
+                                                    name="g"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.nodeTypeChange(e) }}
                                                     required
@@ -1108,7 +1124,7 @@ export default class CreateTreeTemplate extends Component {
                                             <FormGroup className="col-md-5">
                                                 {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
                                                 <Input type="text"
-                                                    name=""
+                                                    name="v"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     // value={this.state.currentItemConfig.title}></Input>
@@ -1122,7 +1138,7 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-5">
                                                 <Input type="text"
-                                                    name=""
+                                                    name="x"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     // value={this.state.currentItemConfig.title}></Input>
@@ -1131,7 +1147,7 @@ export default class CreateTreeTemplate extends Component {
                                             <FormGroup className="col-md-5">
                                                 {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
                                                 <Input type="text"
-                                                    name=""
+                                                    name="n"
                                                     bsSize="sm"
                                                     readOnly="readOnly"
                                                     onChange={(e) => { this.dataChange(e) }}
@@ -1146,7 +1162,7 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-5">
                                                 <Input type="text"
-                                                    name=""
+                                                    name="r"
                                                     bsSize="sm"
                                                     readOnly="readOnly"
                                                     onChange={(e) => { this.dataChange(e) }}
@@ -1157,7 +1173,7 @@ export default class CreateTreeTemplate extends Component {
                                                 {/* <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label> */}
                                                 <Input
                                                     type="select"
-                                                    name=""
+                                                    name="q"
                                                     bsSize="sm"
                                                     onChange={(e) => { this.nodeTypeChange(e) }}
                                                     required
