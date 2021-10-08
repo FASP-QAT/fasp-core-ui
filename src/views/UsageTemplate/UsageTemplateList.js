@@ -1044,6 +1044,77 @@ class usageTemplate extends Component {
 
 
 
+                    // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                    // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                    // // console.log("decryptedUser=====>", decryptedUser);
+
+                    // var roleList = decryptedUser.roleList;
+                    // var roleArray = []
+                    // for (var r = 0; r < roleList.length; r++) {
+                    //     roleArray.push(roleList[r].roleId)
+                    // }
+                    // var typeId = rowData[1];
+
+                    // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+
+                    // }
+
+                    // if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    //     var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    // }
+
+
 
                 }
             },
