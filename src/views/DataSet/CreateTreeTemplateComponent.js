@@ -213,6 +213,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            usageTypeParent: '',
             usageTemplateList: [],
             usageTemplateId: '',
             usageText: '',
@@ -308,18 +309,36 @@ export default class CreateTreeTemplate extends Component {
         this.getUsageText = this.getUsageText.bind(this);
         this.copyDataFromUsageTemplate = this.copyDataFromUsageTemplate.bind(this);
         this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
+        this.getNodeUnitOfPrent = this.getNodeUnitOfPrent.bind(this);
     }
+    getNodeUnitOfPrent() {
+        var id;
+        console.log("obj------->>>>", this.state.currentItemConfig);
+        // if (this.state.addNodeFlag) {
+        id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
+        // } else {
+        //     id = this.state.currentItemConfig.context.payload.nodeUnit.id;
 
+        // }
+        this.setState({
+            usageTypeParent: id
+        }, () => {
+            console.log("parent unit id===", this.state.usageTypeParent);
+        });
+    }
     getUsageTemplateList() {
         console.log(" get uasge template--------------");
         var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
+        console.log("tracerCategoryId---", tracerCategoryId);
         var forecastingUnitId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
+        console.log("forecastingUnitId---", forecastingUnitId);
         var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+        console.log("usageTypeId---", usageTypeId);
         UsageTemplateService.getUsageTemplateListForTree(tracerCategoryId, forecastingUnitId, usageTypeId).then(response => {
             this.setState({
                 usageTemplateList: response.data
-            },()=>{
-                console.log(" get uasge template--------------",response.data);
+            }, () => {
+                console.log(" get uasge template--------------", response.data);
             })
         })
             .catch(
@@ -365,8 +384,20 @@ export default class CreateTreeTemplate extends Component {
     }
 
     copyDataFromUsageTemplate(event) {
-        var usageTemplate = this.state.usageTemplateList.filter(c => c.usageTemplateId == event.target.value);
-        console.log("usageTemplate---",usageTemplate);
+        var usageTemplate = (this.state.usageTemplateList.filter(c => c.usageTemplateId == event.target.value))[0];
+        // console.log("usageTemplate---", usageTemplate);
+        const { currentItemConfig } = this.state;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths = usageTemplate.lagInMonths;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = usageTemplate.noOfPatients;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = usageTemplate.noOfForecastingUnits;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = usageTemplate.usageFrequencyCount;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod.usagePeriodId;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
+        this.setState({ currentItemConfig }, () => {
+            this.getNoOfMonthsInUsagePeriod();
+            this.getUsageText();
+        });
+
     }
 
     getNoOfMonthsInUsagePeriod() {
@@ -964,6 +995,8 @@ export default class CreateTreeTemplate extends Component {
             this.setState({
                 numberNode: true,
                 aggregationNode: true
+            }, () => {
+                this.getNodeUnitOfPrent();
             });
         }
     }
@@ -1037,6 +1070,7 @@ export default class CreateTreeTemplate extends Component {
             this.getUsageText();
         }
         if (event.target.name === "usageTypeIdFU") {
+            console.log("usage type data change function ------------------");
             if (event.target.value == 2 && currentItemConfig.context.payload.nodeType.id == 4) {
                 (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
@@ -1201,6 +1235,7 @@ export default class CreateTreeTemplate extends Component {
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.getNoOfMonthsInUsagePeriod();
+                    this.getNodeUnitOfPrent();
                 }
                 if (data.context.payload.nodeType.id > 3) {
                     // console.log("ttt--------------->",this.state.currentItemConfig);
@@ -1416,7 +1451,7 @@ export default class CreateTreeTemplate extends Component {
                                 </Input>
                             </FormGroup>
                             <FormGroup className="col-md-4">
-                                <Label htmlFor="currencyId">Copy from Template<span class="red Reqasterisk">*</span></Label>
+                                <Label htmlFor="currencyId">Copy from Template</Label>
                                 <Input
                                     type="select"
                                     name="usageTemplateId"
@@ -1494,7 +1529,7 @@ export default class CreateTreeTemplate extends Component {
                                     name="usageTypeParent"
                                     bsSize="sm"
                                     disabled={true}
-                                    value={this.state.addNodeFlag ? this.state.currentItemConfig.context.payload.nodeUnit.id : this.state.currentItemConfig.parentItem.payload.nodeUnit.id}>
+                                    value={this.state.usageTypeParent}>
 
                                     <option value=""></option>
                                     {this.state.nodeUnitList.length > 0
@@ -1915,16 +1950,16 @@ export default class CreateTreeTemplate extends Component {
                                                         {
                                                             dataValue: '',
                                                             notes: '',
-                                                            fuNode : {
-                                                                forecastingUnit : {
-                                                                    tracerCategory : {
+                                                            fuNode: {
+                                                                forecastingUnit: {
+                                                                    tracerCategory: {
 
                                                                     },
-                                                                    unit : {
-                                                                        
+                                                                    unit: {
+
                                                                     }
                                                                 },
-                                                                usageType : {
+                                                                usageType: {
 
                                                                 },
                                                                 usagePeriod: {
@@ -1941,24 +1976,27 @@ export default class CreateTreeTemplate extends Component {
                                                 label: {
                                                     label_en: (itemConfig.level != 0 ? itemConfig.payload.label.label_en : '')
                                                 },
+                                                nodeUnit: {
+                                                    id: itemConfig.payload.nodeUnit.id
+                                                },
                                                 nodeDataMap: [
                                                     [
                                                         {
                                                             dataValue: (itemConfig.payload.nodeDataMap[0])[0].dataValue,
-                                                            fuNode : {
-                                                                forecastingUnit : {
-                                                                    tracerCategory : {
-                                                                        
+                                                            fuNode: {
+                                                                forecastingUnit: {
+                                                                    tracerCategory: {
+
                                                                     },
-                                                                    unit : {
+                                                                    unit: {
 
                                                                     }
                                                                 },
-                                                                usageType : {
-                                                                    
+                                                                usageType: {
+
                                                                 },
                                                                 usagePeriod: {
-                                                                    
+
                                                                 }
                                                             }
                                                         }
