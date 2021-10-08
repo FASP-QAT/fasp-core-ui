@@ -224,7 +224,7 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
@@ -1793,11 +1793,13 @@ class EquivalancyUnit extends Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                        valid = false;
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", "yellow");
                             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+                            valid = false;
                         } else {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setComments(col, "");
