@@ -31,5 +31,10 @@ class ForecastingUnitService {
         return axios.get(`${API_URL}/api/forecastingUnit/realmId/${json}`, {}
         );
     }
+
+    getForcastingUnitListByTracerCategoryId(tracerCategoryId) {
+        return axios.get(`${API_URL}/api/forecastingUnit/tracerCategory/${tracerCategoryId}`, {}
+        );
+    }
 }
 export default new ForecastingUnitService();
