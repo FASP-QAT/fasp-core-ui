@@ -2379,7 +2379,8 @@ export default class WhatIfReportComponent extends React.Component {
                                         planningUnitIdProp = proList[0].value;
                                     }
                                     if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                        var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? {value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label} : {value:"", label: ""};
+                                        // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
                                         var planningUnitDataFilter=planningUnitDataList.filter(c=>c.planningUnitId==planningUnitIdProp);
                                     var programJson={};
                                     if (planningUnitDataFilter.length > 0) {
