@@ -2401,9 +2401,10 @@ class usageTemplate extends Component {
                         </ModalHeader>
                         <ModalBody>
                             <h6 className="red" id="div3"></h6>
-                            <div>
-                                <Row>
-                                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
+                            {/* <div> */}
+                                {/* <Row> */}
+                                    {/* <Card> */}
+                                    <Col sm={12}  style={{ flexBasis: 'auto' }}>
                                         <Card>
                                             <Formik
                                                 enableReinitialize={true}
@@ -2435,9 +2436,10 @@ class usageTemplate extends Component {
                                                     }) => (
                                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                             <CardBody>
-
-                                                                <FormGroup>
+                                                            <div className="d-md-flex">
+                                                                <FormGroup className="mt-md-2 mb-md-0">
                                                                     {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                    <div className="controls UsagePopUpInputField">
                                                                     <Input type="number"
                                                                         bsSize="sm"
                                                                         name="number1"
@@ -2450,11 +2452,13 @@ class usageTemplate extends Component {
                                                                         value={this.state.number1}
                                                                         min="1"
                                                                     />
+                                                                    </div>
                                                                     <FormFeedback className="red">{errors.number1}</FormFeedback>
                                                                 </FormGroup>
 
-                                                                <FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
                                                                     {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                    <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
                                                                         name="picker1"
@@ -2470,11 +2474,16 @@ class usageTemplate extends Component {
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {usageList}
                                                                     </Input>
+                                                                    </div>
                                                                     <FormFeedback className="red">{errors.picker1}</FormFeedback>
                                                                 </FormGroup>
+                                                                <FormGroup className="tab-ml-1 mb-md-0  " style={{marginTop:'14px'}}>
+                                                                    <span>---</span>
+                                                                </FormGroup>
 
-                                                                <FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                     {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                    <div className="controls SelectGo">
                                                                     <Input type="number"
                                                                         bsSize="sm"
                                                                         name="number2"
@@ -2488,10 +2497,12 @@ class usageTemplate extends Component {
                                                                         value={this.state.number2}
                                                                         min="1"
                                                                     />
+                                                                    </div>
                                                                     <FormFeedback className="red">{errors.number2}</FormFeedback>
                                                                 </FormGroup>
-                                                                <FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                     {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
+                                                                    <div className="controls SelectGo">
                                                                     <Input type="text"
                                                                         name="label"
                                                                         id="label"
@@ -2503,10 +2514,12 @@ class usageTemplate extends Component {
                                                                         readOnly
                                                                         value={this.state.textMessage}
                                                                         required />
+                                                                        </div>
                                                                     <FormFeedback className="red">{errors.textMessage}</FormFeedback>
                                                                 </FormGroup>
-                                                                <FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                     {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                    <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
                                                                         name="picker2"
@@ -2522,9 +2535,10 @@ class usageTemplate extends Component {
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {usageDisplayList}
                                                                     </Input>
+                                                                    </div>
                                                                     <FormFeedback className="red">{errors.picker2}</FormFeedback>
                                                                 </FormGroup>
-
+                                                                </div>
                                                             </CardBody>
 
                                                             <CardFooter>
@@ -2541,14 +2555,15 @@ class usageTemplate extends Component {
 
                                         </Card>
                                     </Col>
-                                </Row>
-                            </div>
+                                     {/* </Card> */}
+                                {/* </Row> */}
+                            {/* </div> */}
                             <br />
                         </ModalBody>
 
-                        <ModalFooter>
+                        {/* <ModalFooter>
 
-                        </ModalFooter>
+                        </ModalFooter> */}
                     </Modal>
                 </Card>
 
