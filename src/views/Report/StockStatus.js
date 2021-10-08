@@ -3252,7 +3252,7 @@ class StockStatus extends Component {
           label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#006789',
+          backgroundColor: '#49a4a1',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
