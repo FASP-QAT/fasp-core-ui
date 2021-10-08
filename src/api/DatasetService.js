@@ -6,11 +6,11 @@ class DatasetService {
         return axios.get(`${API_URL}/api/dataset/`, {
         });
     }
-    loadDataset(){
+    loadDataset() {
         return axios.get(`${API_URL}/api/loadDataset/`, {
         });
     }
-    loadMoreDatasetList(programId, page){
+    loadMoreDatasetList(programId, page) {
         return axios.get(`${API_URL}/api/loadDataset/programId/${programId}/page/${page}`, {
         });
     }
@@ -18,8 +18,8 @@ class DatasetService {
         return axios.post(`${API_URL}/api/datasetData`, json, {
         });
     }
-    getDataSetDataById(programId){
-        return axios.get(`${API_URL}/api/dataset/${programId}`,{});
+    getDataSetDataById(programId) {
+        return axios.get(`${API_URL}/api/dataset/${programId}`, {});
     }
     getTreeTemplateList() {
         return axios.get(`${API_URL}/api/treeTemplate/`, {
@@ -33,6 +33,11 @@ class DatasetService {
         return axios.get(`${API_URL}/api/nodeType`, {
         });
     }
-    
+
+    getUsageTypeList() {
+        return axios.get(`${API_URL}/api/usageType`, {
+        });
+    }
+
 }
 export default new DatasetService()
