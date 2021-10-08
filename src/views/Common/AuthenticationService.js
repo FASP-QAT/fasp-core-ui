@@ -146,6 +146,15 @@ class AuthenticationService {
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
+    getLoggedInUserRealm() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("get realm id decryptedUser---", decryptedUser);
+        // console.log(decryptedUser);
+        return decryptedUser.realm;
+    }
 
     checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
@@ -1289,6 +1298,27 @@ class AuthenticationService {
 
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (true) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree":
+                    case "/dataset/loadDeleteDataSet":
+                        case "/dataset/loadDeleteDataSet/:message":
+                    case "/dataSet/buildTree/:treeId":
+                    case "/dataSet/buildTree/":
+                    case "/dataset/createTreeTemplate/:templateId":
+                    case "/dataset/listTreeTemplate/":
+                    case "/dataSet/buildTree/:templateId":
+                    case "/dataset/listTree/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
+                            return true;
+                        }
+                        break;
+
+
+                    case "/usageTemplate/listUsageTemplate":
+                    case "/usageTemplate/listUsageTemplate/:color/:message":
                         if (true) {
                             return true;
                         }

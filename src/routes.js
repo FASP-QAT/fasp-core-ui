@@ -239,6 +239,9 @@ const UsagePeriodList = React.lazy(() => import('./views/UsagePeriod/UsagePeriod
 const ModelingTypeList = React.lazy(() => import('./views/ModelingType/ModelingTypeList'));
 const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
 const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
+const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTemplateList'));
+
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -603,5 +606,10 @@ const routes = [
 
   { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
   { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+
+  { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+  { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 export default routes;
