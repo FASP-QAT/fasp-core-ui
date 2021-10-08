@@ -51,7 +51,8 @@ let initialValuesNodeData = {
     nodeTypeId: "",
     nodeTitle: "",
     nodeUnitId: "",
-    nodeValue: ""
+    nodeValue: "",
+    percentageOfParent: ""
 }
 
 const validationSchema = function (values) {
@@ -72,7 +73,7 @@ const validationSchemaNodeData = function (values) {
         nodeUnitId: Yup.string()
             .test('nodeUnitId', 'This is required',
                 function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 2 && document.getElementById("nodeUnitId").value == "") {
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 3) && document.getElementById("nodeUnitId").value == "") {
                         return false;
                     } else {
                         return true;
@@ -81,13 +82,21 @@ const validationSchemaNodeData = function (values) {
         nodeValue: Yup.string()
             .test('nodeValue', 'This is required',
                 function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 2 && document.getElementById("nodeValue").value == "") {
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 3) && document.getElementById("nodeValue").value == "") {
                         return false;
                     } else {
                         return true;
                     }
                 }),
-
+        percentageOfParent: Yup.string()
+            .test('percentageOfParent', 'This is required',
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("percentageOfParent").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
 
     })
 }
@@ -533,7 +542,8 @@ export default class CreateTreeTemplate extends Component {
             nodeTypeId: true,
             nodeTitle: true,
             nodeUnitId: true,
-            nodeValue: true
+            nodeValue: true,
+            percentageOfParent: true
         }
         )
         this.validateFormNodeData(errors)
@@ -1351,7 +1361,7 @@ export default class CreateTreeTemplate extends Component {
                                                     valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
                                                     invalid={touched.nodeUnitId && !!errors.nodeUnitId}
                                                     onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e);this.dataChange(e) }}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeUnit.id}
                                                 >
@@ -1393,8 +1403,12 @@ export default class CreateTreeTemplate extends Component {
                                                 <Input type="text"
                                                     id="percentageOfParent"
                                                     name="percentageOfParent"
+                                                    valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
+                                                    invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                    onBlur={handleBlur}
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
+                                                <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
@@ -1405,6 +1419,7 @@ export default class CreateTreeTemplate extends Component {
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={this.state.currentItemConfig.context.level != 0 && this.state.addNodeFlag !== "true" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
                                                 ></Input>
+
                                             </FormGroup></>}
                                     {this.state.aggregationNode &&
                                         <FormGroup>
@@ -1416,9 +1431,9 @@ export default class CreateTreeTemplate extends Component {
                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
                                                 readOnly={this.state.numberNode ? true : false}
-                                                onChange={(e) => { handleChange(e);this.dataChange(e) }}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                 value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}></Input>
-                                                 <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                            <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                         </FormGroup>}
 
                                     <FormGroup>
