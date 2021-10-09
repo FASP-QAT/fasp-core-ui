@@ -615,9 +615,8 @@ class LoadDeleteDataSet extends Component {
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
                                     <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
-
-                                    <li><img width="16" title="Clean up" src={cleanUp} className="ml-1"></img>Keep latest  version of program and delete older versions.</li>
-                                    <li><i title="Delete" className="ml-1 fa fa-trash">Delete the version</i></li>
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version of program and delete older versions.</span></li>
+                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -678,7 +677,7 @@ class LoadDeleteDataSet extends Component {
                                                                                         <div className="checkbox m-0">
                                                                                             <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
                                                                                             <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
-                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1"></img>}
+                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 CleanUpIcon"></img>}
                                                                                         </div>
                                                                                     </span>
                                                                                 </span>
@@ -694,7 +693,7 @@ class LoadDeleteDataSet extends Component {
                                                                                                             <div className="checkbox m-0">
                                                                                                                 <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
                                                                                                                 <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash"></i>}
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcon"></i>}
                                                                                                             </div>
                                                                                                         </span>
                                                                                                     </span>
@@ -874,15 +873,15 @@ class LoadDeleteDataSet extends Component {
                         //     programTransaction2.delete(id);
                         // }
                         // transaction2.oncomplete = function (event) {
-                            // this.setState({
-                            //     loading: false,
-                            //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                            //     color: 'green'
-                            // }, () => {
-                            //     this.hideFirstComponent()
-                            // })
-                            this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
-                            window.location.reload();
+                        // this.setState({
+                        //     loading: false,
+                        //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                        //     color: 'green'
+                        // }, () => {
+                        //     this.hideFirstComponent()
+                        // })
+                        this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+                        window.location.reload();
                         // }.bind(this)
                     }.bind(this)
                 }.bind(this)
@@ -933,15 +932,15 @@ class LoadDeleteDataSet extends Component {
                                     //     programTransaction2.delete(id);
                                     // }
                                     // transaction2.oncomplete = function (event) {
-                                        this.setState({
-                                            loading: false,
-                                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                                            color: 'green'
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        })
-                                        this.getPrograms();
-                                        this.getLocalPrograms();
+                                    this.setState({
+                                        loading: false,
+                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        color: 'green'
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    this.getPrograms();
+                                    this.getLocalPrograms();
                                     // }.bind(this)
                                 }.bind(this)
                             }.bind(this)
@@ -1000,15 +999,15 @@ class LoadDeleteDataSet extends Component {
                                     // var programTransaction2 = transaction2.objectStore('programQPLDetails');
                                     // var deleteRequest2 = programTransaction2.delete(id);
                                     // deleteRequest2.onsuccess = function (event) {
-                                        this.setState({
-                                            loading: false,
-                                            message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                                            color: 'green'
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        })
-                                        this.getPrograms();
-                                        this.getLocalPrograms();
+                                    this.setState({
+                                        loading: false,
+                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        color: 'green'
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    this.getPrograms();
+                                    this.getLocalPrograms();
 
                                     // }.bind(this)
                                 }.bind(this)
@@ -1123,7 +1122,7 @@ class LoadDeleteDataSet extends Component {
                 console.log(">>>", checkboxesChecked)
                 DatasetService.getAllDatasetData(checkboxesChecked)
                     .then(response => {
-                        console.log("response>>>",response.data);
+                        console.log("response>>>", response.data);
                         var json = response.data;
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
@@ -1227,20 +1226,20 @@ class LoadDeleteDataSet extends Component {
                                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                                         }
-                                                        
-                                                            this.setState({
-                                                                message: 'static.program.downloadsuccess',
-                                                                color: 'green',
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideFirstComponent()
-                                                            })
-                                                            // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                            this.setState({ loading: false })
-                                                            // this.refs.programListChild.checkNewerVersions();
-                                                            this.getPrograms();
-                                                            this.getLocalPrograms();
-                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+
+                                                        this.setState({
+                                                            message: 'static.program.downloadsuccess',
+                                                            color: 'green',
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideFirstComponent()
+                                                        })
+                                                        // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                        this.setState({ loading: false })
+                                                        // this.refs.programListChild.checkNewerVersions();
+                                                        this.getPrograms();
+                                                        this.getLocalPrograms();
+                                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                                         // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                         //     // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                         //     // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
@@ -1273,7 +1272,7 @@ class LoadDeleteDataSet extends Component {
                                                         //         this.getPrograms();
                                                         //         this.getLocalPrograms();
                                                         //         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
-                                                            // }.bind(this)
+                                                        // }.bind(this)
                                                         // }.bind(this)
                                                     }.bind(this)
                                                 }
@@ -1345,40 +1344,40 @@ class LoadDeleteDataSet extends Component {
                                             };
                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                             var putRequest = downloadedProgramSaveData.put(item);
-                                            
+
                                         }
                                         // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                            // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                            // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                            // var programIds = []
-                                            // for (var r = 0; r < json.length; r++) {
-                                            //     var programQPLDetailsJson = {
-                                            //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                            //         programId: json[r].programId,
-                                            //         version: json[r].currentVersion.versionId,
-                                            //         userId: userId,
-                                            //         programCode: json[r].programCode,
-                                            //         openCount: 0,
-                                            //         addressedCount: 0,
-                                            //         programModified: 0
-                                            //     };
-                                                // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                // var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                            // }
-                                            // programQPLDetailsTransaction.oncomplete = function (event) {
-                                                this.setState({
-                                                    message: 'static.program.downloadsuccess',
-                                                    color: 'green',
-                                                    loading: false
-                                                })
-                                                this.hideFirstComponent();
-                                                // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
-                                                this.setState({ loading: false })
-                                                // this.refs.programListChild.checkNewerVersions();
-                                                this.getPrograms();
-                                                this.getLocalPrograms();
-                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
-                                            // }.bind(this)
+                                        // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                        // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                        // var programIds = []
+                                        // for (var r = 0; r < json.length; r++) {
+                                        //     var programQPLDetailsJson = {
+                                        //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                        //         programId: json[r].programId,
+                                        //         version: json[r].currentVersion.versionId,
+                                        //         userId: userId,
+                                        //         programCode: json[r].programCode,
+                                        //         openCount: 0,
+                                        //         addressedCount: 0,
+                                        //         programModified: 0
+                                        //     };
+                                        // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                        // var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                        // }
+                                        // programQPLDetailsTransaction.oncomplete = function (event) {
+                                        this.setState({
+                                            message: 'static.program.downloadsuccess',
+                                            color: 'green',
+                                            loading: false
+                                        })
+                                        this.hideFirstComponent();
+                                        // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                        this.setState({ loading: false })
+                                        // this.refs.programListChild.checkNewerVersions();
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
+                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                        // }.bind(this)
                                         // }.bind(this)
                                     }.bind(this)
                                 }
