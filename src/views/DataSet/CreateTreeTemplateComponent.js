@@ -93,13 +93,13 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: (itemConfig.payload.nodeType.id == 4 ? Colors.Yellow : itemConfig.payload.nodeType.id == 5 ? Colors.Black : Colors.White), borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
             {/* <div className="ContactPhone">{itemConfig.payload.label.label_en}</div> */}
-            <div className="ContactPhone">{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black) }}>{getPayloadData(itemConfig)}</div>
             {/* <div className="ContactPhone">{itemConfig.nodeValue.value}</div> */}
         </div>
     ))
