@@ -1612,7 +1612,11 @@ class usageTemplate extends Component {
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -2483,7 +2487,7 @@ class usageTemplate extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
+                {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
@@ -2491,7 +2495,7 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-
+                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
