@@ -720,8 +720,10 @@ class usageTemplate extends Component {
                 data[16] = (papuList[j].oneTimeUsage == false ? "time(s) per" : "")
                 data[17] = (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.usagePeriodId : '')
 
+                let VLookUp = (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : '');
                 // data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${(papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : 1)},2)` : "")//hidden
-                data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? (papuList[j].usageFrequencyUsagePeriod.convertToMonth).toFixed(2) : 1 : "")//hidden
+                // data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? (papuList[j].usageFrequencyUsagePeriod.convertToMonth).toFixed(2) : 1 : "")//hidden
+                data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${VLookUp},2)` != null ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${VLookUp},2)` : '' : "")//hidden
 
                 data[19] = (papuList[j].usageType.id == 1 && papuList[j].oneTimeUsage == false ? 'for' : '')
                 data[20] = (papuList[j].repeatCount == null ? '' : papuList[j].repeatCount);
@@ -730,11 +732,11 @@ class usageTemplate extends Component {
 
 
                 let usagePeriodConversion = (papuList[j].repeatUsagePeriod != null ? papuList[j].repeatUsagePeriod.convertToMonth : 1);
-                let v14 = (papuList[j].repeatCount == null ? 1 : papuList[j].repeatCount);
+                let v14 = (papuList[j].repeatCount == null ? '' : papuList[j].repeatCount);
                 let t14 = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : 1 : 1)
                 // data[22] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
 
-                data[22] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
+                data[22] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*S${parseInt(j) + 1},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
 
 
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
