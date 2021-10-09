@@ -603,7 +603,8 @@ class UsagePeriod extends Component {
             var col = ("C").concat(parseInt(y) + 1);
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
-            var reg = /^\d{1,5}(\.\d{1,4})?$/;
+            // var reg = /^\d{1,5}(\.\d{1,4})?$/;
+            var reg = /^\d{1,5}(\.\d{1,8})?$/;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -613,7 +614,7 @@ class UsagePeriod extends Component {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTest'));
+                    this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
                 } else {
                     if (isNaN(Number.parseInt(value)) || value <= 0) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -672,7 +673,7 @@ class UsagePeriod extends Component {
                 //conversion factor decimal 9,4
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = /^\d{1,5}(\.\d{1,4})?$/;
+                var reg = /^\d{1,5}(\.\d{1,8})?$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -682,7 +683,7 @@ class UsagePeriod extends Component {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTest'));
+                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");

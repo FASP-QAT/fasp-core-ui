@@ -273,16 +273,17 @@ class usageTemplate extends Component {
                     for (var r = 0; r < roleList.length; r++) {
                         roleArray.push(roleList[r].roleId)
                     }
-                    if (roleArray.includes('ROLE_REALM_ADMIN')) {
-                        tempProgramList.unshift({
-                            name: 'All',
-                            id: -1,
-                            active: true,
-                        });
-                    }
+
+                    tempProgramList.unshift({
+                        name: 'All',
+                        id: -1,
+                        active: true,
+                    });
+
 
                     this.setState({
                         typeList: tempProgramList,
+                        roleArray: roleArray
                         // loading: false
                     }, () => {
                         // console.log("PROGRAM---------->111", this.state.typeList) 
@@ -759,6 +760,7 @@ class usageTemplate extends Component {
                 // data[23] = `=ROUND(F${parseInt(j) + 1},0)`
                 data[24] = 0;
                 data[25] = 0;
+                data[26] = (papuList[j].program == null ? -1 : papuList[j].program.id)
 
 
 
@@ -804,6 +806,7 @@ class usageTemplate extends Component {
             data[23] = "";
             data[24] = 1;
             data[25] = 1;
+            data[26] = 0;
             papuDataArr[0] = data;
         }
 
@@ -826,7 +829,8 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
-                    source: this.state.typeList, //1
+                    source: this.state.typeList,
+                    filter: this.filterDataset //1
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
@@ -932,7 +936,7 @@ class usageTemplate extends Component {
                     textEditor: true, //18
                 },
                 {
-                    // title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),//empty for
+                    title: ' ',//empty for
                     type: 'text',
                     readOnly: true,
                     textEditor: true, //19
@@ -967,8 +971,12 @@ class usageTemplate extends Component {
                 },
                 {
                     title: 'addNewRow',
-                    type: 'hidden'
-                }
+                    type: 'hidden'//25
+                },
+                {
+                    title: 'typeId',
+                    type: 'hidden'//26
+                },
 
 
 
@@ -1071,7 +1079,7 @@ class usageTemplate extends Component {
                     // for (var r = 0; r < roleList.length; r++) {
                     //     roleArray.push(roleList[r].roleId)
                     // }
-                    // var typeId = rowData[1];
+                    // var typeId = rowData[26];
 
                     // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                     //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
@@ -1219,6 +1227,26 @@ class usageTemplate extends Component {
         })
     }
 
+    filterDataset = function (instance, cell, c, r, source) {
+        // var mylist = [];
+        // var mylist = (instance.jexcel.getJson(null, false)[r])[5];
+        // if (value > 0) {
+        //     mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
+        // }
+        // console.log("myList--------->1", value);
+        // console.log("myList--------->2", mylist);
+        // console.log("myList--------->3", this.state.forecastingUnitList);
+        var mylist = this.state.typeList;
+        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
+            mylist.splice(0, 1);
+        }
+        return mylist.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+    }.bind(this)
+
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[3];
@@ -1304,6 +1332,7 @@ class usageTemplate extends Component {
         UsageTemplateService.getUsageTemplateListAll().then(response => {
             if (response.status == 200) {
                 console.log("response.data---->", response.data)
+                console.log("response.data---->", response.data.filter(c => c.usageTemplateId == 26));
 
                 // var listArray = response.data;
                 // listArray.sort((a, b) => {
@@ -1431,6 +1460,7 @@ class usageTemplate extends Component {
         data[23] = "";
         data[24] = 1;
         data[25] = 1;
+        data[26] = 0;
 
         this.el.insertRow(
             data, 0, 1
@@ -2479,12 +2509,14 @@ class usageTemplate extends Component {
                         </Col>
                     </CardBody>
                     <CardFooter>
-                        <FormGroup>
-                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                            &nbsp;
-                        </FormGroup>
+                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                            <FormGroup>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                &nbsp;
+                            </FormGroup>
+                        }
                     </CardFooter>
 
 
@@ -2636,12 +2668,14 @@ class usageTemplate extends Component {
                                                     </CardBody>
 
                                                     <CardFooter>
-                                                        <FormGroup>
-                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                            &nbsp;
+                                                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                                                            <FormGroup>
+                                                                <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                                &nbsp;
 
-                                                        </FormGroup>
+                                                            </FormGroup>
+                                                        }
                                                     </CardFooter>
                                                 </Form>
 

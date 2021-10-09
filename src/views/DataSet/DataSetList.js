@@ -259,7 +259,7 @@ export default class ProgramList extends Component {
             // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
                 this.props.history.push({
-                    pathname: `/dataSet/editDataSet/${this.el.getValueFromCoords(0, x)}`,
+                    pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
                     // pathname: `/demographic/scenarioOne`,
                 });
             }
@@ -594,7 +594,7 @@ export default class ProgramList extends Component {
 
     addNewProgram() {
         this.props.history.push({
-            pathname: "/dataSet/addDataSet"
+            pathname: "/dataset/addDataSet"
         });
     }
     

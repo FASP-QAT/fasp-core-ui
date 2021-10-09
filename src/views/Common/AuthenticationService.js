@@ -1320,23 +1320,23 @@ class AuthenticationService {
 
                     case "/usageTemplate/listUsageTemplate":
                     case "/usageTemplate/listUsageTemplate/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
                             return true;
                         }
                         break;
 
-                    case "/dataSet/addDataSet":
+                    case "/dataset/addDataSet":
                         if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
                             return true;
                         }
                         break;
-                    case "/dataSet/editDataSet/:dataSetId":
+                    case "/dataset/editDataSet/:dataSetId":
                         if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
                             return true;
                         }
                         break;
-                    case "/dataSet/listDataSet":
-                    case "/dataSet/listDataSet/:color/:message":
+                    case "/dataset/listDataSet":
+                    case "/dataset/listDataSet/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
                             return true;
                         }
