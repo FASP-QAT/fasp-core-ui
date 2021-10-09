@@ -28,6 +28,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import UsagePeriodService from '../../api/UsagePeriodService.js';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -159,6 +160,8 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            converionFactor: '',
+            planningUnitList: [],
             noFURequired: '',
             usageTypeParent: '',
             usageTemplateList: [],
@@ -216,6 +219,11 @@ export default class CreateTreeTemplate extends Component {
                                         forecastingUnit: {
                                             id: ''
                                         }
+                                    },
+                                    puNode: {
+                                        planningUnit: {
+
+                                        }
                                     }
                                 }
                             ]
@@ -226,7 +234,18 @@ export default class CreateTreeTemplate extends Component {
                     payload: {
                         label: {
 
-                        }
+                        },
+                        nodeDataMap: [
+                            [
+                                {
+                                    puNode: {
+                                        planningUnit: {
+                                            id: ''
+                                        }
+                                    }
+                                }
+                            ]
+                        ]
                     }
                 }
             },
@@ -260,7 +279,61 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeUnitOfPrent = this.getNodeUnitOfPrent.bind(this);
         this.getNoOfFUPatient = this.getNoOfFUPatient.bind(this);
         this.getForecastingUnitUnitByFUId = this.getForecastingUnitUnitByFUId.bind(this);
+        this.getPlanningUnitListByFUId = this.getPlanningUnitListByFUId.bind(this);
     }
+
+    getPlanningUnitListByFUId(forecastingUnitId) {
+        console.log("forecastingUnitId---", forecastingUnitId);
+        PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
+            console.log("response---", response.data)
+            this.setState({
+                planningUnitList: response.data
+            }, () => {
+                console.log(" get uasge template--------------", response.data);
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
     getForecastingUnitUnitByFUId(forecastingUnitId) {
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId))[0];
@@ -868,9 +941,10 @@ export default class CreateTreeTemplate extends Component {
             );
         if (this.props.match.params.templateId != -1) {
             DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+                console.log("my tree---", response.data);
                 this.setState({
                     treeTemplate: response.data,
-                    items: response.data.tree.flatList,
+                    items: response.data.flatList,
                     loading: false
                 }, () => {
                     console.log("Tree Template---", this.state.items);
@@ -1110,6 +1184,15 @@ export default class CreateTreeTemplate extends Component {
             this.getUsageTemplateList();
         }
 
+        if (event.target.name === "planningUnitId") {
+            var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == event.target.value))[0];
+            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
+            this.setState({
+                conversionFactor: pu.multiplier
+            });
+        }
+
+
         this.setState({ currentItemConfig });
     }
     onAddButtonClick(itemConfig) {
@@ -1268,11 +1351,9 @@ export default class CreateTreeTemplate extends Component {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
-                }
-                if (data.context.payload.nodeType.id > 3) {
-                    // console.log("ttt--------------->",this.state.currentItemConfig);
-                    // document.getElementById('usageTypeParent').value = this.state.currentItemConfig.parentItem.payload.nodeUnit.id
-                    // this.getUsageText();
+                } else if (data.context.payload.nodeType.id == 5) {
+                    console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                 }
             })
         }
@@ -1501,6 +1582,75 @@ export default class CreateTreeTemplate extends Component {
                                         disabled="true"
                                         onChange={(e) => { this.dataChange(e) }}
                                         value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.nodeUnitList.length > 0
+                                            && this.state.nodeUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.unitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Planning unit<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="select"
+                                        id="planningUnitId"
+                                        name="planningUnitId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.planningUnitList.length > 0
+                                            && this.state.planningUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.planningUnitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="text"
+                                        id="conversionFactor"
+                                        name="conversionFactor"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={this.state.conversionFactor}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId"># of PU / month /<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="text"
+                                        id="conversionFactor"
+                                        name="conversionFactor"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="select"
+                                        id="planningUnitUnitPU"
+                                        name="planningUnitUnitPU"
+                                        bsSize="sm"
+                                        disabled="true"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id}>
 
                                         <option value=""></option>
                                         {this.state.nodeUnitList.length > 0
@@ -2187,6 +2337,13 @@ export default class CreateTreeTemplate extends Component {
                                                                 repeatUsagePeriod: {
 
                                                                 }
+                                                            },
+                                                            puNode: {
+                                                                planningUnit: {
+                                                                    unit: {
+
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     ]
@@ -2228,6 +2385,13 @@ export default class CreateTreeTemplate extends Component {
                                                                 repeatUsagePeriod: {
 
                                                                 }
+                                                            },
+                                                            puNode: {
+                                                                planningUnit: {
+                                                                    unit: {
+
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     ]
@@ -2239,6 +2403,10 @@ export default class CreateTreeTemplate extends Component {
                                 }, () => {
                                     console.log("add click config---", this.state.currentItemConfig);
                                     console.log("add click nodeflag---", this.state.addNodeFlag);
+                                    if (itemConfig.payload.nodeType.id == 4) {
+                                        console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                        this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                    }
                                 });
                                 // this.onAddButtonClick(itemConfig);
                             }}>
