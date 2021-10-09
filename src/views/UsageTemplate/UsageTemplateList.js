@@ -720,19 +720,20 @@ class usageTemplate extends Component {
                 data[17] = (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.usagePeriodId : '')
 
                 // data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${(papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : 1)},2)` : "")//hidden
-                data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : 1 : "")//hidden
+                data[18] = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? (papuList[j].usageFrequencyUsagePeriod.convertToMonth).toFixed(2) : 1 : "")//hidden
 
-                data[19] = (papuList[j].usageType.id == 2 && papuList[j].oneTimeUsage == false ? 'for' : '')
+                data[19] = (papuList[j].usageType.id == 1 && papuList[j].oneTimeUsage == false ? 'for' : '')
                 data[20] = (papuList[j].repeatCount == null ? '' : papuList[j].repeatCount);
-                data[21] = (papuList[j].repeatUsagePeriod != null ? (papuList[j].usageType.id == 1 ? -1 : papuList[j].repeatUsagePeriod.usagePeriodId) : '')
+                // data[21] = (papuList[j].repeatUsagePeriod != null ? (papuList[j].usageType.id == 2 ? -1 : papuList[j].repeatUsagePeriod.usagePeriodId) : '')
+                data[21] = (papuList[j].usageType.id == 2 ? -1 : (papuList[j].repeatUsagePeriod != null ? papuList[j].repeatUsagePeriod.usagePeriodId : ''))
 
 
                 let usagePeriodConversion = (papuList[j].repeatUsagePeriod != null ? papuList[j].repeatUsagePeriod.convertToMonth : 1);
                 let v14 = (papuList[j].repeatCount == null ? 1 : papuList[j].repeatCount);
                 let t14 = (papuList[j].oneTimeUsage == false ? `=ROUND(P${parseInt(j) + 1}*N${parseInt(j) + 1}* ${papuList[j].usageFrequencyUsagePeriod},2)` != null ? papuList[j].usageFrequencyUsagePeriod.convertToMonth : 1 : 1)
-                // data[22] = (papuList[j].usageType.id == 2 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
+                // data[22] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
 
-                data[22] = (papuList[j].usageType.id == 2 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
+                data[22] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v14}/${usagePeriodConversion}*${t14},2)` : `=ROUND(N${parseInt(j) + 1},2)`) : '')
 
 
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
@@ -742,10 +743,10 @@ class usageTemplate extends Component {
                 if (!papuList[j].oneTimeUsage) { //one time usage false
                     string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
 
-                    if (papuList[j].usageType.id == 1) {
+                    if (papuList[j].usageType.id == 2) {
                         string += " indefinitely";
                     } else {
-                        string += " " + (papuList[j].usageType.id == 2 && papuList[j].oneTimeUsage == false ? 'for ' : '') + (papuList[j].repeatCount == null ? '' : ' ' + papuList[j].repeatCount) + " " + (papuList[j].repeatUsagePeriod != null ? papuList[j].repeatUsagePeriod.label.label_en : '');
+                        string += " " + (papuList[j].usageType.id == 1 && papuList[j].oneTimeUsage == false ? 'for ' : '') + (papuList[j].repeatCount == null ? '' : ' ' + papuList[j].repeatCount) + " " + (papuList[j].repeatUsagePeriod != null ? papuList[j].repeatUsagePeriod.label.label_en : '');
                     }
                 }
 
@@ -757,6 +758,7 @@ class usageTemplate extends Component {
                 // data[23] = `=IF(G${parseInt(j) + 1}="Continuous",CONCAT(H${parseInt(j) + 1}," ",I${parseInt(j) + 1}," ",J${parseInt(j) + 1}," - ",K${parseInt(j) + 1}," ",L${parseInt(j) + 1}," ",M${parseInt(j) + 1}," ",IF(MOD(P${parseInt(j) + 1},1)=0,TEXT(P${parseInt(j) + 1},"0"), TEXT(P${parseInt(j) + 1},"#.##")),", ",Q${parseInt(j) + 1}, " ", R${parseInt(j) + 1}, " indefinitely"),CONCAT(H${parseInt(j) + 1}," ",I${parseInt(j) + 1}," ",J${parseInt(j) + 1}, " - requires ",L${parseInt(j) + 1}," ",M${parseInt(j) + 1},", ", P${parseInt(j) + 1}," ",Q${parseInt(j) + 1}," ",R${parseInt(j) + 1}," ",T${parseInt(j) + 1}," ",U${parseInt(j) + 1}," ",V${parseInt(j) + 1}))`
                 // data[23] = `=ROUND(F${parseInt(j) + 1},0)`
                 data[24] = 0;
+                data[25] = 0;
 
 
 
@@ -801,6 +803,7 @@ class usageTemplate extends Component {
 
             data[23] = "";
             data[24] = 1;
+            data[25] = 1;
             papuDataArr[0] = data;
         }
 
@@ -851,8 +854,8 @@ class usageTemplate extends Component {
                     title: i18n.t('static.supplyPlan.type'),
                     type: 'dropdown',
                     source: [
-                        { id: 1, name: i18n.t('static.usageTemplate.continuous') },
-                        { id: 2, name: i18n.t('static.usageTemplate.discrete') }
+                        { id: 1, name: i18n.t('static.usageTemplate.discrete') },
+                        { id: 2, name: i18n.t('static.usageTemplate.continuous') }
                     ] //6
                 },
                 {
@@ -962,6 +965,10 @@ class usageTemplate extends Component {
                     title: 'isChange',
                     type: 'hidden' //24
                 },
+                {
+                    title: 'addNewRow',
+                    type: 'hidden'
+                }
 
 
 
@@ -983,11 +990,22 @@ class usageTemplate extends Component {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
 
+
+                    // var addRowId = rowData[25];
+                    // // console.log("addRowId------>", addRowId);
+                    // if (addRowId == 0) {//usage template grade out
+                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                    //     cell1.classList.add('readonly');
+                    // } else {
+                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                    //     cell1.classList.remove('readonly');
+                    // }
+
                     var typeId = rowData[6];
                     var oneTimeUsage = rowData[14];
 
 
-                    if (typeId == 1) {
+                    if (typeId == 2) {
                         var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
@@ -1011,7 +1029,7 @@ class usageTemplate extends Component {
                         cell1.classList.remove('readonly');
                     }
 
-                    if (typeId == 2 && oneTimeUsage == false) {
+                    if (typeId == 1 && oneTimeUsage == false) {
                         // elInstance.setValueFromCoords(19, y, 'for', true);
                         var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
@@ -1399,7 +1417,7 @@ class usageTemplate extends Component {
         data[14] = "";
 
         data[15] = ""
-        data[16] = "";
+        data[16] = "time(s) per";
         data[17] = "";
 
         data[18] = "";
@@ -1412,6 +1430,7 @@ class usageTemplate extends Component {
 
         data[23] = "";
         data[24] = 1;
+        data[25] = 1;
 
         this.el.insertRow(
             data, 0, 1
@@ -1461,10 +1480,11 @@ class usageTemplate extends Component {
                         noOfPatients: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         noOfForecastingUnits: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         oneTimeUsage: map1.get("14"),
-                        usageFrequencyUsagePeriod: { id: parseInt(map1.get("17")) },
+                        usageFrequencyUsagePeriod: { usagePeriodId: parseInt(map1.get("17")) },
                         usageFrequencyCount: this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        repeatUsagePeriod: { id: parseInt(map1.get("21")) },
+                        repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("21")) == -1 ? null : parseInt(map1.get("21"))) },
                         repeatCount: this.el.getValue(`U${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        active: true
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -1524,8 +1544,8 @@ class usageTemplate extends Component {
                                 case 404:
                                 case 406:
                                     this.setState({
-                                        // message: error.response.data.messageCode,
-                                        message: i18n.t('static.region.duplicateGLN'),
+                                        message: error.response.data.messageCode,
+                                        // message: i18n.t('static.region.duplicateGLN'),
                                         color: "red", loading: false
                                     },
                                         () => {
@@ -1566,7 +1586,7 @@ class usageTemplate extends Component {
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
-
+        console.log("onchange------------------>", value);
         // //Dataset
         // if (x == 1) {
         //     var budgetRegx = /^\S+(?: \S+)*$/;
@@ -1620,13 +1640,14 @@ class usageTemplate extends Component {
 
                 this.el.setValueFromCoords(16, y, 'time(s) per', true);
 
-                let selectedUTID = this.el.getValueFromCoords(17, y);
-                let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
-                if (usagePeriodObj != undefined && usagePeriodObj != null) {
-                    this.el.setValueFromCoords(18, y, `=ROUND(P${parseInt(y) + 1}*N${parseInt(y) + 1}* ${(usagePeriodObj.convertToMonth)},2)`, true);
-                }
+                // let selectedUTID = this.el.getValueFromCoords(17, y);
+                // let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
+                // if (usagePeriodObj != undefined && usagePeriodObj != null) {
+                //     this.el.setValueFromCoords(18, y, `=ROUND(P${parseInt(y) + 1}*N${parseInt(y) + 1}* ${(usagePeriodObj.convertToMonth)},2)`, true);
+                // }
 
                 this.el.setValueFromCoords(22, y, '', true);
+
 
                 this.el.setValueFromCoords(15, y, '', true);
                 this.el.setValueFromCoords(17, y, '', true);
@@ -1653,10 +1674,19 @@ class usageTemplate extends Component {
             }
         }
 
+        if ((x == 15 || x == 17) && !this.el.getValueFromCoords(14, y)) {
+            let selectedUTID = this.el.getValueFromCoords(17, y);
+            let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
+            if (usagePeriodObj != undefined && usagePeriodObj != null) {
+                this.el.setValueFromCoords(18, y, `=ROUND(P${parseInt(y) + 1}*N${parseInt(y) + 1}* ${(usagePeriodObj.convertToMonth)},2)`, true);
+                // this.el.setValueFromCoords(18, y, this.el.getValueFromCoords(15, y)*this.el.getValueFromCoords(13, y)*usagePeriodObj.convertToMonth, true);
+            }
+        }
+
         if (x == 6 || x == 14) {
             let selectedTypeID = this.el.getValueFromCoords(6, y);
             let selectedTOneTimeUsageID = this.el.getValueFromCoords(14, y);
-            if (selectedTypeID == 2 && !selectedTOneTimeUsageID) {
+            if (selectedTypeID == 1 && !selectedTOneTimeUsageID) {
                 this.el.setValueFromCoords(19, y, 'for', true);
             } else {
                 this.el.setValueFromCoords(19, y, '', true);
@@ -1664,7 +1694,7 @@ class usageTemplate extends Component {
         }
 
         if (x == 6) {
-            if (value == 1) {//continuious
+            if (value == 2) {//continuious
 
                 this.el.setValueFromCoords(22, y, '', true);
                 this.el.setValueFromCoords(8, y, 1, true);
@@ -1677,6 +1707,9 @@ class usageTemplate extends Component {
                 this.el.setComments(col, "");
                 var col = ("V").concat(parseInt(y) + 1);
                 this.el.setComments(col, "");
+
+                this.el.setValueFromCoords(16, y, 'time(s) per', true);
+                this.el.setValueFromCoords(14, y, false, true);
 
 
 
@@ -1701,22 +1734,51 @@ class usageTemplate extends Component {
             } else {//discrete
                 this.el.setValueFromCoords(21, y, '', true);
                 this.el.setValueFromCoords(8, y, '', true);
+                this.el.setValueFromCoords(16, y, '', true);
+                this.el.setValueFromCoords(22, y, '', true);
 
-                let v14 = (this.el.getValue(`U${parseInt(y) + 1}`, true) == null || this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`U${parseInt(y) + 1}`, true));
-                let VLookUp = 1;
-                let t14 = (this.el.getValue(`S${parseInt(y) + 1}`, true) == null || this.el.getValue(`S${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`S${parseInt(y) + 1}`, true));
-                let o14 = (this.el.getValue(`N${parseInt(y) + 1}`, true) == null || this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`N${parseInt(y) + 1}`, true));
-                let selectedOneTimeUsageID = this.el.getValueFromCoords(14, y);
-
-                let selectedUTID = this.el.getValueFromCoords(21, y);
-                let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
-                if (usagePeriodObj != undefined && usagePeriodObj != null) {
-                    VLookUp = usagePeriodObj.convertToMonth;
+                if (!this.el.getValueFromCoords(14, y)) {
+                    this.el.setValueFromCoords(16, y, 'time(s) per', true);
                 }
 
-                let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
-                this.el.setValueFromCoords(22, y, string, true);
+                // let v14 = (this.el.getValue(`U${parseInt(y) + 1}`, true) == null || this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`U${parseInt(y) + 1}`, true));
+                // let VLookUp = 1;
+                // let t14 = (this.el.getValue(`S${parseInt(y) + 1}`, true) == null || this.el.getValue(`S${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`S${parseInt(y) + 1}`, true));
+                // let o14 = (this.el.getValue(`N${parseInt(y) + 1}`, true) == null || this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? 1 : this.el.getValue(`N${parseInt(y) + 1}`, true));
+                // let selectedOneTimeUsageID = this.el.getValueFromCoords(14, y);
+
+                // let selectedUTID = this.el.getValueFromCoords(21, y);
+                // let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
+                // if (usagePeriodObj != undefined && usagePeriodObj != null) {
+                //     VLookUp = usagePeriodObj.convertToMonth;
+                // }
+
+                // let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
+                // this.el.setValueFromCoords(22, y, string, true);
             }
+        }
+
+        if ((x == 18 || x == 20 || x == 21) && this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(14, y)) {
+            let v14 = (this.el.getValue(`U${parseInt(y) + 1}`, true) == null || this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? '' : this.el.getValue(`U${parseInt(y) + 1}`, true));
+            let VLookUp = '';
+            let t14 = (this.el.getValue(`S${parseInt(y) + 1}`, true) == null || this.el.getValue(`S${parseInt(y) + 1}`, true) == '' ? '' : this.el.getValue(`S${parseInt(y) + 1}`, true));
+            let o14 = (this.el.getValue(`N${parseInt(y) + 1}`, true) == null || this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '' : this.el.getValue(`N${parseInt(y) + 1}`, true));
+            let selectedOneTimeUsageID = this.el.getValueFromCoords(14, y);
+
+            let selectedUTID = this.el.getValueFromCoords(21, y);
+            let usagePeriodObj = this.state.usagePeriodList.filter(c => c.id == selectedUTID)[0];
+            if (usagePeriodObj != undefined && usagePeriodObj != null) {
+                VLookUp = usagePeriodObj.convertToMonth;
+            }
+
+            let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
+            if (v14 != null && v14 != '' && VLookUp != null && VLookUp != '') {
+                // this.el.setValueFromCoords(22, y, parseFloat(string).toFixed(2), true);
+                this.el.setValueFromCoords(22, y, `=ROUND(${parseFloat(string)},2)`, true);
+            } else {
+                this.el.setValueFromCoords(22, y, '', true);
+            }
+
         }
 
         if (x == 4) {
@@ -1736,7 +1798,7 @@ class usageTemplate extends Component {
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
                 string += " " + this.el.getValue(`P${parseInt(y) + 1}`, true) + " " + this.el.getValue(`Q${parseInt(y) + 1}`, true) + " " + this.el.getValue(`R${parseInt(y) + 1}`, true);
-                if (this.el.getValueFromCoords(6, y) == 1) {
+                if (this.el.getValueFromCoords(6, y) == 2) {
                     string += " " + this.el.getValue(`V${parseInt(y) + 1}`, true);
                 } else {
                     string += " " + this.el.getValue(`T${parseInt(y) + 1}`, true) + " " + this.el.getValue(`U${parseInt(y) + 1}`, true) + " " + this.el.getValue(`V${parseInt(y) + 1}`, true);
@@ -1892,7 +1954,7 @@ class usageTemplate extends Component {
         //#People
         if (x == 8) {
             let selectedTypeID = this.el.getValueFromCoords(6, y);
-            if (selectedTypeID == 2) {
+            if (selectedTypeID == 1) {
                 var col = ("I").concat(parseInt(y) + 1);
                 value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = DECIMAL_NO_REGEX;
@@ -1993,7 +2055,11 @@ class usageTemplate extends Component {
             let onTimeUsage = this.el.getValueFromCoords(14, y);
 
             if (!onTimeUsage) {//false
-                this.el.setValueFromCoords(21, y, '', true);
+                if (this.el.getValueFromCoords(6, y) == 1) {
+                    this.el.setValueFromCoords(21, y, '', true);
+                }
+
+
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("R").concat(parseInt(y) + 1);
                 if (value == "") {
@@ -2013,10 +2079,38 @@ class usageTemplate extends Component {
             }
         }
 
+        if (x == 6 && this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(14, y)) {
+            var col = ("U").concat(parseInt(y) + 1);
+            value = this.el.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = DECIMAL_NO_REGEX;
+            var reg = INTEGER_NO_REGEX;
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
+                } else {
+                    if (isNaN(Number.parseInt(value)) || value <= 0) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+        }
+
         if (x == 20) {
             let onTimeUsage = this.el.getValueFromCoords(14, y);
             let typeId = this.el.getValueFromCoords(6, y);
-            if (!onTimeUsage && typeId == 2) {
+            if (!onTimeUsage && typeId == 1) {
                 var col = ("U").concat(parseInt(y) + 1);
                 value = this.el.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = DECIMAL_NO_REGEX;
@@ -2048,7 +2142,7 @@ class usageTemplate extends Component {
         if (x == 21) {
             let onTimeUsage = this.el.getValueFromCoords(14, y);
             let typeId = this.el.getValueFromCoords(6, y);
-            if (!onTimeUsage && typeId == 2) {
+            if (!onTimeUsage && typeId == 1) {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("V").concat(parseInt(y) + 1);
                 if (value == "") {
@@ -2182,7 +2276,7 @@ class usageTemplate extends Component {
                 }
 
                 //# People
-                if (this.el.getValueFromCoords(6, y) == 2) {
+                if (this.el.getValueFromCoords(6, y) == 1) {
                     var col = ("I").concat(parseInt(y) + 1);
                     var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     var reg = INTEGER_NO_REGEX;
@@ -2285,7 +2379,7 @@ class usageTemplate extends Component {
                 }
 
 
-                if (!this.el.getValueFromCoords(14, y) && this.el.getValueFromCoords(6, y) == 2) {
+                if (!this.el.getValueFromCoords(14, y) && this.el.getValueFromCoords(6, y) == 1) {
 
                     // #Usage Period
                     var col = ("U").concat(parseInt(y) + 1);
@@ -2402,44 +2496,44 @@ class usageTemplate extends Component {
                         <ModalBody>
                             <h6 className="red" id="div3"></h6>
                             {/* <div> */}
-                                {/* <Row> */}
-                                    {/* <Card> */}
-                                    <Col sm={12}  style={{ flexBasis: 'auto' }}>
-                                        <Card>
-                                            <Formik
-                                                enableReinitialize={true}
-                                                initialValues={initialValues}
-                                                validate={validate(validationSchema)}
-                                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                            {/* <Row> */}
+                            {/* <Card> */}
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                <Card>
+                                    <Formik
+                                        enableReinitialize={true}
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                                    this.el.setValueFromCoords(15, this.state.y, this.state.number2, true);
-                                                    this.el.setValueFromCoords(17, this.state.y, this.state.picker2, true);
-                                                    this.setState({
-                                                        isModalOpen: !this.state.isModalOpen,
-                                                    })
+                                            this.el.setValueFromCoords(15, this.state.y, this.state.number2, true);
+                                            this.el.setValueFromCoords(17, this.state.y, this.state.picker2, true);
+                                            this.setState({
+                                                isModalOpen: !this.state.isModalOpen,
+                                            })
 
-                                                }}
+                                        }}
 
 
-                                                render={
-                                                    ({
-                                                        values,
-                                                        errors,
-                                                        touched,
-                                                        handleChange,
-                                                        handleBlur,
-                                                        handleSubmit,
-                                                        isSubmitting,
-                                                        isValid,
-                                                        setTouched,
-                                                        handleReset
-                                                    }) => (
-                                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
-                                                            <CardBody>
-                                                            <div className="d-md-flex">
-                                                                <FormGroup className="mt-md-2 mb-md-0">
-                                                                    {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                    <div className="controls UsagePopUpInputField">
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
+                                                    <CardBody>
+                                                        <div className="d-md-flex">
+                                                            <FormGroup className="mt-md-2 mb-md-0">
+                                                                {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                <div className="controls UsagePopUpInputField">
                                                                     <Input type="number"
                                                                         bsSize="sm"
                                                                         name="number1"
@@ -2452,13 +2546,13 @@ class usageTemplate extends Component {
                                                                         value={this.state.number1}
                                                                         min="1"
                                                                     />
-                                                                    </div>
-                                                                    <FormFeedback className="red">{errors.number1}</FormFeedback>
-                                                                </FormGroup>
+                                                                </div>
+                                                                <FormFeedback className="red">{errors.number1}</FormFeedback>
+                                                            </FormGroup>
 
-                                                                <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
-                                                                    {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                    <div className="controls SelectGo">
+                                                            <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
+                                                                {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
                                                                         name="picker1"
@@ -2474,16 +2568,16 @@ class usageTemplate extends Component {
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {usageList}
                                                                     </Input>
-                                                                    </div>
-                                                                    <FormFeedback className="red">{errors.picker1}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="tab-ml-1 mb-md-0  " style={{marginTop:'14px'}}>
-                                                                    <span>---</span>
-                                                                </FormGroup>
+                                                                </div>
+                                                                <FormFeedback className="red">{errors.picker1}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '14px' }}>
+                                                                <span>---</span>
+                                                            </FormGroup>
 
-                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                    {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                    <div className="controls SelectGo">
+                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                <div className="controls SelectGo">
                                                                     <Input type="number"
                                                                         bsSize="sm"
                                                                         name="number2"
@@ -2497,12 +2591,12 @@ class usageTemplate extends Component {
                                                                         value={this.state.number2}
                                                                         min="1"
                                                                     />
-                                                                    </div>
-                                                                    <FormFeedback className="red">{errors.number2}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                    {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
-                                                                    <div className="controls SelectGo">
+                                                                </div>
+                                                                <FormFeedback className="red">{errors.number2}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
+                                                                <div className="controls SelectGo">
                                                                     <Input type="text"
                                                                         name="label"
                                                                         id="label"
@@ -2514,12 +2608,12 @@ class usageTemplate extends Component {
                                                                         readOnly
                                                                         value={this.state.textMessage}
                                                                         required />
-                                                                        </div>
-                                                                    <FormFeedback className="red">{errors.textMessage}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                    {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                    <div className="controls SelectGo">
+                                                                </div>
+                                                                <FormFeedback className="red">{errors.textMessage}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
                                                                         name="picker2"
@@ -2535,28 +2629,28 @@ class usageTemplate extends Component {
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {usageDisplayList}
                                                                     </Input>
-                                                                    </div>
-                                                                    <FormFeedback className="red">{errors.picker2}</FormFeedback>
-                                                                </FormGroup>
                                                                 </div>
-                                                            </CardBody>
+                                                                <FormFeedback className="red">{errors.picker2}</FormFeedback>
+                                                            </FormGroup>
+                                                        </div>
+                                                    </CardBody>
 
-                                                            <CardFooter>
-                                                                <FormGroup>
-                                                                    <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                                    &nbsp;
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
 
-                                                                </FormGroup>
-                                                            </CardFooter>
-                                                        </Form>
+                                                        </FormGroup>
+                                                    </CardFooter>
+                                                </Form>
 
-                                                    )} />
+                                            )} />
 
-                                        </Card>
-                                    </Col>
-                                     {/* </Card> */}
-                                {/* </Row> */}
+                                </Card>
+                            </Col>
+                            {/* </Card> */}
+                            {/* </Row> */}
                             {/* </div> */}
                             <br />
                         </ModalBody>
