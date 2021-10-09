@@ -386,15 +386,31 @@ export default class CreateTreeTemplate extends Component {
     }
 
     getNoOfMonthsInUsagePeriod() {
-        var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
-        var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+        if (nodeTypeId == 5) {
+            usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        } else {
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
+            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+        }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+            console.log("convertToMonth---", convertToMonth);
             if (usageTypeId == 2) {
-                var div = (convertToMonth * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
+                var div = (convertToMonth * usageFrequency);
+                console.log("duv---", div);
                 if (div != 0) {
-                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
+                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
@@ -1016,6 +1032,9 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "nodeTypeId") {
             currentItemConfig.context.payload.nodeType.id = event.target.value;
+            if (event.target.value == 5) {
+                this.getNoOfMonthsInUsagePeriod();
+            }
         }
         if (event.target.name === "nodeUnitId") {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
@@ -1032,6 +1051,11 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "forecastingUnitId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = event.target.value;
+            if (event.target.value != null && event.target.value != "") {
+                var forecastingUnitId = document.getElementById("forecastingUnitId");
+                var forecastingUnitLabel = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitLabel;
+            }
             this.getForecastingUnitUnitByFUId(event.target.value);
         }
 
@@ -1411,7 +1435,88 @@ export default class CreateTreeTemplate extends Component {
                             ></Input>
                         </FormGroup>
                     </Form>
-                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) && <div>
+                    {/* Planning unit start */}
+                    {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                        <div>
+                            <div className="row">
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input
+                                        type="select"
+                                        id="usageTypeIdPU"
+                                        name="usageTypeIdPU"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        disabled={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {this.state.usageTypeList.length > 0
+                                            && this.state.usageTypeList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.id}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="text"
+                                        id="forecastingUnitPU"
+                                        name="forecastingUnitPU"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId"># of FU / month / Clients<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="text"
+                                        id="forecastingUnitPU"
+                                        name="forecastingUnitPU"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="select"
+                                        id="forecastingUnitUnitPU"
+                                        name="forecastingUnitUnitPU"
+                                        bsSize="sm"
+                                        disabled="true"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.nodeUnitList.length > 0
+                                            && this.state.nodeUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.unitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                            </div>
+                        </div>}
+                    {/* Plannign unit end */}
+                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
                         <div className="row">
 
                             <FormGroup className="col-md-4">
@@ -2101,19 +2206,24 @@ export default class CreateTreeTemplate extends Component {
                                                         {
                                                             dataValue: (itemConfig.payload.nodeDataMap[0])[0].dataValue,
                                                             fuNode: {
+                                                                noOfForecastingUnitsPerPerson: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson : ''),
+                                                                usageFrequency: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency : ''),
                                                                 forecastingUnit: {
+                                                                    label: {
+                                                                        label_en: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en : '')
+                                                                    },
                                                                     tracerCategory: {
 
                                                                     },
                                                                     unit: {
-
+                                                                        id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id : '')
                                                                     }
                                                                 },
                                                                 usageType: {
-
+                                                                    id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id : '')
                                                                 },
                                                                 usagePeriod: {
-
+                                                                    usagePeriodId: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : '')
                                                                 },
                                                                 repeatUsagePeriod: {
 
