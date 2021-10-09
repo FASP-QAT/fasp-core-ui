@@ -244,6 +244,7 @@ const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTe
 const AddDataSet = React.lazy(() => import('./views/DataSet/AddDataSet'));
 const DataSetList = React.lazy(() => import('./views/DataSet/DataSetList'));
 const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -616,5 +617,7 @@ const routes = [
   { path: '/dataSet/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
   { path: '/dataSet/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
   { path: '/dataSet/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataSet.dataSet') }), component: EditDataSet },
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 export default routes;
