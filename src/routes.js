@@ -607,8 +607,8 @@ const routes = [
   { path: '/modelingTypeType/listModelingType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
   { path: '/modelingTypeType/listModelingType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
 
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },

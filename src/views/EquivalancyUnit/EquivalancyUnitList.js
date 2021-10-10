@@ -28,7 +28,7 @@ import CryptoJS from 'crypto-js';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 // import { Modal } from "bootstrap";
 
-const entityname = i18n.t('static.equivalancyUnit.equivalancyUnit')
+const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
 
 
 class EquivalancyUnit extends Component {
@@ -224,7 +224,7 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
@@ -518,9 +518,10 @@ class EquivalancyUnit extends Component {
                     filter: this.filterForecastingUnitBasedOnTracerCategory
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
                     type: 'autocomplete',
                     source: this.state.equivalancyUnitList,
+                    filter: this.filterEquivalancyUnit
                 },
                 {
                     title: i18n.t('static.equivalancyUnit.conversionToFu'),
@@ -796,6 +797,12 @@ class EquivalancyUnit extends Component {
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
         });
+    }.bind(this)
+
+    filterEquivalancyUnit = function (instance, cell, c, r, source) {
+
+        let mylist = this.state.equivalancyUnitList.filter(c => c.active.toString() == "true");
+        return mylist;
     }.bind(this)
 
     filterDataset = function (instance, cell, c, r, source) {
@@ -1973,7 +1980,7 @@ class EquivalancyUnit extends Component {
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader>
-                            <strong>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</strong>
+                            <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>
                         <ModalBody>
                             <h6 className="red" id="div3"></h6>

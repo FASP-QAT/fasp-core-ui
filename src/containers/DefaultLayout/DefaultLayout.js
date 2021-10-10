@@ -670,8 +670,8 @@ const routes = [
   { path: '/modelingType/listModelingType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
   { path: '/modelingType/listModelingType', exact: true, name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
 
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
@@ -1443,7 +1443,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
                             url: '/equivalancyUnit/listEquivalancyUnit',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true) }

@@ -858,6 +858,7 @@ export default class EditProgram extends Component {
                                                         }}
                                                         onBlur={() => setFieldTouched("regionId", true)}
                                                         multi
+                                                        disabled={true}
                                                         options={this.state.regionList}
                                                         value={this.state.program.regionArray}
                                                     />
