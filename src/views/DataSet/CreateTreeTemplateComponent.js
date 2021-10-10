@@ -1152,7 +1152,8 @@ export default class CreateTreeTemplate extends Component {
     }
 
     resetTree() {
-        this.setState({ items: TreeData.demographic_scenario_two });
+        this.componentDidMount();
+        // this.setState({ items: TreeData.demographic_scenario_two });
     }
     dataChange(event) {
         // alert("hi");
@@ -2729,6 +2730,7 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
+                                            active : true,
                                             label: {
                                                 label_en: template.label.label_en
                                             },
