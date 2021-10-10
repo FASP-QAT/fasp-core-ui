@@ -286,6 +286,7 @@ export default class CreateTreeTemplate extends Component {
         this.getForecastingUnitUnitByFUId = this.getForecastingUnitUnitByFUId.bind(this);
         this.getPlanningUnitListByFUId = this.getPlanningUnitListByFUId.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.calculateValuesForAggregateNode = this.calculateValuesForAggregateNode.bind(this);
     }
     cancelClicked() {
         this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled'))
@@ -1256,12 +1257,58 @@ export default class CreateTreeTemplate extends Component {
             cursorItem: parseInt(items.length + 1)
         }, () => {
             console.log("on add items-------", this.state.items);
+            // var getAllAggregationNode = this.state.items.filter(c => c.payload.nodeType.id == 1);
+            // console.log(">>>", getAllAggregationNode);
+            this.calculateValuesForAggregateNode(this.state.items);
         });
+    }
+
+    calculateValuesForAggregateNode(items) {
+        var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
+            a = a.id;
+            b = b.id;
+            return a > b ? -1 : a < b ? 1 : 0;
+        }.bind(this));
+
+        console.log(">>>", getAllAggregationNode);
+        for (var i = 0; i < getAllAggregationNode.length; i++) {
+            var getChildAggregationNode = items.filter(c => c.parent == getAllAggregationNode[i].id && (c.payload.nodeType.id == 1 || c.payload.nodeType.id == 2))
+            console.log(">>>", getChildAggregationNode);
+            if (getChildAggregationNode.length > 0) {
+                var value = 0;
+                for (var m = 0; m < getChildAggregationNode.length; m++) {
+                    value = parseInt(value) + parseInt(getChildAggregationNode[m].payload.nodeDataMap[0][0].dataValue);
+                }
+
+                var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
+                items[findNodeIndex].payload.nodeDataMap[0][0].dataValue = value;
+
+                this.setState({
+                    items: items,
+                    openAddNodeModal: false,
+                }, () => {
+                    console.log("updated tree data>>>", this.state);
+                });
+            }else{
+                var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
+                items[findNodeIndex].payload.nodeDataMap[0][0].dataValue = "";
+
+                this.setState({
+                    items: items,
+                    openAddNodeModal: false,
+                }, () => {
+                    console.log("updated tree data>>>", this.state);
+                });
+            }
+        }
+
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
 
-        this.setState(this.getDeletedItems(items, [itemConfig.id]));
+        this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
+            this.calculateValuesForAggregateNode(this.state.items);
+        });
     }
     onMoveItem(parentid, itemid) {
         console.log("on move item called");
