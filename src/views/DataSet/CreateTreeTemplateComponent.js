@@ -34,7 +34,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 
-
+const entityname = 'Tree Template';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -52,9 +52,9 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethodId: Yup.string()
-            .required(i18n.t('static.user.validlanguage')),
+            .required("Please select forecast method"),
         treeName: Yup.string()
-            .required(i18n.t('static.user.validlanguage')),
+            .required("Please enter tree name"),
 
     })
 }
@@ -98,9 +98,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
-            {/* <div className="ContactPhone">{itemConfig.payload.label.label_en}</div> */}
             <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black) }}>{getPayloadData(itemConfig)}</div>
-            {/* <div className="ContactPhone">{itemConfig.nodeValue.value}</div> */}
         </div>
     ))
 }
@@ -160,6 +158,8 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            tempNodeValue: '',
+            message: '',
             converionFactor: '',
             planningUnitList: [],
             noFURequired: '',
@@ -290,7 +290,7 @@ export default class CreateTreeTemplate extends Component {
         this.calculateValuesForAggregateNode = this.calculateValuesForAggregateNode.bind(this);
     }
     cancelClicked() {
-        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
     getPlanningUnitListByFUId(forecastingUnitId) {
         console.log("forecastingUnitId---", forecastingUnitId);
@@ -1056,9 +1056,32 @@ export default class CreateTreeTemplate extends Component {
                             },
                             nodeDataMap: [
                                 [{
-                                    dataValue: ''
+                                    dataValue: '',
+                                    fuNode: {
+                                        forecastingUnit: {
+                                            tracerCategory: {
+
+                                            },
+                                            unit: {
+
+                                            }
+                                        },
+                                        usageType: {
+
+                                        },
+                                        usagePeriod: {
+
+                                        }
+                                    }
                                 }]
                             ]
+                        },
+                        parentItem: {
+                            payload: {
+                                nodeUnit: {
+
+                                }
+                            }
                         }
                     }]
                 },
@@ -1078,9 +1101,32 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeDataMap: [
                             [{
-                                dataValue: ''
+                                dataValue: '',
+                                fuNode: {
+                                    forecastingUnit: {
+                                        tracerCategory: {
+
+                                        },
+                                        unit: {
+
+                                        }
+                                    },
+                                    usageType: {
+
+                                    },
+                                    usagePeriod: {
+
+                                    }
+                                }
                             }]
                         ]
+                    },
+                    parentItem: {
+                        payload: {
+                            nodeUnit: {
+
+                            }
+                        }
                     }
                 }]
             }, () => {
@@ -1192,6 +1238,13 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "percentageOfParent") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+            // var tempNodeValue;
+            // if (currentItemConfig.parentItem.payload.nodeType.id == 3) {
+
+            // }
+            this.setState({
+                tempNodeValue: event.target.value
+            })
         }
         if (event.target.name === "nodeValue") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
@@ -1324,7 +1377,7 @@ export default class CreateTreeTemplate extends Component {
                 }, () => {
                     console.log("updated tree data>>>", this.state);
                 });
-            }else{
+            } else {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[0][0].dataValue = "";
 
@@ -1632,7 +1685,9 @@ export default class CreateTreeTemplate extends Component {
                                     name="nodeValue"
                                     readOnly={this.state.numberNode ? true : false}
                                     onChange={(e) => { this.dataChange(e) }}
-                                    value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}></Input>
+                                    // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? this.state.tempNodeValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+                                ></Input>
                             </FormGroup>}
 
                         <FormGroup>
@@ -1737,7 +1792,7 @@ export default class CreateTreeTemplate extends Component {
                                         onChange={(e) => { this.dataChange(e) }}
                                         value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id}>
 
-                                        <option value=""></option>
+                                        <option value="">{i18n.t('static.common.select')}</option>
                                         {this.state.planningUnitList.length > 0
                                             && this.state.planningUnitList.map((item, i) => {
                                                 return (
@@ -1766,8 +1821,8 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-5">
                                     <Input type="text"
-                                        id="conversionFactor"
-                                        name="conversionFactor"
+                                        id="noOfPUUsage"
+                                        name="noOfPUUsage"
                                         bsSize="sm"
                                         readOnly={true}
                                         value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)}>
@@ -1971,7 +2026,6 @@ export default class CreateTreeTemplate extends Component {
                                     bsSize="sm"
                                     readOnly={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? true : false}
                                     onChange={(e) => { this.dataChange(e) }}
-                                    // value={this.state.currentItemConfig.title}></Input>
                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons}>
 
                                 </Input>
@@ -2031,7 +2085,7 @@ export default class CreateTreeTemplate extends Component {
                                     <FormGroup className="col-md-2">
                                         <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
                                     </FormGroup>
-                                    <FormGroup className="col-md-5">
+                                    <FormGroup className="col-md-10">
                                         <Input type="select"
                                             id="oneTimeUsage"
                                             name="oneTimeUsage"
@@ -2045,7 +2099,7 @@ export default class CreateTreeTemplate extends Component {
 
                                         </Input>
                                     </FormGroup>
-                                    <FormGroup className="col-md-5"></FormGroup>
+                                    {/* <FormGroup className="col-md-5"></FormGroup> */}
                                     {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" &&
                                         <>
                                             <FormGroup className="col-md-2"></FormGroup>
@@ -2104,7 +2158,7 @@ export default class CreateTreeTemplate extends Component {
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId}>
 
-                                                    <option value=""></option>
+                                                    <option value="">{i18n.t('static.common.select')}</option>
                                                     {this.state.usagePeriodList.length > 0
                                                         && this.state.usagePeriodList.map((item, i) => {
                                                             return (
@@ -2184,199 +2238,6 @@ export default class CreateTreeTemplate extends Component {
                                     </table>}
                             </div>
                             <div className="pt-2 pl-2"><b>{this.state.usageText}</b></div>
-
-                            {/* <div style={{ width: '100%' }}> */}
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td>Every</td>
-                                    <td>1</td>
-                                    <td>
-                                        <FormGroup className="col-md-6">
-                                            <Input type="text"
-                                                name="nodeTitle"
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // value={this.state.currentItemConfig.title}></Input>
-                                                value={'Clients'}></Input>
-                                        </FormGroup>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>requires</td>
-                                    <td>  <FormGroup className="col-md-6">
-                                        <Input type="text"
-                                            name="nodeTitle"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            // value={this.state.currentItemConfig.title}></Input>
-                                            value={'130'}></Input>
-                                    </FormGroup></td>
-                                    <td>condom</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>every</td>
-                                    <td>  <FormGroup className="col-md-6">
-                                        <Input type="text"
-                                            name="nodeTitle"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            // value={this.state.currentItemConfig.title}></Input>
-                                            value={'1'}></Input>
-                                    </FormGroup></td>
-                                    <td> <FormGroup className="col-md-6">
-                                        <Input
-                                            type="select"
-                                            name="nodeTypeId"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.nodeTypeChange(e) }}
-                                            required
-                                            value={this.state.currentItemConfig.valueType}
-                                        >
-                                            <option value="-1">Nothing Selected</option>
-                                            <option value="1">year(s)</option>
-                                            <option value="2">Discrete</option>
-                                        </Input>
-                                    </FormGroup></td>
-                                    <td>indefinitely</td>
-                                </tr>
-
-                            </table> */}
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td>Every</td>
-                                    <td>4</td>
-                                    <td>Patient</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>requires</td>
-                                    <td>1</td>
-                                    <td>mask</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Single use</td>
-                                    <td>No</td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>1</td>
-                                    <td>times per</td>
-                                    <td>week(s)</td>
-                                </tr>
-                                <tr>
-                                    <td>for</td>
-                                    <td>2</td>
-                                    <td>month(s)</td>
-                                    <td></td>
-                                </tr>
-                            </table> */}
-                            {/* </div><br /> */}
-                            {/* <div style={{ clear: 'both' }}> */}
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td># of FU / patient</td>
-                                    <td>0.25</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / patient</td>
-                                    <td>1.08</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU required</td>
-                                    <td>2.17</td>
-                                </tr>
-                            </table> */}
-                            {/* <table className="table table-bordered">
-                                <tr>
-                                    <td># of FU required for period</td>
-                                    <td>130</td>
-                                </tr>
-                                <tr>
-                                    <td># of months in period</td>
-                                    <td>12.00</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / Patient</td>
-                                    <td>10.83</td>
-                                </tr>
-                            </table> */}
-                            {/* </div> */}
-                            {/* <div className="pt-2"><b>Every 4 Patient requires 1 mask, 1 times per week(s) for 2 month(s)</b></div> */}
-                            {/* <div className="pt-2 pl-2"><b>Every 1 Clients - requires 130 condom every 1 year(s) indefinitely</b></div> */}
-                            {/* <div className="pt-2">
-                            <table className="table table-bordered">
-                                <tr>
-                                    <td>Forecasting unit</td>
-                                    <td>surgical mask, 1 mask</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / usage / Patient</td>
-                                    <td>2.17</td>
-                                    <td>mask</td>
-                                </tr>
-                                <tr>
-                                    <td>Planning Unit</td>
-                                    <td>Surgical mask, pack of 5</td>
-                                </tr>
-                                <tr>
-                                    <td>Conversion Factor (FU:PU)</td>
-                                    <td>5</td>
-                                </tr>
-                                <tr>
-                                    <td># of PU / usage / </td>
-                                    <td>0.43</td>
-                                    <td>packs</td>
-                                </tr>
-                                <tr>
-                                    <td>Will Clients share one PU?</td>
-                                    <td>No</td>
-                                </tr>
-                                <tr>
-                                    <td>How many PU per usage per ?</td>
-                                    <td>1.00</td>
-                                </tr>
-                            </table> */}
-                            {/* <table  className="table table-bordered">
-                                <tr>
-                                    <td>Forecasting unit</td>
-                                    <td>no logo condoms</td>
-                                </tr>
-                                <tr>
-                                    <td># of FU / month / Clients</td>
-                                    <td>10.83</td>
-                                    <td>condom</td>
-                                </tr>
-                                <tr>
-                                    <td>Planning Unit</td>
-                                    <td>No logo condoms, Pack of 10 condoms</td>
-                                </tr>
-                                <tr>
-                                    <td>Conversion Factor (FU:PU)</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <td># of PU / month / </td>
-                                    <td>1.08</td>
-                                    <td>packs</td>
-                                </tr>
-                                <tr>
-                                    <td>QAT estimate for interval (Every _ months)</td>
-                                    <td>0.92</td>
-                                </tr>
-                                <tr>
-                                    <td>Consumption interval (Every X months)</td>
-                                    <td>2.00</td>
-                                </tr>
-                                <tr>
-                                    <td>How many PU per interval per ?</td>
-                                    <td>2.17</td>
-                                </tr>
-                            </table> */}
-                            {/* </div> */}
-                            {/* <div className="pt-2"><b>For each  - we need 2.17 [No logo condoms, Pack of 10 condoms] every 2 months</b></div> */}
-                            {/* <div className="pt-2"><b>For each  - we need 1.00 [Surgical mask, pack of 5]</b></div> */}
                         </div>
                     </div>}
                 </TabPane>
@@ -2669,6 +2530,9 @@ export default class CreateTreeTemplate extends Component {
             }]
         }
         return <div className="animated fadeIn">
+            <AuthenticationServiceComponent history={this.props.history} />
+            <h5 style={{ color: "red" }} id="div2">
+                {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
@@ -2684,7 +2548,10 @@ export default class CreateTreeTemplate extends Component {
 
                                 <Formik
                                     enableReinitialize={true}
-                                    initialValues={initialValues}
+                                    initialValues={{
+                                        forecastMethodId: this.state.treeTemplate.forecastMethod.id,
+                                        treeName: this.state.treeTemplate.label.label_en
+                                    }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         var template = this.state.treeTemplate;
@@ -2711,7 +2578,7 @@ export default class CreateTreeTemplate extends Component {
                                                     },
                                                     nodeDataMap:
                                                     {
-                                                        0 : [
+                                                        0: [
                                                             {
                                                                 month: "2021-06-01",
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
@@ -2730,7 +2597,7 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
-                                            active : true,
+                                            active: true,
                                             label: {
                                                 label_en: template.label.label_en
                                             },
@@ -2739,28 +2606,7 @@ export default class CreateTreeTemplate extends Component {
                                             },
                                             flatList: flatList
                                         }
-
-                                        // template.flatList = this.state.items;
                                         console.log("template obj---", templateObj);
-                                        // var t = JSON.stringify(template);
-                                        // console.log("on submit called 0-----------",t);
-                                        // console.log("on submit called 00-----------",JSON.parse(template));
-                                        // console.log("on submit called 1--------------", template.stringify())
-                                        // console.log("on submit called 2--------------", template.parse())
-                                        // let result = [];
-                                        // for(var i = 0; i < template.length; i++) {
-                                        //     if( template.hasOwnProperty( field ) ){
-                                        //       var name = template[field];
-                                        //       result[name] = name;
-                                        //     }
-                                        //   }
-                                        // for (var field in template){
-                                        //     if( template.hasOwnProperty( field ) ){
-                                        //       var name = template[field];
-                                        //       result[name] = name;
-                                        //     }
-                                        //   }
-                                        //   console.log("result---",result);
                                         this.setState({
                                             loading: true
                                         })
@@ -2768,7 +2614,7 @@ export default class CreateTreeTemplate extends Component {
                                             DatasetService.addTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
-                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
+                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
                                                         this.setState({
                                                             message: response.data.messageCode, loading: false
@@ -2981,9 +2827,8 @@ export default class CreateTreeTemplate extends Component {
                                                     </div>
                                                     <CardFooter>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     </CardFooter>
                                                 </Form>
 
@@ -3033,7 +2878,7 @@ export default class CreateTreeTemplate extends Component {
                 <ModalFooter>
                     <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
-                    }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>
