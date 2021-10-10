@@ -189,6 +189,7 @@ export default class CreateTreeTemplate extends Component {
                         label_en: ""
                     }
                 }
+                , flatList: []
             },
             forecastMethodList: [],
             nodeTypeList: [],
@@ -1028,6 +1029,38 @@ export default class CreateTreeTemplate extends Component {
                 );
         } else {
             this.setState({
+                treeTemplate: {
+                    treeTemplateId: 0,
+                    label: {
+                        label_en: ""
+                    },
+                    forecastMethod: {
+                        label: {
+                            label_en: ""
+                        }
+                    },
+                    flatList: [{
+                        id: 1,
+                        level: 0,
+                        parent: null,
+                        payload: {
+                            label: {
+                                label_en: ''
+                            },
+                            nodeType: {
+                                id: 2
+                            },
+                            nodeUnit: {
+                                id: ''
+                            },
+                            nodeDataMap: [
+                                [{
+                                    dataValue: ''
+                                }]
+                            ]
+                        }
+                    }]
+                },
                 items: [{
                     id: 1,
                     level: 0,
@@ -1230,6 +1263,7 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "planningUnitId") {
             var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == event.target.value))[0];
             (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
             this.setState({
                 conversionFactor: pu.multiplier
             });
@@ -2606,13 +2640,83 @@ export default class CreateTreeTemplate extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         var template = this.state.treeTemplate;
-                                        template.flatList = this.state.items;
-                                        console.log("on submit called--------------", template)
+                                        console.log("template---", template);
+                                        var items = this.state.items;
+                                        console.log("items---", items);
+                                        var flatList = [];
+                                        for (var i = 0; i < items.length; i++) {
+                                            console.log("i============", i);
+                                            var item = items[i];
+                                            console.log("item---", item);
+                                            var json = {
+                                                id: item.id,
+                                                parent: item.parent,
+                                                payload: {
+                                                    nodeType: {
+                                                        id: item.payload.nodeType.id
+                                                    },
+                                                    nodeUnit: {
+                                                        id: item.payload.nodeUnit.id
+                                                    },
+                                                    label: {
+                                                        label_en: item.payload.label.label_en
+                                                    },
+                                                    nodeDataMap:
+                                                    {
+                                                        0 : [
+                                                            {
+                                                                month: "2021-06-01",
+                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
+                                                                fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
+                                                                puNode: (item.payload.nodeDataMap[0])[0].puNode,
+                                                                notes: (item.payload.nodeDataMap[0])[0].notes
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                level: item.level
+                                                // sortOrder: item.sortOrder
+                                            }
+                                            flatList.push(json);
+                                        }
+                                        console.log("flatList---", flatList);
+                                        var templateObj = {
+                                            treeTemplateId: template.treeTemplateId,
+                                            label: {
+                                                label_en: template.label.label_en
+                                            },
+                                            forecastMethod: {
+                                                id: template.forecastMethod.id
+                                            },
+                                            flatList: flatList
+                                        }
+
+                                        // template.flatList = this.state.items;
+                                        console.log("template obj---", templateObj);
+                                        // var t = JSON.stringify(template);
+                                        // console.log("on submit called 0-----------",t);
+                                        // console.log("on submit called 00-----------",JSON.parse(template));
+                                        // console.log("on submit called 1--------------", template.stringify())
+                                        // console.log("on submit called 2--------------", template.parse())
+                                        // let result = [];
+                                        // for(var i = 0; i < template.length; i++) {
+                                        //     if( template.hasOwnProperty( field ) ){
+                                        //       var name = template[field];
+                                        //       result[name] = name;
+                                        //     }
+                                        //   }
+                                        // for (var field in template){
+                                        //     if( template.hasOwnProperty( field ) ){
+                                        //       var name = template[field];
+                                        //       result[name] = name;
+                                        //     }
+                                        //   }
+                                        //   console.log("result---",result);
                                         this.setState({
                                             loading: true
                                         })
                                         if (template.treeTemplateId == 0) {
-                                            DatasetService.addTreeTemplate(template)
+                                            DatasetService.addTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
                                                         this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
@@ -2666,7 +2770,7 @@ export default class CreateTreeTemplate extends Component {
                                                     }
                                                 );
                                         } else {
-                                            DatasetService.updatTreeTemplate(template)
+                                            DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
                                                         this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
