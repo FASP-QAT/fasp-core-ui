@@ -241,6 +241,9 @@ const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/Forec
 const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTemplateList'));
 
+const AddDataSet = React.lazy(() => import('./views/DataSet/AddDataSet'));
+const DataSetList = React.lazy(() => import('./views/DataSet/DataSetList'));
+const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
 const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
@@ -609,6 +612,11 @@ const routes = [
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+
+  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataSet.dataSet') }), component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
+  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataSet.dataSet') }), component: EditDataSet },
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];

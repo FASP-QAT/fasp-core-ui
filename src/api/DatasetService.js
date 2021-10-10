@@ -38,6 +38,14 @@ class DatasetService {
         return axios.get(`${API_URL}/api/usageType`, {
         });
     }
+    addTreeTemplate(json) {
+        return axios.post(`${API_URL}/api/treeTemplate`, json, {
+        });
+    }
+    updateTreeTemplate(json) {
+        return axios.put(`${API_URL}/api/treeTemplate`, json, {
+        });
+    }
 
 }
 export default new DatasetService()

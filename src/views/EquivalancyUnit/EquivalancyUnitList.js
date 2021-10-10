@@ -52,6 +52,7 @@ class EquivalancyUnit extends Component {
             table2Instance: "",
             selSource: [],
 
+            loading: true,
             loading1: true,
             loading2: true
         }
@@ -214,7 +215,7 @@ class EquivalancyUnit extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 70],
             columns: [
 
                 {
@@ -223,13 +224,13 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnit'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.type'),
+                    title: i18n.t('static.healtharea.realm'),
                     type: 'text',
                     readOnly: true
                     // textEditor: true,
@@ -429,7 +430,7 @@ class EquivalancyUnit extends Component {
         }
         this.setState({
             isModalOpen: !this.state.isModalOpen,
-            // loading: false
+            // loading: true
         },
             () => {
 
@@ -496,7 +497,7 @@ class EquivalancyUnit extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 50, 100],
             columns: [
 
                 {
@@ -534,9 +535,10 @@ class EquivalancyUnit extends Component {
                     textEditor: true,
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.type'),
+                    title: i18n.t('static.dataSet.dataSet'),
                     type: 'autocomplete',
                     source: this.state.typeList,
+                    filter: this.filterDataset
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -579,7 +581,7 @@ class EquivalancyUnit extends Component {
                     // var productCategoryId = rowData[0];
                     var forecastingUnitId = rowData[11];
                     var typeId = rowData[12];
-                    console.log("updateTable------>", rowData[11]);
+                    // console.log("updateTable------>", rowData[11]);
                     if (forecastingUnitId == 0) {
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
@@ -619,7 +621,7 @@ class EquivalancyUnit extends Component {
 
                     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    console.log("decryptedUser=====>", decryptedUser);
+                    // console.log("decryptedUser=====>", decryptedUser);
 
                     var roleList = decryptedUser.roleList;
                     var roleArray = []
@@ -628,8 +630,10 @@ class EquivalancyUnit extends Component {
                     }
 
 
-
+                    let checkReadOnly = 0;
                     if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        checkReadOnly = checkReadOnly + 1;
+
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
@@ -674,16 +678,40 @@ class EquivalancyUnit extends Component {
                     //     cell1.classList.add('readonly');
                     // }
 
-
-
                     var addRowId = rowData[13];
-                    console.log("addRowId------>", addRowId);
+                    // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-                    } else {
+                    } else if (checkReadOnly == 0) {
                         var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
+                    }
+
+
+
+
+                    if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
 
 
@@ -763,6 +791,26 @@ class EquivalancyUnit extends Component {
         // console.log("myList--------->1", value);
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
+        return mylist.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+    }.bind(this)
+
+    filterDataset = function (instance, cell, c, r, source) {
+        // var mylist = [];
+        // var mylist = (instance.jexcel.getJson(null, false)[r])[5];
+        // if (value > 0) {
+        //     mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
+        // }
+        // console.log("myList--------->1", value);
+        // console.log("myList--------->2", mylist);
+        // console.log("myList--------->3", this.state.forecastingUnitList);
+        var mylist = this.state.typeList;
+        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
+            mylist.splice(0, 1);
+        }
         return mylist.sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
@@ -1041,16 +1089,17 @@ class EquivalancyUnit extends Component {
                     for (var r = 0; r < roleList.length; r++) {
                         roleArray.push(roleList[r].roleId)
                     }
-                    if (roleArray.includes('ROLE_REALM_ADMIN')) {
-                        tempProgramList.unshift({
-                            name: 'All',
-                            id: -1,
-                            active: true,
-                        });
-                    }
+
+                    tempProgramList.unshift({
+                        name: 'All',
+                        id: -1,
+                        active: true,
+                    });
+
 
                     this.setState({
                         typeList: tempProgramList,
+                        roleArray: roleArray
                         // loading: false
                     }, () => {
                         // console.log("PROGRAM---------->111", this.state.typeList) 
@@ -1311,7 +1360,7 @@ class EquivalancyUnit extends Component {
                         console.log(response);
                         // window.location.reload();
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: true, color: 'green'
                         },
                             () => {
                                 this.modelOpenClose();
@@ -1744,11 +1793,13 @@ class EquivalancyUnit extends Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                        valid = false;
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", "yellow");
                             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+                            valid = false;
                         } else {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setComments(col, "");
@@ -1824,18 +1875,19 @@ class EquivalancyUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
-
+                    <Col md="12 pl-3">
+                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
+                    </Col>
                     <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
                                     {/* <a href='javascript:;' onClick={this.modelOpenClose} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()}>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.modelOpenClose()} disabled={this.state.loading ? true : false}>{i18n.t('static.equivalancyUnit.equivalancyUnitManage')}</Button>
                                 </a>
                             </div>
                         </div>
@@ -1905,39 +1957,43 @@ class EquivalancyUnit extends Component {
 
                     </CardBody>
                     <CardFooter>
-
-                        <FormGroup>
-                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                            <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
-                            &nbsp;
-                        </FormGroup>
+                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                            <FormGroup>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                &nbsp;
+                            </FormGroup>
+                        }
 
                     </CardFooter>
-                
 
 
-                <Modal isOpen={this.state.isModalOpen}
-                    className={'modal-lg ' + this.props.className, "modalWidth"}>
-                    <ModalHeader>
-                        <strong>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</strong>
-                    </ModalHeader>
-                    <ModalBody>
-                        <h6 className="red" id="div3"></h6>
-                         <div>
-                            <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
+
+                    <Modal isOpen={this.state.isModalOpen}
+                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        <ModalHeader>
+                            <strong>{i18n.t('static.equivalancyUnit.equivalancyUnit')}</strong>
+                        </ModalHeader>
+                        <ModalBody>
+                            <h6 className="red" id="div3"></h6>
+                            <div>
+                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
+                                </div>
                             </div>
-                         </div>
-                        <br />
-                    </ModalBody>
-                    <ModalFooter>
-                        <div className="mr-0">
-                            <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                        </div>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
-                </Modal>
+                            <br />
+                        </ModalBody>
+
+                        <ModalFooter>
+                            {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                                <div className="mr-0">
+                                    <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                </div>
+                            }
+                            <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.modelOpenClose()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        </ModalFooter>
+                    </Modal>
                 </Card>
             </div>
         )

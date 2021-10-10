@@ -1298,7 +1298,8 @@ class AuthenticationService {
 
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                            // if (true) {
                             return true;
                         }
                         break;
@@ -1319,7 +1320,24 @@ class AuthenticationService {
 
                     case "/usageTemplate/listUsageTemplate":
                     case "/usageTemplate/listUsageTemplate/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/dataset/addDataSet":
+                        if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/editDataSet/:dataSetId":
+                        if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listDataSet":
+                    case "/dataset/listDataSet/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
                             return true;
                         }
                         break;

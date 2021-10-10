@@ -196,5 +196,20 @@ class ProgramService {
         );
     }
 
+    addDataset(json) {
+        return axios.post(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getDatasetById(json) {
+        return axios.get(`${API_URL}/api/dataset/${json}`, {}
+        );
+    }
+
+    editDataset(json) {
+        return axios.put(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()

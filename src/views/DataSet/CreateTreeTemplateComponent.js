@@ -28,6 +28,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import UsagePeriodService from '../../api/UsagePeriodService.js';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -92,13 +93,13 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: (itemConfig.payload.nodeType.id == 4 ? Colors.Yellow : itemConfig.payload.nodeType.id == 5 ? Colors.Black : Colors.White), borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
             {/* <div className="ContactPhone">{itemConfig.payload.label.label_en}</div> */}
-            <div className="ContactPhone">{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black) }}>{getPayloadData(itemConfig)}</div>
             {/* <div className="ContactPhone">{itemConfig.nodeValue.value}</div> */}
         </div>
     ))
@@ -159,6 +160,8 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            converionFactor: '',
+            planningUnitList: [],
             noFURequired: '',
             usageTypeParent: '',
             usageTemplateList: [],
@@ -214,8 +217,17 @@ export default class CreateTreeTemplate extends Component {
                                     notes: '',
                                     fuNode: {
                                         forecastingUnit: {
-                                            id: ''
+                                            id: '',
+                                            label: {
+                                                label_en: ""
+                                            }
                                         }
+                                    },
+                                    puNode: {
+                                        planningUnit: {
+
+                                        },
+                                        refillMonths: ''
                                     }
                                 }
                             ]
@@ -226,7 +238,19 @@ export default class CreateTreeTemplate extends Component {
                     payload: {
                         label: {
 
-                        }
+                        },
+                        nodeDataMap: [
+                            [
+                                {
+                                    puNode: {
+                                        planningUnit: {
+                                            id: ''
+                                        },
+                                        refillMonths: ''
+                                    }
+                                }
+                            ]
+                        ]
                     }
                 }
             },
@@ -260,7 +284,64 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeUnitOfPrent = this.getNodeUnitOfPrent.bind(this);
         this.getNoOfFUPatient = this.getNoOfFUPatient.bind(this);
         this.getForecastingUnitUnitByFUId = this.getForecastingUnitUnitByFUId.bind(this);
+        this.getPlanningUnitListByFUId = this.getPlanningUnitListByFUId.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
+    cancelClicked() {
+        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled'))
+    }
+    getPlanningUnitListByFUId(forecastingUnitId) {
+        console.log("forecastingUnitId---", forecastingUnitId);
+        PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
+            console.log("response---", response.data)
+            this.setState({
+                planningUnitList: response.data
+            }, () => {
+                console.log(" get uasge template--------------", response.data);
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
     getForecastingUnitUnitByFUId(forecastingUnitId) {
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId))[0];
@@ -273,7 +354,14 @@ export default class CreateTreeTemplate extends Component {
     getNoOfFUPatient() {
         console.log("no of fu------", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
         console.log("no of person---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons);
-        var noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+        var noOfFUPatient;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+            noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+        } else {
+            console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+            noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+        }
+        console.log("noOfFUPatient---", noOfFUPatient);
         this.setState({
             noOfFUPatient
         })
@@ -386,19 +474,35 @@ export default class CreateTreeTemplate extends Component {
     }
 
     getNoOfMonthsInUsagePeriod() {
-        var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
-        var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+        if (nodeTypeId == 5) {
+            usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        } else {
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
+            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+        }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+            console.log("convertToMonth---", convertToMonth);
             if (usageTypeId == 2) {
-                var div = (convertToMonth * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
+                var div = (convertToMonth * usageFrequency);
+                console.log("duv---", div);
                 if (div != 0) {
-                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
+                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
-                noOfMonthsInUsagePeriod = convertToMonth * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency * this.state.noOfFUPatient;
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * this.state.noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
         }
@@ -413,6 +517,7 @@ export default class CreateTreeTemplate extends Component {
         var noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
         var noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
         var usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+
         var usageTypeParent = document.getElementById("usageTypeParent");
         var selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
@@ -425,17 +530,37 @@ export default class CreateTreeTemplate extends Component {
             var usagePeriodId = document.getElementById("usagePeriodId");
             var selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
         }
+        // FU
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
 
-        if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
-            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
-                var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
-                var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
-                usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount + " " + selectedText3;
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
+                if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+                    var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
+                    var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
+                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount + " " + selectedText3;
+                } else {
+                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
+                }
             } else {
-                usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
+                usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
             }
         } else {
-            usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
+            //PU
+            var planningUnitId = document.getElementById("planningUnitId");
+            var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.usageType.id == 1) {
+                var sharePu;
+                if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
+                    sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                } else {
+                    sharePu = Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
+                }
+                usageText = "For each " + "we need " + sharePu + " " + planningUnit;
+            } else {
+                // need grand parent here 
+                var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
+                usageText = "For each " + "we need " + puPerInterval + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
+            }
         }
 
 
@@ -852,9 +977,10 @@ export default class CreateTreeTemplate extends Component {
             );
         if (this.props.match.params.templateId != -1) {
             DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+                console.log("my tree---", response.data);
                 this.setState({
                     treeTemplate: response.data,
-                    items: response.data.tree.flatList,
+                    items: response.data.flatList,
                     loading: false
                 }, () => {
                     console.log("Tree Template---", this.state.items);
@@ -998,6 +1124,12 @@ export default class CreateTreeTemplate extends Component {
         // alert("hi");
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
+        if (event.target.name === "sharePlanningUnit") {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = event.target.value;
+        }
+        if (event.target.name === "refillMonths") {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths = event.target.value;
+        }
         if (event.target.name === "forecastMethodId") {
             treeTemplate.forecastMethod.id = event.target.value;
         }
@@ -1016,6 +1148,9 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "nodeTypeId") {
             currentItemConfig.context.payload.nodeType.id = event.target.value;
+            if (event.target.value == 5) {
+                this.getNoOfMonthsInUsagePeriod();
+            }
         }
         if (event.target.name === "nodeUnitId") {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
@@ -1032,6 +1167,12 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "forecastingUnitId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = event.target.value;
+            if (event.target.value != null && event.target.value != "") {
+                var forecastingUnitId = document.getElementById("forecastingUnitId");
+                var forecastingUnitLabel = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
+                console.log("forecastingUnitLabel---", forecastingUnitLabel);
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitLabel;
+            }
             this.getForecastingUnitUnitByFUId(event.target.value);
         }
 
@@ -1080,13 +1221,24 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "usageTypeIdFU") {
             console.log("usage type data change function ------------------");
             if (event.target.value == 2 && currentItemConfig.context.payload.nodeType.id == 4) {
-                (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
             this.getUsageTemplateList();
         }
 
-        this.setState({ currentItemConfig });
+        if (event.target.name === "planningUnitId") {
+            var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == event.target.value))[0];
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
+            this.setState({
+                conversionFactor: pu.multiplier
+            });
+        }
+
+
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
     }
     onAddButtonClick(itemConfig) {
         console.log("add button clicked---", itemConfig);
@@ -1095,6 +1247,9 @@ export default class CreateTreeTemplate extends Component {
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
         newItem.id = parseInt(items.length + 1);
+        if (itemConfig.context.payload.nodeType.id == 4) {
+            (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
+        }
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
@@ -1244,11 +1399,9 @@ export default class CreateTreeTemplate extends Component {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
-                }
-                if (data.context.payload.nodeType.id > 3) {
-                    // console.log("ttt--------------->",this.state.currentItemConfig);
-                    // document.getElementById('usageTypeParent').value = this.state.currentItemConfig.parentItem.payload.nodeUnit.id
-                    // this.getUsageText();
+                } else if (data.context.payload.nodeType.id == 5) {
+                    console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                 }
             })
         }
@@ -1411,7 +1564,217 @@ export default class CreateTreeTemplate extends Component {
                             ></Input>
                         </FormGroup>
                     </Form>
-                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) && <div>
+                    {/* Planning unit start */}
+                    {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                        <div>
+                            <div className="row">
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input
+                                        type="select"
+                                        id="usageTypeIdPU"
+                                        name="usageTypeIdPU"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        required
+                                        disabled={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {this.state.usageTypeList.length > 0
+                                            && this.state.usageTypeList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.id}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="text"
+                                        id="forecastingUnitPU"
+                                        name="forecastingUnitPU"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of FU / month / Clients" : "# of FU / usage / Patient"}<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="text"
+                                        id="forecastingUnitPU"
+                                        name="forecastingUnitPU"
+                                        bsSize="sm"
+                                        readOnly={true}
+
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="select"
+                                        id="forecastingUnitUnitPU"
+                                        name="forecastingUnitUnitPU"
+                                        bsSize="sm"
+                                        disabled="true"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.nodeUnitList.length > 0
+                                            && this.state.nodeUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.unitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Planning unit<span class="red Reqasterisk">*</span></Label>
+
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="select"
+                                        id="planningUnitId"
+                                        name="planningUnitId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.planningUnitList.length > 0
+                                            && this.state.planningUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.planningUnitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="text"
+                                        id="conversionFactor"
+                                        name="conversionFactor"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={this.state.conversionFactor}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month /" : "# of PU / usage / "}<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="text"
+                                        id="conversionFactor"
+                                        name="conversionFactor"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)}>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-5">
+                                    <Input type="select"
+                                        id="planningUnitUnitPU"
+                                        name="planningUnitUnitPU"
+                                        bsSize="sm"
+                                        disabled="true"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id}>
+
+                                        <option value=""></option>
+                                        {this.state.nodeUnitList.length > 0
+                                            && this.state.nodeUnitList.map((item, i) => {
+                                                return (
+                                                    <option key={i} value={item.unitId}>
+                                                        {getLabelText(item.label, this.state.lang)}
+                                                    </option>
+                                                )
+                                            }, this)}
+                                    </Input>
+                                </FormGroup>
+                                {(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
+                                    <>
+                                        <FormGroup className="col-md-2">
+                                            <Label htmlFor="currencyId">QAT estimate for interval (Every _ months)<span class="red Reqasterisk">*</span></Label>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-10">
+                                            <Input type="text"
+                                                id="interval"
+                                                name="interval"
+                                                bsSize="sm"
+                                                readOnly={true}
+                                                value={this.state.converionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}>
+
+                                            </Input>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-2">
+                                            <Label htmlFor="currencyId">Consumption interval (Every X months)<span class="red Reqasterisk">*</span></Label>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-10">
+                                            <Input type="text"
+                                                id="refillMonths"
+                                                name="refillMonths"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                                bsSize="sm"
+                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths}>
+
+                                            </Input>
+                                        </FormGroup></>}
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">Will Clients share one PU?<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="select"
+                                        id="sharePlanningUnit"
+                                        name="sharePlanningUnit"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit}>
+
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per ?" : "How many PU per usage per ?"}<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-10">
+                                    <Input type="text"
+                                        id="puInterval"
+                                        name="puInterval"
+                                        readOnly={true}
+                                        bsSize="sm"
+                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)))}>
+
+                                    </Input>
+                                </FormGroup>
+
+                            </div>
+                        </div>}
+                    {/* Plannign unit end */}
+                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
                         <div className="row">
 
                             <FormGroup className="col-md-4">
@@ -2071,6 +2434,9 @@ export default class CreateTreeTemplate extends Component {
                                                                     },
                                                                     unit: {
 
+                                                                    },
+                                                                    label: {
+                                                                        label_en: ""
                                                                     }
                                                                 },
                                                                 usageType: {
@@ -2082,6 +2448,14 @@ export default class CreateTreeTemplate extends Component {
                                                                 repeatUsagePeriod: {
 
                                                                 }
+                                                            },
+                                                            puNode: {
+                                                                planningUnit: {
+                                                                    unit: {
+
+                                                                    }
+                                                                },
+                                                                refillMonths: ''
                                                             }
                                                         }
                                                     ]
@@ -2101,23 +2475,37 @@ export default class CreateTreeTemplate extends Component {
                                                         {
                                                             dataValue: (itemConfig.payload.nodeDataMap[0])[0].dataValue,
                                                             fuNode: {
+                                                                noOfForecastingUnitsPerPerson: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson : ''),
+                                                                usageFrequency: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency : ''),
                                                                 forecastingUnit: {
+                                                                    label: {
+                                                                        label_en: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en : '')
+                                                                    },
                                                                     tracerCategory: {
 
                                                                     },
                                                                     unit: {
-
+                                                                        id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id : '')
                                                                     }
                                                                 },
                                                                 usageType: {
-
+                                                                    id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id : '')
                                                                 },
                                                                 usagePeriod: {
-
+                                                                    usagePeriodId: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : '')
                                                                 },
                                                                 repeatUsagePeriod: {
 
-                                                                }
+                                                                },
+                                                                noOfPersons: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons : '')
+                                                            },
+                                                            puNode: {
+                                                                planningUnit: {
+                                                                    unit: {
+
+                                                                    }
+                                                                },
+                                                                refillMonths: ''
                                                             }
                                                         }
                                                     ]
@@ -2129,6 +2517,15 @@ export default class CreateTreeTemplate extends Component {
                                 }, () => {
                                     console.log("add click config---", this.state.currentItemConfig);
                                     console.log("add click nodeflag---", this.state.addNodeFlag);
+                                    if (itemConfig.payload.nodeType.id == 4) {
+                                        console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                        this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                        this.getNoOfFUPatient();
+                                        this.getNoOfMonthsInUsagePeriod();
+                                    } else {
+
+
+                                    }
                                 });
                                 // this.onAddButtonClick(itemConfig);
                             }}>
@@ -2208,7 +2605,121 @@ export default class CreateTreeTemplate extends Component {
                                     initialValues={initialValues}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        var template = this.state.treeTemplate;
+                                        template.flatList = this.state.items;
+                                        console.log("on submit called--------------", template)
+                                        this.setState({
+                                            loading: true
+                                        })
+                                        if (template.treeTemplateId == 0) {
+                                            DatasetService.addTreeTemplate(template)
+                                                .then(response => {
+                                                    if (response.status == 200) {
+                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.messageCode, loading: false
+                                                        },
+                                                            () => {
+                                                                this.hideSecondComponent();
+                                                            })
+                                                    }
 
+                                                }).catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                        } else {
+                                                            switch (error.response ? error.response.status : "") {
+
+                                                                case 401:
+                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                    break;
+                                                                case 403:
+                                                                    this.props.history.push(`/accessDenied`)
+                                                                    break;
+                                                                case 500:
+                                                                case 404:
+                                                                case 406:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                case 412:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                default:
+                                                                    this.setState({
+                                                                        message: 'static.unkownError',
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                );
+                                        } else {
+                                            DatasetService.updatTreeTemplate(template)
+                                                .then(response => {
+                                                    if (response.status == 200) {
+                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.messageCode, loading: false
+                                                        },
+                                                            () => {
+                                                                this.hideSecondComponent();
+                                                            })
+                                                    }
+
+                                                }).catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                        } else {
+                                                            switch (error.response ? error.response.status : "") {
+
+                                                                case 401:
+                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                    break;
+                                                                case 403:
+                                                                    this.props.history.push(`/accessDenied`)
+                                                                    break;
+                                                                case 500:
+                                                                case 404:
+                                                                case 406:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                case 412:
+                                                                    this.setState({
+                                                                        message: error.response.data.messageCode,
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                                default:
+                                                                    this.setState({
+                                                                        message: 'static.unkownError',
+                                                                        loading: false
+                                                                    });
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                );
+                                        }
 
                                     }}
                                     render={
