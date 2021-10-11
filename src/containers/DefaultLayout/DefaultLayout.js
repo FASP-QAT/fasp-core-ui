@@ -293,11 +293,12 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/dataset/loadDeleteDataSet', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
-  { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
-  { path: '/dataset/listTreeTemplate/', name: 'List Tree Template', component: ListTreeTemplate },
-  { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
-  { path: '/dataSet/buildTree/', exact: true, name: 'static.common.buildTree', component: BuildTree },
+  {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/loadDeleteDataSet/:message',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/listTreeTemplate/:color/:message',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/listTreeTemplate/', exact: true,name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/createTreeTemplate/:templateId',name:'Create Tree Template',component:CreateTreeTemplate},
+  { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:templateId', exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -670,8 +671,8 @@ const routes = [
   { path: '/modelingType/listModelingType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
   { path: '/modelingType/listModelingType', exact: true, name: 'static.breadcrum.list', entityname: 'static.modelingType.modelingType', component: ModelingTypeList },
 
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnit', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.equivalancyUnit.equivalancyUnits', component: EquivalancyUnitList },
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
@@ -1423,11 +1424,11 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.common.datasetmanagement'),
                         icon: 'fa fa-list',
+                        // attributes: {
+                        // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        // },
                         attributes: {
-                          // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
-                          attributes: {
-                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
-                          },
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           {
@@ -1443,7 +1444,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnit'),
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
                             url: '/equivalancyUnit/listEquivalancyUnit',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true) }

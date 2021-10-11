@@ -5003,3 +5003,23 @@ height: 0px;
           border: 2px solid #000000a8;
           border-radius: 3px;
         }
+        label.arrow_label:before {
+          margin: -2px 1em 0 -2em!important;
+          font-size: 18px!important;
+      }
+      .DeleteIcontree {
+        padding: 1px 2px;
+        border: 2px solid #000000a8;
+        border-radius: 3px;
+        font-size: 10px;
+    }
+    .btn-danger {
+      color: #fff;
+      background-color: #BA0C2F!important;
+      border-color: #BA0C2F!important;
+  }
+    .btn-danger:hover {
+      color: #fff;
+      background-color: #BA0C2F!important;
+      border-color: #BA0C2F!important;
+  }

@@ -2497,7 +2497,7 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
+                            <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -2569,8 +2569,12 @@ class usageTemplate extends Component {
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                     <CardBody>
                                                         <div className="d-md-flex">
-                                                            <FormGroup className="mt-md-2 mb-md-0">
+                                                            <FormGroup className="pr-lg-2 mt-md-4 pt-lg-2 mb-md-0">
+                                                                <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
+                                                            </FormGroup>
+                                                            <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
                                                                 <div className="controls UsagePopUpInputField">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2590,6 +2594,7 @@ class usageTemplate extends Component {
 
                                                             <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
@@ -2609,12 +2614,13 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.picker1}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '14px' }}>
+                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
                                                                 <span>---</span>
                                                             </FormGroup>
 
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
                                                                 <div className="controls SelectGo">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2632,7 +2638,8 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.number2}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                                                <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label>
                                                                 {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input type="text"
@@ -2651,6 +2658,7 @@ class usageTemplate extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label>
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"

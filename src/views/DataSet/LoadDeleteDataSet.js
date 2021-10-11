@@ -614,8 +614,8 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
-                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version of program and delete older versions.</span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Dataset is not loaded.</span></li>
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
                                     <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
@@ -677,7 +677,7 @@ class LoadDeleteDataSet extends Component {
                                                                                         <div className="checkbox m-0">
                                                                                             <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
                                                                                             <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
-                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="16" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 CleanUpIcon"></img>}
+                                                                                            {this.state.programList.filter(c => c.programId == item2.program.id).length > 0 && <img width="15" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 CleanUpIcon"></img>}
                                                                                         </div>
                                                                                     </span>
                                                                                 </span>
@@ -693,7 +693,7 @@ class LoadDeleteDataSet extends Component {
                                                                                                             <div className="checkbox m-0">
                                                                                                                 <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
                                                                                                                 <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcon"></i>}
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcontree"></i>}
                                                                                                             </div>
                                                                                                         </span>
                                                                                                     </span>
@@ -735,7 +735,7 @@ class LoadDeleteDataSet extends Component {
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button> */}
                             </CardFooter>
                         </Card>
                     </Col>
@@ -892,7 +892,7 @@ class LoadDeleteDataSet extends Component {
     deleteLocalVersionUsingProgramId(programId) {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Do you want to delete",
+            message: "Do you want to delete all the older version and keep latest version only.",
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -934,7 +934,7 @@ class LoadDeleteDataSet extends Component {
                                     // transaction2.oncomplete = function (event) {
                                     this.setState({
                                         loading: false,
-                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        message: "Dataset deleted successfully",
                                         color: 'green'
                                     }, () => {
                                         this.hideFirstComponent()
@@ -1001,7 +1001,7 @@ class LoadDeleteDataSet extends Component {
                                     // deleteRequest2.onsuccess = function (event) {
                                     this.setState({
                                         loading: false,
-                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        message: "Dataset delete succesfully.",
                                         color: 'green'
                                     }, () => {
                                         this.hideFirstComponent()
@@ -1285,7 +1285,7 @@ class LoadDeleteDataSet extends Component {
                                                     this.setState({ loading: false, color: "red" }, () => {
                                                         this.hideFirstComponent()
                                                     })
-                                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
+                                                    this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.actioncancelled'))
                                                 }
                                             }
                                         ]
