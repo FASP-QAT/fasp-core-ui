@@ -2377,6 +2377,7 @@ export default class CreateTreeTemplate extends Component {
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
                         <button key="1" className="StyledButton" style={{ width: '23px', height: '23px' }}
                             onClick={(event) => {
+                                console.log("add button called---------");
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
@@ -2593,6 +2594,7 @@ export default class CreateTreeTemplate extends Component {
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        console.log("on submit called-----------------");
                                         var template = this.state.treeTemplate;
                                         console.log("template---", template);
                                         var items = this.state.items;
