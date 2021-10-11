@@ -1524,7 +1524,7 @@ export default class CreateTreeTemplate extends Component {
                                         }, this)}
                                 </Input>
                             </FormGroup>
-                            <div style={{ clear: 'both' }}>
+                            <div style={{ clear: 'both',width:'100%' }}>
                                 <table className="table table-bordered">
                                     <tr>
                                         <td># of FU required for period</td>
@@ -1540,7 +1540,7 @@ export default class CreateTreeTemplate extends Component {
                                     </tr>
                                 </table>
                             </div>
-                            <div className="pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
 
                             {/* <div style={{ width: '100%' }}> */}
                             {/* <table className="table table-bordered">
@@ -2111,7 +2111,7 @@ export default class CreateTreeTemplate extends Component {
                                                             </div>
                                                         </Provider>
                                                     </div>
-                                                    <CardFooter>
+                                                    <CardFooter style={{backgroundColor:'transparent',borderTop:'0px solid #c8ced3'}}>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {/* <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
