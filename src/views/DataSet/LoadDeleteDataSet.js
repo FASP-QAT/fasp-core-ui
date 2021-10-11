@@ -311,15 +311,15 @@ class LoadDeleteDataSet extends Component {
         document.getElementById("treeDiv").style.display = "block";
         // AuthenticationService.setupAxiosInterceptors();
         if (this.state.realmId != "" && this.state.realmId > 0) {
-            this.setState({
-                message: ""
-            })
-            RealmCountryService.getRealmCountryForProgram(this.state.realmId)
-                .then(response => {
-                    if (response.status == 200) {
-                        this.setState({
-                            countryList: response.data
-                        })
+        //     this.setState({
+        //         message: ""
+        //     })
+        //     RealmCountryService.getRealmCountryForProgram(this.state.realmId)
+        //         .then(response => {
+        //             if (response.status == 200) {
+                        // this.setState({
+                        //     countryList: response.data
+                        // })
                         // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
                         //     .then(response => {
                         //         if (response.status == 200) {
@@ -332,7 +332,8 @@ class LoadDeleteDataSet extends Component {
                                 console.log(">>>", response);
                                 if (response.status == 200) {
                                     this.setState({
-                                        prgList: response.data,
+                                        countryList: response.data.realmCountryList,
+                                        prgList: response.data.programList,
                                         loading: false
                                     })
                                 } else {
@@ -427,66 +428,66 @@ class LoadDeleteDataSet extends Component {
                         //         }
                         //     }
                         // );
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode,
-                            loading: false, color: "red"
-                        }, () => {
-                            this.hideFirstComponent()
-                        })
-                    }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false,
-                                color: "red"
-                            }, () => {
-                                this.hideFirstComponent()
-                            })
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+                //     } else {
+                //         this.setState({
+                //             message: response.data.messageCode,
+                //             loading: false, color: "red"
+                //         }, () => {
+                //             this.hideFirstComponent()
+                //         })
+                //     }
+                // }).catch(
+                //     error => {
+                //         if (error.message === "Network Error") {
+                //             this.setState({
+                //                 message: 'static.unkownError',
+                //                 loading: false,
+                //                 color: "red"
+                //             }, () => {
+                //                 this.hideFirstComponent()
+                //             })
+                //         } else {
+                //             switch (error.response ? error.response.status : "") {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false,
-                                        color: "red"
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false,
-                                        color: "red"
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false,
-                                        color: "red"
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    break;
-                            }
-                        }
-                    }
-                );
+                //                 case 401:
+                //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                //                     break;
+                //                 case 403:
+                //                     this.props.history.push(`/accessDenied`)
+                //                     break;
+                //                 case 500:
+                //                 case 404:
+                //                 case 406:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false,
+                //                         color: "red"
+                //                     }, () => {
+                //                         this.hideFirstComponent()
+                //                     })
+                //                     break;
+                //                 case 412:
+                //                     this.setState({
+                //                         message: error.response.data.messageCode,
+                //                         loading: false,
+                //                         color: "red"
+                //                     }, () => {
+                //                         this.hideFirstComponent()
+                //                     })
+                //                     break;
+                //                 default:
+                //                     this.setState({
+                //                         message: 'static.unkownError',
+                //                         loading: false,
+                //                         color: "red"
+                //                     }, () => {
+                //                         this.hideFirstComponent()
+                //                     })
+                //                     break;
+                //             }
+                //         }
+                //     }
+                // );
 
         } else {
             document.getElementById("treeDiv").style.display = "none";
