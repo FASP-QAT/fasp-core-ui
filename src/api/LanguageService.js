@@ -23,6 +23,11 @@ class LanguageService {
         return axios.get(`${API_URL}/api/language/${json}`, {}
         );
     }
+
+    testAsync() {
+        return axios.get(`${API_URL}/api/async/success2`, {}
+        );
+    }
 }
 
 export default new LanguageService()

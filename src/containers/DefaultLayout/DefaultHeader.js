@@ -1,23 +1,17 @@
+import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Nav, NavItem, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import PropTypes from 'prop-types';
-
-import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
-import DefaultHeaderDropdown from './DefaultHeaderDropdown'
-import logo from '../../assets/img/QAT-logo.png'
-import QAT from '../../assets/img/brand/QAT-minimize.png'
-import i18n from '../../i18n'
-import { Online, Offline } from 'react-detect-offline';
-import AuthenticationService from '../../views/Common/AuthenticationService';
-import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { Alert, Col, Nav, NavItem } from 'reactstrap';
+import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
-import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
-import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
-import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
-import iconsDownarrowRed from '../../assets/img/icons-downarrow-red.png';
-import { API_URL, polling } from '../../Constants';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import logo from '../../assets/img/QAT-logo.png';
+import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { API_URL } from '../../Constants';
+import i18n from '../../i18n';
+import AuthenticationService from '../../views/Common/AuthenticationService';
+import DefaultHeaderDropdown from './DefaultHeaderDropdown';
+import eventBus from './eventBus.js'
 
 const propTypes = {
   children: PropTypes.node,
@@ -28,17 +22,37 @@ const defaultProps = {};
 class DefaultHeader extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      visible: false,
+      responseMessage:''
+    };
+
+    this.onDismiss = this.onDismiss.bind(this);
+
     this.changeLanguage = this.changeLanguage.bind(this)
   }
+
+  onDismiss() {
+    this.setState({ visible: false });
+  }
+
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
 
+  componentDidMount(){
+    eventBus.on("testDataAccess", (data) =>
+      this.setState({ visible: data.message,responseMessage:data.responseMessage })
+    );
+  }
+  componentWillUnmount() {
+    eventBus.remove("testDataAccess");
+  }
 
   render() {
-
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
     const checkOnline = localStorage.getItem('sessionType');
@@ -51,6 +65,7 @@ class DefaultHeader extends Component {
             full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
             minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
           />
+
         </NavLink>
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
@@ -168,7 +183,11 @@ class DefaultHeader extends Component {
               </span>
             </NavLink>
           </NavItem>
-
+              <Col xs="12" md="6">
+                <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss}>
+                  Commit Status is : {this.state.responseMessage}
+                </Alert>
+              </Col>
         </Nav>
 
 
