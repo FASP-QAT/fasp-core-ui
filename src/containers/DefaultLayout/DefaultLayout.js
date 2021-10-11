@@ -293,11 +293,12 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/dataset/loadDeleteDataSet', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
-  { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
-  { path: '/dataset/listTreeTemplate/', name: 'List Tree Template', component: ListTreeTemplate },
-  { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
-  { path: '/dataSet/buildTree/', exact: true, name: 'static.common.buildTree', component: BuildTree },
+  {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/loadDeleteDataSet/:message',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
+  {path:'/dataset/listTreeTemplate/:color/:message',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/listTreeTemplate/', exact: true,name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/createTreeTemplate/:templateId',name:'Create Tree Template',component:CreateTreeTemplate},
+  { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:templateId', exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
