@@ -2222,7 +2222,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                     </FormGroup>
                                 </>}
-                            <div style={{ clear: 'both' }}>
+                            <div style={{ clear: 'both',width:'100%' }}>
                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                     <table className="table table-bordered">
                                         <tr>
@@ -2254,7 +2254,7 @@ export default class CreateTreeTemplate extends Component {
                                         </tr>
                                     </table>}
                             </div>
-                            <div className="pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
                         </div>
                     </div>}
                 </TabPane>
@@ -2845,7 +2845,7 @@ export default class CreateTreeTemplate extends Component {
                                                             </div>
                                                         </Provider>
                                                     </div>
-                                                    <CardFooter>
+                                                    <CardFooter style={{backgroundColor:'transparent',borderTop:'0px solid #c8ced3'}}>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
