@@ -2205,7 +2205,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                     </FormGroup>
                                 </>}
-                            <div style={{ clear: 'both' }}>
+                            <div style={{ clear: 'both',width:'100%' }}>
                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                     <table className="table table-bordered">
                                         <tr>
@@ -2237,7 +2237,7 @@ export default class CreateTreeTemplate extends Component {
                                         </tr>
                                     </table>}
                             </div>
-                            <div className="pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
                         </div>
                     </div>}
                 </TabPane>
