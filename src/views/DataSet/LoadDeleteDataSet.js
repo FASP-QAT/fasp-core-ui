@@ -614,8 +614,8 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
-                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version of program and delete older versions.</span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Dataset is not loaded.</span></li>
+                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
                                     <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
                                 <Col md="3 pl-0" id="realmDiv">
@@ -735,7 +735,7 @@ class LoadDeleteDataSet extends Component {
                             <CardFooter>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.deleteClicked()}><i className="fa fa-times"></i> {i18n.t('static.common.delete')}</Button> */}
                             </CardFooter>
                         </Card>
                     </Col>
@@ -892,7 +892,7 @@ class LoadDeleteDataSet extends Component {
     deleteLocalVersionUsingProgramId(programId) {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Do you want to delete",
+            message: "Do you want to delete all the older version and keep latest version only.",
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -934,7 +934,7 @@ class LoadDeleteDataSet extends Component {
                                     // transaction2.oncomplete = function (event) {
                                     this.setState({
                                         loading: false,
-                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        message: "Dataset deleted successfully",
                                         color: 'green'
                                     }, () => {
                                         this.hideFirstComponent()
@@ -1001,7 +1001,7 @@ class LoadDeleteDataSet extends Component {
                                     // deleteRequest2.onsuccess = function (event) {
                                     this.setState({
                                         loading: false,
-                                        message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                                        message: "Dataset delete succesfully.",
                                         color: 'green'
                                     }, () => {
                                         this.hideFirstComponent()
@@ -1285,7 +1285,7 @@ class LoadDeleteDataSet extends Component {
                                                     this.setState({ loading: false, color: "red" }, () => {
                                                         this.hideFirstComponent()
                                                     })
-                                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
+                                                    this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.actioncancelled'))
                                                 }
                                             }
                                         ]
