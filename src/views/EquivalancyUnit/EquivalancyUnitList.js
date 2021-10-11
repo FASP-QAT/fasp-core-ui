@@ -536,7 +536,8 @@ class EquivalancyUnit extends Component {
                     textEditor: true,
                 },
                 {
-                    title: i18n.t('static.dataSet.dataSet'),
+                    // title: i18n.t('static.dataSet.dataSet'),
+                    title: i18n.t('static.equivalancyUnit.type'),
                     type: 'autocomplete',
                     source: this.state.typeList,
                     filter: this.filterDataset
@@ -1098,7 +1099,8 @@ class EquivalancyUnit extends Component {
                     }
 
                     tempProgramList.unshift({
-                        name: 'All',
+                        // name: 'All',
+                        name: i18n.t('static.common.realmLevel'),
                         id: -1,
                         active: true,
                     });
@@ -1934,8 +1936,8 @@ class EquivalancyUnit extends Component {
                                                 onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
-                                                <option value="1">{i18n.t('static.dashboard.realmheader')}</option>
-                                                <option value="2">{i18n.t('static.forecastProgram.forecastProgram')}</option>
+                                                <option value="1">{i18n.t('static.common.realmLevel')}</option>
+                                                <option value="2">{i18n.t('static.common.datasetLevel')}</option>
                                                 {/* {dataSourceTypeList} */}
                                             </Input>
                                             {/* <InputGroupAddon addonType="append">
