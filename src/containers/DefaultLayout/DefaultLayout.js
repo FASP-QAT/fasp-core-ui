@@ -290,7 +290,8 @@ const LoadDeleteDataSet=React.lazy(() => import('../../views/DataSet/LoadDeleteD
 const routes = [
   {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
   {path:'/dataset/loadDeleteDataSet/:message',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
-  {path:'/dataset/listTreeTemplate/',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/listTreeTemplate/:color/:message',name:'List Tree Template',component:ListTreeTemplate},
+  {path:'/dataset/listTreeTemplate/', exact: true,name:'List Tree Template',component:ListTreeTemplate},
   {path:'/dataset/createTreeTemplate/:templateId',name:'Create Tree Template',component:CreateTreeTemplate},
   { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
