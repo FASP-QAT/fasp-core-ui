@@ -135,6 +135,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
         var inventoryList = this.props.items.inventoryList;
         var programJson = this.props.items.programJson;
+        var generalProgramJson=this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -160,7 +161,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
+                    if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -183,8 +184,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
-                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
+                        if (dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
+                            if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
@@ -379,7 +380,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 var rowData = elInstance.getRowData(y);
                                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                                     for (var c = 0; c < colArr.length; c++) {
                                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                                         cell.classList.add('readonly');
@@ -512,7 +513,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var inventoryBatchEditable = inventoryEditable;
         var lastEditableDate = "";
         lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1 && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
             inventoryBatchEditable = false;
         }
         if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
@@ -1362,7 +1363,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 // adjustmentsQty += (map.get("7") * map.get("4"))
                 var rowData = elInstance.getRowData(y);
                 var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 } else {
                     // var colArr = ['D'];
                     // for (var c = 0; c < colArr.length; c++) {
@@ -1578,11 +1579,29 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var programDataJson = programRequest.result.programData;
+                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
                     var inventoryDataList = (programJson.inventoryList);
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1673,11 +1692,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.inventoryList = inventoryDataList;
-                    programJson.actionList = actionList;
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
                     this.setState({
-                        programJson: programJson
+                        programJson: programJson,
+                        planningUnitDataList:planningUnitDataList
                     })
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    programDataJson.planningUnitDataList=planningUnitDataList;
+                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
                     putRequest.onerror = function (event) {

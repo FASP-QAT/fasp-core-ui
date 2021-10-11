@@ -95,7 +95,7 @@ export default class ExportProgram extends Component {
                     var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                     console.log("ProgramNameLabel", programNameLabel);
-                    var bytes1 = CryptoJS.AES.decrypt(json[i].programData, SECRET_KEY);
+                    var bytes1 = CryptoJS.AES.decrypt(json[i].programData.generalData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     if (json[i].userId == userId) {
@@ -251,8 +251,12 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].programPlanningUnitList = programPlanningUnitList;
                                                                                         myResult[i].regionList = regionList;
                                                                                         myResult[i].budgetList = budgetList;
-                                                                                        var readonly = programQPLResult.filter(c => c.id == programId[j].value)[0];
-                                                                                        myResult[i].readonly = readonly;
+                                                                                        var programQPLResultFiltered = programQPLResult.filter(c => c.id == programId[j].value)[0];
+                                                                                        myResult[i].programModified = programQPLResultFiltered.programModified;
+                                                                                        myResult[i].openCount = programQPLResultFiltered.openCount;
+                                                                                        myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
+                                                                                        myResult[i].readonly = programQPLResultFiltered.readonly;
+
                                                                                         var txt = JSON.stringify(myResult[i]);
                                                                                         var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
                                                                                         var txt1 = JSON.stringify(dArray)
