@@ -93,12 +93,12 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: (itemConfig.payload.nodeType.id == 4 ? Colors.Yellow : itemConfig.payload.nodeType.id == 5 ? Colors.Black : Colors.White), borderColor: Colors.Black }}>
+        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black), marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: Colors.Black, marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div>
         </div>
     ))
 }
@@ -296,6 +296,26 @@ export default class CreateTreeTemplate extends Component {
         this.getPlanningUnitListByFUId = this.getPlanningUnitListByFUId.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.calculateValuesForAggregateNode = this.calculateValuesForAggregateNode.bind(this);
+        this.duplicateNode = this.duplicateNode.bind(this);
+    }
+
+    duplicateNode(itemConfig) {
+        console.log("duplicate node called---", this.state.currentItemConfig);
+        const { items } = this.state;
+        var newItem = {
+            id: parseInt(items.length + 1),
+            level: this.state.currentItemConfig.context.level,
+            parent: this.state.currentItemConfig.context.parent,
+            payload: this.state.currentItemConfig.context.payload
+        };
+        console.log("add button clicked value after update---", newItem);
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: parseInt(items.length + 1)
+        }, () => {
+            console.log("on add items-------", this.state.items);
+            this.calculateValuesForAggregateNode(this.state.items);
+        });
     }
     cancelClicked() {
         this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
@@ -1368,6 +1388,7 @@ export default class CreateTreeTemplate extends Component {
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
         newItem.id = parseInt(items.length + 1);
+        newItem.level = parseInt(itemConfig.context.level + 1);
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
         }
@@ -2531,6 +2552,7 @@ export default class CreateTreeTemplate extends Component {
                             <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
+                                    this.duplicateNode(itemConfig);
                                 }}>
                                 <FontAwesomeIcon icon={faCopy} />
                             </button>
