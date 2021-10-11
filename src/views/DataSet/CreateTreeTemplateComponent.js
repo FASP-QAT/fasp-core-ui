@@ -98,7 +98,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black) }}>{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black),marginLeft : '-50px' }}>{getPayloadData(itemConfig)}</div>
         </div>
     ))
 }
@@ -115,7 +115,11 @@ function getPayloadData(itemConfig) {
     // }
     console.log("data---", data);
     if (data != null && data[0] != null && (data[0])[0] != null) {
-        return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+        if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
+            return (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+        } else {
+            return (itemConfig.payload.nodeDataMap[0])[0].dataValue + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? "%=" + (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue : "");
+        }
     } else {
         return "";
     }
@@ -158,7 +162,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
-            parentValue : '',
+            parentValue: '',
             calculatedDataValue: '',
             message: '',
             converionFactor: '',
@@ -984,9 +988,26 @@ export default class CreateTreeTemplate extends Component {
         if (this.props.match.params.templateId != -1) {
             DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
                 console.log("my tree---", response.data);
+                var items = response.data.flatList;
+                var arr = [];
+                for (let i = 0; i < items.length; i++) {
+
+                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                    } else {
+
+                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                        console.log("api parent value---", parentValue);
+
+                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                    }
+                    console.log("load---", items[i])
+                    // arr.push(items[i]);
+                }
                 this.setState({
                     treeTemplate: response.data,
-                    items: response.data.flatList,
+                    items,
                     loading: false
                 }, () => {
                     console.log("Tree Template---", this.state.items);
@@ -1243,20 +1264,16 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "percentageOfParent") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
             var calculatedDataValue;
-            if (currentItemConfig.parentItem.payload.nodeType.id == 1 || currentItemConfig.parentItem.payload.nodeType.id == 2) {
-                calculatedDataValue = event.target.value;
-            } else {
-                calculatedDataValue = (event.target.value * (currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue) / 100;
-            }
             var parentValue;
             if (this.state.addNodeFlag !== "true") {
                 parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue
             } else {
                 parentValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue
             }
-
+            console.log("parentValue---", parentValue);
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = (event.target.value * parentValue) / 100
+            console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
-                calculatedDataValue,
                 parentValue
             })
         }
@@ -1691,7 +1708,7 @@ export default class CreateTreeTemplate extends Component {
                                         name="parentValue"
                                         readOnly={true}
                                         onChange={(e) => { this.dataChange(e) }}
-                                        value={this.state.parentValue}
+                                        value={this.state.addNodeFlag != "true" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : this.state.parentValue}
                                     ></Input>
                                 </FormGroup></>}
                         {this.state.aggregationNode &&
@@ -1703,7 +1720,7 @@ export default class CreateTreeTemplate extends Component {
                                     readOnly={this.state.numberNode ? true : false}
                                     onChange={(e) => { this.dataChange(e) }}
                                     // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? this.state.calculatedDataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
                                 ></Input>
                             </FormGroup>}
 
@@ -2222,7 +2239,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                     </FormGroup>
                                 </>}
-                            <div style={{ clear: 'both',width:'100%' }}>
+                            <div style={{ clear: 'both', width: '100%' }}>
                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                     <table className="table table-bordered">
                                         <tr>
@@ -2386,6 +2403,7 @@ export default class CreateTreeTemplate extends Component {
                                                     [
                                                         {
                                                             dataValue: '',
+                                                            calculatedDataValue: '',
                                                             notes: '',
                                                             fuNode: {
                                                                 forecastingUnit: {
@@ -2437,6 +2455,7 @@ export default class CreateTreeTemplate extends Component {
                                                     [
                                                         {
                                                             dataValue: (itemConfig.payload.nodeDataMap[0])[0].dataValue,
+                                                            calculatedDataValue: (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue,
                                                             fuNode: {
                                                                 noOfForecastingUnitsPerPerson: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson : ''),
                                                                 usageFrequency: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency : ''),
@@ -2587,6 +2606,7 @@ export default class CreateTreeTemplate extends Component {
                                                 id: item.id,
                                                 parent: item.parent,
                                                 payload: {
+                                                    nodeId : item.payload.nodeId,
                                                     nodeType: {
                                                         id: item.payload.nodeType.id
                                                     },
@@ -2688,7 +2708,7 @@ export default class CreateTreeTemplate extends Component {
                                             DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
-                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode))
+                                                        this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
                                                         this.setState({
                                                             message: response.data.messageCode, loading: false
@@ -2845,7 +2865,7 @@ export default class CreateTreeTemplate extends Component {
                                                             </div>
                                                         </Provider>
                                                     </div>
-                                                    <CardFooter style={{backgroundColor:'transparent',borderTop:'0px solid #c8ced3'}}>
+                                                    <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
