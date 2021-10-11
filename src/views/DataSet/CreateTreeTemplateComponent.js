@@ -158,7 +158,8 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
-            tempNodeValue: '',
+            parentValue : '',
+            calculatedDataValue: '',
             message: '',
             converionFactor: '',
             planningUnitList: [],
@@ -237,6 +238,9 @@ export default class CreateTreeTemplate extends Component {
                 },
                 parentItem: {
                     payload: {
+                        nodeType: {
+                            id: ''
+                        },
                         label: {
 
                         },
@@ -1238,16 +1242,27 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "percentageOfParent") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
-            // var tempNodeValue;
-            // if (currentItemConfig.parentItem.payload.nodeType.id == 3) {
+            var calculatedDataValue;
+            if (currentItemConfig.parentItem.payload.nodeType.id == 1 || currentItemConfig.parentItem.payload.nodeType.id == 2) {
+                calculatedDataValue = event.target.value;
+            } else {
+                calculatedDataValue = (event.target.value * (currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue) / 100;
+            }
+            var parentValue;
+            if (this.state.addNodeFlag !== "true") {
+                parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue
+            } else {
+                parentValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue
+            }
 
-            // }
             this.setState({
-                tempNodeValue: event.target.value
+                calculatedDataValue,
+                parentValue
             })
         }
         if (event.target.name === "nodeValue") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = event.target.value;
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
@@ -1667,6 +1682,8 @@ export default class CreateTreeTemplate extends Component {
                                         onChange={(e) => { this.dataChange(e) }}
                                         value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
                                 </FormGroup>
+                                {/* 1---{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue} */}
+                                {/* 2---{(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue} */}
                                 <FormGroup>
                                     <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
                                     <Input type="text"
@@ -1674,7 +1691,7 @@ export default class CreateTreeTemplate extends Component {
                                         name="parentValue"
                                         readOnly={true}
                                         onChange={(e) => { this.dataChange(e) }}
-                                        value={this.state.currentItemConfig.context.level != 0 && this.state.addNodeFlag !== "true" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].dataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+                                        value={this.state.parentValue}
                                     ></Input>
                                 </FormGroup></>}
                         {this.state.aggregationNode &&
@@ -1686,7 +1703,7 @@ export default class CreateTreeTemplate extends Component {
                                     readOnly={this.state.numberNode ? true : false}
                                     onChange={(e) => { this.dataChange(e) }}
                                     // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? this.state.tempNodeValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? this.state.calculatedDataValue : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
                                 ></Input>
                             </FormGroup>}
 
@@ -2407,6 +2424,9 @@ export default class CreateTreeTemplate extends Component {
                                         },
                                         parentItem: {
                                             payload: {
+                                                nodeType: {
+                                                    id: itemConfig.payload.nodeType.id
+                                                },
                                                 label: {
                                                     label_en: (itemConfig.level != 0 ? itemConfig.payload.label.label_en : '')
                                                 },
