@@ -1397,7 +1397,7 @@
     "static.manualtagging.result": "Enter ERP shipment number. and prime line number.",
     "static.country.languagetext": "Select language",
     "static.language.languageCode": "Language display name",
-    "static.common.datasetLevel": "Frequency",
+    "static.common.datasetLevel": "Dataset Level",
     "static.dataentry.downloadTemplate": "Download template",
     "static.quantimed.planningUnitNotFoundText": "Planning Unit Not Found",
     "static.translation.labelCode": "Label code",
