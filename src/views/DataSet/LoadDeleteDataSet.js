@@ -759,7 +759,7 @@ class LoadDeleteDataSet extends Component {
 
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + "Load delete dataset action cancelled");
     }
 
     deleteClicked() {
@@ -951,7 +951,7 @@ class LoadDeleteDataSet extends Component {
                     label: i18n.t('static.program.no'),
                     onClick: () => {
                         this.setState({
-                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "red"
                         })
                         this.setState({ loading: false, color: "red" }, () => {
                             this.hideFirstComponent()
@@ -1019,7 +1019,7 @@ class LoadDeleteDataSet extends Component {
                     label: i18n.t('static.program.no'),
                     onClick: () => {
                         this.setState({
-                            message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "red"
                         })
                         this.setState({ loading: false, color: "red" }, () => {
                             this.hideFirstComponent()
@@ -1102,7 +1102,7 @@ class LoadDeleteDataSet extends Component {
         }
         if (programCheckedCount == 0) {
             this.setState({
-                message: i18n.t('static.program.errorSelectAtleastOneProgram'),
+                message: 'Select atleast one dataset to load',
                 loading: false, color: "red"
             },
                 () => {
@@ -1170,7 +1170,7 @@ class LoadDeleteDataSet extends Component {
                                 if (isExists > 0) {
                                     confirmAlert({
                                         title: i18n.t('static.program.confirmsubmit'),
-                                        message: i18n.t('static.program.programwithsameversion'),
+                                        message: 'A dataset with same version number already exists in the local machine. Do you want to overwrite that dataset with the new data?',
                                         buttons: [
                                             {
                                                 label: i18n.t('static.program.yes'),
@@ -1235,12 +1235,12 @@ class LoadDeleteDataSet extends Component {
                                                         }, () => {
                                                             this.hideFirstComponent()
                                                         })
-                                                        // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                                        // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
                                                         this.setState({ loading: false })
                                                         // this.refs.programListChild.checkNewerVersions();
                                                         this.getPrograms();
                                                         this.getLocalPrograms();
-                                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                        this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
                                                         // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                         //     // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                         //     // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
@@ -1281,7 +1281,7 @@ class LoadDeleteDataSet extends Component {
                                                 label: i18n.t('static.program.no'),
                                                 onClick: () => {
                                                     this.setState({
-                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                                                        message: i18n.t('static.actionCancelled'), loading: false, color: "red"
                                                     })
                                                     this.setState({ loading: false, color: "red" }, () => {
                                                         this.hideFirstComponent()
@@ -1372,12 +1372,12 @@ class LoadDeleteDataSet extends Component {
                                             loading: false
                                         })
                                         this.hideFirstComponent();
-                                        // this.props.history.push(`/dashboard/`+'green/' + i18n.t('static.program.downloadsuccess'))
+                                        // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
                                         this.setState({ loading: false })
                                         // this.refs.programListChild.checkNewerVersions();
                                         this.getPrograms();
                                         this.getLocalPrograms();
-                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                        this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
                                         // }.bind(this)
                                         // }.bind(this)
                                     }.bind(this)
