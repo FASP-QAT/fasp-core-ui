@@ -98,7 +98,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black),marginLeft : '-50px' }}>{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: (itemConfig.payload.nodeType.id == 5 ? Colors.White : Colors.Black), marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div>
         </div>
     ))
 }
@@ -1384,6 +1384,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     calculateValuesForAggregateNode(items) {
+        console.log("start>>>", Date.now());
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
             b = b.id;
@@ -1397,11 +1398,13 @@ export default class CreateTreeTemplate extends Component {
             if (getChildAggregationNode.length > 0) {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
-                    value = parseInt(value) + parseInt(getChildAggregationNode[m].payload.nodeDataMap[0][0].dataValue);
+                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[0][0].dataValue != "" ? parseInt(getChildAggregationNode[m].payload.nodeDataMap[0][0].dataValue) : 0;
+                    value = value + parseInt(value2);
                 }
 
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[0][0].dataValue = value;
+                items[findNodeIndex].payload.nodeDataMap[0][0].calculatedDataValue = value;
 
                 this.setState({
                     items: items,
@@ -1412,6 +1415,7 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[0][0].dataValue = "";
+                items[findNodeIndex].payload.nodeDataMap[0][0].calculatedDataValue = "";
 
                 this.setState({
                     items: items,
@@ -1421,7 +1425,7 @@ export default class CreateTreeTemplate extends Component {
                 });
             }
         }
-
+        console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
@@ -1570,6 +1574,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                 }
+
             })
         }
     };
@@ -1585,6 +1590,7 @@ export default class CreateTreeTemplate extends Component {
             openAddNodeModal: false,
         }, () => {
             console.log("updated tree data+++", this.state);
+            this.calculateValuesForAggregateNode(this.state.items);
         });
     }
 
@@ -2522,7 +2528,7 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2"  type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                 }}>
@@ -2530,7 +2536,7 @@ export default class CreateTreeTemplate extends Component {
                             </button>
 
 
-                            <button key="3"  type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -2608,7 +2614,7 @@ export default class CreateTreeTemplate extends Component {
                                                 id: item.id,
                                                 parent: item.parent,
                                                 payload: {
-                                                    nodeId : item.payload.nodeId,
+                                                    nodeId: item.payload.nodeId,
                                                     nodeType: {
                                                         id: item.payload.nodeType.id
                                                     },
