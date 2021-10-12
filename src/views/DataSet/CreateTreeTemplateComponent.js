@@ -96,9 +96,14 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
         <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
+                {/* <div className="ContactTitle" style={{ color: Colors.Black }}><b style={{fontSize:'13px'}}>{itemConfig.payload.label.label_en}</b><b style={{ color:'#212721',float:'right' }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div> */}
+                <div className="ContactTitle" style={{ color: Colors.Black }}><div title="" style={{fontSize:'13px',whiteSpace: 'nowrap',overflow:'hidden',textOverflow:'ellipsis',width:'158px',float:'left',fontWeight:'bold'}}>{itemConfig.payload.label.label_en}</div><b style={{ color:'#212721',float:'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{fontSize:'11px'}}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{fontSize:'11px'}} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{fontSize:'11px'}} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{fontSize:'11px'}} ></i>:(itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-cube" style={{fontSize:'11px'}} ></i>:""))))}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: Colors.Black, marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div>
+            {/* <div className="ContactPhone" style={{ color: Colors.Black, marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div> */}
+            <div className="ContactPhone" style={{ color: Colors.Black }}>
+                <span style={{textAlign:'center',fontWeight:'600'}}>75.4%</span>
+                <div style={{marginTop:'10px',overflow:'inherit',width:'132px'}}><p className="float-lg-right pl-lg-5" style={{textAlign:'right'}}> 45,386,984</p></div>
+                </div>
         </div>
     ))
 }
@@ -3078,7 +3083,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both' }} >
+                                                            <div className="placeholder" style={{ clear: 'both',height:'100vh' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>

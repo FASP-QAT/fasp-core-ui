@@ -4248,6 +4248,7 @@ display: none;
     color: #fff !important;
     padding-top: 6px !important;
   padding-bottom: 30px !important;
+  height: 0px!important;
 }
 .sidebar-minimized .module2 .nav-link.bgColourRemoveLink.tab2:hover {
     margin-top: 3px !important;
@@ -5000,3 +5001,7 @@ height: 0px;
           border: 2px solid #000000a8;
           border-radius: 3px;
         }
+        .ContactTemplate .ContactPhone {
+          overflow: inherit!important;
+        }
+        
