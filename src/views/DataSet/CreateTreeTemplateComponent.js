@@ -1932,7 +1932,7 @@ export default class CreateTreeTemplate extends Component {
                             {/* <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback> */}
                         </FormGroup>
                         {this.state.aggregationNode &&
-                            <>
+                            
                                 <FormGroup>
                                     <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
                                     <Input
@@ -1954,7 +1954,7 @@ export default class CreateTreeTemplate extends Component {
                                                 )
                                             }, this)}
                                     </Input>
-                                </FormGroup>
+                                </FormGroup>}
                                 <FormGroup>
                                     <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                     <div className="controls edit">
@@ -1973,7 +1973,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Picker>
                                     </div>
                                 </FormGroup>
-                            </>}
+                            
                         {this.state.numberNode &&
                             <>
                                 <FormGroup>
