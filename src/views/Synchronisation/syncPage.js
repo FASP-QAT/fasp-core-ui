@@ -3483,11 +3483,48 @@ export default class syncPage extends Component {
                       programRequest2.onsuccess = function (e) {
 
                         var json = response.data;
-                        json.actionList = [];
+//                        json.actionList = [];
                         var version = json.requestedProgramVersion;
                         if (version == -1) {
                           version = json.currentVersion.versionId
                         }
+                        
+                        var updatedJson = {};
+              var planningUnitList = json.planningUnitList;
+              var consumptionList = json.consumptionList;
+              var inventoryList = json.inventoryList;
+              var shipmentList = json.shipmentList;
+              var batchInfoList = json.batchInfoList;
+              var problemReportList = json.problemReportList;
+              var supplyPlan = json.supplyPlan;
+              var generalData = json;
+              delete generalData.consumptionList;
+              delete generalData.inventoryList;
+              delete generalData.shipmentList;
+              delete generalData.batchInfoList;
+              delete generalData.supplyPlan;
+              delete generalData.planningUnitList;
+              generalData.actionList = [];
+              var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+              var planningUnitDataList = [];
+              for (var pu = 0; pu < planningUnitList.length; pu++) {
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+                var planningUnitDataJson = {
+                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+                }
+                var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+                planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+              }
+              var programDataJson = {
+                generalData: generalEncryptedData,
+                planningUnitDataList: planningUnitDataList
+              };
+              updatedJson = programDataJson;
 
                         var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                         var programSaveData = transactionForSavingData.objectStore('programData');
@@ -3498,7 +3535,7 @@ export default class syncPage extends Component {
                         var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
                         // for (var i = 0; i < json.length; i++) {
-                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                        var encryptedText = updatedJson;
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
@@ -3509,7 +3546,7 @@ export default class syncPage extends Component {
                           programId: json.programId,
                           version: version,
                           programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                          programData: encryptedText.toString(),
+                          programData: encryptedText,
                           userId: userId
                         };
                         var programQPLDetails = {
