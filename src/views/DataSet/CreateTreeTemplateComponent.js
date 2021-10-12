@@ -96,9 +96,12 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
         <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><b>{itemConfig.payload.label.label_en}</b><b style={{ color: Colors.Blue }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: Colors.Black, marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div>
+            <div className="ContactPhone" style={{ color: Colors.Black }}>
+                <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
+                <div style={{ marginLeft: '30px', marginTop: '10px', overflow: 'inherit', width: '100%' }}><span style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</span></div>
+            </div>
         </div>
     ))
 }
@@ -118,7 +121,7 @@ function addCommas(cell, row) {
     }
 }
 
-function getPayloadData(itemConfig) {
+function getPayloadData(itemConfig, type) {
     console.log("inside get payload");
     var data = [];
     data = itemConfig.payload.nodeDataMap;
@@ -132,9 +135,17 @@ function getPayloadData(itemConfig) {
     console.log("data---", data);
     if (data != null && data[0] != null && (data[0])[0] != null) {
         if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+            if (type == 1) {
+                return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+            } else {
+                return "";
+            }
         } else {
-            return (itemConfig.payload.nodeDataMap[0])[0].dataValue + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? "%=" + addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+            if (type == 1) {
+                return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
+            } else {
+                return ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+            }
         }
     } else {
         return "";
@@ -321,6 +332,17 @@ export default class CreateTreeTemplate extends Component {
         this.duplicateNode = this.duplicateNode.bind(this);
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
+        this.getConversionFactor = this.getConversionFactor.bind(this);
+    }
+
+    getConversionFactor(planningUnitId) {
+        console.log("planningUnitId cf ---", planningUnitId);
+        var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
+        console.log("pu---", pu)
+        // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
+        this.setState({
+            conversionFactor: pu.multiplier
+        });
     }
 
     getNodeTypeFollowUpList(nodeTypeId) {
@@ -1829,6 +1851,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     // this.getUsageText();
+                    // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
                 }
 
             })
@@ -2898,7 +2921,7 @@ export default class CreateTreeTemplate extends Component {
                                                         0: [
                                                             {
                                                                 month: (item.payload.nodeDataMap[0])[0].month,
-                                                                nodeDataId : (item.payload.nodeDataMap[0])[0].nodeDataId,
+                                                                nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
