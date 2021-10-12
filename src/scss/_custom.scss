@@ -5003,15 +5003,19 @@ height: 0px;
           border: 2px solid #000000a8;
           border-radius: 3px;
         }
-        label.arrow_label:before {
-          margin: -2px 1em 0 -2em!important;
-          font-size: 18px!important;
-      }
+      //   label.arrow_label:before {
+      //     margin: -2px 1em 0 -2em!important;
+      //     font-size: 15px!important;
+      // }
       .DeleteIcontree {
-        padding: 1px 2px;
-        border: 2px solid #000000a8;
-        border-radius: 3px;
-        font-size: 10px;
+        // padding: 1px 2px;
+        // border: 2px solid #000000a8;
+        // border-radius: 3px;
+        // font-size: 10px;
+        padding: 0px 2px 1px 2px;
+    border: 2px solid #000000a8;
+    border-radius: 3px;
+    font-size: 9px;
     }
     .btn-danger {
       color: #fff;
@@ -5020,6 +5024,35 @@ height: 0px;
   }
     .btn-danger:hover {
       color: #fff;
-      background-color: #BA0C2F!important;
-      border-color: #BA0C2F!important;
+      background-color: #d20e35!important;
+      border-color: #d20e35!important;
   }
+  label.arrow_label:before {
+    color: #000000a8;
+    position: relative;
+    z-index: 1;
+    float: left;
+    // margin: 0 1em 0 -2em;
+    margin: -2px 1em 0 -2em!important;
+    font-size: 15px!important;
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+    // content: "\f150";
+    content: "\f0d7"!important;
+    border: 2px solid #000000a8!important;
+    border-radius: 3px!important;
+    text-align: center;
+    line-height: 11px!important;
+}
+
+:checked ~ label.arrow_label:before {
+  content: "\f0d9"!important;
+  border: 2px solid #000000a8!important;
+    border-radius: 3px!important;
+    padding-right: 6px;
+    padding-left: 2px;
+}
+.arrow_label:after {
+  border-left: 0px solid #777!important;
+}
