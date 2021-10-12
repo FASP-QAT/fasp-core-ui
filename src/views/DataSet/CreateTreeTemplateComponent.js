@@ -96,14 +96,12 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
         <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
             <div className="ContactTitleBackground"
             >
-                {/* <div className="ContactTitle" style={{ color: Colors.Black }}><b style={{fontSize:'13px'}}>{itemConfig.payload.label.label_en}</b><b style={{ color:'#212721',float:'right' }}>{itemConfig.payload.nodeType.id == 2 ? " (#)" : (itemConfig.payload.nodeType.id == 3 ? " (%)" : "")}</b></div> */}
-                <div className="ContactTitle" style={{ color: Colors.Black }}><div title="" style={{fontSize:'13px',whiteSpace: 'nowrap',overflow:'hidden',textOverflow:'ellipsis',width:'158px',float:'left',fontWeight:'bold'}}>{itemConfig.payload.label.label_en}</div><b style={{ color:'#212721',float:'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{fontSize:'11px'}}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{fontSize:'11px'}} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{fontSize:'11px'}} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{fontSize:'11px'}} ></i>:(itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-cube" style={{fontSize:'11px'}} ></i>:""))))}</b></div>
+                <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
             </div>
-            {/* <div className="ContactPhone" style={{ color: Colors.Black, marginLeft: '-50px' }}>{getPayloadData(itemConfig)}</div> */}
             <div className="ContactPhone" style={{ color: Colors.Black }}>
-                <span style={{textAlign:'center',fontWeight:'600'}}>75.4%</span>
-                <div style={{marginTop:'10px',overflow:'inherit',width:'132px'}}><p className="float-lg-right pl-lg-5" style={{textAlign:'right'}}> 45,386,984</p></div>
-                </div>
+                <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
+                <div style={{ marginLeft: '30px', marginTop: '10px', overflow: 'inherit', width: '100%' }}><span style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</span></div>
+            </div>
         </div>
     ))
 }
@@ -123,7 +121,7 @@ function addCommas(cell, row) {
     }
 }
 
-function getPayloadData(itemConfig) {
+function getPayloadData(itemConfig, type) {
     console.log("inside get payload");
     var data = [];
     data = itemConfig.payload.nodeDataMap;
@@ -137,9 +135,17 @@ function getPayloadData(itemConfig) {
     console.log("data---", data);
     if (data != null && data[0] != null && (data[0])[0] != null) {
         if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+            if (type == 1) {
+                return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+            } else {
+                return "";
+            }
         } else {
-            return (itemConfig.payload.nodeDataMap[0])[0].dataValue + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? "%=" + addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+            if (type == 1) {
+                return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
+            } else {
+                return ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+            }
         }
     } else {
         return "";
@@ -183,6 +189,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            noOfFUPatient: '',
             nodeTypeFollowUpList: [],
             parentValue: '',
             calculatedDataValue: '',
@@ -325,6 +332,17 @@ export default class CreateTreeTemplate extends Component {
         this.duplicateNode = this.duplicateNode.bind(this);
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
+        this.getConversionFactor = this.getConversionFactor.bind(this);
+    }
+
+    getConversionFactor(planningUnitId) {
+        console.log("planningUnitId cf ---", planningUnitId);
+        var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
+        console.log("pu---", pu)
+        // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
+        this.setState({
+            conversionFactor: pu.multiplier
+        });
     }
 
     getNodeTypeFollowUpList(nodeTypeId) {
@@ -384,9 +402,9 @@ export default class CreateTreeTemplate extends Component {
         const { items } = this.state;
         var newItem = {
             id: parseInt(items.length + 1),
-            level: this.state.currentItemConfig.context.level,
+            level: itemConfig.level,
             parent: itemConfig.parent,
-            payload: this.state.currentItemConfig.context.payload
+            payload: itemConfig.payload
         };
         console.log("add button clicked value after update---", newItem);
         this.setState({
@@ -412,10 +430,17 @@ export default class CreateTreeTemplate extends Component {
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
+
             this.setState({
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
+                // const { currentItemConfig } = this.state;
+                // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
+                // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                // this.setState({
+                //     currentItemConfig
+                // })
             })
         })
             .catch(
@@ -482,6 +507,8 @@ export default class CreateTreeTemplate extends Component {
         console.log("noOfFUPatient---", noOfFUPatient);
         this.setState({
             noOfFUPatient
+        }, () => {
+            console.log("state update fu--->", this.state.noOfFUPatient)
         })
     }
     getNodeUnitOfPrent() {
@@ -586,10 +613,56 @@ export default class CreateTreeTemplate extends Component {
 
     }
     getNoFURequired() {
-        var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+        if (nodeTypeId == 5) {
+            usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        } else {
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        }
+        console.log("usagePeriodId dis---", usagePeriodId);
+        var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
-            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * this.state.noOfMonthsInUsagePeriod);
+            console.log("convertToMonth dis---", convertToMonth);
+            console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
+            console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
+
+            if (usageTypeId == 2) {
+                var div = (convertToMonth * usageFrequency);
+                console.log("duv---", div);
+                if (div != 0) {
+                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                }
+            } else {
+                // var noOfFUPatient = this.state.noOfFUPatient;
+                var noOfFUPatient;
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                } else {
+                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                }
+                console.log("no of fu patient---", noOfFUPatient);
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+            }
+
+
+            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
             console.log("noFURequired---", noFURequired);
             this.setState({
                 noFURequired
@@ -610,9 +683,12 @@ export default class CreateTreeTemplate extends Component {
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
         } else {
-            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
             usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
         }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
@@ -626,7 +702,16 @@ export default class CreateTreeTemplate extends Component {
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
-                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * this.state.noOfFUPatient;
+                // var noOfFUPatient = this.state.noOfFUPatient;
+                var noOfFUPatient;
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                } else {
+                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                }
+                console.log("no of fu patient---", noOfFUPatient);
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
         }
@@ -638,21 +723,29 @@ export default class CreateTreeTemplate extends Component {
     }
     getUsageText() {
         var usageText = '';
-        var noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
-        var noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
-        var usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+        var noOfPersons;
+        var noOfForecastingUnitsPerPerson;
+        var usageFrequency;
+        var selectedText;
+        var selectedText1;
+        var selectedText2;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+            noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
 
-        var usageTypeParent = document.getElementById("usageTypeParent");
-        var selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
+            var usageTypeParent = document.getElementById("usageTypeParent");
+            selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
-        var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
-        var selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
+            var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
+            selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
 
 
 
-        if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
-            var usagePeriodId = document.getElementById("usagePeriodId");
-            var selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+                var usagePeriodId = document.getElementById("usagePeriodId");
+                selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
+            }
         }
         // FU
         if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
@@ -1174,6 +1267,7 @@ export default class CreateTreeTemplate extends Component {
                     items,
                     loading: false
                 }, () => {
+                    console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                     console.log("Tree Template---", this.state.items);
                 })
             })
@@ -1478,7 +1572,7 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths = event.target.value;
         }
 
-        
+
 
         if (event.target.name === "forecastingUnitPerPersonsFC") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = event.target.value;
@@ -1746,11 +1840,18 @@ export default class CreateTreeTemplate extends Component {
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    this.getNoOfMonthsInUsagePeriod();
+                    // this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
+                    this.getNoOfFUPatient();
+                    console.log("on curso nofuchanged---", this.state.noOfFUPatient)
+                    this.getNoOfMonthsInUsagePeriod();
+                    this.getNoFURequired();
+                    console.log("no -----------------");
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    // this.getUsageText();
+                    // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
                 }
 
             })
@@ -1862,13 +1963,13 @@ export default class CreateTreeTemplate extends Component {
                                             name="month"
                                             ref="pickAMonth2"
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            value={this.state.singleValue2}
+                                            value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                             lang={pickerLang.months}
                                             theme="dark"
                                             onChange={this.handleAMonthChange2}
                                             onDismiss={this.handleAMonthDissmis2}
                                         >
-                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                            <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
@@ -2473,11 +2574,21 @@ export default class CreateTreeTemplate extends Component {
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = (value, text) => {
+    handleAMonthChange2 = (year, month) => {
+        console.log("value>>>", year);
+        console.log("text>>>", month)
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
         //
         //
     }
     handleAMonthDissmis2 = (value) => {
+        console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
         })
@@ -2809,7 +2920,8 @@ export default class CreateTreeTemplate extends Component {
                                                     {
                                                         0: [
                                                             {
-                                                                month: "2021-06-01",
+                                                                month: (item.payload.nodeDataMap[0])[0].month,
+                                                                nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
@@ -2894,6 +3006,7 @@ export default class CreateTreeTemplate extends Component {
                                                     }
                                                 );
                                         } else {
+                                            console.log("templateObj for update>>>", templateObj);
                                             DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
@@ -3091,8 +3204,8 @@ export default class CreateTreeTemplate extends Component {
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.common.submit')}</Button>
                                                     </CardFooter>
                                                 </Form>
 
