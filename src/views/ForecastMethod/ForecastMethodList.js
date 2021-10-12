@@ -35,7 +35,8 @@ class forecastMethod extends Component {
             message: '',
             selSource: [],
             realms: [],
-            loading: true
+            loading: true,
+            forecastMethodTypeList: []
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -55,6 +56,7 @@ class forecastMethod extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getForecastMethodData = this.getForecastMethodData.bind(this);
+        this.getForecastMethodTypeList = this.getForecastMethodTypeList.bind(this);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -154,10 +156,11 @@ class forecastMethod extends Component {
                     title: i18n.t('static.forecastMethod.methodology'),
                     // readOnly: true,
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: i18n.t('static.forecastMethod.historicalData') },
-                        { id: 2, name: i18n.t('static.forecastMethod.tree') }
-                    ]
+                    source: this.state.forecastMethodTypeList,
+                    // source: [
+                    //     { id: 1, name: i18n.t('static.forecastMethod.historicalData') },
+                    //     { id: 2, name: i18n.t('static.forecastMethod.tree') }
+                    // ]
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -288,6 +291,96 @@ class forecastMethod extends Component {
         this.setState({
             loading: false
         })
+    }
+
+    getForecastMethodTypeList() {
+        ForecastMethodService.getForecastMethodTypeList().then(response => {
+            if (response.status == 200) {
+                console.log("response.data---->", response.data)
+
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+
+                let tempList = [];
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: getLabelText(listArray[i].label, this.state.lang),
+                            id: parseInt(listArray[i].id),
+                            active: listArray[i].active,
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                this.setState({
+                    forecastMethodTypeList: tempList,
+                },
+                    () => {
+                        this.getForecastMethodData();
+                        // this.buildJexcel()
+                    })
+
+            }
+            else {
+                this.setState({
+                    message: response.data.messageCode, loading: false, color: "red",
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red",
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false,
+                                    color: "red",
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     getForecastMethodData() {
@@ -607,7 +700,7 @@ class forecastMethod extends Component {
     }
 
     componentDidMount() {
-        this.getForecastMethodData();
+        this.getForecastMethodTypeList();
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -886,8 +979,8 @@ class forecastMethod extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                        <h5 style={{ color: "red" }} >{i18n.t('static.common.customWarningMessage')}</h5>
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block",marginTop:'-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                            <h5 style={{ color: "red" }} >{i18n.t('static.common.customWarningMessage')}</h5>
+                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
