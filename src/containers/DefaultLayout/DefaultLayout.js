@@ -1440,7 +1440,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.loadDeleteDataSet'),
                             url: '/dataset/loadDeleteDataSet',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
@@ -1458,13 +1458,13 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.listtree'),
                             url: '/dataset/listTree',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-list-alt ',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: 'List Tree Template',
                             url: '/dataset/listTreeTemplate',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           }
                         ]
