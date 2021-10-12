@@ -169,6 +169,7 @@ label.tree_label:after {
 .checkbox label {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 
   /*16px width of fake checkbox + 6px distance between fake checkbox and text*/
   padding-left: 22px;
@@ -1705,8 +1706,8 @@ h5,
   border-color: 1px solid #86cd99;
 }
 .legend .redlegend {
-  background-color: red;
-  border-color: 1px solid red;
+  background-color: #BA0C2F;
+  border-color: 1px solid #BA0C2F;
 }
 
 .legendcommitversion .greylegend {
@@ -2560,8 +2561,8 @@ input::placeholder {
     border-color: 1px solid #86cd99;
   }
   .legendcommitversion .redlegend {
-    background-color: red;
-    border-color: 1px solid red;
+    background-color: #BA0C2F;
+    border-color: 1px solid #BA0C2F;
   }
   
   .legendcommitversion .orangelegend {
@@ -4997,12 +4998,23 @@ height: 0px;
         .CleanUpIcon{
           border: 2px solid #000000a8;
             border-radius: 3px;
+            cursor: pointer;
         }
         .DeleteIcon{
           padding: 1px 2px;
           border: 2px solid #000000a8;
           border-radius: 3px;
+          cursor: pointer;
         }
+        .CleanUpIconTree{
+          padding: 1px 1px 1px 1px;
+    border: 2px solid #000000a8;
+    border-radius: 3px;
+    font-size: 9px;
+    cursor: pointer;
+    margin-top: 1px;
+        }
+
       //   label.arrow_label:before {
       //     margin: -2px 1em 0 -2em!important;
       //     font-size: 15px!important;
@@ -5012,10 +5024,11 @@ height: 0px;
         // border: 2px solid #000000a8;
         // border-radius: 3px;
         // font-size: 10px;
-        padding: 0px 2px 1px 2px;
+        padding: 1px 2px 1px 2px;
     border: 2px solid #000000a8;
     border-radius: 3px;
     font-size: 9px;
+    cursor: pointer;
     }
     .btn-danger {
       color: #fff;
@@ -5033,7 +5046,7 @@ height: 0px;
     z-index: 1;
     float: left;
     // margin: 0 1em 0 -2em;
-    margin: -2px 1em 0 -2em!important;
+    margin: -1px 1em 0 -2em!important;
     font-size: 15px!important;
     width: 1em;
     height: 1em;
