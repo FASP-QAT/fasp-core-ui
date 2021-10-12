@@ -15,6 +15,10 @@ import {
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import eventBus from './eventBus.js'
+import ProgramService from "../../api/ProgramService"
+import { Alert, Col, Nav, NavItem, Row } from 'reactstrap';
+
 
 
 // routes config
@@ -658,18 +662,39 @@ class DefaultLayout extends Component {
       isTimedOut: false,
       changeIcon: false,
       programDataLastModifiedDate: '',
-      downloadedProgramDataLastModifiedDate: ''
+      downloadedProgramDataLastModifiedDate: '',
+      notificationArray:[{
+      visible: false,
+      notificationDetails: {
+        program: {
+          code: "",
+          id: 0
+        }, committedRequestId: 0, status: 0
+      }}],
+      loading: false
     }
+
     this.idleTimer = null
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
     this.getProgramData = this.getProgramData.bind(this);
     this.getNotificationCount = this.getNotificationCount.bind(this);
+    this.goToMasterDataSync = this.goToMasterDataSync.bind(this);
+    this.onDismiss = this.onDismiss.bind(this);
 
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
+
+  onDismiss(e,count) {
+    e.stopPropagation();
+    var notificationArray=this.state.notificationArray;
+    notificationArray[count].visible=false;
+    this.setState({ notificationArray:notificationArray });
+  }
+
+
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -733,7 +758,182 @@ class DefaultLayout extends Component {
       this.setState({ businessFunctions: bfunction });
     }
     // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
+    eventBus.on("testDataAccess", (data) =>
+    {
+      console.log("data.notificationDetails+++",data.notificationDetails);
+      console.log("this.state.notificationDetails+++",this.state.notificationArray);
+      var notificationArray=this.state.notificationArray;
+      if(notificationArray[0].notificationDetails.program.id==0){
+        notificationArray=[];
+      }
+      notificationArray.push({ visible: data.message, notificationDetails: data.notificationDetails })
+      this.setState({
+        notificationArray:notificationArray
+      })
+    }
+    );
 
+  }
+
+  componentWillUnmount() {
+    eventBus.remove("testDataAccess");
+  }
+
+  alertClicked(programId, versionId) {
+    this.setState({ loading: true });
+    var checkboxesChecked = [];
+    checkboxesChecked.push({ programId: programId, versionId: -1 })
+    console.log("Alert clicked+++", programId, "VersionId+++", versionId);
+    ProgramService.getAllProgramData(checkboxesChecked)
+      .then(response => {
+        console.log("Resposne+++", response);
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+          var program = transaction.objectStore('programQPLDetails');
+          var getRequest = program.getAll();
+          getRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red'
+            })
+            this.hideFirstComponent()
+          }.bind(this);
+          getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            var userId = AuthenticationService.getLoggedInUserId();
+            console.log("Myresult+++", myResult);
+            var checkIfProgramExists = myResult.filter(c => c.programId == programId && c.version == versionId && c.readonly == 1 && c.userId == userId);
+            console.log("checkIfProgramExists+++", checkIfProgramExists);
+            var programIdToDelete = 0;
+            if (checkIfProgramExists.length > 0) {
+              programIdToDelete = checkIfProgramExists[0].id;
+            }
+            var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+            var programDataOs1 = programDataTransaction1.objectStore('programData');
+            var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+
+            var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+            var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+            var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
+
+            var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+            var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+
+            programRequest1.onerror = function (event) {
+              this.setState({
+                supplyPlanError: i18n.t('static.program.errortext')
+              })
+            }.bind(this);
+            programRequest2.onsuccess = function (e) {
+
+              var json = response.data[0];
+              console.log("Json+++", json);
+              // json.actionList = [];
+              var version = json.requestedProgramVersion;
+              if (version == -1) {
+                version = json.currentVersion.versionId
+              }
+
+              var updatedJson = {};
+              var planningUnitList = json.planningUnitList;
+              var consumptionList = json.consumptionList;
+              var inventoryList = json.inventoryList;
+              var shipmentList = json.shipmentList;
+              var batchInfoList = json.batchInfoList;
+              var problemReportList = json.problemReportList;
+              var supplyPlan = json.supplyPlan;
+              var generalData = json;
+              delete generalData.consumptionList;
+              delete generalData.inventoryList;
+              delete generalData.shipmentList;
+              delete generalData.batchInfoList;
+              delete generalData.supplyPlan;
+              delete generalData.planningUnitList;
+              generalData.actionList = [];
+              var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+              var planningUnitDataList = [];
+              for (var pu = 0; pu < planningUnitList.length; pu++) {
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+                var planningUnitDataJson = {
+                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+                }
+                var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+                planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+              }
+              var programDataJson = {
+                generalData: generalEncryptedData,
+                planningUnitDataList: planningUnitDataList
+              };
+              updatedJson = programDataJson;
+              // }
+
+              var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+              var programSaveData = transactionForSavingData.objectStore('programData');
+
+              var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+              var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+
+              var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+              var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
+              // for (var i = 0; i < json.length; i++) {
+              var encryptedText = updatedJson;
+              var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+              var userId = userBytes.toString(CryptoJS.enc.Utf8);
+              var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+              var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+              console.log("Encrypted Yext+++", encryptedText);
+              var item = {
+                id: json.programId + "_v" + version + "_uId_" + userId,
+                programId: json.programId,
+                version: version,
+                programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                programData: encryptedText,
+                userId: userId
+              };
+              var programQPLDetails = {
+                id: json.programId + "_v" + version + "_uId_" + userId,
+                programId: json.programId,
+                version: version,
+                userId: userId,
+                programCode: json.programCode,
+                openCount: openCount,
+                addressedCount: addressedCount,
+                programModified: 0,
+                readonly: 0
+              }
+              var putRequest = programSaveData.put(item);
+              var putRequest1 = downloadedProgramSaveData.put(item);
+              var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+              this.goToMasterDataSync([json.programId + "_v" + version + "_uId_" + userId]);
+
+
+
+
+              // console.log("ProgramThenCount", programThenCount)
+              // console.log("Response data", response.data)
+              // var json = response.data;
+            }.bind(this)
+          }.bind(this)
+        }.bind(this);
+      })
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
@@ -780,6 +980,14 @@ class DefaultLayout extends Component {
     }
 
   }
+
+  goToMasterDataSync(programIds) {
+    console.log("ProgramIds++++", programIds);
+    console.log("this props++++", this)
+    console.log("this props++++", this.props)
+    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } });
+  }
+
   showShipmentLinkingAlerts(e) {
     e.preventDefault();
     this.props.history.push(`/shipmentLinkingNotification`)
@@ -997,10 +1205,32 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} masterDataSync={this.goToMasterDataSync} />
           </Suspense>
+          {this.state.notificationArray.map((c,count)=>{
+          return(<div className="col-md-12">
+            <Col className="col-12 col-md-6 offset-md-6">
+              {c.notificationDetails.status == 2 && <Alert color="info" isOpen={c.visible} toggle={(e)=>this.onDismiss(e,count)} onClick={() => this.alertClicked(c.notificationDetails.program.id, c.notificationDetails.committedVersionId)}>
+                {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
+              </Alert>}
+              {c.notificationDetails.status == 3 && <Alert color="info" isOpen={c.visible} toggle={(e)=>this.onDismiss(e,count)}>
+                {i18n.t('static.notification.commitFailed', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
+              </Alert>}
+            </Col>
+          </div>)
+          })}
+          {/* <div className="col-md-12">
+        <Col className="col-12 col-md-6 offset-md-6">
+          {this.state.notificationDetails.status == 2 && <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss} onClick={this.alertClicked(this.state.notificationDetails.program.id, this.state.notificationDetails.committedVersionId)}>
+            {i18n.t('static.notification.commitSuccess', { programCode: this.state.notificationDetails.program.code, programVersion: this.state.notificationDetails.committedVersionId })}
+          </Alert>}
+          {this.state.notificationDetails.status == 3 && <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss}>
+            {i18n.t('static.notification.commitFailed', { programCode: this.state.notificationDetails.program.code, programVersion: this.state.notificationDetails.committedVersionId })}
+          </Alert>}
+        </Col>
+        </div> */}
         </AppHeader>
-        <div className="app-body">
+        <div className="app-body" style={{ display: this.state.loading ? "none" : "block" }}>
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
@@ -2723,6 +2953,17 @@ class DefaultLayout extends Component {
               {/* <DefaultAside /> */}
             </Suspense>
           </AppAside>
+        </div>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+              <div class="spinner-border blue ml-4" role="status">
+
+              </div>
+            </div>
+          </div>
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>

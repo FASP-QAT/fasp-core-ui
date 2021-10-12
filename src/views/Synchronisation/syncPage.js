@@ -27,6 +27,8 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
+import LanguageService from '../../api/LanguageService';
+import eventBus from '../../containers/DefaultLayout/eventBus';
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -3377,6 +3379,8 @@ export default class syncPage extends Component {
             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
             programQPLDetailsGetRequest.onsuccess = function (event) {
               var programQPLDetails = programQPLDetailsGetRequest.result;
+              var programIdForNotification=programQPLDetails.programId;
+              var versionIdForNotification=programQPLDetails.version;
               // var planningUnitList = [];
               // var consumptionData = [];
               // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
@@ -3593,7 +3597,7 @@ export default class syncPage extends Component {
                               var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
                               //   this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                              this.redirectToDashbaord();
+                              this.redirectToDashbaord(response.data);
                               // }.bind(this)
                             } else {
                               this.setState({
@@ -3832,7 +3836,29 @@ export default class syncPage extends Component {
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
-  redirectToDashbaord() {
+  redirectToDashbaord(commitRequestId) {
+    console.log("method called",commitRequestId);
+        AuthenticationService.setupAxiosInterceptors();
+        const sendGetRequest = async () => {
+            try {
+                const resp = await ProgramService.sendNotificationAsync(commitRequestId);
+                // var msg=resp.data.messageCode;
+                // console.log("Response +++", msg);
+                // this.setState({openModal:true,
+                // responseMessage:msg});
+                var curUser = AuthenticationService.getLoggedInUserId();
+                console.log("Resposne.data+++",resp.data);
+                if(resp.data.createdBy.userId==curUser){
+                  eventBus.dispatch("testDataAccess",{openModal:true,notificationDetails:resp.data});
+                }
+                // window.visible=true;
+               
+            } catch (err) {
+                // Handle Error Here
+                console.error("Error+++", err);
+            }
+        };
+        sendGetRequest();
     this.setState({ loading: false })
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))

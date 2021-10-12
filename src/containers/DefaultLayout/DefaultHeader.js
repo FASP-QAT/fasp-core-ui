@@ -2,16 +2,19 @@ import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Alert, Col, Nav, NavItem } from 'reactstrap';
+import { Alert, Col, Nav, NavItem ,Row} from 'reactstrap';
 import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
 import logo from '../../assets/img/QAT-logo.png';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
-import { API_URL } from '../../Constants';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown';
 import eventBus from './eventBus.js'
+import CryptoJS from 'crypto-js'
+import ProgramService from "../../api/ProgramService"
 
 const propTypes = {
   children: PropTypes.node,
@@ -22,19 +25,7 @@ const defaultProps = {};
 class DefaultHeader extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      visible: false,
-      responseMessage:''
-    };
-
-    this.onDismiss = this.onDismiss.bind(this);
-
     this.changeLanguage = this.changeLanguage.bind(this)
-  }
-
-  onDismiss() {
-    this.setState({ visible: false });
   }
 
   changeLanguage(lang) {
@@ -43,13 +34,8 @@ class DefaultHeader extends Component {
     window.location.reload(false);
   }
 
-  componentDidMount(){
-    eventBus.on("testDataAccess", (data) =>
-      this.setState({ visible: data.message,responseMessage:data.responseMessage })
-    );
-  }
-  componentWillUnmount() {
-    eventBus.remove("testDataAccess");
+  componentDidMount() {
+    
   }
 
   render() {
@@ -111,8 +97,8 @@ class DefaultHeader extends Component {
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                  {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
-                  <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px',marginTop: '-1px' }} />
+                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
+                <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px', marginTop: '-1px' }} />
               </NavLink>
             </NavItem>}
           <DefaultHeaderDropdown mssgs />
@@ -183,14 +169,7 @@ class DefaultHeader extends Component {
               </span>
             </NavLink>
           </NavItem>
-              <Col xs="12" md="6">
-                <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss}>
-                  Commit Status is : {this.state.responseMessage}
-                </Alert>
-              </Col>
         </Nav>
-
-
       </React.Fragment>
     );
   }

@@ -121,27 +121,6 @@ class AddLanguageComponent extends Component {
     //         })
     // }
 
-    testAsync() {
-        console.log("method called");
-        AuthenticationService.setupAxiosInterceptors();
-        const sendGetRequest = async () => {
-            try {
-                const resp = await LanguageService.testAsync()
-                var msg=resp.data.messageCode;
-                console.log("Response +++", msg);
-                // this.setState({openModal:true,
-                // responseMessage:msg});
-                eventBus.dispatch("testDataAccess",{openModal:true,responseMessage:msg});
-                // window.visible=true;
-               
-            } catch (err) {
-                // Handle Error Here
-                console.error("Error+++", err);
-            }
-        };
-        sendGetRequest();
-    }
-
     toggleLarge(){
         this.setState({openModal:false});
     }
