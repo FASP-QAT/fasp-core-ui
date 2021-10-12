@@ -100,9 +100,9 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ marginLeft: '30px', marginTop: '10px', overflow: 'inherit', width: '100%' }}><span style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</span></div>
+                <div style={{marginTop:'10px',overflow:'inherit',width:'132px'}}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
-        </div>
+git        </div>
     ))
 }
 function addCommas(cell, row) {
