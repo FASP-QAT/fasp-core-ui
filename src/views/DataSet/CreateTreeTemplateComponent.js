@@ -1030,6 +1030,7 @@ export default class CreateTreeTemplate extends Component {
                     items,
                     loading: false
                 }, () => {
+                    console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                     console.log("Tree Template---", this.state.items);
                 })
             })
@@ -1705,13 +1706,13 @@ export default class CreateTreeTemplate extends Component {
                                             name="month"
                                             ref="pickAMonth2"
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            value={this.state.singleValue2}
+                                            value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                             lang={pickerLang.months}
                                             theme="dark"
                                             onChange={this.handleAMonthChange2}
                                             onDismiss={this.handleAMonthDissmis2}
                                         >
-                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                            <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
                                         </Picker>
                                     </div>
                                 </FormGroup>
@@ -2317,11 +2318,21 @@ export default class CreateTreeTemplate extends Component {
     handleClickMonthBox2 = (e) => {
         this.refs.pickAMonth2.show()
     }
-    handleAMonthChange2 = (value, text) => {
+    handleAMonthChange2 = (year, month) => {
+        console.log("value>>>", year);
+        console.log("text>>>", month)
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
         //
         //
     }
     handleAMonthDissmis2 = (value) => {
+        console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
         })
@@ -2650,7 +2661,7 @@ export default class CreateTreeTemplate extends Component {
                                                     {
                                                         0: [
                                                             {
-                                                                month: "2021-06-01",
+                                                                month: (item.payload.nodeDataMap[0])[0].month,
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
@@ -2735,6 +2746,7 @@ export default class CreateTreeTemplate extends Component {
                                                     }
                                                 );
                                         } else {
+                                            console.log("templateObj for update>>>", templateObj);
                                             DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
                                                     if (response.status == 200) {
