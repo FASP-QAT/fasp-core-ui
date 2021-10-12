@@ -178,6 +178,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            noOfFUPatient: '',
             nodeTypeFollowUpList: [],
             parentValue: '',
             calculatedDataValue: '',
@@ -379,9 +380,9 @@ export default class CreateTreeTemplate extends Component {
         const { items } = this.state;
         var newItem = {
             id: parseInt(items.length + 1),
-            level: this.state.currentItemConfig.context.level,
+            level: itemConfig.level,
             parent: itemConfig.parent,
-            payload: this.state.currentItemConfig.context.payload
+            payload: itemConfig.payload
         };
         console.log("add button clicked value after update---", newItem);
         this.setState({
@@ -407,10 +408,17 @@ export default class CreateTreeTemplate extends Component {
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
+
             this.setState({
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
+                // const { currentItemConfig } = this.state;
+                // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
+                // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                // this.setState({
+                //     currentItemConfig
+                // })
             })
         })
             .catch(
@@ -477,6 +485,8 @@ export default class CreateTreeTemplate extends Component {
         console.log("noOfFUPatient---", noOfFUPatient);
         this.setState({
             noOfFUPatient
+        }, () => {
+            console.log("state update fu--->", this.state.noOfFUPatient)
         })
     }
     getNodeUnitOfPrent() {
@@ -581,10 +591,56 @@ export default class CreateTreeTemplate extends Component {
 
     }
     getNoFURequired() {
-        var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+        if (nodeTypeId == 5) {
+            usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        } else {
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
+            usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
+        }
+        console.log("usagePeriodId dis---", usagePeriodId);
+        var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
-            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * this.state.noOfMonthsInUsagePeriod);
+            console.log("convertToMonth dis---", convertToMonth);
+            console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
+            console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
+
+            if (usageTypeId == 2) {
+                var div = (convertToMonth * usageFrequency);
+                console.log("duv---", div);
+                if (div != 0) {
+                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                }
+            } else {
+                // var noOfFUPatient = this.state.noOfFUPatient;
+                var noOfFUPatient;
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                } else {
+                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                }
+                console.log("no of fu patient---", noOfFUPatient);
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+            }
+
+
+            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
             console.log("noFURequired---", noFURequired);
             this.setState({
                 noFURequired
@@ -605,9 +661,12 @@ export default class CreateTreeTemplate extends Component {
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
         } else {
-            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.usageTypeId;
+            usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+            console.log("usageTypeId---", usageTypeId);
             usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+            console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+            console.log("usageFrequency---", usageFrequency);
         }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
@@ -621,7 +680,16 @@ export default class CreateTreeTemplate extends Component {
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
-                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * this.state.noOfFUPatient;
+                // var noOfFUPatient = this.state.noOfFUPatient;
+                var noOfFUPatient;
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                } else {
+                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                }
+                console.log("no of fu patient---", noOfFUPatient);
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
         }
@@ -633,21 +701,29 @@ export default class CreateTreeTemplate extends Component {
     }
     getUsageText() {
         var usageText = '';
-        var noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
-        var noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
-        var usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+        var noOfPersons;
+        var noOfForecastingUnitsPerPerson;
+        var usageFrequency;
+        var selectedText;
+        var selectedText1;
+        var selectedText2;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+            noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
 
-        var usageTypeParent = document.getElementById("usageTypeParent");
-        var selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
+            var usageTypeParent = document.getElementById("usageTypeParent");
+            selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
-        var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
-        var selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
+            var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
+            selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
 
 
 
-        if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
-            var usagePeriodId = document.getElementById("usagePeriodId");
-            var selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+                var usagePeriodId = document.getElementById("usagePeriodId");
+                selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
+            }
         }
         // FU
         if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
@@ -1473,7 +1549,7 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths = event.target.value;
         }
 
-        
+
 
         if (event.target.name === "forecastingUnitPerPersonsFC") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = event.target.value;
@@ -1741,11 +1817,17 @@ export default class CreateTreeTemplate extends Component {
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    this.getNoOfMonthsInUsagePeriod();
+                    // this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
+                    this.getNoOfFUPatient();
+                    console.log("on curso nofuchanged---", this.state.noOfFUPatient)
+                    this.getNoOfMonthsInUsagePeriod();
+                    this.getNoFURequired();
+                    console.log("no -----------------");
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    // this.getUsageText();
                 }
 
             })
@@ -3086,8 +3168,8 @@ export default class CreateTreeTemplate extends Component {
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.common.submit')}</Button>
                                                     </CardFooter>
                                                 </Form>
 
