@@ -157,7 +157,7 @@ label.tree_label:after {
 .tick-bg {
   float: left;
   margin-right: 5px;
-  background-image: linear-gradient(orange,#BA0C2F);
+  background-image: linear-gradient(orange, red);
   padding: 2px;
   color: #fff;
 }
@@ -415,7 +415,7 @@ label.arrow_label:after {
 .red {
   //  color: #f86c6b !important;
 
-  color: #BA0C2F !important;
+  color: red !important;
   font-size: 14px;
 }
 .blue{color: 20a8d8 !important;}
@@ -431,7 +431,7 @@ label.arrow_label:after {
   margin-top: 0.25rem;
   // font-size: 80%;
   font-size: 12px !important;
-  color: #BA0C2F !important;
+  color: red !important;
   // color: #f86c6b;
 }
 
@@ -662,7 +662,7 @@ label.arrow_label:after {
 }
 
 .jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
-  color: #BA0C2F !important;
+  color: red !important;
 }
 
 .jexcel > tbody > tr > td.readonly.shipmentEntryActive {
@@ -680,7 +680,7 @@ label.arrow_label:after {
 }
 
 .jexcel > tbody > tr > td.shipmentEntryEmergency {
-  color: #BA0C2F !important;
+  color: red !important;
 }
 
 .jexcel > tbody > tr > td.shipmentEntryActive {
@@ -703,12 +703,12 @@ label.arrow_label:after {
 }
 
 .shipmentEmergencyNotAccount{
-  color:#BA0C2F !important;
+  color: red !important;
   background-color: #D3D3D3 !important;
 }
 
 .shipmentEmergencyAccount{
-  color:#BA0C2F !important;
+  color: red !important;
   background-color: #FFF !important;
 }
 
@@ -974,7 +974,7 @@ label.arrow_label:after {
  position: relative;
   width: 3px;
   height: 100%;
-  color:#BA0C2F; 
+  color: red; 
   top: 0px;
   left: 2px;
   cursor: col-resize;
@@ -1705,8 +1705,8 @@ h5,
   border-color: 1px solid #86cd99;
 }
 .legend .redlegend {
-  background-color: #BA0C2F;
-  border-color: 1px solid #BA0C2F;
+  background-color: red;
+  border-color: 1px solid red;
 }
 
 .legendcommitversion .greylegend {
@@ -2560,8 +2560,8 @@ input::placeholder {
     border-color: 1px solid #86cd99;
   }
   .legendcommitversion .redlegend {
-    background-color: #BA0C2F;
-    border-color: 1px solid #BA0C2F;
+    background-color: red;
+    border-color: 1px solid red;
   }
   
   .legendcommitversion .orangelegend {
@@ -2612,8 +2612,8 @@ input::placeholder {
     border-color: 1px solid #696969;
   }
   .redlegend {
-    background-color: #BA0C2F;
-    border-color: 1px solid #BA0C2F;
+    background-color: red;
+    border-color: 1px solid red;
   }
 
   .greenlegend {
@@ -3465,7 +3465,7 @@ margin-left: -45px;
 }
 
 .versionColor{
-  color:#BA0C2F;
+  color:#cb3828;
   font-weight: 500;
   font-size: 12px !important;
 }
@@ -3829,7 +3829,7 @@ background-color: yellow;
 }
 
 .redColor{
-  color: #BA0C2F;
+  color: red;
 }
 
 .jexcel_filter{
@@ -4626,7 +4626,7 @@ height: 0px;
       float: left;
       width: 20px;
       height: 20px;
-      background-color: #BA0C2F;
+      background-color: red;
       color: white; }
     
     .CursorFrame {
