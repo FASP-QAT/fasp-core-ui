@@ -27,6 +27,8 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
+import LanguageService from '../../api/LanguageService';
+import eventBus from '../../containers/DefaultLayout/eventBus';
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -3377,6 +3379,88 @@ export default class syncPage extends Component {
             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
             programQPLDetailsGetRequest.onsuccess = function (event) {
               var programQPLDetails = programQPLDetailsGetRequest.result;
+              var programIdForNotification=programQPLDetails.programId;
+              var versionIdForNotification=programQPLDetails.version;
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              //   if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              //     consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              //   } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              //     consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              //   }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              //   if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              //     inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              //   } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              //     inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              //   }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              //   if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              //     shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              //   } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              //     shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              //   }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+              // var problemReportList = [];
+              // var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              // var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              // var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              // for (var c = 0; c < problemJson.length; c++) {
+              //   if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+              //     problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              //   } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+              //     problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              //   }
+              var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+              var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+              var generalJson = JSON.parse(generalData);
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var consumptionList = [];
+              var inventoryList = [];
+              var shipmentList = [];
+              var batchInfoList = [];
+              var supplyPlan = [];
+
+              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+              }
+              var programJson = generalJson;
+              programJson.consumptionList = consumptionList;
+              programJson.inventoryList = inventoryList;
+              programJson.shipmentList = shipmentList;
+              programJson.batchInfoList = batchInfoList;
+              programJson.supplyPlan = supplyPlan;
+              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              // var programJson = JSON.parse(programData);
               // var planningUnitList = [];
               // var consumptionData = [];
               // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
@@ -3593,7 +3677,7 @@ export default class syncPage extends Component {
                               var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
 
                               //   this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                              this.redirectToDashbaord();
+                              this.redirectToDashbaord(response.data);
                               // }.bind(this)
                             } else {
                               this.setState({
@@ -3832,7 +3916,29 @@ export default class syncPage extends Component {
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
-  redirectToDashbaord() {
+  redirectToDashbaord(commitRequestId) {
+    console.log("method called",commitRequestId);
+        AuthenticationService.setupAxiosInterceptors();
+        const sendGetRequest = async () => {
+            try {
+                const resp = await ProgramService.sendNotificationAsync(commitRequestId);
+                // var msg=resp.data.messageCode;
+                // console.log("Response +++", msg);
+                // this.setState({openModal:true,
+                // responseMessage:msg});
+                var curUser = AuthenticationService.getLoggedInUserId();
+                console.log("Resposne.data+++",resp.data);
+                if(resp.data.createdBy.userId==curUser){
+                  eventBus.dispatch("testDataAccess",{openModal:true,notificationDetails:resp.data});
+                }
+                // window.visible=true;
+               
+            } catch (err) {
+                // Handle Error Here
+                console.error("Error+++", err);
+            }
+        };
+        sendGetRequest();
     this.setState({ loading: false })
     let id = AuthenticationService.displayDashboardBasedOnRole();
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
