@@ -663,14 +663,15 @@ class DefaultLayout extends Component {
       changeIcon: false,
       programDataLastModifiedDate: '',
       downloadedProgramDataLastModifiedDate: '',
-      notificationArray:[{
-      visible: false,
-      notificationDetails: {
-        program: {
-          code: "",
-          id: 0
-        }, committedRequestId: 0, status: 0
-      }}],
+      notificationArray: [{
+        visible: false,
+        notificationDetails: {
+          program: {
+            code: "",
+            id: 0
+          }, committedRequestId: 0, status: 0
+        }
+      }],
       loading: false
     }
 
@@ -687,11 +688,11 @@ class DefaultLayout extends Component {
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
 
-  onDismiss(e,count) {
+  onDismiss(e, count) {
     e.stopPropagation();
-    var notificationArray=this.state.notificationArray;
-    notificationArray[count].visible=false;
-    this.setState({ notificationArray:notificationArray });
+    var notificationArray = this.state.notificationArray;
+    notificationArray[count].visible = false;
+    this.setState({ notificationArray: notificationArray });
   }
 
 
@@ -758,17 +759,20 @@ class DefaultLayout extends Component {
       this.setState({ businessFunctions: bfunction });
     }
     // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
-    eventBus.on("testDataAccess", (data) =>
-    {
-      console.log("data.notificationDetails+++",data.notificationDetails);
-      console.log("this.state.notificationDetails+++",this.state.notificationArray);
-      var notificationArray=this.state.notificationArray;
-      if(notificationArray[0].notificationDetails.program.id==0){
-        notificationArray=[];
+    eventBus.on("testDataAccess", (data) => {
+      console.log("data.notificationDetails+++", data.notificationDetails);
+      console.log("this.state.notificationDetails+++", this.state.notificationArray);
+      var notificationArray = this.state.notificationArray;
+      if (notificationArray[0].notificationDetails.program.id == 0) {
+        notificationArray = [];
       }
+      // var programIdsSuccessfullyCommitted=this.state.programIdsSuccessfullyCommitted;
+      // if(data.notificationDetails.status==2){
+      //   programIdsSuccessfullyCommitted.push(data.notificationDetails);
+      // }
       notificationArray.push({ visible: data.message, notificationDetails: data.notificationDetails })
       this.setState({
-        notificationArray:notificationArray
+        notificationArray: notificationArray
       })
     }
     );
@@ -779,14 +783,60 @@ class DefaultLayout extends Component {
     eventBus.remove("testDataAccess");
   }
 
-  alertClicked(programId, versionId) {
+  alertClicked() {
     this.setState({ loading: true });
     var checkboxesChecked = [];
-    checkboxesChecked.push({ programId: programId, versionId: -1 })
-    console.log("Alert clicked+++", programId, "VersionId+++", versionId);
+    var programIdsToSyncArray = [];
+    var programIdsSuccessfullyCommitted = this.state.notificationArray;
+    for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
+      var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
+      if (index == -1) {
+        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+      }
+    }
+    // checkboxesChecked.push({ programId: programId, versionId: -1 })
     ProgramService.getAllProgramData(checkboxesChecked)
       .then(response => {
         console.log("Resposne+++", response);
+        var json=response.data;
+        var updatedJson = [];
+        for (var r = 0; r < json.length; r++) {
+          var planningUnitList = json[r].planningUnitList;
+          var consumptionList=json[r].consumptionList;
+          var inventoryList=json[r].inventoryList;
+          var shipmentList=json[r].shipmentList;
+          var batchInfoList=json[r].batchInfoList;
+          var problemReportList=json[r].problemReportList;
+          var supplyPlan=json[r].supplyPlan;
+          var generalData = json[r];
+          delete generalData.consumptionList;
+          delete generalData.inventoryList;
+          delete generalData.shipmentList;
+          delete generalData.batchInfoList;
+          delete generalData.supplyPlan;
+          delete generalData.planningUnitList;
+          generalData.actionList=[];
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+          var planningUnitDataList = [];
+          for (var pu = 0; pu < planningUnitList.length; pu++) {
+              // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+              // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+              var planningUnitDataJson = {
+                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+              }
+              var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+              planningUnitDataList.push({planningUnitId:planningUnitList[pu].id,planningUnitData:encryptedPlanningUnitDataText})
+          }
+          var programDataJson = {
+              generalData:generalEncryptedData,
+              planningUnitDataList:planningUnitDataList
+          };
+          updatedJson.push(programDataJson);
+      }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -814,126 +864,129 @@ class DefaultLayout extends Component {
             myResult = getRequest.result;
             var userId = AuthenticationService.getLoggedInUserId();
             console.log("Myresult+++", myResult);
-            var checkIfProgramExists = myResult.filter(c => c.programId == programId && c.version == versionId && c.readonly == 1 && c.userId == userId);
-            console.log("checkIfProgramExists+++", checkIfProgramExists);
-            var programIdToDelete = 0;
-            if (checkIfProgramExists.length > 0) {
-              programIdToDelete = checkIfProgramExists[0].id;
-            }
+
             var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
             var programDataOs1 = programDataTransaction1.objectStore('programData');
-            var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
-
-            var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-            var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-            var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
-
-            var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-            var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-            var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
-
-            programRequest1.onerror = function (event) {
-              this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
-              })
-            }.bind(this);
-            programRequest2.onsuccess = function (e) {
-
-              var json = response.data[0];
-              console.log("Json+++", json);
-              // json.actionList = [];
-              var version = json.requestedProgramVersion;
-              if (version == -1) {
-                version = json.currentVersion.versionId
+            for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+              var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+              console.log("checkIfProgramExists+++", checkIfProgramExists);
+              var programIdToDelete = 0;
+              if (checkIfProgramExists.length > 0) {
+                programIdToDelete = checkIfProgramExists[0].id;
               }
+              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+            }
+            programDataTransaction1.oncomplete = function (event) {
+              var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+              var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
 
-              var updatedJson = {};
-              var planningUnitList = json.planningUnitList;
-              var consumptionList = json.consumptionList;
-              var inventoryList = json.inventoryList;
-              var shipmentList = json.shipmentList;
-              var batchInfoList = json.batchInfoList;
-              var problemReportList = json.problemReportList;
-              var supplyPlan = json.supplyPlan;
-              var generalData = json;
-              delete generalData.consumptionList;
-              delete generalData.inventoryList;
-              delete generalData.shipmentList;
-              delete generalData.batchInfoList;
-              delete generalData.supplyPlan;
-              delete generalData.planningUnitList;
-              generalData.actionList = [];
-              var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
-              var planningUnitDataList = [];
-              for (var pu = 0; pu < planningUnitList.length; pu++) {
-                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
-                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
-                var planningUnitDataJson = {
-                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
-                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+              for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                console.log("checkIfProgramExists+++", checkIfProgramExists);
+                var programIdToDelete = 0;
+                if (checkIfProgramExists.length > 0) {
+                  programIdToDelete = checkIfProgramExists[0].id;
                 }
-                var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
-                planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
               }
-              var programDataJson = {
-                generalData: generalEncryptedData,
-                planningUnitDataList: planningUnitDataList
-              };
-              updatedJson = programDataJson;
-              // }
+              programDataTransaction3.oncomplete = function (event) {
+                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
 
-              var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-              var programSaveData = transactionForSavingData.objectStore('programData');
+                for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                  var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                  console.log("checkIfProgramExists+++", checkIfProgramExists);
+                  var programIdToDelete = 0;
+                  if (checkIfProgramExists.length > 0) {
+                    programIdToDelete = checkIfProgramExists[0].id;
+                  }
+                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                }
+                programDataTransaction2.oncomplete = function (event) {
 
-              var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-              var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  var programSaveData = transactionForSavingData.objectStore('programData');
+                  for (var r = 0; r < json.length; r++) {
+                    json[r].actionList = [];
+                    // json[r].openCount = 0;
+                    // json[r].addressedCount = 0;
+                    // json[r].programCode = json[r].programCode;
+                    // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var version = json[r].requestedProgramVersion;
+                    if (version == -1) {
+                      version = json[r].currentVersion.versionId
+                    }
+                    var item = {
+                      id: json[r].programId + "_v" + version + "_uId_" + userId,
+                      programId: json[r].programId,
+                      version: version,
+                      programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                      programData: updatedJson[r],
+                      userId: userId,
+                      programCode: json[r].programCode,
+                      // openCount: 0,
+                      // addressedCount: 0
+                    };
+                    programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                    // console.log("Item------------>", item);
+                    var putRequest = programSaveData.put(item);
 
-              var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
-              var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-              // for (var i = 0; i < json.length; i++) {
-              var encryptedText = updatedJson;
-              var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-              var userId = userBytes.toString(CryptoJS.enc.Utf8);
-              var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-              var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-              console.log("Encrypted Yext+++", encryptedText);
-              var item = {
-                id: json.programId + "_v" + version + "_uId_" + userId,
-                programId: json.programId,
-                version: version,
-                programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                programData: encryptedText,
-                userId: userId
-              };
-              var programQPLDetails = {
-                id: json.programId + "_v" + version + "_uId_" + userId,
-                programId: json.programId,
-                version: version,
-                userId: userId,
-                programCode: json.programCode,
-                openCount: openCount,
-                addressedCount: addressedCount,
-                programModified: 0,
-                readonly: 0
-              }
-              var putRequest = programSaveData.put(item);
-              var putRequest1 = downloadedProgramSaveData.put(item);
-              var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-              this.goToMasterDataSync([json.programId + "_v" + version + "_uId_" + userId]);
+                  }
+                  transactionForSavingData.oncomplete = function (event) {
+                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                    for (var r = 0; r < json.length; r++) {
+                      // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                      var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                      var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                      var version = json[r].requestedProgramVersion;
+                      if (version == -1) {
+                        version = json[r].currentVersion.versionId
+                      }
+                      var item = {
+                        id: json[r].programId + "_v" + version + "_uId_" + userId,
+                        programId: json[r].programId,
+                        version: version,
+                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                        programData: updatedJson[r],
+                        userId: userId
+                      };
+                      // console.log("Item------------>", item);
+                      var putRequest = downloadedProgramSaveData.put(item);
 
-
-
-
-              // console.log("ProgramThenCount", programThenCount)
-              // console.log("Response data", response.data)
-              // var json = response.data;
-            }.bind(this)
-          }.bind(this)
+                    }
+                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                      var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                      var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                      var programIds = []
+                      for (var r = 0; r < json.length; r++) {
+                        var programQPLDetailsJson = {
+                          id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                          programId: json[r].programId,
+                          version: json[r].currentVersion.versionId,
+                          userId: userId,
+                          programCode: json[r].programCode,
+                          openCount: 0,
+                          addressedCount: 0,
+                          programModified: 0,
+                          readonly: 0
+                        };
+                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                      }
+                      programQPLDetailsTransaction.oncomplete = function (event) {
+                        this.goToMasterDataSync(programIdsToSyncArray);
+                      }.bind(this)
+                    }.bind(this)
+                  }.bind(this);
+                }.bind(this);
+              }.bind(this);
+            }.bind(this);
+          }.bind(this);
         }.bind(this);
-      })
+            })
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
@@ -1207,17 +1260,17 @@ class DefaultLayout extends Component {
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} masterDataSync={this.goToMasterDataSync} />
           </Suspense>
-          {this.state.notificationArray.map((c,count)=>{
-          return(<div className="col-md-12">
-            <Col className="col-12 col-md-6 offset-md-6">
-              {c.notificationDetails.status == 2 && <Alert color="info" isOpen={c.visible} toggle={(e)=>this.onDismiss(e,count)} onClick={() => this.alertClicked(c.notificationDetails.program.id, c.notificationDetails.committedVersionId)}>
-                {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
-              </Alert>}
-              {c.notificationDetails.status == 3 && <Alert color="info" isOpen={c.visible} toggle={(e)=>this.onDismiss(e,count)}>
-                {i18n.t('static.notification.commitFailed', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
-              </Alert>}
-            </Col>
-          </div>)
+          {this.state.notificationArray.map((c, count) => {
+            return (<div className="col-md-12">
+              <Col className="col-12 col-md-6 offset-md-6">
+                {c.notificationDetails.status == 2 && <Alert color="success" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)} onClick={() => this.alertClicked()}>
+                  {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
+                </Alert>}
+                {c.notificationDetails.status == 3 && <Alert color="warning" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)}>
+                  {i18n.t('static.notification.commitFailed', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
+                </Alert>}
+              </Col>
+            </div>)
           })}
           {/* <div className="col-md-12">
         <Col className="col-12 col-md-6 offset-md-6">
