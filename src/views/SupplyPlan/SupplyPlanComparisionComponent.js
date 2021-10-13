@@ -107,8 +107,8 @@ export default class SupplyPlanComponent extends React.Component {
 
         this.adjustmentsDetailsClicked = this.adjustmentsDetailsClicked.bind(this);
 
-        // this.leftClicked = this.leftClicked.bind(this);
-        // this.rightClicked = this.rightClicked.bind(this);
+        this.leftClicked = this.leftClicked.bind(this);
+        this.rightClicked = this.rightClicked.bind(this);
         this.leftClickedConsumption = this.leftClickedConsumption.bind(this);
         this.rightClickedConsumption = this.rightClickedConsumption.bind(this);
 
@@ -123,6 +123,18 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleAccordionManualShipments = this.toggleAccordionManualShipments.bind(this);
         this.toggleAccordionErpShipments = this.toggleAccordionErpShipments.bind(this);
         this.updateState = this.updateState.bind(this);
+    }
+
+    leftClicked() {
+        var monthCount = (this.props.items.monthCount) - NO_OF_MONTHS_ON_LEFT_CLICKED;
+        this.props.updateState("monthCount",monthCount);
+        this.formSubmit(monthCount)
+    }
+
+    rightClicked() {
+        var monthCount = (this.props.items.monthCount) + NO_OF_MONTHS_ON_RIGHT_CLICKED;
+        this.props.updateState("monthCount",monthCount);
+        this.formSubmit(monthCount)
     }
 
     toggleAccordionTotalShipments() {
@@ -803,6 +815,9 @@ export default class SupplyPlanComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
+        this.props.updateState("startDate",{ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } );
+        localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
         for (var i = 1; i < TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN; i++) {
             var curDate = currentDate.add(1, 'months');
@@ -2281,8 +2296,8 @@ export default class SupplyPlanComponent extends React.Component {
                         </Row>
                         {/* <Row> */}
                         <div className="col-md-12">
-                            {/* <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span> */}
-                            {/* <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span> */}
+                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         {/* </Row> */}
                         <div className="table-scroll">
