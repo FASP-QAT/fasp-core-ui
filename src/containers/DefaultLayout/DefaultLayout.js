@@ -1261,8 +1261,8 @@ class DefaultLayout extends Component {
             <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} masterDataSync={this.goToMasterDataSync} />
           </Suspense>
           {this.state.notificationArray.map((c, count) => {
-            return (<div className="col-md-12">
-              <Col className="col-12 col-md-6 offset-md-6">
+            return (<div className="col-md-6  offset-md-6">
+              <Col className="col-12 col-md-12">
                 {c.notificationDetails.status == 2 && <Alert color="success" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)} onClick={() => this.alertClicked()}>
                   {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
                 </Alert>}
