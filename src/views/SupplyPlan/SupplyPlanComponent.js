@@ -373,6 +373,8 @@ export default class SupplyPlanComponent extends React.Component {
         });
         if (tab == 2) {
             this.refs.compareChild.formSubmit(this.state.monthCount)
+        }else{
+            this.formSubmit(this.state.planningUnit,this.state.monthCount);
         }
     }
 
