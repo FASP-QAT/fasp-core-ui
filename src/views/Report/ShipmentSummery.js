@@ -2245,7 +2245,7 @@ class ShipmentSummery extends Component {
 
             }, {
                 label: i18n.t('static.report.arrived'),
-                backgroundColor: '#006789',
+                backgroundColor: '#0067B9',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2260,7 +2260,7 @@ class ShipmentSummery extends Component {
                 label: i18n.t('static.report.shipped'),
                 stack: 1,
                 // backgroundColor: '#1d97c2',
-                backgroundColor: '#49a4a1',
+                backgroundColor: '#49A4A1',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',

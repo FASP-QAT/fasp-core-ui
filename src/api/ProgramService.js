@@ -194,5 +194,10 @@ class ProgramService {
         );
     }
 
+    sendNotificationAsync(commitRequestId) {
+        return axios.get(`${API_URL}/api/sendNotification/${commitRequestId}`, {}
+        );
+    }
+
 }
 export default new ProgramService()
