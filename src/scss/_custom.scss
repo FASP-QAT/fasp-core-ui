@@ -1668,6 +1668,19 @@ h5,
   font-size: 0.76562rem;
   line-height: 1.5;
   border-radius: 0.2rem;}
+
+  .jexcel_clear_btn:hover {
+    color: #fff !important;
+    background-color: #4AB7DE !important;
+    border-color: #4AB7DE !important;
+    margin-left: 5px;
+    margin-top: 7px;
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
 ///legend sync
 /* basic positioning */
 .legend {
@@ -1873,8 +1886,8 @@ input::placeholder {
 }
 .btn-info:hover {
   color: #fff !important;
-  background-color: #20a8d8 !important;
-  border-color: #20a8d8 !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
 }
 
 // .progress-text{
@@ -5020,9 +5033,28 @@ height: 0px;
   }
     .btn-danger:hover {
       color: #fff;
-      background-color: #BA0C2F!important;
-      border-color: #BA0C2F!important;
+      background-color: #D20E35!important;
+      border-color: #D20E35!important;
   }
         .ContactTemplate .ContactPhone {
           overflow: inherit!important;
         }
+        .modalWidthUsagepopup{
+          width: 90%;
+        }
+        .card-header-action a i:hover {
+          font-size: 25px;
+          color: #4AB7DE;
+      }
+      .jexcel_pagination_dropdown:hover {
+        color: #fff !important;
+        background-color: #4AB7DE !important;
+        border-color: #4AB7DE !important;
+        margin-left: 5px;
+        margin-top: -2px;
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.76562rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }
