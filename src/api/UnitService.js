@@ -21,6 +21,10 @@ class UnitService {
         return axios.get(`${API_URL}/api/unit/${json}`, {}
         );
     }
+    getUnitListByDimensionId(dimensionId) {
+        return axios.get(`${API_URL}/api/unit/dimension/${dimensionId}`, {}
+        );
+    }
 }
 
 export default new UnitService();

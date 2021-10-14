@@ -30,7 +30,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 
@@ -100,9 +100,9 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{marginTop:'10px',overflow:'inherit',width:'132px'}}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
+                <div style={{ marginTop: '10px', overflow: 'inherit', width: '132px' }}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
-git        </div>
+            git        </div>
     ))
 }
 function addCommas(cell, row) {
@@ -982,7 +982,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             );
 
-        UnitService.getUnitListAll().then(response => {
+        UnitService.getUnitListByDimensionId(TREE_DIMENSION_ID).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -990,7 +990,7 @@ export default class CreateTreeTemplate extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-                nodeUnitList: listArray.filter(c => (c.dimension.id == 3 && c.active == true))
+                nodeUnitList: listArray
             })
         })
             .catch(
@@ -1932,48 +1932,48 @@ export default class CreateTreeTemplate extends Component {
                             {/* <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback> */}
                         </FormGroup>
                         {this.state.aggregationNode &&
-                            
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
-                                    <Input
-                                        type="select"
-                                        id="nodeUnitId"
-                                        name="nodeUnitId"
-                                        bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        required
-                                        value={this.state.currentItemConfig.context.payload.nodeUnit.id}
-                                    >
-                                        <option value="">{i18n.t('static.common.select')}</option>
-                                        {this.state.nodeUnitList.length > 0
-                                            && this.state.nodeUnitList.map((item, i) => {
-                                                return (
-                                                    <option key={i} value={item.unitId}>
-                                                        {getLabelText(item.label, this.state.lang)}
-                                                    </option>
-                                                )
-                                            }, this)}
-                                    </Input>
-                                </FormGroup>}
-                                <FormGroup>
-                                    <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                                    <div className="controls edit">
-                                        <Picker
-                                            id="month"
-                                            name="month"
-                                            ref="pickAMonth2"
-                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
-                                            lang={pickerLang.months}
-                                            theme="dark"
-                                            onChange={this.handleAMonthChange2}
-                                            onDismiss={this.handleAMonthDissmis2}
-                                        >
-                                            <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
-                                        </Picker>
-                                    </div>
-                                </FormGroup>
-                            
+
+                            <FormGroup>
+                                <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                <Input
+                                    type="select"
+                                    id="nodeUnitId"
+                                    name="nodeUnitId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    required
+                                    value={this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                >
+                                    <option value="">{i18n.t('static.common.select')}</option>
+                                    {this.state.nodeUnitList.length > 0
+                                        && this.state.nodeUnitList.map((item, i) => {
+                                            return (
+                                                <option key={i} value={item.unitId}>
+                                                    {getLabelText(item.label, this.state.lang)}
+                                                </option>
+                                            )
+                                        }, this)}
+                                </Input>
+                            </FormGroup>}
+                        <FormGroup>
+                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                            <div className="controls edit">
+                                <Picker
+                                    id="month"
+                                    name="month"
+                                    ref="pickAMonth2"
+                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                    value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
+                                    lang={pickerLang.months}
+                                    theme="dark"
+                                    onChange={this.handleAMonthChange2}
+                                    onDismiss={this.handleAMonthDissmis2}
+                                >
+                                    <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                </Picker>
+                            </div>
+                        </FormGroup>
+
                         {this.state.numberNode &&
                             <>
                                 <FormGroup>
@@ -3196,7 +3196,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both',height:'100vh' }} >
+                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
