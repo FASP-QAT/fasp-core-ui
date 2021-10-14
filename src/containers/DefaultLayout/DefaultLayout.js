@@ -785,6 +785,13 @@ class DefaultLayout extends Component {
 
   alertClicked() {
     this.setState({ loading: true });
+    var notificationArray=this.state.notificationArray;
+    for(var i=0;i<notificationArray.length;i++){
+      notificationArray[i].visible=false;
+    }
+    this.setState({
+      notificationArray:notificationArray
+    })
     var checkboxesChecked = [];
     var programIdsToSyncArray = [];
     var programIdsSuccessfullyCommitted = this.state.notificationArray;
@@ -1263,10 +1270,10 @@ class DefaultLayout extends Component {
           {this.state.notificationArray.map((c, count) => {
             return (<div className="col-md-6  offset-md-6">
               <Col className="col-12 col-md-12">
-                {c.notificationDetails.status == 2 && <Alert color="success" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)} onClick={() => this.alertClicked()}>
+                {c.notificationDetails.status == 2 && <Alert className="notification-success" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)} onClick={() => this.alertClicked()}>
                   {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
                 </Alert>}
-                {c.notificationDetails.status == 3 && <Alert color="warning" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)}>
+                {c.notificationDetails.status == 3 && <Alert className="notification-failed" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)}>
                   {i18n.t('static.notification.commitFailed', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
                 </Alert>}
               </Col>
@@ -3018,7 +3025,7 @@ class DefaultLayout extends Component {
             </div>
           </div>
         </div>
-        <AppFooter>
+        <AppFooter  style={{ display: this.state.loading ? "none" : "block" }}>
           <Suspense fallback={this.loading()}>
             <DefaultFooter />
           </Suspense>
