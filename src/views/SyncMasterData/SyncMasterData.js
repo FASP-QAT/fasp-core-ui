@@ -171,7 +171,7 @@ export default class SyncMasterData extends Component {
 
     }
 
-    syncProgramData(date, programList, programQPLDetailsList) {
+    syncProgramData(date, programList, programQPLDetailsList,programPlanningUnitList) {
         // console.log("Date", date);
         // console.log('Program List', programList);
         var valid = true;
@@ -205,8 +205,9 @@ export default class SyncMasterData extends Component {
                             // console.log("Shipment data list", shipmentDataList);
                             // console.log("Batch Info list", batchInfoList);
                             var shipArray = response.data.shipmentList;
+                            var pplModified=programPlanningUnitList.filter(c=>moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss")>=moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id==response.data.programId);
                             var rebuild = false;
-                            if (response.data.shipmentList.length > 0) {
+                            if (response.data.shipmentList.length > 0 || pplModified.length>0) {
                                 rebuild = true;
                             }
                             var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
@@ -222,6 +223,11 @@ export default class SyncMasterData extends Component {
                             for (var j = 0; j < shipArray.length; j++) {
                                 if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
                                     planningUnitList.push(shipArray[j].planningUnit.id);
+                                }
+                            }
+                            for(var ppl=0;ppl<pplModified.length;ppl++){
+                                if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
+                                    planningUnitList.push(pplModified[ppl].planningUnit.id);
                                 }
                             }
 
@@ -279,6 +285,9 @@ export default class SyncMasterData extends Component {
                                 }
 
                             }
+                            if(pplModified.length>0){
+                                minDate=null;
+                            }
                             // console.log("Batch Info updated", batchInfoList);
 
                             var problemReportArray = response.data.problemReportList;
@@ -317,7 +326,7 @@ export default class SyncMasterData extends Component {
                                 actionList.push({
                                     planningUnitId: planningUnitList[p],
                                     type: SHIPMENT_MODIFIED,
-                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                    date: minDate!=null?moment(minDate).startOf('month').format("YYYY-MM-DD"):moment(Date.now()).startOf('month').format("YYYY-MM-DD")
 
                                 })
                             }
@@ -851,7 +860,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                 syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                             }, () => {
-                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson);
+                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson,response.programPlanningUnitList);
                                                                                                                                                                                                 // currency
                                                                                                                                                                                                 var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                                                                                                                                                                                 // console.log("M sync currency transaction start")
