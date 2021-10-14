@@ -4070,3 +4070,21 @@ z-index:999;
   .Select.is-disabled>.Select-control{
    background-color:#e5edf5!important
   }
+
+  .notification-failed {
+    color: #fff;
+    background-color: #BA0C2F!important;
+    border-color: #BA0C2F!important;
+}
+
+.notification-success {
+  color: #fff;
+  background-color: #4dbd74!important;
+  border-color: #4dbd74!important;
+}
+.notification-success:hover {
+  color: #fff;
+  background-color: #3ea662!important;
+  border-color: #3ea662!important;
+  cursor: pointer;
+}

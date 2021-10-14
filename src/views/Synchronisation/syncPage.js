@@ -1249,6 +1249,8 @@ export default class syncPage extends Component {
                 this.checkLastModifiedDateForProgram(proList[0]);
               })
             } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+              var programFilter=proList.filter(c => c.value == localStorage.getItem("sesProgramId"));
+              if(programFilter.length>0){
               this.setState({
                 versionTypeList: response.data,
                 programList: proList,
@@ -1258,6 +1260,7 @@ export default class syncPage extends Component {
                 // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
                 this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
               })
+            }
             } else {
               this.setState({
                 versionTypeList: response.data,
