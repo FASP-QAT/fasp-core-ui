@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 import { OrgDiagram } from 'basicprimitivesreact';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
-import { DndProvider, DropTarget, DragSource } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DropTarget, DragSource } from 'react-dnd';
+// import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faTrash, faEdit, faArrowsAlt, faCopy } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faCopy } from '@fortawesome/free-solid-svg-icons'
 import i18n from '../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import TreeData from '../../Samples/TreeData';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import classnames from 'classnames';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
-import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import ForecastMethodService from '../../api/ForecastMethodService.js';
@@ -32,6 +29,8 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
 
 
 const entityname = 'Tree Template';
@@ -189,6 +188,8 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            unitList: [],
+            autocompleteData: [],
             noOfFUPatient: '',
             nodeTypeFollowUpList: [],
             parentValue: '',
@@ -486,9 +487,12 @@ export default class CreateTreeTemplate extends Component {
     }
 
     getForecastingUnitUnitByFUId(forecastingUnitId) {
+        console.log("forecastingUnitId---", forecastingUnitId);
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId))[0];
+        console.log("forecastingUnit---", forecastingUnit);
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = forecastingUnit.unit.id;
+        console.log("currentItemConfig---", currentItemConfig);
         this.setState({
             currentItemConfig
         });
@@ -793,15 +797,14 @@ export default class CreateTreeTemplate extends Component {
         console.log("tracerCategoryId---", tracerCategoryId)
         ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
             console.log("fu list---", response.data)
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            // console.log("fu list t---", response.data.filter(c => c.tracerCategory.id == tracerCategoryId && c.active == true))
+
+            var autocompleteData = [];
+            for (var i = 0; i < response.data.length; i++) {
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + " | " + response.data[i].label.label_en }
+            }
             this.setState({
-                forecastingUnitList: listArray
+                autocompleteData,
+                forecastingUnitList: response.data
             })
         })
             .catch(
@@ -991,6 +994,57 @@ export default class CreateTreeTemplate extends Component {
             });
             this.setState({
                 nodeUnitList: listArray
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        UnitService.getUnitListAll().then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+                unitList: listArray
             })
         })
             .catch(
@@ -1487,6 +1541,7 @@ export default class CreateTreeTemplate extends Component {
     }
     dataChange(event) {
         // alert("hi");
+        console.log("event---", event);
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
 
@@ -1549,16 +1604,16 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
             this.getNotes();
         }
-        if (event.target.name === "forecastingUnitId") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = event.target.value;
-            if (event.target.value != null && event.target.value != "") {
-                var forecastingUnitId = document.getElementById("forecastingUnitId");
-                var forecastingUnitLabel = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
-                console.log("forecastingUnitLabel---", forecastingUnitLabel);
-                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitLabel;
-            }
-            this.getForecastingUnitUnitByFUId(event.target.value);
-        }
+        // if (event.target.name === "forecastingUnitId") {
+        //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = event.target.value;
+        //     if (event.target.value != null && event.target.value != "") {
+        //         var forecastingUnitId = document.getElementById("forecastingUnitId");
+        //         var forecastingUnitLabel = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
+        //         console.log("forecastingUnitLabel---", forecastingUnitLabel);
+        //         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitLabel;
+        //     }
+        //     this.getForecastingUnitUnitByFUId(event.target.value);
+        // }
 
         if (event.target.name === "tracerCategoryId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
@@ -2257,7 +2312,46 @@ export default class CreateTreeTemplate extends Component {
                             </FormGroup>
                             <FormGroup className="col-md-4">
                                 <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                <Input
+                                <div className="controls "
+                                >
+                                    <Autocomplete
+                                        id="forecastingUnitId"
+                                        name="forecastingUnitId"
+                                        // value={this.state.roNoOrderNo}
+                                        defaultValue={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id}
+                                        options={this.state.autocompleteData}
+                                        getOptionLabel={(option) => option.label}
+                                        style={{ width: 450 }}
+                                        onChange={(event, value) => {
+                                            console.log("combo 2 ro combo box---", value);
+                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = value.value;
+                                            if (value != null) {
+                                                (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = value.label;
+                                            }
+                                            this.getForecastingUnitUnitByFUId(value.value);
+                                            // this.dataChange(event);
+                                            // if (value != null) {
+                                            //     this.setState({
+                                            //         searchedValue: value.label
+                                            //         ,
+                                            //         roNoOrderNo: value.label
+                                            //     }, () => { this.getOrderDetails() });
+                                            // } else {
+                                            //     this.setState({
+                                            //         searchedValue: ''
+                                            //         , autocompleteData: []
+                                            //     }, () => { this.getOrderDetails() });
+                                            // }
+
+                                        }} // prints the selected value
+                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                            onChange={(e) => {
+                                                // this.searchErpOrderData(e.target.value)
+                                            }} />}
+                                    />
+
+                                </div>
+                                {/* <Input
                                     type="select"
                                     id="forecastingUnitId"
                                     name="forecastingUnitId"
@@ -2275,7 +2369,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </option>
                                             )
                                         }, this)}
-                                </Input>
+                                </Input> */}
                             </FormGroup>
                             <FormGroup className="col-md-4">
                                 <Label htmlFor="currencyId">Copy from Template</Label>
@@ -2389,8 +2483,8 @@ export default class CreateTreeTemplate extends Component {
                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
 
                                     <option value=""></option>
-                                    {this.state.nodeUnitList.length > 0
-                                        && this.state.nodeUnitList.map((item, i) => {
+                                    {this.state.unitList.length > 0
+                                        && this.state.unitList.map((item, i) => {
                                             return (
                                                 <option key={i} value={item.unitId}>
                                                     {getLabelText(item.label, this.state.lang)}
