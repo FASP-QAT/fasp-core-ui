@@ -432,7 +432,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -449,21 +449,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -938,7 +938,7 @@ class EquivalancyUnit extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -952,7 +952,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -969,21 +969,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1399,7 +1399,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1416,21 +1416,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1653,7 +1653,7 @@ class EquivalancyUnit extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.modelOpenClose();
@@ -1668,7 +1668,7 @@ class EquivalancyUnit extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: "red",
+                                color: "#BA0C2F",
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1684,7 +1684,7 @@ class EquivalancyUnit extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                         // message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
                                     },
@@ -1697,7 +1697,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     },
                                         () => {
                                             this.modelOpenClose();
@@ -1708,7 +1708,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     });
                                     break;
                             }
@@ -1774,7 +1774,7 @@ class EquivalancyUnit extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1787,7 +1787,7 @@ class EquivalancyUnit extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1804,7 +1804,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         // message: error.response.data.messageCode,
                                         message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1813,7 +1813,7 @@ class EquivalancyUnit extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1822,7 +1822,7 @@ class EquivalancyUnit extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -2225,7 +2225,7 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
                     <Col md="12 pl-3">
-                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
+                        <h5 className="red">{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
                     </Col>
                     <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">

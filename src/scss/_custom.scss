@@ -157,7 +157,7 @@ label.tree_label:after {
 .tick-bg {
   float: left;
   margin-right: 5px;
-  background-image: linear-gradient(orange, red);
+  background-image: linear-gradient(orange, #BA0C2F);
   padding: 2px;
   color: #fff;
 }
@@ -415,7 +415,7 @@ label.arrow_label:after {
 .red {
   //  color: #f86c6b !important;
 
-  color: red !important;
+  color: #BA0C2F !important;
   font-size: 14px;
 }
 .blue{color: 20a8d8 !important;}
@@ -431,7 +431,7 @@ label.arrow_label:after {
   margin-top: 0.25rem;
   // font-size: 80%;
   font-size: 12px !important;
-  color: red !important;
+  color: #BA0C2F !important;
   // color: #f86c6b;
 }
 
@@ -662,7 +662,7 @@ label.arrow_label:after {
 }
 
 .jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
-  color: red !important;
+  color: #BA0C2F !important;
 }
 
 .jexcel > tbody > tr > td.readonly.shipmentEntryActive {
@@ -680,7 +680,7 @@ label.arrow_label:after {
 }
 
 .jexcel > tbody > tr > td.shipmentEntryEmergency {
-  color: red !important;
+  color: #BA0C2F !important;
 }
 
 .jexcel > tbody > tr > td.shipmentEntryActive {
@@ -703,12 +703,12 @@ label.arrow_label:after {
 }
 
 .shipmentEmergencyNotAccount{
-  color: red !important;
+  color: #BA0C2F !important;
   background-color: #D3D3D3 !important;
 }
 
 .shipmentEmergencyAccount{
-  color: red !important;
+  color: #BA0C2F !important;
   background-color: #FFF !important;
 }
 
@@ -974,7 +974,7 @@ label.arrow_label:after {
  position: relative;
   width: 3px;
   height: 100%;
-  color: red; 
+  color: #BA0C2F; 
   top: 0px;
   left: 2px;
   cursor: col-resize;
@@ -1668,6 +1668,19 @@ h5,
   font-size: 0.76562rem;
   line-height: 1.5;
   border-radius: 0.2rem;}
+
+  .jexcel_clear_btn:hover {
+    color: #fff !important;
+    background-color: #4AB7DE !important;
+    border-color: #4AB7DE !important;
+    margin-left: 5px;
+    margin-top: 7px;
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
 ///legend sync
 /* basic positioning */
 .legend {
@@ -1705,8 +1718,8 @@ h5,
   border-color: 1px solid #86cd99;
 }
 .legend .redlegend {
-  background-color: red;
-  border-color: 1px solid red;
+  background-color: #BA0C2F;
+  border-color: 1px solid #BA0C2F;
 }
 
 .legendcommitversion .greylegend {
@@ -1873,8 +1886,8 @@ input::placeholder {
 }
 .btn-info:hover {
   color: #fff !important;
-  background-color: #20a8d8 !important;
-  border-color: #20a8d8 !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
 }
 
 // .progress-text{
@@ -2560,8 +2573,8 @@ input::placeholder {
     border-color: 1px solid #86cd99;
   }
   .legendcommitversion .redlegend {
-    background-color: red;
-    border-color: 1px solid red;
+    background-color: #BA0C2F;
+    border-color: 1px solid #BA0C2F;
   }
   
   .legendcommitversion .orangelegend {
@@ -2612,8 +2625,8 @@ input::placeholder {
     border-color: 1px solid #696969;
   }
   .redlegend {
-    background-color: red;
-    border-color: 1px solid red;
+    background-color: #BA0C2F;
+    border-color: 1px solid #BA0C2F;
   }
 
   .greenlegend {
@@ -3465,7 +3478,7 @@ margin-left: -45px;
 }
 
 .versionColor{
-  color:#cb3828;
+  color:#BA0C2F;
   font-weight: 500;
   font-size: 12px !important;
 }
@@ -3829,7 +3842,7 @@ background-color: yellow;
 }
 
 .redColor{
-  color: red;
+  color: #BA0C2F;
 }
 
 .jexcel_filter{
@@ -4626,7 +4639,7 @@ height: 0px;
       float: left;
       width: 20px;
       height: 20px;
-      background-color: red;
+      background-color: #BA0C2F;
       color: white; }
     
     .CursorFrame {
@@ -5020,6 +5033,28 @@ height: 0px;
   }
     .btn-danger:hover {
       color: #fff;
-      background-color: #BA0C2F!important;
-      border-color: #BA0C2F!important;
+      background-color: #D20E35!important;
+      border-color: #D20E35!important;
   }
+        .ContactTemplate .ContactPhone {
+          overflow: inherit!important;
+        }
+        .modalWidthUsagepopup{
+          width: 90%;
+        }
+        .card-header-action a i:hover {
+          font-size: 25px;
+          color: #4AB7DE;
+      }
+      .jexcel_pagination_dropdown:hover {
+        color: #fff !important;
+        background-color: #4AB7DE !important;
+        border-color: #4AB7DE !important;
+        margin-left: 5px;
+        margin-top: -2px;
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.76562rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }

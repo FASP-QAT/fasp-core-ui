@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Col, Row, FormFeedback, Form,
+    CardFooter, Button, Table, Col, Row,FormFeedback, Form,
     Modal, ModalBody, ModalFooter, ModalHeader,
 
 
@@ -1366,7 +1366,7 @@ class usageTemplate extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -1380,7 +1380,7 @@ class usageTemplate extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1397,21 +1397,21 @@ class usageTemplate extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1562,7 +1562,7 @@ class usageTemplate extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1575,7 +1575,7 @@ class usageTemplate extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1592,7 +1592,7 @@ class usageTemplate extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         // message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1601,7 +1601,7 @@ class usageTemplate extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1610,7 +1610,7 @@ class usageTemplate extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -2511,9 +2511,8 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
-                            <h5 style={{ color: "red" }}>{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
-                            <div className="table-responsive consumptionDataEntryTable" id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
+                            <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -2542,7 +2541,7 @@ class usageTemplate extends Component {
 
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-xl ' + this.props.className}>
                         <ModalHeader>
                             <strong>{i18n.t('static.usageTemplate.calculateUsageFrequency')}</strong>
                         </ModalHeader>
@@ -2584,12 +2583,15 @@ class usageTemplate extends Component {
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                     <CardBody>
                                                         <div className="d-md-flex">
-                                                            <FormGroup className="pr-lg-2 mt-md-4 pt-lg-2 mb-md-0">
+                                                        <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{display:'flex'}}>
+                                                                 <legend  class="w-auto" style={{fontSize:'14px'}}>Interval</legend>
+                                                            
+                                                            <FormGroup className="pr-lg-2 mt-md-1 pt-lg-2 mb-md-0">
                                                                 <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
                                                             </FormGroup>
                                                             <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls UsagePopUpInputField">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2609,7 +2611,7 @@ class usageTemplate extends Component {
 
                                                             <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
@@ -2629,13 +2631,20 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.picker1}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
+                                                            {/* <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
+                                                                <span>---</span>
+                                                            </FormGroup> */}
+                                                        </fieldset>
+                                                        <FormGroup className="tab-ml-1 mb-md-0 pr-lg-3 " style={{ marginTop: '56px' }}>
                                                                 <span>---</span>
                                                             </FormGroup>
+                                                            
 
+                                                            <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{display:'flex'}}>
+                                                                 <legend  class="w-auto" style={{fontSize:'14px'}}>Frequency</legend>
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2653,8 +2662,8 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.number2}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
-                                                                <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label>
+                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                {/* <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label> */}
                                                                 {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input type="text"
@@ -2673,7 +2682,7 @@ class usageTemplate extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
@@ -2693,6 +2702,7 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.picker2}</FormFeedback>
                                                             </FormGroup>
+                                                            </fieldset>
                                                         </div>
                                                     </CardBody>
 
