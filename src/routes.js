@@ -613,10 +613,10 @@ const routes = [
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
 
-  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataSet.dataSet') }), component: AddDataSet },
-  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
-  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataSet.dataSet') }), component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataSet.dataSet') }), component: EditDataSet },
+  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataset.manageProgram') }), component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataset.manageProgram') }), component: EditDataSet },
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];

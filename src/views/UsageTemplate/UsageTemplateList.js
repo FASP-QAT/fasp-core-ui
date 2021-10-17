@@ -17,7 +17,7 @@ import i18n from '../../i18n'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -598,14 +598,14 @@ class usageTemplate extends Component {
 
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
-            console.log("response------->" + response.data);
+            console.log("response------->" + JSON.stringify(response.data));
             if (response.status == 200) {
                 var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                // listArray.sort((a, b) => {
+                //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                //     return itemLabelA > itemLabelB ? 1 : -1;
+                // });
 
                 let tempList = [];
                 if (listArray.length > 0) {
@@ -619,6 +619,11 @@ class usageTemplate extends Component {
                         tempList[i] = paJson
                     }
                 }
+
+                tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth));
+
+                // console.log("response------->1" + JSON.stringify(tempList.sort((a, b) => parseFloat(a.convertToMonth) - parseFloat(b.convertToMonth))));//ascending
+                // console.log("response------->2" + JSON.stringify(tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth))));//decending
 
                 tempList.unshift({
                     name: 'indefinitely',
@@ -763,6 +768,7 @@ class usageTemplate extends Component {
                 data[24] = 0;
                 data[25] = 0;
                 data[26] = (papuList[j].program == null ? -1 : papuList[j].program.id)
+                data[27] = papuList[j].notes
 
 
 
@@ -809,6 +815,7 @@ class usageTemplate extends Component {
             data[24] = 1;
             data[25] = 1;
             data[26] = 0;
+            data[27] = "";
             papuDataArr[0] = data;
         }
 
@@ -820,7 +827,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
                 {
@@ -965,6 +972,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
+                    width: 200,
                     textEditor: true, //23
                 },
                 {
@@ -979,7 +987,11 @@ class usageTemplate extends Component {
                     title: 'typeId',
                     type: 'hidden'//26
                 },
-
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    // width: 400
+                },
 
 
             ],
@@ -1463,6 +1475,7 @@ class usageTemplate extends Component {
         data[24] = 1;
         data[25] = 1;
         data[26] = 0;
+        data[27] = "";
 
         this.el.insertRow(
             data, 0, 1
@@ -1516,7 +1529,8 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("21")) == -1 ? null : parseInt(map1.get("21"))) },
                         repeatCount: this.el.getValue(`U${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true
+                        active: true,
+                        notes: map1.get("27")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -2498,7 +2512,8 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <h5 style={{ color: "red" }}>{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
+                            <div className="table-responsive consumptionDataEntryTable" id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

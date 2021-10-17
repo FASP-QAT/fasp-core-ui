@@ -796,7 +796,7 @@ export default class EditProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.dashboard.healthareaheader')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.healthAreaId },
@@ -844,7 +844,7 @@ export default class EditProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.inventory.region')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.regionId },

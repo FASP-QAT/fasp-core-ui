@@ -680,11 +680,11 @@ const routes = [
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 
-  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.forecastProgram.forecastProgram', component: AddDataSet },
-  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: DataSetList },
+  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
-  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.forecastProgram.forecastProgram', component: EditDataSet },
+  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
 
 ];
 
@@ -1432,7 +1432,7 @@ class DefaultLayout extends Component {
                         },
                         children: [
                           {
-                            name: i18n.t('static.forecastProgram.forecastProgram'),
+                            name: i18n.t('static.dataset.manageProgram'),
                             url: '/dataSet/listDataSet',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true) }
