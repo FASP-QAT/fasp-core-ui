@@ -31,6 +31,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID } from '../../Co
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import pdfIcon from '../../assets/img/pdf.png';
 
 
 const entityname = 'Tree Template';
@@ -258,6 +259,8 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            openAddScenarioModal: false,
+            openTreeDataModal: false,
             unitList: [],
             autocompleteData: [],
             noOfFUPatient: '',
@@ -3395,10 +3398,24 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-lg-0" style={{ display: 'contents' }}>
+                        <div className="pb-lg-0">
                             <div className="card-header-actions">
-                                <div className="card-header-actions pr-4 pt-1">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button>
+                                <div className="card-header-action pr-4 pt-lg-0">
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                                <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                    this.setState({
+                                                        openTreeDataModal: true
+                                                    })
+                                                }}><i className="fa fa-plus-square"></i></a>
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                // onClick={() => this.exportPDF(columns)} 
+                                                />
+                                            </FormGroup>
+
+                                        </div>
+                                    </Col>
                                 </div>
                             </div>
                         </div>
@@ -3659,7 +3676,7 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -3695,6 +3712,69 @@ export default class BuildTree extends Component {
                                                                     >
                                                                     </Input>
                                                                     <FormFeedback>{errors.treeName}</FormFeedback>
+                                                                </FormGroup> */}
+                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
+                                                                    <Label htmlFor="languageId" style={{ visibility: 'hidden' }}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        required
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{'BEN-Con/PRH-MOH[Condoms - Demographic]'}</option>
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+
+                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <InputGroup>
+                                                                        {/* <InputGroupAddon addonType="append">
+                                                                        <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                    </InputGroupAddon> */}
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="languageId"
+                                                                            id="languageId"
+                                                                            bsSize="sm"
+                                                                            // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                            // invalid={touched.languageId && !!errors.languageId}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            // onBlur={handleBlur}
+                                                                            required
+                                                                        // value={this.state.user.language.languageId}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            <option value="">{'Scenario 1'}</option>
+                                                                        </Input>
+                                                                        <InputGroupAddon addonType="append">
+                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={() => {
+                                                                                this.setState({
+                                                                                    openAddScenarioModal: true
+                                                                                })
+                                                                            }} title=""></i></InputGroupText>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="languageId"
+                                                                        id="languageId"
+                                                                        bsSize="sm"
+                                                                        // valid={!errors.languageId && this.state.user.language.languageId != ''}
+                                                                        // invalid={touched.languageId && !!errors.languageId}
+                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        // onBlur={handleBlur}
+                                                                        required
+                                                                    // value={this.state.user.language.languageId}
+                                                                    >
+                                                                    </Input>
+                                                                    {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '28px' }}>
                                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
@@ -3791,6 +3871,93 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
+            {/* tree fields Modal start------------------- */}
+            <Modal isOpen={this.state.openTreeDataModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Tree Data</strong>
+                    <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup className="col-md-12">
+                        <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeTypeId"
+                            bsSize="sm"
+                            onChange={(e) => { this.nodeTypeChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Demographic Method</option>
+                            <option value="2">surgical mask, 1 mask</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup className="col-md-12">
+                        <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="scenarioDesc"
+                            name="scenarioDesc"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioDesc}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup className="col-md-12">
+                        <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                        <Input
+                            type="select"
+                            name="nodeTypeId"
+                            bsSize="sm"
+                            onChange={(e) => { this.nodeTypeChange(e) }}
+                            required
+                            value={this.state.currentItemConfig.valueType}
+                        >
+                            <option value="-1">Nothing Selected</option>
+                            <option value="1">Region A</option>
+                            <option value="2">surgical mask, 1 mask</option>
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeFieldsModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Scenario Modal start------------------- */}
+            <Modal isOpen={this.state.openAddScenarioModal}
+                className={'modal-md '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Scenario</strong>
+                    <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="scenarioName"
+                            name="scenarioName"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioName}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">Notes</Label>
+                        <Input type="text"
+                            id="scenarioDesc"
+                            name="scenarioDesc"
+                            onChange={(e) => { this.scenarioChange(e) }}
+                        // value={this.state.scenario.scenarioDesc}
+                        ></Input>
+                    </FormGroup>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
+            {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-lg '} >
