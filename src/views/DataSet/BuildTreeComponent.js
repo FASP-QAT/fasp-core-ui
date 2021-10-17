@@ -173,9 +173,9 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     ))
 }
 function addCommas(cell1, row) {
-    
+
     if (cell1 != null && cell1 != "") {
-        var cell = parseFloat(cell1); 
+        var cell = parseFloat(cell1);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -367,7 +367,17 @@ export default class BuildTree extends Component {
                     }
                 }
             },
-            activeTab1: new Array(2).fill('1')
+            activeTab1: new Array(2).fill('1'),
+            tracerCategoryList: [],
+            tracerCategoryList: [],
+            forecastMethodList: [],
+            unitOfDimensionIdFour: [],
+            unitList: [],
+            usagePeriodList: [],
+            usageTypeList: [],
+            usageTemplateList: [],
+            forecastingUnitByTracerCategory: [],
+            planningUnitByTracerCategory: [],
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -404,6 +414,15 @@ export default class BuildTree extends Component {
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
         this.getConversionFactor = this.getConversionFactor.bind(this);
+        this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
+        this.getForecastMethodList = this.getForecastMethodList.bind(this);
+        this.getUnitListForDimensionIdFour = this.getUnitListForDimensionIdFour.bind(this);
+        this.getUnitList = this.getUnitList.bind(this);
+        this.getUsagePeriodList = this.getUsagePeriodList.bind(this);
+        this.getUsageTypeList = this.getUsageTypeList.bind(this);
+        this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
+        this.getForecastingUnitListByTracerCategory = this.getForecastingUnitListByTracerCategory.bind(this);
+        this.getPlanningUnitListByForecastingUnitId = this.getPlanningUnitListByForecastingUnitId.bind(this);
     }
 
     getConversionFactor(planningUnitId) {
@@ -1027,7 +1046,302 @@ export default class BuildTree extends Component {
     calculateNodeValue() {
 
     }
+
+    getTracerCategoryList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('tracerCategory');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============", myResult)
+                this.setState({
+                    tracerCategoryList: myResult
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getForecastMethodList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============2", myResult)
+                this.setState({
+                    forecastMethodList: myResult
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getUnitListForDimensionIdFour() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['unit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('unit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============3", myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].dimension.id == 4) {
+                        proList[i] = myResult[i]
+                    }
+                }
+                this.setState({
+                    unitOfDimensionIdFour: proList[0]
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getUnitList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['unit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('unit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============4", myResult)
+
+                this.setState({
+                    unitList: myResult
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getUsagePeriodList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['usagePeriod'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('usagePeriod');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============5", myResult)
+
+                this.setState({
+                    usagePeriodList: myResult
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getUsageTypeList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['usageType'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('usageType');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============6", myResult)
+
+                this.setState({
+                    usageTypeList: myResult
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getUsageTemplateList() {
+        // const lan = 'en';
+        // var db1;
+        // var storeOS;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var planningunitTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+        //     var planningunitOs = planningunitTransaction.objectStore('usageTemplate');
+        //     var planningunitRequest = planningunitOs.getAll();
+        //     var planningList = []
+        //     planningunitRequest.onerror = function (event) {
+        //         // Handle errors!
+        //     };
+        //     planningunitRequest.onsuccess = function (e) {
+        //         var myResult = [];
+        //         myResult = planningunitRequest.result;
+        //         var proList = []
+        //         console.log("myResult===============6", myResult)
+
+        //         this.setState({
+        //             usageTemplateList: myResult
+        //         }, () => {
+
+        //         })
+        //     }.bind(this);
+        // }.bind(this)
+    }
+
+    getForecastingUnitListByTracerCategory(tracerCategoryId) {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('forecastingUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============123", myResult)
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].tracerCategory.id == tracerCategoryId) {
+                        proList[i] = myResult[i]
+                    }
+                }
+                console.log("myResult===============123", proList)
+
+                this.setState({
+                    forecastingUnitByTracerCategory: proList
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    getPlanningUnitListByForecastingUnitId(forecastingUnitId) {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].forecastingUnit.id == forecastingUnitId) {
+                        proList[i] = myResult[i]
+                    }
+                }
+                console.log("myResult===============1234", proList)
+
+                this.setState({
+                    planningUnitByTracerCategory: proList
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
     componentDidMount() {
+        this.getTracerCategoryList();
+        this.getForecastMethodList();
+        this.getUnitListForDimensionIdFour();
+        this.getUnitList();
+        this.getUsagePeriodList();
+        this.getUsageTypeList();
+        this.getUsageTemplateList();
+        this.getForecastingUnitListByTracerCategory(22);
+        this.getPlanningUnitListByForecastingUnitId(1);
+
         this.getNodeTyeList();
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             var listArray = response.data;
