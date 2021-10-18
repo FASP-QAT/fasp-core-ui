@@ -1459,7 +1459,7 @@ class EquivalancyUnit extends Component {
                         }
                     }
                     this.setState({
-                        technicalAreaList: tempList, loading: false
+                        technicalAreaList: tempList
                     },
                         () => {
                             this.getTracerCategory();

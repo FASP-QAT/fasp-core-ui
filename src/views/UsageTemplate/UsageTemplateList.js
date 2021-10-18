@@ -1095,6 +1095,8 @@ class usageTemplate extends Component {
                         cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`AB${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
 
                     }
 
@@ -1124,6 +1126,8 @@ class usageTemplate extends Component {
                         var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`AB${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     }
 
