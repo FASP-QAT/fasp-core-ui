@@ -260,6 +260,10 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            selectedScenario: '',
+            scenarioList: [],
+            regionList: [],
+            curTreeObj: [],
             treeData: [],
             openAddScenarioModal: false,
             openTreeDataModal: false,
@@ -430,7 +434,22 @@ export default class BuildTree extends Component {
         this.getPlanningUnitListByForecastingUnitId = this.getPlanningUnitListByForecastingUnitId.bind(this);
         this.getScenarioList = this.getScenarioList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
+        this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
     }
+
+    getTreeByTreeId(treeId) {
+        console.log("treeId---", treeId)
+        var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
+        console.log("curTreeObj---", curTreeObj)
+        this.setState({
+            curTreeObj,
+            scenarioList: curTreeObj.scenarioList,
+            regionList: curTreeObj.regionList
+        }, () => {
+            console.log("my items--->", this.state.items);
+        });
+    }
+
     getScenarioList() {
 
     }
@@ -463,7 +482,10 @@ export default class BuildTree extends Component {
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         console.log("programData---", programData);
-                        proList.push(programData.treeList[0]);
+                        var treeList = programData.treeList;
+                        for (var k = 0; k < treeList.length; k++) {
+                            proList.push(treeList[k])
+                        }
                     }
                 }
                 console.log("pro list---", proList);
@@ -1425,18 +1447,24 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
-        this.getTreeList();
-        this.getTracerCategoryList();
-        this.getForecastMethodList();
-        this.getUnitListForDimensionIdFour();
-        this.getUnitList();
-        this.getUsagePeriodList();
-        this.getUsageTypeList();
-        this.getUsageTemplateList();
-        this.getForecastingUnitListByTracerCategory(22);
-        this.getPlanningUnitListByForecastingUnitId(1);
+        this.setState({
+            treeId: this.props.match.params.treeId,
+            templateId: this.props.match.params.templateId
+        }, () => {
+            this.getTreeList();
+            this.getTracerCategoryList();
+            this.getForecastMethodList();
+            this.getUnitListForDimensionIdFour();
+            this.getUnitList();
+            this.getUsagePeriodList();
+            this.getUsageTypeList();
+            this.getUsageTemplateList();
+            this.getForecastingUnitListByTracerCategory(22);
+            this.getPlanningUnitListByForecastingUnitId(1);
 
-        this.getNodeTyeList();
+            this.getNodeTyeList();
+        })
+
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -1801,179 +1829,179 @@ export default class BuildTree extends Component {
         //         }
         //     );
         if (this.props.match.params.templateId != -1) {
-            DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
-                console.log("my tree---", response.data);
-                var items = response.data.flatList;
-                var arr = [];
-                for (let i = 0; i < items.length; i++) {
+            // DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+            //     console.log("my tree---", response.data);
+            //     var items = response.data.flatList;
+            //     var arr = [];
+            //     for (let i = 0; i < items.length; i++) {
 
-                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
-                    } else {
+            //         if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+            //             (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+            //         } else {
 
-                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                        console.log("api parent value---", parentValue);
+            //             var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+            //             var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+            //             console.log("api parent value---", parentValue);
 
-                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
-                    }
-                    console.log("load---", items[i])
-                    // arr.push(items[i]);
-                }
-                this.setState({
-                    treeTemplate: response.data,
-                    items,
-                    loading: false
-                }, () => {
-                    console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
-                    console.log("Tree Template---", this.state.items);
-                })
-            })
-                .catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+            //             (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+            //         }
+            //         console.log("load---", items[i])
+            //         // arr.push(items[i]);
+            //     }
+            //     this.setState({
+            //         treeTemplate: response.data,
+            //         items,
+            //         loading: false
+            //     }, () => {
+            //         console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
+            //         console.log("Tree Template---", this.state.items);
+            //     })
+            // })
+            //     .catch(
+            //         error => {
+            //             if (error.message === "Network Error") {
+            //                 this.setState({
+            //                     message: 'static.unkownError',
+            //                     loading: false
+            //                 });
+            //             } else {
+            //                 switch (error.response ? error.response.status : "") {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
+            //                     case 401:
+            //                         this.props.history.push(`/login/static.message.sessionExpired`)
+            //                         break;
+            //                     case 403:
+            //                         this.props.history.push(`/accessDenied`)
+            //                         break;
+            //                     case 500:
+            //                     case 404:
+            //                     case 406:
+            //                         this.setState({
+            //                             message: error.response.data.messageCode,
+            //                             loading: false
+            //                         });
+            //                         break;
+            //                     case 412:
+            //                         this.setState({
+            //                             message: error.response.data.messageCode,
+            //                             loading: false
+            //                         });
+            //                         break;
+            //                     default:
+            //                         this.setState({
+            //                             message: 'static.unkownError',
+            //                             loading: false
+            //                         });
+            //                         break;
+            //                 }
+            //             }
+            //         }
+            //     );
         } else {
-            this.setState({
-                treeTemplate: {
-                    treeTemplateId: 0,
-                    active: true,
-                    label: {
-                        label_en: ""
-                    },
-                    forecastMethod: {
-                        label: {
-                            label_en: ""
-                        }
-                    },
-                    flatList: [{
-                        id: 1,
-                        level: 0,
-                        parent: null,
-                        payload: {
-                            label: {
-                                label_en: ''
-                            },
-                            nodeType: {
-                                id: 2
-                            },
-                            nodeUnit: {
-                                id: ''
-                            },
-                            nodeDataMap: [
-                                [{
-                                    dataValue: '',
-                                    fuNode: {
-                                        forecastingUnit: {
-                                            tracerCategory: {
+            //     this.setState({
+            //         treeTemplate: {
+            //             treeTemplateId: 0,
+            //             active: true,
+            //             label: {
+            //                 label_en: ""
+            //             },
+            //             forecastMethod: {
+            //                 label: {
+            //                     label_en: ""
+            //                 }
+            //             },
+            //             flatList: [{
+            //                 id: 1,
+            //                 level: 0,
+            //                 parent: null,
+            //                 payload: {
+            //                     label: {
+            //                         label_en: ''
+            //                     },
+            //                     nodeType: {
+            //                         id: 2
+            //                     },
+            //                     nodeUnit: {
+            //                         id: ''
+            //                     },
+            //                     nodeDataMap: [
+            //                         [{
+            //                             dataValue: '',
+            //                             fuNode: {
+            //                                 forecastingUnit: {
+            //                                     tracerCategory: {
 
-                                            },
-                                            unit: {
+            //                                     },
+            //                                     unit: {
 
-                                            }
-                                        },
-                                        usageType: {
+            //                                     }
+            //                                 },
+            //                                 usageType: {
 
-                                        },
-                                        usagePeriod: {
+            //                                 },
+            //                                 usagePeriod: {
 
-                                        }
-                                    }
-                                }]
-                            ]
-                        },
-                        parentItem: {
-                            payload: {
-                                nodeUnit: {
+            //                                 }
+            //                             }
+            //                         }]
+            //                     ]
+            //                 },
+            //                 parentItem: {
+            //                     payload: {
+            //                         nodeUnit: {
 
-                                }
-                            }
-                        }
-                    }]
-                },
-                items: [{
-                    id: 1,
-                    level: 0,
-                    parent: null,
-                    payload: {
-                        label: {
-                            label_en: ''
-                        },
-                        nodeType: {
-                            id: 2
-                        },
-                        nodeUnit: {
-                            id: ''
-                        },
-                        nodeDataMap: [
-                            [{
-                                dataValue: '',
-                                fuNode: {
-                                    forecastingUnit: {
-                                        tracerCategory: {
+            //                         }
+            //                     }
+            //                 }
+            //             }]
+            //         },
+            //         items: [{
+            //             id: 1,
+            //             level: 0,
+            //             parent: null,
+            //             payload: {
+            //                 label: {
+            //                     label_en: ''
+            //                 },
+            //                 nodeType: {
+            //                     id: 2
+            //                 },
+            //                 nodeUnit: {
+            //                     id: ''
+            //                 },
+            //                 nodeDataMap: [
+            //                     [{
+            //                         dataValue: '',
+            //                         fuNode: {
+            //                             forecastingUnit: {
+            //                                 tracerCategory: {
 
-                                        },
-                                        unit: {
+            //                                 },
+            //                                 unit: {
 
-                                        }
-                                    },
-                                    usageType: {
+            //                                 }
+            //                             },
+            //                             usageType: {
 
-                                    },
-                                    usagePeriod: {
+            //                             },
+            //                             usagePeriod: {
 
-                                    }
-                                }
-                            }]
-                        ]
-                    },
-                    parentItem: {
-                        payload: {
-                            nodeUnit: {
+            //                             }
+            //                         }
+            //                     }]
+            //                 ]
+            //             },
+            //             parentItem: {
+            //                 payload: {
+            //                     nodeUnit: {
 
-                            }
-                        }
-                    }
-                }]
-            }, () => {
-                console.log("Tree Template---", this.state.items);
-            })
+            //                     }
+            //                 }
+            //             }
+            //         }]
+            //     }, () => {
+            //         console.log("Tree Template---", this.state.items);
+            //     })
         }
     }
     addScenario() {
@@ -2046,8 +2074,25 @@ export default class BuildTree extends Component {
     dataChange(event) {
         // alert("hi");
         console.log("event---", event);
+        let { curTreeObj } = this.state;
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
+
+
+        if (event.target.name == "treeId") {
+            curTreeObj.treeId = event.target.value;
+            this.getTreeByTreeId(event.target.value);
+        }
+
+        if (event.target.name == "scenarioId") {
+            console.log("scenario id---", event.target.value)
+            this.setState({
+                items: (event.target.value != "" ? curTreeObj.tree.flatList : []),
+                selectedScenario: event.target.value
+            });
+            // curTreeObj.treeId = event.target.value;
+            // this.getTreeByTreeId(event.target.value);
+        }
 
         if (event.target.name == "active") {
             treeTemplate.active = event.target.id === "active2" ? false : true;
@@ -3222,11 +3267,20 @@ export default class BuildTree extends Component {
             }, this);
 
         const { treeData } = this.state;
-        console.log("treeData--->",treeData)
+        console.log("treeData--->", treeData)
         let treeList = treeData.length > 0
             && treeData.map((item, i) => {
                 return (
                     <option key={i} value={item.treeId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+        const { scenarioList } = this.state;
+        let scenarios = scenarioList.length > 0
+            && scenarioList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -3823,6 +3877,7 @@ export default class BuildTree extends Component {
                                                                         id="treeId"
                                                                         bsSize="sm"
                                                                         required
+                                                                        onChange={(e) => { this.dataChange(e) }}
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {treeList}
@@ -3838,18 +3893,18 @@ export default class BuildTree extends Component {
                                                                     </InputGroupAddon> */}
                                                                         <Input
                                                                             type="select"
-                                                                            name="languageId"
-                                                                            id="languageId"
+                                                                            name="scenarioId"
+                                                                            id="scenarioId"
                                                                             bsSize="sm"
                                                                             // valid={!errors.languageId && this.state.user.language.languageId != ''}
                                                                             // invalid={touched.languageId && !!errors.languageId}
-                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            onChange={(e) => { this.dataChange(e) }}
                                                                             // onBlur={handleBlur}
                                                                             required
                                                                         // value={this.state.user.language.languageId}
                                                                         >
                                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                                            <option value="">{'Scenario 1'}</option>
+                                                                            {scenarios}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
                                                                             <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={() => {

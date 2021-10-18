@@ -1306,12 +1306,12 @@ class AuthenticationService {
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
-                    case "/dataSet/buildTree/:treeId":
+                    case "/dataSet/buildTree/tree/:treeId":
                     case "/dataSet/buildTree/":
                     case "/dataset/createTreeTemplate/:templateId":
                     case "/dataset/listTreeTemplate/":
                     case "/dataset/listTreeTemplate/:color/:message":
-                    case "/dataSet/buildTree/:templateId":
+                    case "/dataSet/buildTree/template/:templateId":
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                             return true;

@@ -83,9 +83,6 @@ export default class ListTreeComponent extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 console.log("1---", userId);
                 console.log("2---", myResult);
-                // var t = CryptoJS.AES.decrypt(myResult, SECRET_KEY);
-                // var tt = JSON.parse(t.toString(CryptoJS.enc.Utf8));
-                // console.log("tt>>>",tt);
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("3---", myResult[i]);
                     if (myResult[i].userId == userId) {
@@ -96,24 +93,15 @@ export default class ListTreeComponent extends Component {
                         // var f = 0
                         var treeList = programData.treeList;
                         for (var k = 0; k < treeList.length; k++) {
-                            // if (datasetId == 0) {
-                            //     console.log('inside else')
-                            //     proList.push(treeList[k])
-                            // } else if (programData.programId == datasetId) {
-                            //     console.log('inside if')
+                            if (datasetId == 0) {
+                                console.log('inside else')
                                 proList.push(treeList[k])
-                            // }
+                            } else if (programData.programId == datasetId) {
+                                console.log('inside if')
+                                proList.push(treeList[k])
+                            }
                         }
                     }
-                    //     if (datasetId == 0) {
-                    //         console.log('inside else')
-                    //         proList.push(programData.treeList)
-                    //     } else
-                    //         if (programData.programId == datasetId) {
-                    //             console.log('inside if')
-                    //             proList.push(programData.treeList)
-                    //         }
-                    // }
                 }
                 console.log("pro list---", proList);
                 this.setState({
@@ -156,7 +144,7 @@ export default class ListTreeComponent extends Component {
     onTemplateChange(event) {
 
         this.props.history.push({
-            pathname: `/dataSet/buildTree/${event.target.value}`,
+            pathname: `/dataSet/buildTree/template/${event.target.value}`,
             // state: { role }
         });
 
@@ -181,10 +169,11 @@ export default class ListTreeComponent extends Component {
             // for (var k = 0; k < trees.length; k++) {
             // console.log("trees[k]---", trees[k]);
             data = [];
-            data[0] = getLabelText(treeList[j].label, this.state.lang)
-            data[1] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-            data[2] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
-            data[3] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[0] = treeList[j].treeId
+            data[1] = getLabelText(treeList[j].label, this.state.lang)
+            data[2] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[3] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
+            data[4] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
             treeArray[count] = data;
             count++;
             // }
@@ -200,6 +189,10 @@ export default class ListTreeComponent extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
+                {
+                    title: 'Tree Id',
+                    type: 'hidden'
+                },
                 {
                     title: i18n.t('static.common.treeName'),
                     type: 'text',
@@ -316,7 +309,7 @@ export default class ListTreeComponent extends Component {
             var treeId = this.el.getValueFromCoords(0, x);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
-                pathname: `/dataSet/buildTree/${treeId}`,
+                pathname: `/dataSet/buildTree/tree/${treeId}`,
                 // state: { role }
             });
             // }
@@ -415,7 +408,7 @@ export default class ListTreeComponent extends Component {
                                             name="datasetId"
                                             id="datasetId"
                                             bsSize="sm"
-                                        // onChange={(e) =>{this.getTreeList(e.target.value)}}
+                                            onChange={(e) => { this.getTreeList(e.target.value) }}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {datasets}
