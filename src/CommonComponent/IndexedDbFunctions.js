@@ -172,6 +172,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('downloadedDatasetData')){
             storeOS = db1.createObjectStore('downloadedDatasetData', { keyPath: 'id'});
         }
+        if(!db1.objectStoreNames.contains('usageTemplate')){
+            storeOS = db1.createObjectStore('usageTemplate', { keyPath: 'usageTemplateId'});
+        }
         console.log("indexed db completed----------------------")
         
     };
