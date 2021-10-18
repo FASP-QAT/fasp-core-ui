@@ -55,6 +55,7 @@ class EquivalancyUnit extends Component {
             table2Instance: "",
             selSource: [],
             unitList: [],
+            roleArray: [],
 
             loading: true,
             loading1: true,
@@ -700,18 +701,7 @@ class EquivalancyUnit extends Component {
 
                     }
 
-
-                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    // console.log("decryptedUser=====>", decryptedUser);
-
-                    var roleList = decryptedUser.roleList;
-                    var roleArray = []
-                    for (var r = 0; r < roleList.length; r++) {
-                        roleArray.push(roleList[r].roleId)
-                    }
-
-
+                    let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
                     if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
@@ -740,28 +730,6 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     }
-                    // if (this.state.roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1) {
-                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    // }
 
                     var addRowId = rowData[15];
                     // console.log("addRowId------>", addRowId);
@@ -804,7 +772,7 @@ class EquivalancyUnit extends Component {
 
 
                 }
-            },
+            }.bind(this),
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1448,7 +1416,22 @@ class EquivalancyUnit extends Component {
     componentDidMount() {
         // this.getEquivalancyUnitMappingData();
         // console.log("USER------->", localStorage.getItem('curUser'));
-        this.getHealthArea();
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("decryptedUser=====>", decryptedUser);
+
+        var roleList = decryptedUser.roleList;
+        var roleArray = []
+        for (var r = 0; r < roleList.length; r++) {
+            roleArray.push(roleList[r].roleId)
+        }
+        this.setState({
+            roleArray: roleArray
+        },
+            () => {
+                this.getHealthArea();
+            })
+
         // this.getTracerCategory();
     }
 
