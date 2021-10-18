@@ -27,7 +27,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID,SECRET_KEY } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -260,7 +260,7 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
-            treeData : [],
+            treeData: [],
             openAddScenarioModal: false,
             openTreeDataModal: false,
             unitList: [],
@@ -435,7 +435,7 @@ export default class BuildTree extends Component {
 
     }
 
-    getTreeList(datasetId) {
+    getTreeList() {
         var proList = [];
         var db1;
         getDatabase();
@@ -463,32 +463,14 @@ export default class BuildTree extends Component {
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         console.log("programData---", programData);
-                        // var f = 0
-                        // for (var k = 0; k < this.state.datasetList.length; k++) {
-                        //     if (this.state.datasetList[k].programId == programData.programId) {
-                        //         f = 1;
-                        //         console.log('already exist')
-                        //     }
-                        // }
-                        // if (datasetId == 0) {
-                        //     console.log('inside else')
-                        //     proList.push(programData)
-                        // } else
-                        //     if (programData.programId == datasetId) {
-                        //         console.log('inside if')
-                        proList.push(programData)
-                        // }
+                        proList.push(programData.treeList[0]);
                     }
                 }
                 console.log("pro list---", proList);
                 this.setState({
-                    treeData: proList.sort(function (a, b) {
-                        a = a.programCode.toLowerCase();
-                        b = b.programCode.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    })
+                    treeData: proList
                 }, () => {
-                    this.buildJexcel();
+                    // this.buildJexcel();
                 });
 
             }.bind(this);
@@ -1443,6 +1425,7 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
+        this.getTreeList();
         this.getTracerCategoryList();
         this.getForecastMethodList();
         this.getUnitListForDimensionIdFour();
@@ -3238,6 +3221,17 @@ export default class BuildTree extends Component {
                 )
             }, this);
 
+        const { treeData } = this.state;
+        console.log("treeData--->",treeData)
+        let treeList = treeData.length > 0
+            && treeData.map((item, i) => {
+                return (
+                    <option key={i} value={item.treeId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
 
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
@@ -3825,13 +3819,13 @@ export default class BuildTree extends Component {
                                                                     <Label htmlFor="languageId" style={{ visibility: 'hidden' }}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
-                                                                        name="languageId"
-                                                                        id="languageId"
+                                                                        name="treeId"
+                                                                        id="treeId"
                                                                         bsSize="sm"
                                                                         required
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                                        <option value="">{'BEN-Con/PRH-MOH[Condoms - Demographic]'}</option>
+                                                                        {treeList}
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>

@@ -19,6 +19,7 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            usageTemplateList: [],
             treeData: [],
             datasetList: [],
             message: '',
@@ -30,6 +31,39 @@ export default class ListTreeComponent extends Component {
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
+        this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
+    }
+    getUsageTemplateList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['usageTemplate'], 'readwrite');
+            var program = transaction.objectStore('usageTemplate');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                console.log("ut--->",myResult)
+                this.setState({
+                    usageTemplateList: myResult
+                    // .filter(x => x.active == "true")
+                }, () => {
+                    this.getTreeList(0);
+                    // this.buildJexcel();
+                });
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("usageTemplateList--->", myResult[i])
+
+                }
+
+            }.bind(this);
+        }.bind(this);
     }
 
     getTreeList(datasetId) {
@@ -144,14 +178,14 @@ export default class ListTreeComponent extends Component {
             console.log("treeList[j]---", treeList[j]);
             // var trees = treeList[j].treeList;
             // for (var k = 0; k < trees.length; k++) {
-                // console.log("trees[k]---", trees[k]);
-                data = [];
-                data[0] = getLabelText(treeList[j][0].label, this.state.lang)
-                data[1] = treeList[j][0].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                data[2] = getLabelText(treeList[j][0].forecastMethod.label, this.state.lang)
-                data[3] = treeList[j][0].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                treeArray[count] = data;
-                count++;
+            // console.log("trees[k]---", trees[k]);
+            data = [];
+            data[0] = getLabelText(treeList[j][0].label, this.state.lang)
+            data[1] = treeList[j][0].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[2] = getLabelText(treeList[j][0].forecastMethod.label, this.state.lang)
+            data[3] = treeList[j][0].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            treeArray[count] = data;
+            count++;
             // }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -265,7 +299,7 @@ export default class ListTreeComponent extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getDatasetList();
-        // this.getTreeList(0);
+        this.getUsageTemplateList();
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -307,6 +341,18 @@ export default class ListTreeComponent extends Component {
                     </option>
                 )
             }, this);
+
+        const { usageTemplateList } = this.state;
+        let usageTemplates = usageTemplateList.length > 0
+            && usageTemplateList.map((item, i) => {
+                return (
+                    <option key={i} value={item.usageTemplateId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
@@ -338,8 +384,7 @@ export default class ListTreeComponent extends Component {
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
                                                             <option value="0">{'Select Template'}</option>
-                                                            <option value="1">Demographic TreeTemplate</option>
-                                                            {/* {realmList} */}
+                                                            {usageTemplates}
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
@@ -368,7 +413,7 @@ export default class ListTreeComponent extends Component {
                                             name="datasetId"
                                             id="datasetId"
                                             bsSize="sm"
-                                            onChange={(e)=>this.getTreeList(e.target.value)}
+                                            onChange={(e) => this.getTreeList(e.target.value)}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {datasets}
