@@ -69,21 +69,17 @@ export default class ListTreeComponent extends Component {
                         // }
                         if (datasetId == 0) {
                             console.log('inside else')
-                            proList.push(programData)
+                            proList.push(programData.treeList)
                         } else
                             if (programData.programId == datasetId) {
                                 console.log('inside if')
-                                proList.push(programData)
+                                proList.push(programData.treeList)
                             }
                     }
                 }
                 console.log("pro list---", proList);
                 this.setState({
-                    treeData: proList.sort(function (a, b) {
-                        a = a.programCode.toLowerCase();
-                        b = b.programCode.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    })
+                    treeData: proList
                 }, () => {
                     this.buildJexcel();
                 });
@@ -110,7 +106,8 @@ export default class ListTreeComponent extends Component {
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    this.buildJexcel();
+                    this.getTreeList(0);
+                    // this.buildJexcel();
                 });
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("datasetList--->", myResult[i])
@@ -145,17 +142,17 @@ export default class ListTreeComponent extends Component {
 
         for (var j = 0; j < treeList.length; j++) {
             console.log("treeList[j]---", treeList[j]);
-            var trees = treeList[j].treeList;
-            for (var k = 0; k < trees.length; k++) {
-                console.log("trees[k]---", trees[k]);
+            // var trees = treeList[j].treeList;
+            // for (var k = 0; k < trees.length; k++) {
+                // console.log("trees[k]---", trees[k]);
                 data = [];
-                data[0] = getLabelText(trees[k].label, this.state.lang)
-                data[1] = trees[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                data[2] = getLabelText(trees[k].forecastMethod.label, this.state.lang)
-                data[3] = trees[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                data[0] = getLabelText(treeList[j][0].label, this.state.lang)
+                data[1] = treeList[j][0].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                data[2] = getLabelText(treeList[j][0].forecastMethod.label, this.state.lang)
+                data[3] = treeList[j][0].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
                 treeArray[count] = data;
                 count++;
-            }
+            // }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -268,7 +265,7 @@ export default class ListTreeComponent extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getDatasetList();
-        this.getTreeList(0);
+        // this.getTreeList(0);
     }
 
     loaded = function (instance, cell, x, y, value) {

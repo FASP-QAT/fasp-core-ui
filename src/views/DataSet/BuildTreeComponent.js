@@ -27,11 +27,12 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID,SECRET_KEY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
+import CryptoJS from 'crypto-js'
 
 
 const entityname = 'Tree Template';
@@ -259,6 +260,7 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            treeData : [],
             openAddScenarioModal: false,
             openTreeDataModal: false,
             unitList: [],
@@ -426,8 +428,72 @@ export default class BuildTree extends Component {
         this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
         this.getForecastingUnitListByTracerCategory = this.getForecastingUnitListByTracerCategory.bind(this);
         this.getPlanningUnitListByForecastingUnitId = this.getPlanningUnitListByForecastingUnitId.bind(this);
+        this.getScenarioList = this.getScenarioList.bind(this);
+        this.getTreeList = this.getTreeList.bind(this);
+    }
+    getScenarioList() {
+
     }
 
+    getTreeList(datasetId) {
+        var proList = [];
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                console.log("userId---", userId);
+                console.log("myResult.length---", myResult.length);
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("inside for---", myResult[i]);
+                    if (myResult[i].userId == userId) {
+                        console.log("inside if---");
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        console.log("programData---", programData);
+                        // var f = 0
+                        // for (var k = 0; k < this.state.datasetList.length; k++) {
+                        //     if (this.state.datasetList[k].programId == programData.programId) {
+                        //         f = 1;
+                        //         console.log('already exist')
+                        //     }
+                        // }
+                        // if (datasetId == 0) {
+                        //     console.log('inside else')
+                        //     proList.push(programData)
+                        // } else
+                        //     if (programData.programId == datasetId) {
+                        //         console.log('inside if')
+                        proList.push(programData)
+                        // }
+                    }
+                }
+                console.log("pro list---", proList);
+                this.setState({
+                    treeData: proList.sort(function (a, b) {
+                        a = a.programCode.toLowerCase();
+                        b = b.programCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
+                }, () => {
+                    this.buildJexcel();
+                });
+
+            }.bind(this);
+        }.bind(this);
+    }
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
