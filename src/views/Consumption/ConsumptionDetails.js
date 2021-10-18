@@ -53,7 +53,8 @@ export default class ConsumptionDetails extends React.Component {
             consumptionType: "",
             dataSources: [],
             planningUnitId: '',
-            realmCountryPlanningUnitList: []
+            realmCountryPlanningUnitList: [],
+            programQPLDetails:[]
         }
 
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -924,7 +925,7 @@ export default class ConsumptionDetails extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
-
+                        {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
                             <div className="table-responsive consumptionDataEntryTable" id="consumptionTableDiv">
