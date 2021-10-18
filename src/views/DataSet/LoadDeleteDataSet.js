@@ -80,7 +80,7 @@ class LoadDeleteDataSet extends Component {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     }, () => {
                         this.hideFirstComponent()
                     })
@@ -91,7 +91,7 @@ class LoadDeleteDataSet extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -110,7 +110,7 @@ class LoadDeleteDataSet extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -119,7 +119,7 @@ class LoadDeleteDataSet extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -128,7 +128,7 @@ class LoadDeleteDataSet extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -185,7 +185,7 @@ class LoadDeleteDataSet extends Component {
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: "red"
+                            message: response.data.messageCode, loading: false, color: "#BA0C2F"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -196,7 +196,7 @@ class LoadDeleteDataSet extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: "red"
+                                color: "#BA0C2F"
                             }, () => {
                                 this.hideFirstComponent()
                             })
@@ -215,7 +215,7 @@ class LoadDeleteDataSet extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -224,7 +224,7 @@ class LoadDeleteDataSet extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -233,7 +233,7 @@ class LoadDeleteDataSet extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -260,7 +260,7 @@ class LoadDeleteDataSet extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -340,7 +340,7 @@ class LoadDeleteDataSet extends Component {
                                     this.setState({
                                         message: response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -351,7 +351,7 @@ class LoadDeleteDataSet extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -370,7 +370,7 @@ class LoadDeleteDataSet extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -379,7 +379,7 @@ class LoadDeleteDataSet extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -388,7 +388,7 @@ class LoadDeleteDataSet extends Component {
                                                 this.setState({
                                                     message: 'static.unkownError',
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -493,7 +493,7 @@ class LoadDeleteDataSet extends Component {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
                 message: i18n.t('static.common.realmtext'),
-                color: "red"
+                color: "#BA0C2F"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -527,7 +527,7 @@ class LoadDeleteDataSet extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             }, () => {
                 this.hideFirstComponent()
             })
@@ -544,7 +544,7 @@ class LoadDeleteDataSet extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 }, () => {
                     this.hideFirstComponent()
@@ -836,7 +836,7 @@ class LoadDeleteDataSet extends Component {
         if (programCheckedCount == 0) {
             this.setState({
                 message: i18n.t('static.program.errorSelectAtleastOneProgram'),
-                loading: false, color: "red"
+                loading: false, color: "#BA0C2F"
             },
                 () => {
                     this.hideFirstComponent();
@@ -951,9 +951,9 @@ class LoadDeleteDataSet extends Component {
                     label: i18n.t('static.program.no'),
                     onClick: () => {
                         this.setState({
-                            message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
                         })
-                        this.setState({ loading: false, color: "red" }, () => {
+                        this.setState({ loading: false, color: "#BA0C2F" }, () => {
                             this.hideFirstComponent()
                         })
                         this.props.history.push(`/dataSet/loadDeleteDataSet`)
@@ -1019,9 +1019,9 @@ class LoadDeleteDataSet extends Component {
                     label: i18n.t('static.program.no'),
                     onClick: () => {
                         this.setState({
-                            message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+                            message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
                         })
-                        this.setState({ loading: false, color: "red" }, () => {
+                        this.setState({ loading: false, color: "#BA0C2F" }, () => {
                             this.hideFirstComponent()
                         })
                         this.props.history.push(`/dataSet/loadDeleteDataSet`)
@@ -1103,7 +1103,7 @@ class LoadDeleteDataSet extends Component {
         if (programCheckedCount == 0) {
             this.setState({
                 message: 'Select atleast one dataset to load',
-                loading: false, color: "red"
+                loading: false, color: "#BA0C2F"
             },
                 () => {
                     this.hideFirstComponent();
@@ -1281,9 +1281,9 @@ class LoadDeleteDataSet extends Component {
                                                 label: i18n.t('static.program.no'),
                                                 onClick: () => {
                                                     this.setState({
-                                                        message: i18n.t('static.actionCancelled'), loading: false, color: "red"
+                                                        message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
                                                     })
-                                                    this.setState({ loading: false, color: "red" }, () => {
+                                                    this.setState({ loading: false, color: "#BA0C2F" }, () => {
                                                         this.hideFirstComponent()
                                                     })
                                                     this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.actioncancelled'))
@@ -1391,7 +1391,7 @@ class LoadDeleteDataSet extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -1410,7 +1410,7 @@ class LoadDeleteDataSet extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1419,7 +1419,7 @@ class LoadDeleteDataSet extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1428,7 +1428,7 @@ class LoadDeleteDataSet extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1439,7 +1439,7 @@ class LoadDeleteDataSet extends Component {
                     );
 
             } else {
-                this.setState({ loading: false, color: "red" }, () => {
+                this.setState({ loading: false, color: "#BA0C2F" }, () => {
                     this.hideFirstComponent()
                 })
                 alert(i18n.t('static.common.online'))

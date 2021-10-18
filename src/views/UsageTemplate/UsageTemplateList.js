@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Col, Row, FormFeedback, Form,
+    CardFooter, Button, Table, Col, Row,FormFeedback, Form,
     Modal, ModalBody, ModalFooter, ModalHeader,
 
 
@@ -17,7 +17,7 @@ import i18n from '../../i18n'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -598,14 +598,14 @@ class usageTemplate extends Component {
 
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
-            console.log("response------->" + response.data);
+            console.log("response------->" + JSON.stringify(response.data));
             if (response.status == 200) {
                 var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                // listArray.sort((a, b) => {
+                //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                //     return itemLabelA > itemLabelB ? 1 : -1;
+                // });
 
                 let tempList = [];
                 if (listArray.length > 0) {
@@ -619,6 +619,11 @@ class usageTemplate extends Component {
                         tempList[i] = paJson
                     }
                 }
+
+                tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth));
+
+                // console.log("response------->1" + JSON.stringify(tempList.sort((a, b) => parseFloat(a.convertToMonth) - parseFloat(b.convertToMonth))));//ascending
+                // console.log("response------->2" + JSON.stringify(tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth))));//decending
 
                 tempList.unshift({
                     name: 'indefinitely',
@@ -763,6 +768,7 @@ class usageTemplate extends Component {
                 data[24] = 0;
                 data[25] = 0;
                 data[26] = (papuList[j].program == null ? -1 : papuList[j].program.id)
+                data[27] = papuList[j].notes
 
 
 
@@ -809,6 +815,7 @@ class usageTemplate extends Component {
             data[24] = 1;
             data[25] = 1;
             data[26] = 0;
+            data[27] = "";
             papuDataArr[0] = data;
         }
 
@@ -820,7 +827,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
                 {
@@ -965,6 +972,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
+                    width: 200,
                     textEditor: true, //23
                 },
                 {
@@ -979,7 +987,11 @@ class usageTemplate extends Component {
                     title: 'typeId',
                     type: 'hidden'//26
                 },
-
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    // width: 400
+                },
 
 
             ],
@@ -1354,7 +1366,7 @@ class usageTemplate extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -1368,7 +1380,7 @@ class usageTemplate extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1385,21 +1397,21 @@ class usageTemplate extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1463,6 +1475,7 @@ class usageTemplate extends Component {
         data[24] = 1;
         data[25] = 1;
         data[26] = 0;
+        data[27] = "";
 
         this.el.insertRow(
             data, 0, 1
@@ -1516,7 +1529,8 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("21")) == -1 ? null : parseInt(map1.get("21"))) },
                         repeatCount: this.el.getValue(`U${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true
+                        active: true,
+                        notes: map1.get("27")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -1548,7 +1562,7 @@ class usageTemplate extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1561,7 +1575,7 @@ class usageTemplate extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1578,7 +1592,7 @@ class usageTemplate extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         // message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1587,7 +1601,7 @@ class usageTemplate extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1596,7 +1610,7 @@ class usageTemplate extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -2497,8 +2511,8 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
+                            <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -2527,7 +2541,7 @@ class usageTemplate extends Component {
 
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-xl ' + this.props.className}>
                         <ModalHeader>
                             <strong>{i18n.t('static.usageTemplate.calculateUsageFrequency')}</strong>
                         </ModalHeader>
@@ -2569,12 +2583,15 @@ class usageTemplate extends Component {
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                     <CardBody>
                                                         <div className="d-md-flex">
-                                                            <FormGroup className="pr-lg-2 mt-md-4 pt-lg-2 mb-md-0">
+                                                        <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{display:'flex'}}>
+                                                                 <legend  class="w-auto" style={{fontSize:'14px'}}>Interval</legend>
+                                                            
+                                                            <FormGroup className="pr-lg-2 mt-md-1 pt-lg-2 mb-md-0">
                                                                 <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
                                                             </FormGroup>
                                                             <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls UsagePopUpInputField">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2594,7 +2611,7 @@ class usageTemplate extends Component {
 
                                                             <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
@@ -2614,13 +2631,20 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.picker1}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
+                                                            {/* <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
+                                                                <span>---</span>
+                                                            </FormGroup> */}
+                                                        </fieldset>
+                                                        <FormGroup className="tab-ml-1 mb-md-0 pr-lg-3 " style={{ marginTop: '56px' }}>
                                                                 <span>---</span>
                                                             </FormGroup>
+                                                            
 
+                                                            <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{display:'flex'}}>
+                                                                 <legend  class="w-auto" style={{fontSize:'14px'}}>Frequency</legend>
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input type="number"
                                                                         bsSize="sm"
@@ -2638,8 +2662,8 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.number2}</FormFeedback>
                                                             </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
-                                                                <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label>
+                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                {/* <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label> */}
                                                                 {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input type="text"
@@ -2658,7 +2682,7 @@ class usageTemplate extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                 {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label>
+                                                                {/* <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label> */}
                                                                 <div className="controls SelectGo">
                                                                     <Input
                                                                         type="select"
@@ -2678,6 +2702,7 @@ class usageTemplate extends Component {
                                                                 </div>
                                                                 <FormFeedback className="red">{errors.picker2}</FormFeedback>
                                                             </FormGroup>
+                                                            </fieldset>
                                                         </div>
                                                     </CardBody>
 

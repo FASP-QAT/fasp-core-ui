@@ -329,7 +329,7 @@ class forecastMethod extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -343,7 +343,7 @@ class forecastMethod extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -360,21 +360,21 @@ class forecastMethod extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -407,7 +407,7 @@ class forecastMethod extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -424,21 +424,21 @@ class forecastMethod extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -470,7 +470,7 @@ class forecastMethod extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -484,7 +484,7 @@ class forecastMethod extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -501,21 +501,21 @@ class forecastMethod extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -799,7 +799,7 @@ class forecastMethod extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -812,7 +812,7 @@ class forecastMethod extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -829,7 +829,7 @@ class forecastMethod extends Component {
                                     this.setState({
                                         // message: error.response.data.messageCode,
                                         message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -838,7 +838,7 @@ class forecastMethod extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -847,7 +847,7 @@ class forecastMethod extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -979,7 +979,7 @@ class forecastMethod extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 style={{ color: "red" }} >{i18n.t('static.common.customWarningMessage')}</h5>
+                            <h5 className="red" >{i18n.t('static.common.customWarningMessage')}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

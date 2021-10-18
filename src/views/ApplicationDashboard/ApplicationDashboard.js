@@ -218,7 +218,7 @@ class ApplicationDashboard extends Component {
       activeIndexProgram: 0,
       problemActionList: [],
       programList: [],
-      datasetList:[],
+      datasetList: [],
 
       message: '',
       dashboard: '',
@@ -421,22 +421,25 @@ class ApplicationDashboard extends Component {
         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
         for (var i = 0; i < filteredGetRequestList.length; i++) {
 
-          // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-          // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-          // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          // var programJson1 = JSON.parse(programData);
-          // console.log("programData---", programData);
+          var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+          var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson1 = JSON.parse(programData);
+
           datasetList.push({
             programCode: filteredGetRequestList[i].programCode,
             programVersion: filteredGetRequestList[i].version,
             programId: filteredGetRequestList[i].programId,
             versionId: filteredGetRequestList[i].version,
             id: filteredGetRequestList[i].id,
-            loading: false
+            loading: false,
+            forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+            forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
           });
           // }
         }
+        console.log("DATSET-------->", datasetList);
         this.setState({
           datasetList: datasetList
         })
@@ -1383,6 +1386,7 @@ class ApplicationDashboard extends Component {
                         <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
                       </div>
                       <div className="TextTittle ">{item.programCode + "~v" + item.versionId}</div>
+                      <div className="TextTittle ">{item.forecastStartDate + " to " + item.forecastStopDate}</div>
                       {/* <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div> */}
                       {/* <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div> */}
                     </div>
@@ -1398,7 +1402,7 @@ class ApplicationDashboard extends Component {
                   </CardBody>
                 </Card>
               </Col>
-              ))
+            ))
           }
           {
             this.state.programList.length > 0 && activeTab1 == 2 &&
