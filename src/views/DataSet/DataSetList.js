@@ -121,13 +121,13 @@ export default class ProgramList extends Component {
             let healthAreaLabels = programList[j].healthAreaList;
             let haValues = [];
             healthAreaLabels.map(c => {
-                haValues.push(getLabelText(c.label, this.state.lang));
+                haValues.push(' ' + getLabelText(c.label, this.state.lang));
             })
 
             let regionLabels = programList[j].regionList;
             let reValues = [];
             regionLabels.map(c => {
-                reValues.push(getLabelText(c.label, this.state.lang));
+                reValues.push(' ' + getLabelText(c.label, this.state.lang));
             })
 
             data = [];
@@ -139,8 +139,10 @@ export default class ProgramList extends Component {
             data[5] = programList[j].organisation.code
             data[6] = haValues.toString();
             data[7] = reValues.toString();
-            data[8] = programList[j].lastModifiedBy.username;
-            data[9] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = programList[j].programManager.username
+            data[9] = programList[j].programNotes
+            data[10] = programList[j].lastModifiedBy.username;
+            data[11] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
 
             programArray[count] = data;
@@ -159,7 +161,7 @@ export default class ProgramList extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -172,12 +174,12 @@ export default class ProgramList extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.forecastProgram.forecastProgram'),
+                    title: i18n.t('static.program.programName'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.datasetDisplayName'),
+                    title: i18n.t('static.program.programDisplayName'),
                     type: 'text',
                     readOnly: true
                 },
@@ -192,12 +194,22 @@ export default class ProgramList extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.healthareas'),
+                    title: i18n.t('static.dashboard.healthareaheader'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.dashboard.region'),
+                    title: i18n.t('static.inventory.region'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.programmanager'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.notes'),
                     type: 'text',
                     readOnly: true
                 },
@@ -597,7 +609,7 @@ export default class ProgramList extends Component {
             pathname: "/dataset/addDataSet"
         });
     }
-    
+
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -634,7 +646,7 @@ export default class ProgramList extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}
@@ -668,7 +680,7 @@ export default class ProgramList extends Component {
 
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
                                     <div className="controls SelectGo">
@@ -685,7 +697,13 @@ export default class ProgramList extends Component {
                                             </Input>
                                         </InputGroup>
                                     </div>
-                                </FormGroup>
+                                </FormGroup> */}
+                                <Input
+                                    type="hidden"
+                                    name="countryId"
+                                    id="countryId"
+                                    bsSize="sm"
+                                ></Input>
                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">

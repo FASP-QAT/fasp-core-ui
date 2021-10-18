@@ -932,7 +932,7 @@ export default class AddForecastProgram extends Component {
 
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.healthareas')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.dashboard.healthareaheader')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
@@ -978,7 +978,7 @@ export default class AddForecastProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.dashboard.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.inventory.region')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',

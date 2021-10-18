@@ -155,7 +155,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
         if (canDrop) {
             itemTitleColor = "green";
         } else {
-            itemTitleColor = "red";
+            itemTitleColor = "#BA0C2F";
         }
     }
 
@@ -3120,7 +3120,7 @@ export default class CreateTreeTemplate extends Component {
         }
         return <div className="animated fadeIn">
             <AuthenticationServiceComponent history={this.props.history} />
-            <h5 style={{ color: "red" }} id="div2">
+            <h5 className="red" id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>

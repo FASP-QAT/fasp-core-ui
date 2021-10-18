@@ -19,10 +19,12 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
+import UnitService from '../../api/UnitService.js';
 import moment from 'moment';
 import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import HealthAreaService from '../../api/HealthAreaService';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
@@ -47,10 +49,13 @@ class EquivalancyUnit extends Component {
             roleArray: [],
             isModalOpen: false,
             equivalancyUnitAllList: [],
+            technicalAreaList: [],
             eqUnitTableEl: "",
             table1Instance: "",
             table2Instance: "",
             selSource: [],
+            unitList: [],
+            roleArray: [],
 
             loading: true,
             loading1: true,
@@ -67,12 +72,14 @@ class EquivalancyUnit extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.getHealthArea = this.getHealthArea.bind(this);
 
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
 
         //jumper
         this.getTracerCategory = this.getTracerCategory.bind(this);
         this.getForecastingUnit = this.getForecastingUnit.bind(this);
+        this.getUnit = this.getUnit.bind(this);
         this.getType = this.getType.bind(this);
         this.getEquivalancyUnit = this.getEquivalancyUnit.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
@@ -108,7 +115,7 @@ class EquivalancyUnit extends Component {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
 
-        elInstance.setValueFromCoords(7, y, 1, true);
+        elInstance.setValueFromCoords(8, y, 1, true);
 
     }
 
@@ -119,8 +126,8 @@ class EquivalancyUnit extends Component {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(8, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -152,9 +159,30 @@ class EquivalancyUnit extends Component {
             }
         }
 
+        //HealthArea
+        if (x == 2) {
+            console.log("LOG---------->2", value);
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
         //Active
-        if (x != 7) {
-            elInstance.setValueFromCoords(7, y, 1, true);
+        if (x != 8) {
+            elInstance.setValueFromCoords(8, y, 1, true);
         }
     }.bind(this);
 
@@ -177,13 +205,14 @@ class EquivalancyUnit extends Component {
                 data = [];
                 data[0] = papuList[j].equivalencyUnitId
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[2] = getLabelText(papuList[j].realm.label, this.state.lang)
-                data[3] = papuList[j].notes
-                data[4] = papuList[j].active
-                data[5] = papuList[j].lastModifiedBy.username;
-                data[6] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-                data[7] = 0
+                data[2] = papuList[j].healthArea.id
+                data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
+                data[4] = ''
+                data[5] = papuList[j].active
+                data[6] = papuList[j].lastModifiedBy.username;
+                data[7] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
                 data[8] = 0
+                data[9] = 0
                 papuDataArr[count] = data;
                 count++;
             }
@@ -230,6 +259,12 @@ class EquivalancyUnit extends Component {
                     textEditor: true,
                 },
                 {
+                    title: i18n.t('static.program.healtharea'),
+                    type: 'autocomplete',
+                    source: this.state.technicalAreaList,
+                    filter: this.filterHealthArea
+                },
+                {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'text',
                     readOnly: true
@@ -237,7 +272,7 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: i18n.t('static.common.notes'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                     textEditor: true,
                 },
@@ -271,14 +306,20 @@ class EquivalancyUnit extends Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    var addRowId = rowData[8];
+                    var addRowId = rowData[9];
                     console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
-                    } else {
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
+                    } else {
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
                 }
             },
@@ -350,6 +391,20 @@ class EquivalancyUnit extends Component {
             })
     }
 
+    filterHealthArea = function (instance, cell, c, r, source) {
+
+        var mylist = this.state.technicalAreaList.filter(c => c.active.toString() == "true");
+
+        // console.log("myList--------->1", value);
+        // console.log("myList--------->2", mylist);
+        // console.log("myList--------->3", this.state.forecastingUnitList);
+        return mylist.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+    }.bind(this)
+
     getEquivalancyUnitAll() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
@@ -384,7 +439,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -401,21 +456,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -448,19 +503,22 @@ class EquivalancyUnit extends Component {
 
                 data = [];
                 data[0] = papuList[j].equivalencyUnitMappingId
-                data[1] = papuList[j].tracerCategory.id
-                data[2] = papuList[j].forecastingUnit.id
-                data[3] = papuList[j].equivalencyUnit.equivalencyUnitId
-                data[4] = papuList[j].convertToFu
-                data[5] = papuList[j].notes
-                data[6] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
-                data[7] = papuList[j].active
-                data[8] = papuList[j].lastModifiedBy.username;
-                data[9] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-                data[10] = 0;
-                data[11] = papuList[j].forecastingUnit.id
-                data[12] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
-                data[13] = 0;
+                data[1] = papuList[j].equivalencyUnit.equivalencyUnitId
+                data[2] = papuList[j].equivalencyUnit.healthArea.id
+                data[3] = papuList[j].tracerCategory.id
+                data[4] = papuList[j].forecastingUnit.id
+
+                data[5] = papuList[j].unit.id
+                data[6] = papuList[j].convertToEu
+                data[7] = papuList[j].notes
+                data[8] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
+                data[9] = papuList[j].active
+                data[10] = papuList[j].lastModifiedBy.username;
+                data[11] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+                data[12] = 0;
+                data[13] = papuList[j].forecastingUnit.id
+                data[14] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
+                data[15] = 0;
                 papuDataArr[count] = data;
                 count++;
             }
@@ -497,7 +555,7 @@ class EquivalancyUnit extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 50, 100],
+            colWidths: [100, 100, 100, 100, 100, 50],
             columns: [
 
                 {
@@ -506,9 +564,23 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
+                    type: 'autocomplete',
+                    source: this.state.equivalancyUnitList,
+                    filter: this.filterEquivalancyUnit
+                },
+                {
+                    title: i18n.t('static.program.healtharea'),
+                    type: 'autocomplete',
+                    // readOnly: true,
+                    source: this.state.technicalAreaList,
+                    filter: this.filterTechnicalAreaList
+                },
+                {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     source: this.state.tracerCategoryList,
+                    filter: this.filterTracerCategoryList
 
                 },
                 {
@@ -517,14 +589,16 @@ class EquivalancyUnit extends Component {
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory
                 },
+
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
+                    title: i18n.t('static.dashboard.unit'),
                     type: 'autocomplete',
-                    source: this.state.equivalancyUnitList,
-                    filter: this.filterEquivalancyUnit
+                    readOnly: true,
+                    source: this.state.unitList, //12
                 },
+
                 {
-                    title: i18n.t('static.equivalancyUnit.conversionToFu'),
+                    title: i18n.t('static.equivalencyUnit.conversionToEU'),
                     type: 'text',
                     // readOnly: true
                     textEditor: true,
@@ -532,12 +606,13 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.common.notes'),
                     type: 'text',
+                    width: 150,
                     // readOnly: true
                     textEditor: true,
                 },
                 {
                     // title: i18n.t('static.dataSet.dataSet'),
-                    title: i18n.t('static.equivalancyUnit.type'),
+                    title: i18n.t('static.dataSource.program'),
                     type: 'autocomplete',
                     source: this.state.typeList,
                     filter: this.filterDataset
@@ -581,20 +656,23 @@ class EquivalancyUnit extends Component {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
                     // var productCategoryId = rowData[0];
-                    var forecastingUnitId = rowData[11];
-                    var typeId = rowData[12];
+                    var forecastingUnitId = rowData[13];
+                    var typeId = rowData[14];
                     // console.log("updateTable------>", rowData[11]);
                     if (forecastingUnitId == 0) {
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
 
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
 
                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -602,16 +680,19 @@ class EquivalancyUnit extends Component {
 
 
                     } else {
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -620,24 +701,10 @@ class EquivalancyUnit extends Component {
 
                     }
 
-
-                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    // console.log("decryptedUser=====>", decryptedUser);
-
-                    var roleList = decryptedUser.roleList;
-                    var roleArray = []
-                    for (var r = 0; r < roleList.length; r++) {
-                        roleArray.push(roleList[r].roleId)
-                    }
-
-
+                    let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
                     if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
-
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -648,7 +715,7 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
-                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
@@ -656,37 +723,21 @@ class EquivalancyUnit extends Component {
 
                         var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
-                    // if (this.state.roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1) {
-                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
 
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    // }
-
-                    var addRowId = rowData[13];
+                    var addRowId = rowData[15];
                     // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
-                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else if (checkReadOnly == 0) {
-                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     }
 
@@ -694,9 +745,6 @@ class EquivalancyUnit extends Component {
 
 
                     if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
@@ -706,7 +754,7 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
-                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
@@ -714,11 +762,17 @@ class EquivalancyUnit extends Component {
 
                         var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
 
 
                 }
-            },
+            }.bind(this),
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -786,7 +840,7 @@ class EquivalancyUnit extends Component {
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        var value = (instance.jexcel.getJson(null, false)[r])[3];
         if (value > 0) {
             mylist = this.state.forecastingUnitList.filter(c => c.tracerCategoryId == value && c.active.toString() == "true");
         }
@@ -803,6 +857,21 @@ class EquivalancyUnit extends Component {
     filterEquivalancyUnit = function (instance, cell, c, r, source) {
 
         let mylist = this.state.equivalancyUnitList.filter(c => c.active.toString() == "true");
+        return mylist;
+    }.bind(this)
+
+
+    filterTechnicalAreaList = function (instance, cell, c, r, source) {
+        var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
+        console.log("selectedEqObj-------->", selectedEqObj);
+        let mylist = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id);
+        return mylist;
+    }.bind(this)
+
+    filterTracerCategoryList = function (instance, cell, c, r, source) {
+        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2];
+        let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
         return mylist;
     }.bind(this)
 
@@ -843,7 +912,7 @@ class EquivalancyUnit extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -857,7 +926,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -874,21 +943,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -902,6 +971,7 @@ class EquivalancyUnit extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    console.log("TracerCategory------->", response.data)
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -916,6 +986,7 @@ class EquivalancyUnit extends Component {
                                 name: getLabelText(listArray[i].label, this.state.lang),
                                 id: parseInt(listArray[i].tracerCategoryId),
                                 active: listArray[i].active,
+                                healthArea: listArray[i].healthArea
                             }
                             tempList[i] = paJson
                         }
@@ -999,7 +1070,8 @@ class EquivalancyUnit extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].forecastingUnitId),
                             active: listArray[i].active,
-                            tracerCategoryId: listArray[i].tracerCategory.id
+                            tracerCategoryId: listArray[i].tracerCategory.id,
+                            unit: listArray[i].unit
                         }
                         tempList[i] = paJson
                     }
@@ -1010,6 +1082,93 @@ class EquivalancyUnit extends Component {
                     // loading: false
                 },
                     () => {
+                        // this.getEquivalancyUnit();
+                        this.getUnit();
+                    })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+
+    getUnit() {
+        UnitService.getUnitListAll().then(response => {
+            console.log("response------->" + response.data);
+            if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                // listArray = listArray.filter(c => c.active == true);
+
+                let tempList = [];
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: getLabelText(listArray[i].label, this.state.lang),
+                            id: parseInt(listArray[i].unitId),
+                            active: listArray[i].active,
+
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                this.setState({
+                    unitList: tempList,
+                    // loading: false
+                },
+                    () => {
+                        // this.getDataSet();
                         this.getEquivalancyUnit();
                     })
             } else {
@@ -1185,6 +1344,7 @@ class EquivalancyUnit extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].equivalencyUnitId),
                             active: listArray[i].active,
+                            healthArea: listArray[i].healthArea
                         }
                         tempList[i] = paJson
                     }
@@ -1213,7 +1373,7 @@ class EquivalancyUnit extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1230,21 +1390,21 @@ class EquivalancyUnit extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1256,8 +1416,106 @@ class EquivalancyUnit extends Component {
     componentDidMount() {
         // this.getEquivalancyUnitMappingData();
         // console.log("USER------->", localStorage.getItem('curUser'));
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("decryptedUser=====>", decryptedUser);
 
-        this.getTracerCategory();
+        var roleList = decryptedUser.roleList;
+        var roleArray = []
+        for (var r = 0; r < roleList.length; r++) {
+            roleArray.push(roleList[r].roleId)
+        }
+        this.setState({
+            roleArray: roleArray
+        },
+            () => {
+                this.getHealthArea();
+            })
+
+        // this.getTracerCategory();
+    }
+
+    getHealthArea() {
+        HealthAreaService.getHealthAreaList()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("response---", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].label, this.state.lang),
+                                id: parseInt(listArray[i].healthAreaId),
+                                active: listArray[i].active,
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+                    this.setState({
+                        technicalAreaList: tempList
+                    },
+                        () => {
+                            this.getTracerCategory();
+                        })
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -1265,11 +1523,11 @@ class EquivalancyUnit extends Component {
         var elInstance = this.state.table1Instance;
         var rowData = elInstance.getRowData(y);
 
-        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
+        if (x == 6 && !isNaN(rowData[6]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         }
 
-        elInstance.setValueFromCoords(10, y, 1, true);
+        elInstance.setValueFromCoords(12, y, 1, true);
 
     }
 
@@ -1281,11 +1539,12 @@ class EquivalancyUnit extends Component {
         data[1] = "";
         data[2] = "";
         data[3] = "";
-        data[4] = true;
-        data[5] = "";
+        data[4] = "";
+        data[5] = true;
         data[6] = "";
-        data[7] = 1;
+        data[7] = "";
         data[8] = 1;
+        data[9] = 1;
 
         elInstance.insertRow(
             data, 0, 1
@@ -1303,13 +1562,15 @@ class EquivalancyUnit extends Component {
         data[4] = "";
         data[5] = "";
         data[6] = "";
-        data[7] = true;
+        data[7] = "";
         data[8] = "";
-        data[9] = "";
-        data[10] = 1;
-        data[11] = 0;
-        data[12] = 0;
-        data[13] = 1;
+        data[9] = true;
+        data[10] = "";
+        data[11] = "";
+        data[12] = 1;
+        data[13] = 0;
+        data[14] = 0;
+        data[15] = 1;
 
         elInstance.insertRow(
             data, 0, 1
@@ -1323,11 +1584,11 @@ class EquivalancyUnit extends Component {
                 var index = (instance.jexcel).getValue(`G${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(0, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                    (instance.jexcel).setValueFromCoords(11, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(13, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(14, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -1346,15 +1607,16 @@ class EquivalancyUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("7"))
-                if (parseInt(map1.get("7")) === 1) {
+                console.log("8 map---" + map1.get("8"))
+                if (parseInt(map1.get("8")) === 1) {
                     let json = {
 
                         equivalencyUnitId: parseInt(map1.get("0")),
                         label: {
                             label_en: map1.get("1"),
                         },
-                        active: map1.get("4"),
+                        healthArea: { id: parseInt(map1.get("2")) },
+                        active: map1.get("5"),
 
 
                     }
@@ -1380,7 +1642,7 @@ class EquivalancyUnit extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.modelOpenClose();
@@ -1395,7 +1657,7 @@ class EquivalancyUnit extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: "red",
+                                color: "#BA0C2F",
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1411,7 +1673,7 @@ class EquivalancyUnit extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                         // message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
                                     },
@@ -1424,7 +1686,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     },
                                         () => {
                                             this.modelOpenClose();
@@ -1435,7 +1697,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     });
                                     break;
                             }
@@ -1458,17 +1720,17 @@ class EquivalancyUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("10 map---" + map1.get("10"))
-                if (parseInt(map1.get("10")) === 1) {
+                console.log("12 map---" + map1.get("12"))
+                if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         equivalencyUnitMappingId: parseInt(map1.get("0")),
-                        tracerCategory: { id: parseInt(map1.get("1")) },
-                        forecastingUnit: { id: parseInt(map1.get("2")) },
-                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("3")) },
-                        convertToFu: map1.get("4").toString().replace(/,/g, ""),
-                        notes: map1.get("5"),
-                        program: (parseInt(map1.get("6")) == -1 ? null : { id: parseInt(map1.get("6")) }),
-                        active: map1.get("7"),
+                        tracerCategory: { id: parseInt(map1.get("3")) },
+                        forecastingUnit: { id: parseInt(map1.get("4")) },
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")) },
+                        convertToEu: map1.get("6").toString().replace(/,/g, ""),
+                        notes: map1.get("7"),
+                        program: (parseInt(map1.get("8")) == -1 ? null : { id: parseInt(map1.get("8")) }),
+                        active: map1.get("9"),
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -1501,7 +1763,7 @@ class EquivalancyUnit extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1514,7 +1776,7 @@ class EquivalancyUnit extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1531,7 +1793,7 @@ class EquivalancyUnit extends Component {
                                     this.setState({
                                         // message: error.response.data.messageCode,
                                         message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1540,7 +1802,7 @@ class EquivalancyUnit extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1549,7 +1811,7 @@ class EquivalancyUnit extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -1570,20 +1832,72 @@ class EquivalancyUnit extends Component {
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
-        // tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
 
         var elInstance = this.state.table1Instance;
-        console.log("LOG---------->1", elInstance);
-        //Tracer Category
+        // console.log("LOG---------->1", elInstance);
+
+        //Equivalancy Unit
         if (x == 1) {
-            console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
-            elInstance.setValueFromCoords(2, y, '', true);
+            elInstance.setValueFromCoords(2, y, '', true);//calculate
+            elInstance.setValueFromCoords(3, y, '', true);
+            elInstance.setValueFromCoords(4, y, '', true);
+            elInstance.setValueFromCoords(5, y, '', true);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+
+        //HealthArea
+        if (x == 2) {
+            // console.log("LOG---------->2", value);
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("C").concat(parseInt(y) + 1);
+            elInstance.setValueFromCoords(3, y, '', true);
+            elInstance.setValueFromCoords(4, y, '', true);
+            elInstance.setValueFromCoords(5, y, '', true);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+
+        //Tracer Category
+        if (x == 3) {
+            // console.log("LOG---------->3", value);
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            elInstance.setValueFromCoords(4, y, '', true);
+            elInstance.setValueFromCoords(5, y, '', true);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1601,9 +1915,9 @@ class EquivalancyUnit extends Component {
         }
 
         //Forecasting Unit
-        if (x == 2) {
+        if (x == 4) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
+            var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1618,32 +1932,17 @@ class EquivalancyUnit extends Component {
                     elInstance.setComments(col, "");
                 }
             }
-        }
-
-        //Equivalancy Unit
-        if (x == 3) {
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
+            let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
+            console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
+            if (obj != undefined && obj != null) {
+                this.el.setValueFromCoords(5, y, obj.unit.id, true);
             }
         }
 
         //conversion To FU 14,4
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            value = elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,14}(\.\d{1,4})?$/;
             if (value == "") {
@@ -1672,9 +1971,9 @@ class EquivalancyUnit extends Component {
         }
 
         //Type
-        if (x == 6) {
+        if (x == 8) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("G").concat(parseInt(y) + 1);
+            var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1692,8 +1991,8 @@ class EquivalancyUnit extends Component {
         }
 
         //Active
-        if (x != 10) {
-            elInstance.setValueFromCoords(10, y, 1, true);
+        if (x != 12) {
+            elInstance.setValueFromCoords(12, y, 1, true);
         }
 
 
@@ -1707,7 +2006,7 @@ class EquivalancyUnit extends Component {
         var json = elInstance.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = elInstance.getValueFromCoords(7, y);
+            var value = elInstance.getValueFromCoords(8, y);
             if (parseInt(value) == 1) {
                 //UsagePeriod
                 var budgetRegx = /^\S+(?: \S+)*$/;
@@ -1732,6 +2031,20 @@ class EquivalancyUnit extends Component {
                 }
 
 
+                //HealthAreaId
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
             }
         }
         return valid;
@@ -1743,10 +2056,10 @@ class EquivalancyUnit extends Component {
         var json = elInstance.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = elInstance.getValueFromCoords(10, y);
+            var value = elInstance.getValueFromCoords(12, y);
             if (parseInt(value) == 1) {
 
-                //TracerCategory
+                //Equivalancy Unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(1, y);
                 if (value == "") {
@@ -1759,8 +2072,7 @@ class EquivalancyUnit extends Component {
                     elInstance.setComments(col, "");
                 }
 
-
-                //ForecastingUnit
+                //HealthArea
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(2, y);
                 if (value == "") {
@@ -1773,8 +2085,7 @@ class EquivalancyUnit extends Component {
                     elInstance.setComments(col, "");
                 }
 
-
-                //Equivalancy Unit
+                //TracerCategory
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(3, y);
                 if (value == "") {
@@ -1788,9 +2099,23 @@ class EquivalancyUnit extends Component {
                 }
 
 
-                //conversion to FU decimal 14,4
+                //ForecastingUnit
                 var col = ("E").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(4, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+                //conversion to FU decimal 14,4
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(6, y);
                 var reg = /^\d{1,14}(\.\d{1,4})?$/;
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -1818,8 +2143,8 @@ class EquivalancyUnit extends Component {
 
 
                 //Type
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(6, y);
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(8, y);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -1889,7 +2214,7 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
                     <Col md="12 pl-3">
-                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
+                        <h5 className="red">{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
                     </Col>
                     <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
@@ -1949,7 +2274,7 @@ class EquivalancyUnit extends Component {
                             </div>
                         </Col>
 
-                        <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="table-responsive consumptionDataEntryTable" id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

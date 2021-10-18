@@ -17,7 +17,7 @@ import i18n from '../../i18n'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -110,7 +110,8 @@ class usageTemplate extends Component {
             picker2: '',
             textMessage: 'time(s) per',
             usagePeriodListLong: [],
-            usagePeriodDisplayList: []
+            usagePeriodDisplayList: [],
+            roleArray: []
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -598,14 +599,14 @@ class usageTemplate extends Component {
 
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
-            console.log("response------->" + response.data);
+            console.log("response------->" + JSON.stringify(response.data));
             if (response.status == 200) {
                 var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
+                // listArray.sort((a, b) => {
+                //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                //     return itemLabelA > itemLabelB ? 1 : -1;
+                // });
 
                 let tempList = [];
                 if (listArray.length > 0) {
@@ -619,6 +620,11 @@ class usageTemplate extends Component {
                         tempList[i] = paJson
                     }
                 }
+
+                tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth));
+
+                // console.log("response------->1" + JSON.stringify(tempList.sort((a, b) => parseFloat(a.convertToMonth) - parseFloat(b.convertToMonth))));//ascending
+                // console.log("response------->2" + JSON.stringify(tempList.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth))));//decending
 
                 tempList.unshift({
                     name: 'indefinitely',
@@ -763,6 +769,7 @@ class usageTemplate extends Component {
                 data[24] = 0;
                 data[25] = 0;
                 data[26] = (papuList[j].program == null ? -1 : papuList[j].program.id)
+                data[27] = papuList[j].notes
 
 
 
@@ -809,6 +816,7 @@ class usageTemplate extends Component {
             data[24] = 1;
             data[25] = 1;
             data[26] = 0;
+            data[27] = "";
             papuDataArr[0] = data;
         }
 
@@ -820,7 +828,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
                 {
@@ -965,6 +973,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
+                    width: 200,
                     textEditor: true, //23
                 },
                 {
@@ -979,7 +988,11 @@ class usageTemplate extends Component {
                     title: 'typeId',
                     type: 'hidden'//26
                 },
-
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    // width: 400
+                },
 
 
             ],
@@ -1053,99 +1066,75 @@ class usageTemplate extends Component {
                     }
 
 
-                    // var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
-                    // var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
+                    var typeId = rowData[26];
+                    let roleArray = this.state.roleArray;
+                    if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`AB${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
 
-                    // var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
-                    // var cell1 = elInstance.getCell(`M${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
+                    }
 
-                    // var cell1 = elInstance.getCell(`Q${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
-                    // var cell1 = elInstance.getCell(`T${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
-                    // var cell1 = elInstance.getCell(`X${parseInt(y) + 1}`)
-                    // cell1.classList.add('readonly');
-
-
-
-                    // let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    // let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    // // console.log("decryptedUser=====>", decryptedUser);
-
-                    // var roleList = decryptedUser.roleList;
-                    // var roleArray = []
-                    // for (var r = 0; r < roleList.length; r++) {
-                    //     roleArray.push(roleList[r].roleId)
-                    // }
-                    // var typeId = rowData[26];
-
-                    // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    // }
-
-                    // if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
-                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    // }
+                    if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`L${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`P${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`R${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`U${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`AB${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    }
 
 
 
                 }
-            },
+            }.bind(this),
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1354,7 +1343,7 @@ class usageTemplate extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -1368,7 +1357,7 @@ class usageTemplate extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1385,21 +1374,21 @@ class usageTemplate extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -1410,7 +1399,23 @@ class usageTemplate extends Component {
     }
 
     componentDidMount() {
-        this.getTracerCategory();
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("decryptedUser=====>", decryptedUser);
+
+        var roleList = decryptedUser.roleList;
+        var roleArray = []
+        for (var r = 0; r < roleList.length; r++) {
+            roleArray.push(roleList[r].roleId)
+        }
+        this.setState({
+            roleArray: roleArray
+        },
+            () => {
+                this.getTracerCategory();
+            })
+
+
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -1463,6 +1468,7 @@ class usageTemplate extends Component {
         data[24] = 1;
         data[25] = 1;
         data[26] = 0;
+        data[27] = "";
 
         this.el.insertRow(
             data, 0, 1
@@ -1516,7 +1522,8 @@ class usageTemplate extends Component {
                         usageFrequencyCount: this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         repeatUsagePeriod: { usagePeriodId: (parseInt(map1.get("21")) == -1 ? null : parseInt(map1.get("21"))) },
                         repeatCount: this.el.getValue(`U${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        active: true
+                        active: true,
+                        notes: map1.get("27")
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
                         // capacityCbm: this.el.getValueFromCoords(2, i).replace(/,/g, ""),
@@ -1548,7 +1555,7 @@ class usageTemplate extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1561,7 +1568,7 @@ class usageTemplate extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: "red", loading: false
+                                color: "#BA0C2F", loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1578,7 +1585,7 @@ class usageTemplate extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         // message: i18n.t('static.region.duplicateGLN'),
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1587,7 +1594,7 @@ class usageTemplate extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1596,7 +1603,7 @@ class usageTemplate extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: "red", loading: false
+                                        color: "#BA0C2F", loading: false
                                     });
                                     break;
                             }
@@ -2497,8 +2504,9 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
+                            <h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
+                            <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -2527,7 +2535,7 @@ class usageTemplate extends Component {
 
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        className={'modal-xl ' + this.props.className}>
                         <ModalHeader>
                             <strong>{i18n.t('static.usageTemplate.calculateUsageFrequency')}</strong>
                         </ModalHeader>
@@ -2569,115 +2577,126 @@ class usageTemplate extends Component {
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                     <CardBody>
                                                         <div className="d-md-flex">
-                                                            <FormGroup className="pr-lg-2 mt-md-4 pt-lg-2 mb-md-0">
-                                                                <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
-                                                            </FormGroup>
-                                                            <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
-                                                                {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
-                                                                <div className="controls UsagePopUpInputField">
-                                                                    <Input type="number"
-                                                                        bsSize="sm"
-                                                                        name="number1"
-                                                                        id="number1"
-                                                                        valid={!errors.number1 && this.state.number1 != ''}
-                                                                        invalid={touched.number1 && !!errors.number1}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.number1}
-                                                                        min="1"
-                                                                    />
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.number1}</FormFeedback>
-                                                            </FormGroup>
+                                                            <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{ display: 'flex' }}>
+                                                                <legend class="w-auto" style={{ fontSize: '14px' }}>Interval</legend>
 
-                                                            <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
-                                                                {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
-                                                                <div className="controls SelectGo">
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="picker1"
-                                                                        id="picker1"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.picker1 && this.state.picker1 != ''}
-                                                                        invalid={touched.picker1 && !!errors.picker1}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.picker1}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {usageList}
-                                                                    </Input>
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.picker1}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
+                                                                <FormGroup className="pr-lg-2 mt-md-1 pt-lg-2 mb-md-0">
+                                                                    <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
+                                                                </FormGroup>
+                                                                <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
+                                                                    {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                    {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
+                                                                    <div className="controls UsagePopUpInputField">
+                                                                        <Input type="number"
+                                                                            bsSize="sm"
+                                                                            name="number1"
+                                                                            id="number1"
+                                                                            valid={!errors.number1 && this.state.number1 != ''}
+                                                                            invalid={touched.number1 && !!errors.number1}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            onBlur={handleBlur}
+                                                                            required
+                                                                            value={this.state.number1}
+                                                                            min="1"
+                                                                        />
+                                                                    </div>
+                                                                    <FormFeedback className="red">{errors.number1}</FormFeedback>
+                                                                </FormGroup>
+
+                                                                <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
+                                                                    {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                    {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
+                                                                    <div className="controls SelectGo">
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="picker1"
+                                                                            id="picker1"
+                                                                            bsSize="sm"
+                                                                            valid={!errors.picker1 && this.state.picker1 != ''}
+                                                                            invalid={touched.picker1 && !!errors.picker1}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            onBlur={handleBlur}
+                                                                            required
+                                                                            value={this.state.picker1}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            {usageList}
+                                                                        </Input>
+                                                                    </div>
+                                                                    <FormFeedback className="red">{errors.picker1}</FormFeedback>
+                                                                </FormGroup>
+                                                                {/* <FormGroup className="tab-ml-1 mb-md-0  " style={{ marginTop: '29px' }}>
                                                                 <span>---</span>
+                                                            </FormGroup> */}
+                                                            </fieldset>
+                                                            <FormGroup className="tab-ml-1 mb-md-0 pr-lg-3 " style={{ marginTop: '56px' }}>
+                                                                <span>=</span>
                                                             </FormGroup>
 
-                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}></Label>
-                                                                <div className="controls SelectGo">
-                                                                    <Input type="number"
-                                                                        bsSize="sm"
-                                                                        name="number2"
-                                                                        id="number2"
-                                                                        valid={!errors.number2 && this.state.number2 != ''}
-                                                                        invalid={touched.number2 && !!errors.number2}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        readOnly
-                                                                        required
-                                                                        value={this.state.number2}
-                                                                        min="1"
-                                                                    />
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.number2}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
-                                                                <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label>
-                                                                {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
-                                                                <div className="controls SelectGo">
-                                                                    <Input type="text"
-                                                                        name="label"
-                                                                        id="label"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.textMessage && this.state.textMessage != ''}
-                                                                        invalid={touched.textMessage && !!errors.textMessage}
-                                                                        // onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                        onBlur={handleBlur}
-                                                                        readOnly
-                                                                        value={this.state.textMessage}
-                                                                        required />
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.textMessage}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
-                                                                <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label>
-                                                                <div className="controls SelectGo">
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="picker2"
-                                                                        id="picker2"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.picker2 && this.state.picker2 != ''}
-                                                                        invalid={touched.picker2 && !!errors.picker2}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.picker2}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {usageDisplayList}
-                                                                    </Input>
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.picker2}</FormFeedback>
-                                                            </FormGroup>
+
+                                                            <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{ display: 'flex' }}>
+                                                                <legend class="w-auto" style={{ fontSize: '14px' }}>Frequency</legend>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                    {/* <Label for="number1">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label> */}
+                                                                    {/* <Label for="number1" style={{ visibility: 'hidden' }}></Label> */}
+                                                                    <div className="controls SelectGo">
+                                                                        <Input type="number"
+                                                                            bsSize="sm"
+                                                                            name="number2"
+                                                                            id="number2"
+                                                                            valid={!errors.number2 && this.state.number2 != ''}
+                                                                            invalid={touched.number2 && !!errors.number2}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            onBlur={handleBlur}
+                                                                            readOnly
+                                                                            required
+                                                                            value={this.state.number2}
+                                                                            min="1"
+                                                                        />
+                                                                    </div>
+                                                                    <FormFeedback className="red">{errors.number2}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                    {/* <Label for="number1">{i18n.t('static.usageTemplate.frequency')}</Label> */}
+                                                                    {/* <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label> */}
+                                                                    <div className="controls SelectGo">
+                                                                        <Input type="text"
+                                                                            name="label"
+                                                                            id="label"
+                                                                            bsSize="sm"
+                                                                            valid={!errors.textMessage && this.state.textMessage != ''}
+                                                                            invalid={touched.textMessage && !!errors.textMessage}
+                                                                            // onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                                            onBlur={handleBlur}
+                                                                            readOnly
+                                                                            value={this.state.textMessage}
+                                                                            required />
+                                                                    </div>
+                                                                    <FormFeedback className="red">{errors.textMessage}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                                    {/* <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label> */}
+                                                                    {/* <Label for="number1" style={{ visibility: 'hidden' }}><span className="red Reqasterisk">*</span></Label> */}
+                                                                    <div className="controls SelectGo">
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="picker2"
+                                                                            id="picker2"
+                                                                            bsSize="sm"
+                                                                            valid={!errors.picker2 && this.state.picker2 != ''}
+                                                                            invalid={touched.picker2 && !!errors.picker2}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                            onBlur={handleBlur}
+                                                                            required
+                                                                            value={this.state.picker2}
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            {usageDisplayList}
+                                                                        </Input>
+                                                                    </div>
+                                                                    <FormFeedback className="red">{errors.picker2}</FormFeedback>
+                                                                </FormGroup>
+                                                            </fieldset>
                                                         </div>
                                                     </CardBody>
 

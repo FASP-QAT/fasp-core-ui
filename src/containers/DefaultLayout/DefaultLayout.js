@@ -293,12 +293,12 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  {path:'/dataset/loadDeleteDataSet',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
-  {path:'/dataset/loadDeleteDataSet/:message',name:'Load or Delete Dataset',component:LoadDeleteDataSet},
-  {path:'/dataset/listTreeTemplate/:color/:message',name:'List Tree Template',component:ListTreeTemplate},
-  {path:'/dataset/listTreeTemplate/', exact: true,name:'List Tree Template',component:ListTreeTemplate},
-  {path:'/dataset/createTreeTemplate/:templateId',name:'Create Tree Template',component:CreateTreeTemplate},
-  { path: '/dataSet/buildTree/',exact: true, name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataset/loadDeleteDataSet', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
+  { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
+  { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
+  { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
+  { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
+  { path: '/dataSet/buildTree/', exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:treeId', name: 'static.common.buildTree', component: BuildTree },
   { path: '/dataSet/buildTree/:templateId', exact: true, name: 'static.common.buildTree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -680,11 +680,11 @@ const routes = [
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 
-  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.forecastProgram.forecastProgram', component: AddDataSet },
-  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: DataSetList },
+  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
-  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.forecastProgram.forecastProgram', component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.forecastProgram.forecastProgram', component: EditDataSet },
+  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
 
 ];
 
@@ -1432,7 +1432,7 @@ class DefaultLayout extends Component {
                         },
                         children: [
                           {
-                            name: i18n.t('static.forecastProgram.forecastProgram'),
+                            name: i18n.t('static.dataset.manageProgram'),
                             url: '/dataSet/listDataSet',
                             icon: 'fa fa-globe',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true) }
@@ -1446,13 +1446,13 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
                             url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-link',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.usageTemplate.usageTemplate'),
                             url: '/usageTemplate/listUsageTemplate',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-bank',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
                           },
                           {

@@ -157,7 +157,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
         if (canDrop) {
             itemTitleColor = "green";
         } else {
-            itemTitleColor = "red";
+            itemTitleColor = "#BA0C2F";
         }
     }
 

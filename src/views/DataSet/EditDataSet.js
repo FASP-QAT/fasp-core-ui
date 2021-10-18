@@ -673,7 +673,7 @@ export default class EditProgram extends Component {
 
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} loading={this.changeLoading} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -796,7 +796,7 @@ export default class EditProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.dashboard.healthareaheader')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.healthAreaId },
@@ -844,7 +844,7 @@ export default class EditProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.inventory.region')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.regionId },
