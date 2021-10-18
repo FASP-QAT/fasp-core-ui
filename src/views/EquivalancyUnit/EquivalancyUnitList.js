@@ -55,6 +55,7 @@ class EquivalancyUnit extends Component {
             table2Instance: "",
             selSource: [],
             unitList: [],
+            roleArray: [],
 
             loading: true,
             loading1: true,
@@ -206,7 +207,7 @@ class EquivalancyUnit extends Component {
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
                 data[2] = papuList[j].healthArea.id
                 data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
-                data[4] = papuList[j].notes
+                data[4] = ''
                 data[5] = papuList[j].active
                 data[6] = papuList[j].lastModifiedBy.username;
                 data[7] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
@@ -271,7 +272,7 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: i18n.t('static.common.notes'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                     textEditor: true,
                 },
@@ -310,9 +311,15 @@ class EquivalancyUnit extends Component {
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
                     } else {
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
                 }
             },
@@ -694,18 +701,7 @@ class EquivalancyUnit extends Component {
 
                     }
 
-
-                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                    // console.log("decryptedUser=====>", decryptedUser);
-
-                    var roleList = decryptedUser.roleList;
-                    var roleArray = []
-                    for (var r = 0; r < roleList.length; r++) {
-                        roleArray.push(roleList[r].roleId)
-                    }
-
-
+                    let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
                     if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
@@ -734,30 +730,8 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     }
-                    // if (this.state.roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1) {
-                    //     var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
 
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-
-                    //     var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    // }
-
-                    var addRowId = rowData[14];
+                    var addRowId = rowData[15];
                     // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
@@ -798,7 +772,7 @@ class EquivalancyUnit extends Component {
 
 
                 }
-            },
+            }.bind(this),
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1442,7 +1416,22 @@ class EquivalancyUnit extends Component {
     componentDidMount() {
         // this.getEquivalancyUnitMappingData();
         // console.log("USER------->", localStorage.getItem('curUser'));
-        this.getHealthArea();
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("decryptedUser=====>", decryptedUser);
+
+        var roleList = decryptedUser.roleList;
+        var roleArray = []
+        for (var r = 0; r < roleList.length; r++) {
+            roleArray.push(roleList[r].roleId)
+        }
+        this.setState({
+            roleArray: roleArray
+        },
+            () => {
+                this.getHealthArea();
+            })
+
         // this.getTracerCategory();
     }
 
@@ -1953,7 +1942,7 @@ class EquivalancyUnit extends Component {
         //conversion To FU 14,4
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
-            value = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,14}(\.\d{1,4})?$/;
             if (value == "") {
