@@ -90,9 +90,9 @@ export default class CommitRequest extends React.Component {
                     data[2] = getLabelText(responseData[sb].versionType.label, this.state.lang);
                     data[3] = responseData[sb].notes; //C
                     data[4] = responseData[sb].createdBy.username; //E
-                    data[5] = moment(responseData[sb].createdDate).format("YYYY-MM-DD"); //F
+                    data[5] = moment(responseData[sb].createdDate).format("YYYY-MM-DD HH:mm:ss"); //F
                     data[6] = responseData[sb].status == 1 ? i18n.t("static.commitReqiest.statusPending") : responseData[sb].status == 2 ? i18n.t("static.commitReqiest.statusCompleted") : i18n.t("static.commitReqiest.statusFailed");
-                    data[7] = moment(responseData[sb].completedDate).format("YYYY-MM-DD"); //F
+                    data[7] = responseData[sb].status == 2 ? moment(responseData[sb].completedDate).format("YYYY-MM-DD HH:mm:ss"):null; //F
                     json.push(data);
                 }
                 var options = {
