@@ -98,7 +98,7 @@ export default class ListTreeComponent extends Component {
                 }
                 console.log("pro list---", proList);
                 this.setState({
-                    datasetList: proList.sort(function (a, b) {
+                    treeList: proList.sort(function (a, b) {
                         a = a.programCode.toLowerCase();
                         b = b.programCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -159,19 +159,21 @@ export default class ListTreeComponent extends Component {
     }
     buildJexcel() {
         let treeList = this.state.treeList;
-        // console.log("dataSourceList---->", dataSourceList);
+        console.log("treeList---->", treeList);
         let treeArray = [];
         let count = 0;
 
         for (var j = 0; j < treeList.length; j++) {
-            data = [];
-            data[0] = treeList[j].treeName
-            data[1] = treeList[j].region
-            data[2] = treeList[j].forecastMethod
-            data[3] = treeList[j].scenarioName
-            data[4] = treeList[j].status;
-            treeArray[count] = data;
-            count++;
+            for (var k = 0; k < treeList[j].treeList.length; l++) {
+                data = [];
+                data[0] = getLabelText(treeList[k].label, this.state.lang)
+                data[1] = ''
+                data[2] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
+                data[3] = ''
+                data[4] = '';
+                treeArray[count] = data;
+                count++;
+            }
         }
         // if (dataSourceList.length == 0) {
         //     data = [];
