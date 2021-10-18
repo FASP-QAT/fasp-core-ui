@@ -173,9 +173,9 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     ))
 }
 function addCommas(cell1, row) {
-    
+
     if (cell1 != null && cell1 != "") {
-        var cell = parseFloat(cell1); 
+        var cell = parseFloat(cell1);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -437,6 +437,27 @@ export default class CreateTreeTemplate extends Component {
         }
         this.setState({
             nodeTypeFollowUpList: nodeTypeList
+        }, () => {
+            if (nodeTypeList.length == 1) {
+                const currentItemConfig = this.state.currentItemConfig;
+                currentItemConfig.context.payload.nodeType.id = nodeTypeList[0].id;
+
+                this.setState({
+                    currentItemConfig: currentItemConfig
+                }, () => {
+                    this.nodeTypeChange(nodeTypeList[0].id);
+                })
+            } else {
+                const currentItemConfig = this.state.currentItemConfig;
+                currentItemConfig.context.payload.nodeType.id = "";
+
+                this.setState({
+                    currentItemConfig: currentItemConfig
+
+                }, () => {
+
+                })
+            }
         });
     }
 
@@ -875,7 +896,30 @@ export default class CreateTreeTemplate extends Component {
             this.setState({
                 autocompleteData,
                 forecastingUnitList: response.data
+            }, () => {
+                if (response.data.length == 1) {
+                    const currentItemConfig = this.state.currentItemConfig;
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + " | " + response.data[0].label.label_en;
+                    this.setState({
+                        currentItemConfig: currentItemConfig
+                    }, () => {
+                        this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
+                    })
+                } else {
+                    const currentItemConfig = this.state.currentItemConfig;
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = "";
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = "";
+                    this.setState({
+                        currentItemConfig: currentItemConfig
+
+                    }, () => {
+
+                    })
+                }
             })
+
+
         })
             .catch(
                 error => {
@@ -1588,8 +1632,8 @@ export default class CreateTreeTemplate extends Component {
             console.log("final tab list---", this.state);
         });
     }
-    nodeTypeChange(event) {
-        var nodeTypeId = event.target.value;
+    nodeTypeChange(value) {
+        var nodeTypeId = value;
         console.log("node type value---", nodeTypeId)
         if (nodeTypeId == 1) {
             this.setState({
@@ -2098,7 +2142,7 @@ export default class CreateTreeTemplate extends Component {
                                             valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                             invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                             onBlur={handleBlur}
-                                            onChange={(e) => { handleChange(e); this.nodeTypeChange(e); this.dataChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
                                             required
                                             value={this.state.currentItemConfig.context.payload.nodeType.id}
                                         >
@@ -2458,8 +2502,8 @@ export default class CreateTreeTemplate extends Component {
                                                     <Autocomplete
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
-                                                        // value={this.state.roNoOrderNo}
-                                                        defaultValue={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id}
+                                                        value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
                                                         style={{ width: 450 }}
