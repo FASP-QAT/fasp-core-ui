@@ -2501,6 +2501,7 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
+                            <h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
                             <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -2625,7 +2626,7 @@ class usageTemplate extends Component {
                                                             </FormGroup> */}
                                                             </fieldset>
                                                             <FormGroup className="tab-ml-1 mb-md-0 pr-lg-3 " style={{ marginTop: '56px' }}>
-                                                                <span>---</span>
+                                                                <span>=</span>
                                                             </FormGroup>
 
 
