@@ -460,26 +460,26 @@ export default class BuildTree extends Component {
         this.setState({
             nodeTypeFollowUpList: nodeTypeList
         }, () => {
-            if (nodeTypeList.length == 1) {
-                const currentItemConfig = this.state.currentItemConfig;
-                currentItemConfig.context.payload.nodeType.id = nodeTypeList[0].id;
+            // if (nodeTypeList.length == 1) {
+            //     const currentItemConfig = this.state.currentItemConfig;
+            //     currentItemConfig.context.payload.nodeType.id = nodeTypeList[0].id;
 
-                this.setState({
-                    currentItemConfig: currentItemConfig
-                }, () => {
-                    this.nodeTypeChange(nodeTypeList[0].id);
-                })
-            } else {
-                const currentItemConfig = this.state.currentItemConfig;
-                currentItemConfig.context.payload.nodeType.id = "";
+            //     this.setState({
+            //         currentItemConfig: currentItemConfig
+            //     }, () => {
+            //         this.nodeTypeChange(nodeTypeList[0].id);
+            //     })
+            // } else {
+            //     const currentItemConfig = this.state.currentItemConfig;
+            //     currentItemConfig.context.payload.nodeType.id = "";
 
-                this.setState({
-                    currentItemConfig: currentItemConfig
+            //     this.setState({
+            //         currentItemConfig: currentItemConfig
 
-                }, () => {
+            //     }, () => {
 
-                })
-            }
+            //     })
+            // }
         });
     }
 
@@ -3097,18 +3097,18 @@ export default class BuildTree extends Component {
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / Patient</td>
+                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
                                                             <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU / patient</td>
+                                                            <td># of FU / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / patient</td>
+                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
