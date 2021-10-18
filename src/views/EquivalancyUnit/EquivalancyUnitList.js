@@ -206,7 +206,7 @@ class EquivalancyUnit extends Component {
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
                 data[2] = papuList[j].healthArea.id
                 data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
-                data[4] = papuList[j].notes
+                data[4] = ''
                 data[5] = papuList[j].active
                 data[6] = papuList[j].lastModifiedBy.username;
                 data[7] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
@@ -271,7 +271,7 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: i18n.t('static.common.notes'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                     textEditor: true,
                 },
@@ -310,9 +310,15 @@ class EquivalancyUnit extends Component {
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
                     } else {
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
                     }
                 }
             },
@@ -757,7 +763,7 @@ class EquivalancyUnit extends Component {
                     //     cell1.classList.add('readonly');
                     // }
 
-                    var addRowId = rowData[14];
+                    var addRowId = rowData[15];
                     // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
@@ -1953,7 +1959,7 @@ class EquivalancyUnit extends Component {
         //conversion To FU 14,4
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
-            value = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,14}(\.\d{1,4})?$/;
             if (value == "") {
