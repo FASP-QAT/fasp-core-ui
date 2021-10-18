@@ -49,18 +49,14 @@ export default class ListTreeComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("ut--->",myResult)
                 this.setState({
                     usageTemplateList: myResult
                     // .filter(x => x.active == "true")
-                }, () => {
-                    this.getTreeList(0);
-                    // this.buildJexcel();
                 });
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("usageTemplateList--->", myResult[i])
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("usageTemplateList--->", myResult[i])
 
-                }
+                // }
 
             }.bind(this);
         }.bind(this);
@@ -85,31 +81,39 @@ export default class ListTreeComponent extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                console.log("userId---", userId);
-                console.log("myResult.length---", myResult.length);
+                console.log("1---", userId);
+                console.log("2---", myResult);
+                // var t = CryptoJS.AES.decrypt(myResult, SECRET_KEY);
+                // var tt = JSON.parse(t.toString(CryptoJS.enc.Utf8));
+                // console.log("tt>>>",tt);
                 for (var i = 0; i < myResult.length; i++) {
-                    console.log("inside for---", myResult[i]);
+                    console.log("3---", myResult[i]);
                     if (myResult[i].userId == userId) {
-                        console.log("inside if---");
+                        console.log("4---");
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                        console.log("programData---", programData);
+                        console.log("5--->", programData);
                         // var f = 0
-                        // for (var k = 0; k < this.state.datasetList.length; k++) {
-                        //     if (this.state.datasetList[k].programId == programData.programId) {
-                        //         f = 1;
-                        //         console.log('already exist')
-                        //     }
-                        // }
-                        if (datasetId == 0) {
-                            console.log('inside else')
-                            proList.push(programData.treeList)
-                        } else
-                            if (programData.programId == datasetId) {
-                                console.log('inside if')
-                                proList.push(programData.treeList)
-                            }
+                        var treeList = programData.treeList;
+                        for (var k = 0; k < treeList.length; k++) {
+                            // if (datasetId == 0) {
+                            //     console.log('inside else')
+                            //     proList.push(treeList[k])
+                            // } else if (programData.programId == datasetId) {
+                            //     console.log('inside if')
+                                proList.push(treeList[k])
+                            // }
+                        }
                     }
+                    //     if (datasetId == 0) {
+                    //         console.log('inside else')
+                    //         proList.push(programData.treeList)
+                    //     } else
+                    //         if (programData.programId == datasetId) {
+                    //             console.log('inside if')
+                    //             proList.push(programData.treeList)
+                    //         }
+                    // }
                 }
                 console.log("pro list---", proList);
                 this.setState({
@@ -139,14 +143,11 @@ export default class ListTreeComponent extends Component {
                 myResult = getRequest.result;
                 this.setState({
                     datasetList: myResult
-                }, () => {
-                    this.getTreeList(0);
-                    // this.buildJexcel();
                 });
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("datasetList--->", myResult[i])
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
 
-                }
+                // }
 
             }.bind(this);
         }.bind(this);
@@ -180,10 +181,10 @@ export default class ListTreeComponent extends Component {
             // for (var k = 0; k < trees.length; k++) {
             // console.log("trees[k]---", trees[k]);
             data = [];
-            data[0] = getLabelText(treeList[j][0].label, this.state.lang)
-            data[1] = treeList[j][0].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-            data[2] = getLabelText(treeList[j][0].forecastMethod.label, this.state.lang)
-            data[3] = treeList[j][0].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[0] = getLabelText(treeList[j].label, this.state.lang)
+            data[1] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[2] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
+            data[3] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
             treeArray[count] = data;
             count++;
             // }
@@ -300,6 +301,7 @@ export default class ListTreeComponent extends Component {
         this.hideFirstComponent();
         this.getDatasetList();
         this.getUsageTemplateList();
+        this.getTreeList(0);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -413,7 +415,7 @@ export default class ListTreeComponent extends Component {
                                             name="datasetId"
                                             id="datasetId"
                                             bsSize="sm"
-                                            onChange={(e) => this.getTreeList(e.target.value)}
+                                        // onChange={(e) =>{this.getTreeList(e.target.value)}}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {datasets}
