@@ -104,9 +104,9 @@ export default class CommitRequest extends React.Component {
                         { title: i18n.t('static.report.versiontype'), type: 'text', width: 100 },
                         { title: i18n.t('static.common.note'), type: 'text', width: 200 },
                         { title: i18n.t('static.report.createdBy'), type: 'text', width: 100 },
-                        { title: i18n.t('static.report.createdDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                        { title: i18n.t('static.report.createdDate'), type: 'calendar', options: { isTime: 1, format: "DD-Mon-YY HH24:MM PM" }, width: 100 },
                         { title: i18n.t('static.status.status'), type: 'text', width: 100 },
-                        { title: i18n.t('static.commitRequest.completedDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT }, width: 100 },
+                        { title: i18n.t('static.commitRequest.completedDate'), type: 'calendar', options: { isTime: 1, format: "DD-Mon-YY HH24:MM PM" }, width: 100 },
                     ],
                     text: {
                         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
