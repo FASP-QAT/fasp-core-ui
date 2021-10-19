@@ -3604,6 +3604,9 @@ export default class BuildTree extends Component {
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                            <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                         </a>
                                                 <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                     this.setState({
                                                         openTreeDataModal: true
@@ -3979,7 +3982,7 @@ export default class BuildTree extends Component {
                                                                     </Input>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '28px' }}>
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '28px' }}>
                                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                                                     <FormGroup check inline>
                                                                         <Input
@@ -4013,7 +4016,7 @@ export default class BuildTree extends Component {
                                                                             {i18n.t('static.common.disabled')}
                                                                         </Label>
                                                                     </FormGroup>
-                                                                </FormGroup>
+                                                                </FormGroup> */}
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
                                                                         <div>
