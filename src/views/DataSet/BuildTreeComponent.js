@@ -197,25 +197,21 @@ function getPayloadData(itemConfig, type) {
     var data = [];
     data = itemConfig.payload.nodeDataMap;
     console.log("itemConfig---", data);
-    var curMonth = moment().format("YYYY-MM");
-    // console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
-    // for (var i = 0; i < data.length; i++) {
-    // var month = moment(data[i].month).format("YYYY-MM");
-    // console.log("month---");
-    // }
     console.log("data---", data);
-    if (data != null && data[0] != null && (data[0])[0] != null) {
+    var scenarioId = document.getElementById('scenarioId').value;
+    // this.state.selectedScenario;
+    if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
         if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
             if (type == 1) {
-                return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue);
             } else {
                 return "";
             }
         } else {
             if (type == 1) {
-                return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
+                return (itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue + "% of parent";
             } else {
-                return ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                return ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
             }
         }
     } else {
@@ -439,15 +435,26 @@ export default class BuildTree extends Component {
 
     getTreeByTreeId(treeId) {
         console.log("treeId---", treeId)
-        var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
-        console.log("curTreeObj---", curTreeObj)
-        this.setState({
-            curTreeObj,
-            scenarioList: curTreeObj.scenarioList,
-            regionList: curTreeObj.regionList
-        }, () => {
-            console.log("my items--->", this.state.items);
-        });
+        if (treeId != "" && treeId != 0) {
+            console.log("tree data---", this.state.treeData);
+            var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
+            console.log("curTreeObj---", curTreeObj)
+            this.setState({
+                curTreeObj,
+                scenarioList: curTreeObj.scenarioList,
+                regionList: curTreeObj.regionList
+            }, () => {
+                console.log("my items--->", this.state.items);
+            });
+        } else {
+            this.setState({
+                curTreeObj: [],
+                scenarioList: [],
+                regionList: [],
+                items: [],
+                selectedScenario: ''
+            });
+        }
     }
 
     getScenarioList() {
@@ -492,6 +499,10 @@ export default class BuildTree extends Component {
                 this.setState({
                     treeData: proList
                 }, () => {
+                    console.log("tree data --->", this.state.treeData);
+                    if (this.state.treeId != "") {
+                        this.getTreeByTreeId(this.state.treeId);
+                    }
                     // this.buildJexcel();
                 });
 
@@ -2080,16 +2091,49 @@ export default class BuildTree extends Component {
 
 
         if (event.target.name == "treeId") {
-            curTreeObj.treeId = event.target.value;
-            this.getTreeByTreeId(event.target.value);
+            var treeId = 0;
+            console.log("data change---", event.target.value);
+            if (event.target.value != null) {
+                treeId = event.target.value;
+                this.setState({
+                    treeId
+                });
+            }
+            this.getTreeByTreeId(treeId);
+
         }
 
         if (event.target.name == "scenarioId") {
             console.log("scenario id---", event.target.value)
-            this.setState({
-                items: (event.target.value != "" ? curTreeObj.tree.flatList : []),
-                selectedScenario: event.target.value
-            });
+            if (event.target.value != "") {
+                var items = curTreeObj.tree.flatList;
+                var scenarioId = event.target.value;
+                var arr = [];
+                for (let i = 0; i < items.length; i++) {
+                    console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
+                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                        (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
+                    } else {
+
+                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
+                        console.log("api parent value---", parentValue);
+
+                        (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[scenarioId])[0].dataValue) / 100;
+                    }
+                    console.log("load---", items[i])
+                    // arr.push(items[i]);
+                }
+                this.setState({
+                    items,
+                    selectedScenario: scenarioId
+                });
+            } else {
+                this.setState({
+                    items: [],
+                    selectedScenario: ''
+                });
+            }
             // curTreeObj.treeId = event.target.value;
             // this.getTreeByTreeId(event.target.value);
         }
@@ -3877,7 +3921,9 @@ export default class BuildTree extends Component {
                                                                         id="treeId"
                                                                         bsSize="sm"
                                                                         required
+                                                                        value={this.state.treeId}
                                                                         onChange={(e) => { this.dataChange(e) }}
+
                                                                     >
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {treeList}
