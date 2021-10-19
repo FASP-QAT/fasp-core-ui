@@ -10,57 +10,147 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
+import CryptoJS from 'crypto-js'
 const entityname = i18n.t('static.common.listtree');
 export default class ListTreeComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            treeList: [{
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Demographic',
-                treeName: 'Condoms Demographic Tree',
-                region: 'Region A',
-                scenarioName: 'High,Medium',
-                status: 'Active'
-            }, {
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Consumption',
-                treeName: 'Condoms Consumption Tree',
-                region: 'Region B',
-                scenarioName: 'Medium',
-                status: 'Active'
-            },
-            {
-                forecastDatasetName: 'AGO-CON-MOH',
-                forecastMethod: 'Morbidity',
-                treeName: 'Condoms Morbidity Tree',
-                region: 'Region C',
-                scenarioName: 'High,Medium,Low',
-                status: 'Active'
-            }
-
-            ],
+            usageTemplateList: [],
+            treeData: [],
+            datasetList: [],
             message: '',
             loading: true
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
-        this.buildTree=this.buildTree.bind(this);
-        this.onTemplateChange=this.onTemplateChange.bind(this);
+        this.buildTree = this.buildTree.bind(this);
+        this.onTemplateChange = this.onTemplateChange.bind(this);
+        this.getDatasetList = this.getDatasetList.bind(this);
+        this.getTreeList = this.getTreeList.bind(this);
+        this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
+    }
+    getUsageTemplateList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['usageTemplate'], 'readwrite');
+            var program = transaction.objectStore('usageTemplate');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    usageTemplateList: myResult
+                    // .filter(x => x.active == "true")
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("usageTemplateList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
     }
 
+    getTreeList(datasetId) {
+        var proList = [];
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
 
-    onTemplateChange(event){
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                console.log("1---", userId);
+                console.log("2---", myResult);
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("3---", myResult[i]);
+                    if (myResult[i].userId == userId) {
+                        console.log("4---");
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        console.log("5--->", programData);
+                        // var f = 0
+                        var treeList = programData.treeList;
+                        for (var k = 0; k < treeList.length; k++) {
+                            if (datasetId == 0) {
+                                console.log('inside else')
+                                proList.push(treeList[k])
+                            } else if (programData.programId == datasetId) {
+                                console.log('inside if')
+                                proList.push(treeList[k])
+                            }
+                        }
+                    }
+                }
+                console.log("pro list---", proList);
+                this.setState({
+                    treeData: proList
+                }, () => {
+                    this.buildJexcel();
+                });
+
+            }.bind(this);
+        }.bind(this);
+    }
+    getDatasetList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    datasetList: myResult
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
+    }
+
+    onTemplateChange(event) {
 
         this.props.history.push({
-            pathname: `/dataSet/buildTree/${event.target.value}`,
+            pathname: `/dataSet/buildTree/template/${event.target.value}`,
             // state: { role }
         });
 
     }
 
-    buildTree(){
+    buildTree() {
 
         this.props.history.push({
             pathname: `/dataSet/buildTree/`,
@@ -69,26 +159,25 @@ export default class ListTreeComponent extends Component {
 
     }
     buildJexcel() {
-        let treeList = this.state.treeList;
-        // console.log("dataSourceList---->", dataSourceList);
+        let treeList = this.state.treeData;
         let treeArray = [];
         let count = 0;
 
         for (var j = 0; j < treeList.length; j++) {
+            console.log("treeList[j]---", treeList[j]);
+            // var trees = treeList[j].treeList;
+            // for (var k = 0; k < trees.length; k++) {
+            // console.log("trees[k]---", trees[k]);
             data = [];
-            data[0] = treeList[j].treeName
-            data[1] = treeList[j].region
-            data[2] = treeList[j].forecastMethod
-            data[3] = treeList[j].scenarioName
-            data[4] = treeList[j].status;
+            data[0] = treeList[j].treeId
+            data[1] = getLabelText(treeList[j].label, this.state.lang)
+            data[2] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[3] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
+            data[4] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
             treeArray[count] = data;
             count++;
+            // }
         }
-        // if (dataSourceList.length == 0) {
-        //     data = [];
-        //     dataSourceArray[0] = data;
-        // }
-        // console.log("dataSourceArray---->", dataSourceArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
@@ -100,6 +189,10 @@ export default class ListTreeComponent extends Component {
             // colWidths: [150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
+                {
+                    title: 'Tree Id',
+                    type: 'hidden'
+                },
                 {
                     title: i18n.t('static.common.treeName'),
                     type: 'text',
@@ -120,16 +213,7 @@ export default class ListTreeComponent extends Component {
                     title: i18n.t('static.common.scenarioName'),
                     type: 'text',
                     readOnly: true
-                },
-                {
-                    type: 'dropdown',
-                    title: i18n.t('static.common.status'),
-                    readOnly: true,
-                    source: [
-                        { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
-                    ]
-                },
+                }
 
             ],
             text: {
@@ -173,8 +257,8 @@ export default class ListTreeComponent extends Component {
                             onclick: function () {
                                 var rowData = obj.getRowData(y);
                                 console.log("rowData===>", rowData);
-                                rowData[0]="";
-                                rowData[1]="";
+                                rowData[0] = "";
+                                rowData[1] = "";
                                 var data = rowData;
                                 this.el.insertRow(
                                     data, 0, 1
@@ -208,7 +292,9 @@ export default class ListTreeComponent extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        this.buildJexcel();
+        this.getDatasetList();
+        this.getUsageTemplateList();
+        this.getTreeList(0);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -223,7 +309,7 @@ export default class ListTreeComponent extends Component {
             var treeId = this.el.getValueFromCoords(0, x);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
-                pathname: `/dataSet/buildTree/${treeId}`,
+                pathname: `/dataSet/buildTree/tree/${treeId}`,
                 // state: { role }
             });
             // }
@@ -241,6 +327,26 @@ export default class ListTreeComponent extends Component {
     // }
 
     render() {
+        const { datasetList } = this.state;
+        let datasets = datasetList.length > 0
+            && datasetList.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {item.programCode}
+                    </option>
+                )
+            }, this);
+
+        const { usageTemplateList } = this.state;
+        let usageTemplates = usageTemplateList.length > 0
+            && usageTemplateList.map((item, i) => {
+                return (
+                    <option key={i} value={item.usageTemplateId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
 
         return (
             <div className="animated">
@@ -256,37 +362,36 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                    // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
-                                    // <Col md="3" className="pl-0">
-                                        <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label> */}
-                                            <div className="controls SelectGo">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="templateId"
-                                                        id="templateId"
-                                                        bsSize="sm"
-                                                        onChange={(e)=>{this.onTemplateChange(e)}}
-                                                    >
-                                                        <option value="0">{'Select Template'}</option>
-                                                        <option value="1">Demographic TreeTemplate</option>
-                                                        {/* {realmList} */}
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                    // </Col>
-                                }
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
-                                 <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
-                                    <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
-                                    </FormGroup>
-                                }
-                                </div>
+                                <Col md="12 pl-0">
+                                    <div className="d-md-flex">
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                            // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
+                                            // <Col md="3" className="pl-0">
+                                            <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label> */}
+                                                <div className="controls SelectGo">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="templateId"
+                                                            id="templateId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.onTemplateChange(e) }}
+                                                        >
+                                                            <option value="0">{'Select Template'}</option>
+                                                            {usageTemplates}
+                                                        </Input>
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            // </Col>
+                                        }
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                            <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
+                                                <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                            </FormGroup>
+                                        }
+                                    </div>
                                 </Col>
                             </div>
                         </div>
@@ -300,13 +405,13 @@ export default class ListTreeComponent extends Component {
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="realmId"
-                                            id="realmId"
+                                            name="datasetId"
+                                            id="datasetId"
                                             bsSize="sm"
-                                            onChange={this.filterData}
+                                            onChange={(e) => { this.getTreeList(e.target.value) }}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
-                                            {/* {realmList} */}
+                                            {datasets}
                                         </Input>
                                     </InputGroup>
                                 </div>

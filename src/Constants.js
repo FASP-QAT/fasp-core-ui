@@ -132,3 +132,4 @@ export const polling = {url: API_URL}
 export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
 export const PROBLEM_STATUS_IN_COMPLIANCE=4
 export const MAX_PROGRAM_CODE_LENGTH = 50;
+export const TREE_DIMENSION_ID = 5;
