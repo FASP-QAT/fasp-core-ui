@@ -1845,7 +1845,16 @@ class EquivalancyUnit extends Component {
         if (x == 1) {
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
-            elInstance.setValueFromCoords(2, y, '', true);//calculate
+
+            let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
+            if(selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined){
+                let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
+                let healthAreaId = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id)[0].id;
+                elInstance.setValueFromCoords(2, y, healthAreaId, true);//calculate
+            }else{
+                elInstance.setValueFromCoords(2, y, '', true);
+            }
+            
             elInstance.setValueFromCoords(3, y, '', true);
             elInstance.setValueFromCoords(4, y, '', true);
             elInstance.setValueFromCoords(5, y, '', true);

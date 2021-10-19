@@ -1769,7 +1769,7 @@
     "static.report.shipmentCostReport": "Shipment Cost Details",
     "static.supplyplan.adjustmentDataEntry": "Adjustment and inventory details data entry",
     "static.dashboard.forecastmetrics": "Forecast Error (by Planning Unit)",
-    "static.program.datasetDisplayName": "Dataset Display Name",
+    "static.program.datasetDisplayName": "Program Display Name",
     "static.dataSet.dataSetManager": "Dataset Manager",
     "static.report.shipmentSummeryReport": "Shipment Summary",
     "static.commit.inventoryId": "Inventory ID",

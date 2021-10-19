@@ -1003,7 +1003,7 @@ export default class AddForecastProgram extends Component {
 
                                                 <FormGroup>
 
-                                                    <Label htmlFor="company">{i18n.t('static.forecastProgram.forecastProgram')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="company">{i18n.t('static.dataset.forecastingProgram')}<span class="red Reqasterisk">*</span></Label>
 
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName}
