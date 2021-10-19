@@ -1768,7 +1768,7 @@
     "static.report.shipmentCostReport": "Detalles de Costos de Pedidos",
     "static.supplyplan.adjustmentDataEntry": "Captura de datos de detalles de ajustes e inventario",
     "static.dashboard.forecastmetrics": "Error de estimación (por producto)",
-    "static.program.datasetDisplayName": "Nombre para mostrar del conjunto de datos",
+    "static.program.datasetDisplayName": "Nombre de visualización del programa",
     "static.dataSet.dataSetManager": "Administrador de conjuntos de datos",
     "static.report.shipmentSummeryReport": "Resumen de los pedidos",
     "static.commit.inventoryId": "Identificador del inventario",

@@ -1768,7 +1768,7 @@
     "static.report.shipmentCostReport": "Detalhes dos Custos de Embarque",
     "static.supplyplan.adjustmentDataEntry": "Inserção de dados de detalhe de ajustes e stock",
     "static.dashboard.forecastmetrics": "Erro de previsão (por unidade de planeamento)",
-    "static.program.datasetDisplayName": "Nome de exibição do conjunto de dados",
+    "static.program.datasetDisplayName": "Nome de exibição do programa",
     "static.dataSet.dataSetManager": "Gerenciador de conjunto de dados",
     "static.report.shipmentSummeryReport": "Sumário dos Embarques",
     "static.commit.inventoryId": "ID do stock",

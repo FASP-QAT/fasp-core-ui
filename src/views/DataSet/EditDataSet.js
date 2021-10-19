@@ -866,7 +866,7 @@ export default class EditProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="company">{i18n.t('static.dataset.forecastingProgram')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName}
                                                         bsSize="sm"
@@ -881,7 +881,7 @@ export default class EditProgram extends Component {
                                                 <FormGroup style={{ display: 'flex' }}>
                                                     <Col xs="6" className="pl-0">
                                                         <FormGroup >
-                                                            <Label htmlFor="company">{i18n.t('static.program.programCode')}</Label>
+                                                            <Label htmlFor="company">{i18n.t('static.program.datasetDisplayName')}</Label>
                                                             <Input
                                                                 type="text" name="programCode"
                                                                 valid={!errors.programCode1 && this.state.uniqueCode != ''}

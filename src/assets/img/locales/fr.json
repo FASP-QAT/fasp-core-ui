@@ -1768,7 +1768,7 @@
     "static.report.shipmentCostReport": "Détails des frais d`expédition",
     "static.supplyplan.adjustmentDataEntry": "Saisie des données d`ajustement et de détails d`inventaire",
     "static.dashboard.forecastmetrics": "Erreur de prévision (par unité de planification)",
-    "static.program.datasetDisplayName": "Nom d affichage de l ensemble de données",
+    "static.program.datasetDisplayName": "Nom d affichage du programme",
     "static.dataSet.dataSetManager": "Gestionnaire de jeux de données",
     "static.report.shipmentSummeryReport": "Résumé des envois",
     "static.commit.inventoryId": "ID d`inventaire",

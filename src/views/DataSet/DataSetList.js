@@ -174,12 +174,12 @@ export default class ProgramList extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.programName'),
+                    title: i18n.t('static.dataset.forecastingProgram'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.program.programDisplayName'),
+                    title: i18n.t('static.program.datasetDisplayName'),
                     type: 'text',
                     readOnly: true
                 },
