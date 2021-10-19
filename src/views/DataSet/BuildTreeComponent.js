@@ -4096,7 +4096,7 @@ export default class BuildTree extends Component {
                 </ModalBody>
                 <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeFieldsModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                 </ModalFooter>
             </Modal>
             {/* Scenario Modal start------------------- */}
