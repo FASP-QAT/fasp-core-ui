@@ -620,15 +620,15 @@ export default class CreateTreeTemplate extends Component {
             console.log("parent unit id===", this.state.usageTypeParent);
         });
     }
-    getUsageTemplateList() {
-        console.log(" get uasge template--------------");
-        var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
+    getUsageTemplateList(tcId) {
+        console.log(" get uasge template--------------",this.state.currentItemConfig);
+        var tracerCategoryId = tcId;
         console.log("tracerCategoryId---", tracerCategoryId);
         // var forecastingUnitId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
         // console.log("forecastingUnitId---", forecastingUnitId);
         // var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
         // console.log("usageTypeId---", usageTypeId);
-        UsageTemplateService.getUsageTemplateListForTree(tracerCategoryId).then(response => {
+        UsageTemplateService.getUsageTemplateListForTree((tracerCategoryId != "" ? tracerCategoryId : 0)).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1072,6 +1072,7 @@ export default class CreateTreeTemplate extends Component {
     }
     componentDidMount() {
         this.getNodeTyeList();
+        this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -1756,7 +1757,7 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name === "tracerCategoryId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
-            this.getUsageTemplateList();
+            this.getUsageTemplateList(event.target.value);
         }
 
         if (event.target.name === "noOfPersons") {
@@ -2040,6 +2041,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("on curso nofuchanged---", this.state.noOfFUPatient)
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
+                    this.getUsageTemplateList((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     console.log("no -----------------");
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
@@ -2501,13 +2503,14 @@ export default class CreateTreeTemplate extends Component {
                                                     <Autocomplete
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
-                                                        value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        // value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
                                                         defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
                                                         style={{ width: 450 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
+                                                            // if(){
                                                             (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = value.value;
                                                             if (value != null) {
                                                                 (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = value.label;
