@@ -723,7 +723,7 @@ export default class InventoryTurns extends Component {
 
     formSubmit() {
         var programId = this.state.CostOfInventoryInput.programId;
-        var versionId = this.state.CostOfInventoryInput.versionId
+        var versionId = this.state.CostOfInventoryInput.versionId.toString();
         if (programId != 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
