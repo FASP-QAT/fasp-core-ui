@@ -831,8 +831,8 @@ export default class CreateTreeTemplate extends Component {
             var usageTypeParent = document.getElementById("usageTypeParent");
             selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
-            var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
-            selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
+            var forecastingUnit = document.getElementById("forecastingUnitId").value;
+            selectedText1 = "(" + forecastingUnit + ")";
 
 
 
@@ -2781,18 +2781,18 @@ export default class CreateTreeTemplate extends Component {
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / month / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
                                                             <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
                                                             <td>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / month / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
@@ -2925,6 +2925,7 @@ export default class CreateTreeTemplate extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    usageText: "",
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
                                     aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
