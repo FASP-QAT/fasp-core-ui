@@ -3235,18 +3235,18 @@ export default class BuildTree extends Component {
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == document.getElementById('usageTypeParent').value)[0].label.label_en}</td>
+                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
