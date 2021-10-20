@@ -19,7 +19,7 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            usageTemplateList: [],
+            treeTemplateList: [],
             treeData: [],
             datasetList: [],
             message: '',
@@ -31,16 +31,16 @@ export default class ListTreeComponent extends Component {
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
-        this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
+        this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
     }
-    getUsageTemplateList() {
+    getTreeTemplateList() {
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['usageTemplate'], 'readwrite');
-            var program = transaction.objectStore('usageTemplate');
+            var transaction = db1.transaction(['treeTemplate'], 'readwrite');
+            var program = transaction.objectStore('treeTemplate');
             var getRequest = program.getAll();
 
             getRequest.onerror = function (event) {
@@ -50,11 +50,11 @@ export default class ListTreeComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 this.setState({
-                    usageTemplateList: myResult
+                    treeTemplateList: myResult
                     // .filter(x => x.active == "true")
                 });
                 // for (var i = 0; i < myResult.length; i++) {
-                //     console.log("usageTemplateList--->", myResult[i])
+                //     console.log("treeTemplateList--->", myResult[i])
 
                 // }
 
@@ -293,7 +293,7 @@ export default class ListTreeComponent extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getDatasetList();
-        this.getUsageTemplateList();
+        this.getTreeTemplateList();
         this.getTreeList(0);
     }
 
@@ -337,11 +337,11 @@ export default class ListTreeComponent extends Component {
                 )
             }, this);
 
-        const { usageTemplateList } = this.state;
-        let usageTemplates = usageTemplateList.length > 0
-            && usageTemplateList.map((item, i) => {
+        const { treeTemplateList } = this.state;
+        let treeTemplates = treeTemplateList.length > 0
+            && treeTemplateList.map((item, i) => {
                 return (
-                    <option key={i} value={item.usageTemplateId}>
+                    <option key={i} value={item.treeTemplateId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -379,7 +379,7 @@ export default class ListTreeComponent extends Component {
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
                                                             <option value="0">{'Select Template'}</option>
-                                                            {usageTemplates}
+                                                            {treeTemplates}
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
