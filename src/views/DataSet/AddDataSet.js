@@ -19,7 +19,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import classNames from 'classnames';
 
 
-const entityname = i18n.t('static.forecastProgram.forecastProgram');
+const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     realmId: '',
     realmCountryId: '',
@@ -1003,7 +1003,7 @@ export default class AddForecastProgram extends Component {
 
                                                 <FormGroup>
 
-                                                    <Label htmlFor="company">{i18n.t('static.forecastProgram.forecastProgram')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="company">{i18n.t('static.dataset.forecastingProgram')}<span class="red Reqasterisk">*</span></Label>
 
                                                     <Input
                                                         type="text" name="programName" valid={!errors.programName}
@@ -1053,7 +1053,7 @@ export default class AddForecastProgram extends Component {
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.dataSet.dataSetManager')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         value={this.state.program.programManager.userId}
                                                         bsSize="sm"
