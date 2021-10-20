@@ -831,8 +831,9 @@ export default class CreateTreeTemplate extends Component {
             var usageTypeParent = document.getElementById("usageTypeParent");
             selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
-            var forecastingUnit = document.getElementById("forecastingUnitId").value;
-            selectedText1 = "(" + forecastingUnit + ")";
+            var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
+            selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
+
 
 
 
@@ -3128,11 +3129,15 @@ export default class CreateTreeTemplate extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-lg-0" style={{ display: 'contents' }}>
+                        <div className="Card-header-reporticon pb-lg-0">
                             <div className="card-header-actions">
-                                <div className="card-header-actions pr-4 pt-1">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button>
-                                </div>
+                                {/* <div className="card-header-actions pr-4 pt-1"> */}
+                                <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                            </a>
+                                    {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
+                                {/* </div> */}
                             </div>
                         </div>
                         <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
