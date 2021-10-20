@@ -621,7 +621,7 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     getUsageTemplateList(tcId) {
-        console.log(" get uasge template--------------",this.state.currentItemConfig);
+        console.log(" get uasge template--------------", this.state.currentItemConfig);
         var tracerCategoryId = tcId;
         console.log("tracerCategoryId---", tracerCategoryId);
         // var forecastingUnitId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
@@ -2499,7 +2499,7 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
                                                 <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls "
+                                                <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
@@ -2809,7 +2809,10 @@ export default class CreateTreeTemplate extends Component {
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
-                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <FormGroup className="pb-lg-3">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </FormGroup>
                                 </Form>
                             )} />
                 </TabPane>
@@ -3133,10 +3136,10 @@ export default class CreateTreeTemplate extends Component {
                             <div className="card-header-actions">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
                                 <a className="card-header-action">
-                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                                {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
-                            </a>
-                                    {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
+                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
                             </div>
                         </div>

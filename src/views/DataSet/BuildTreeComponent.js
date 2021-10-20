@@ -719,7 +719,7 @@ export default class BuildTree extends Component {
         });
     }
     cancelClicked() {
-        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dataset/listTree/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 
@@ -3080,7 +3080,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
                                                 <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls "
+                                                <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
@@ -3389,7 +3389,10 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
-                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <FormGroup className="pb-lg-3">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </FormGroup>
                                 </Form>
                             )} />
                 </TabPane>
@@ -3662,14 +3665,14 @@ export default class BuildTree extends Component {
                         <div className="pb-lg-0">
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
-                               
+
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
-                                        <a className="pr-lg-0 pt-lg-1">
-                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8',fontSize:'13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                         </a> 
+                                            <a className="pr-lg-0 pt-lg-1">
+                                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                            </a>
                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
-                                          
+
                                                 <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                     this.setState({
                                                         openTreeDataModal: true
@@ -4189,7 +4192,7 @@ export default class BuildTree extends Component {
                             </Label>
                         </FormGroup>
                     </FormGroup>
-                    
+
                 </ModalBody>
                 <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
