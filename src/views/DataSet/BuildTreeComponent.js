@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { OrgDiagram } from 'basicprimitivesreact';
+// import { PDFDocument } from 'pdfkit';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { LOGO } from '../../CommonComponent/Logo.js';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
 // import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -438,7 +442,94 @@ export default class BuildTree extends Component {
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
     }
+    exportPDF = () => {
+        console.log("download pdf");
+        const addFooters = doc => {
 
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                // doc.text(i18n.t('static.dashboard.stockstatusacrossplanningunit'), doc.internal.pageSize.width / 2, 60, {
+                //     align: 'center'
+                // })
+                // if (i == 1) {
+                //     doc.setFontSize(8)
+                //     doc.setFont('helvetica', 'normal')
+                //     doc.text(i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+                //         align: 'left'
+                //     })
+                //     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                //         align: 'left'
+                //     })
+                //     doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                //         align: 'left'
+                //     })
+                //     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                //         align: 'left'
+                //     })
+                //     var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                //     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
+
+                // }
+
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        const headers = '';
+        const data = this.state.items;
+
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: 200,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
+            columnStyles: {
+                1: { cellWidth: 161.89 },
+            }
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".pdf")
+
+    }
     handleRegionChange = (regionIds) => {
         this.setState({
             regionValues: regionIds.map(ele => ele),
@@ -628,7 +719,7 @@ export default class BuildTree extends Component {
         });
     }
     cancelClicked() {
-        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dataset/listTree/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
 
@@ -2989,7 +3080,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
                                                 <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls "
+                                                <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
@@ -2998,7 +3089,7 @@ export default class BuildTree extends Component {
                                                         defaultValue={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        style={{ width: 450 }}
+                                                        style={{ width: 312 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
                                                             (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = value.value;
@@ -3298,7 +3389,10 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
-                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <FormGroup className="pb-lg-3">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </FormGroup>
                                 </Form>
                             )} />
                 </TabPane>
@@ -3571,16 +3665,21 @@ export default class BuildTree extends Component {
                         <div className="pb-lg-0">
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
+
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
+                                            <a className="pr-lg-0 pt-lg-1">
+                                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                            </a>
                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+
                                                 <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                     this.setState({
                                                         openTreeDataModal: true
                                                     })
                                                 }}><i className="fa fa-plus-square"></i></a>
                                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                                // onClick={() => this.exportPDF(columns)} 
+                                                    onClick={() => this.exportPDF()}
                                                 />
                                             </FormGroup>
 
@@ -4093,6 +4192,7 @@ export default class BuildTree extends Component {
                             </Label>
                         </FormGroup>
                     </FormGroup>
+
                 </ModalBody>
                 <ModalFooter>
                     <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
