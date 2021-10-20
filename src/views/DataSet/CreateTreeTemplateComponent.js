@@ -831,8 +831,9 @@ export default class CreateTreeTemplate extends Component {
             var usageTypeParent = document.getElementById("usageTypeParent");
             selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
 
-            var forecastingUnit = document.getElementById("forecastingUnitId").value;
-            selectedText1 = "(" + forecastingUnit + ")";
+            var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
+            selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
+
 
 
 
