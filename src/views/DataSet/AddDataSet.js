@@ -19,7 +19,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import classNames from 'classnames';
 
 
-const entityname = i18n.t('static.forecastProgram.forecastProgram');
+const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     realmId: '',
     realmCountryId: '',

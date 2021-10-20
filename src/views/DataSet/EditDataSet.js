@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import { MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 
 
-const entityname = i18n.t('static.dataSet.dataSet');
+const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     programName: '',
     realmId: '',
