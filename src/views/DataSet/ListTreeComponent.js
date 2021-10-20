@@ -400,7 +400,7 @@ export default class ListTreeComponent extends Component {
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="3" className="pl-0">
                             <FormGroup className="Selectdiv">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastProgram.forecastProgram')}</Label>
+                                <Label htmlFor="appendedInputButton">{'Program'}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
