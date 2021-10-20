@@ -1220,7 +1220,7 @@
     "static.integration.clearBodyParameter": "Clear body parameter",
     "static.dashboard.budget": "Budget",
     "static.common.quarterly": "Quarterly",
-    "static.common.scenarioName": "Scenarion Name",
+    "static.common.scenarioName": "Scenario Name",
     "static.message.role.roleAlreadyExists": "Role already exists",
     "static.program.approvetoshiptext": "Enter `Approved to Shipped` lead time (in months)",
     "static.supplyPlan.doNotIncludeInProjectedShipment": "Do not include in projected balance",
