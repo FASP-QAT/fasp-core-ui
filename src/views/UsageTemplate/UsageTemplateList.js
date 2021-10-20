@@ -634,7 +634,7 @@ class usageTemplate extends Component {
 
                 this.setState({
                     usagePeriodList: tempList,
-                    usagePeriodListLong: response.data
+                    usagePeriodListLong: response.data.sort((a, b) => parseFloat(b.convertToMonth) - parseFloat(a.convertToMonth))
                     // loading: false
                 },
                     () => {
