@@ -1753,7 +1753,7 @@ class EquivalancyUnit extends Component {
                         console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: false, color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
                         },
                             () => {
                                 this.hideSecondComponent();

@@ -1053,7 +1053,7 @@ export default class AddForecastProgram extends Component {
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.dataSet.dataSetManager')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         value={this.state.program.programManager.userId}
                                                         bsSize="sm"
