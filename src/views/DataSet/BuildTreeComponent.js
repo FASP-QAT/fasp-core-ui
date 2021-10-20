@@ -543,7 +543,7 @@ export default class BuildTree extends Component {
 
     getTreeByTreeId(treeId) {
         console.log("treeId---", treeId)
-        if (treeId != "" && treeId != 0) {
+        if (treeId != "" && treeId != null && treeId != 0) {
             console.log("tree data---", this.state.treeData);
             var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
             console.log("curTreeObj---", curTreeObj)
@@ -608,7 +608,7 @@ export default class BuildTree extends Component {
                     treeData: proList
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
-                    if (this.state.treeId != "") {
+                    if (this.state.treeId != "" && this.state.treeId != 0) {
                         this.getTreeByTreeId(this.state.treeId);
                     }
                     // this.buildJexcel();
