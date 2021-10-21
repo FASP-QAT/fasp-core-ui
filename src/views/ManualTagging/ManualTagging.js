@@ -37,6 +37,7 @@ export default class ManualTagging extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            duplicateOrderNo: false,
             artmisHistory: [],
             tempNotes: '',
             originalQty: 0,
@@ -1122,31 +1123,33 @@ export default class ManualTagging extends Component {
                         });
                     }
                     if (this.state.active1 || (this.state.active3 && this.state.active4 && goAhead) || (this.state.active3 && this.state.active5) || callApiActive2) {
+                        console.log("Going to link shipment-----", changedmtList);
+                        // for (var i = 0; i <= 2; i++) {
+                        // console.log("for loop -----",i);
                         ManualTaggingService.linkShipmentWithARTMIS(changedmtList)
                             .then(response => {
-                                if (response.status == 200) {
-                                    console.log("ERP Linking success---");
-                                    this.setState({
-                                        message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
-                                        color: 'green',
-                                        loading: false,
-                                        loading1: false,
-                                        planningUnitIdUpdated: ''
-                                    },
-                                        () => {
-                                            this.hideSecondComponent();
-                                            this.toggleLarge();
+                                console.log("linking response---", response);
 
-                                            (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+                                this.setState({
+                                    message: (this.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')),
+                                    color: 'green',
+                                    loading: false,
+                                    loading1: false,
+                                    planningUnitIdUpdated: ''
+                                },
+                                    () => {
 
-                                        })
-                                }else{
-                                    console.log("ERP Linking failed---",response);
-                                }
+                                        this.hideSecondComponent();
+                                        this.toggleLarge();
+
+                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+                                    })
+                                // }
 
                             }).catch(
                                 error => {
-                                    console.log("ERP Linking error---",error);
+                                    console.log("Linking error-----------", error);
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
@@ -1166,12 +1169,21 @@ export default class ManualTagging extends Component {
                                             case 500:
                                             case 404:
                                             case 406:
+                                                console.log("500 error--------");
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
                                                     color: 'red',
-                                                });
+                                                },
+                                                    () => {
+
+                                                        this.hideSecondComponent();
+                                                        this.toggleLarge();
+
+                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+                                                    });
                                                 break;
                                             case 412:
                                                 this.setState({
@@ -1179,7 +1191,15 @@ export default class ManualTagging extends Component {
                                                     loading: false,
                                                     loading1: false,
                                                     color: 'red',
-                                                });
+                                                },
+                                                    () => {
+
+                                                        this.hideSecondComponent();
+                                                        this.toggleLarge();
+
+                                                        (this.state.active3 ? this.filterErpData() : this.filterData(this.state.planningUnitIds));
+
+                                                    });
                                                 break;
                                             default:
                                                 this.setState({
@@ -1193,6 +1213,7 @@ export default class ManualTagging extends Component {
                                     }
                                 }
                             );
+                        // }
                     }
                 }
             }
@@ -1833,6 +1854,7 @@ export default class ManualTagging extends Component {
                         data[13] = erpDataList[j].erpPlanningUnit.id;
 
                     } else {
+                        console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
                         data[0] = erpDataList[j].active;
                         data[1] = erpDataList[j].erpOrderId;
                         data[2] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + " | " + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo;
@@ -3222,6 +3244,7 @@ export default class ManualTagging extends Component {
                             <div style={{ display: this.state.loading1 ? "none" : "block" }}>
                                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                                     <strong>{i18n.t('static.manualTagging.searchErpOrders')}</strong>
+                                    <strong>{this.state.duplicateOrderNo && 'Already Linked'}</strong>
                                     <Button size="md" color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1" onClick={() => this.cancelClicked()} disabled={(this.state.table1Loader ? false : true)}> <i className="fa fa-times"></i></Button>
                                 </ModalHeader>
                                 <ModalBody>
