@@ -110,7 +110,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -124,7 +124,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -156,7 +156,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -170,7 +170,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -203,7 +203,7 @@ class DeleteLocalProgramComponent extends Component {
       openRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()
@@ -217,7 +217,7 @@ class DeleteLocalProgramComponent extends Component {
         getRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red',
+            color: '#BA0C2F',
             loading: false
           })
           // this.hideFirstComponent()
@@ -249,7 +249,7 @@ class DeleteLocalProgramComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red',
+        color: '#BA0C2F',
         loading: false
       })
       // this.hideFirstComponent()
@@ -264,7 +264,7 @@ class DeleteLocalProgramComponent extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // this.hideFirstComponent()

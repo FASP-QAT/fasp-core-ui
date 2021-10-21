@@ -995,7 +995,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                         } else {
                             this.setState({
                                 message: response.data.messageCode,
-                                color: "red",
+                                color: "#BA0C2F",
                                 loading: false
                             },
                                 () => {
@@ -1009,7 +1009,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
-                                    color: "red",
+                                    color: "#BA0C2F",
                                     loading: false
                                 });
                             } else {
@@ -1026,21 +1026,21 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         });
                                         break;
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         });
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         });
                                         break;
@@ -1073,7 +1073,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.country.duplicatePlanningUnit'),
-                color: "red",
+                color: "#BA0C2F",
                 changedFlag: 0,
 
             },
@@ -2833,7 +2833,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                         />
                                         {!!this.props.error &&
                                             this.props.touched && (
-                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                             )}
 
                                     </FormGroup>

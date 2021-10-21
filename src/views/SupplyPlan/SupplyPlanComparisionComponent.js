@@ -626,7 +626,7 @@ export default class SupplyPlanComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -639,7 +639,7 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
             };
             getRequest.onsuccess = function (event) {
@@ -689,7 +689,7 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
             }.bind(this);
             openRequest.onsuccess = function (e) {
@@ -701,7 +701,7 @@ export default class SupplyPlanComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
@@ -727,7 +727,7 @@ export default class SupplyPlanComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
@@ -754,7 +754,7 @@ export default class SupplyPlanComponent extends React.Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
                                 loading: false,
-                                color: "red"
+                                color: "#BA0C2F"
                             })
                         }.bind(this);
                         puRequest.onsuccess = function (e) {
@@ -770,7 +770,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 })
                             }.bind(this);
                             dataSourceRequest.onsuccess = function (event) {
@@ -895,7 +895,7 @@ export default class SupplyPlanComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -928,7 +928,7 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -978,7 +978,7 @@ export default class SupplyPlanComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
@@ -991,7 +991,7 @@ export default class SupplyPlanComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
@@ -1766,7 +1766,7 @@ export default class SupplyPlanComponent extends React.Component {
             loading: false
         })
         this.props.updateState("message", i18n.t('static.actionCancelled'));
-        this.props.updateState("color", "red");
+        this.props.updateState("color", "#BA0C2F");
         this.props.hideFirstComponent();
     }
 
@@ -1813,7 +1813,7 @@ export default class SupplyPlanComponent extends React.Component {
             })
 
         this.props.updateState("message", i18n.t('static.actionCancelled'));
-        this.props.updateState("color", "red");
+        this.props.updateState("color", "#BA0C2F");
         this.props.hideFirstComponent();
         this.toggleLarge(supplyPlanType);
     }
@@ -2568,7 +2568,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                    return (<td align="right" bgcolor={item1.balance == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                 })
                                             }
                                         </tr>
@@ -2577,7 +2577,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "red" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
                                         </tr>

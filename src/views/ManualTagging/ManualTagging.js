@@ -336,7 +336,7 @@ export default class ManualTagging extends Component {
         this.setState({
             originalQty: 0,
             message: i18n.t('static.actionCancelled'),
-            color: "red",
+            color: "#BA0C2F",
             planningUnitIdUpdated: '',
             table1Loader: false
         }, () => {
@@ -1153,7 +1153,7 @@ export default class ManualTagging extends Component {
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
-                                            color: 'red',
+                                            color: '#BA0C2F',
                                             loading: false,
                                             loading1: false
                                         });
@@ -1174,7 +1174,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 },
                                                     () => {
 
@@ -1190,7 +1190,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 },
                                                     () => {
 
@@ -1206,7 +1206,7 @@ export default class ManualTagging extends Component {
                                                     message: 'static.unkownError',
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 });
                                                 break;
                                         }
@@ -1773,7 +1773,7 @@ export default class ManualTagging extends Component {
 
                     this.setState({
                         message: response.data.messageCode,
-                        color: 'red',
+                        color: '#BA0C2F',
                         loading: false
                     },
                         () => {
@@ -2538,7 +2538,7 @@ export default class ManualTagging extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
-                            color: 'red'
+                            color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();

@@ -398,7 +398,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -411,7 +411,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -435,7 +435,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -469,7 +469,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -489,7 +489,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -509,7 +509,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -593,7 +593,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -606,7 +606,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -1003,7 +1003,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1031,7 +1031,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -1044,7 +1044,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -1114,7 +1114,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1191,7 +1191,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1270,7 +1270,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1376,7 +1376,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1481,7 +1481,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1583,7 +1583,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -2146,7 +2146,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red",
+                color: "#BA0C2F",
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -2160,7 +2160,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red",
+                    color: "#BA0C2F",
                 })
                 this.hideFirstComponent()
             };
@@ -2241,7 +2241,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red",
+                    color: "#BA0C2F",
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -2254,7 +2254,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -2270,7 +2270,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -2292,7 +2292,7 @@ export default class WhatIfReportComponent extends React.Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
                                 loading: false,
-                                color: "red",
+                                color: "#BA0C2F",
                             })
                             this.hideFirstComponent()
                         }.bind(this);
@@ -2320,7 +2320,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 })
                                 this.hideFirstComponent()
                             }.bind(this);
@@ -2337,7 +2337,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     })
                                     this.hideFirstComponent()
                                 }.bind(this);
@@ -2507,7 +2507,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red",
+                color: "#BA0C2F",
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -2542,7 +2542,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -2591,7 +2591,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -2605,7 +2605,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -3404,7 +3404,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
         })
         this.hideFirstComponent();
     }
@@ -3428,7 +3428,7 @@ export default class WhatIfReportComponent extends React.Component {
             }
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: 'red',
+                color: '#BA0C2F',
                 consumptionError: '',
                 inventoryError: '',
                 shipmentError: '',
@@ -4570,7 +4570,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                    return (<td align="right" bgcolor={item1.balance == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                 })
                                             }
                                         </tr>
@@ -4579,7 +4579,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "red" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
                                         </tr>
@@ -5350,7 +5350,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
@@ -5395,7 +5395,7 @@ export default class WhatIfReportComponent extends React.Component {
                         </div>
 
                     </CardBody>
-                    <CardFooter className="pb-5">
+                    <CardFooter className="pb-3">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <Button style={{ display: this.state.display }} type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                         {this.state.programModified==1 && !this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
