@@ -90,7 +90,7 @@ const chartData = {
     datasets: [{
         label: 'Planned',
         data: [0, 0, 0, 0],
-        backgroundColor: 'red',
+        backgroundColor: '#BA0C2F',
         borderWidth: 0
     },
     {

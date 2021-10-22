@@ -534,7 +534,7 @@ export default class ConsumptionDetails extends React.Component {
                             putRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 })
                             }.bind(this);
                             putRequest.onsuccess = function (event) {

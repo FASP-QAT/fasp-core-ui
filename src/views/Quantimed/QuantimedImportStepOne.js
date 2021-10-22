@@ -135,7 +135,7 @@ class QuantimedImportStepOne extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -149,7 +149,7 @@ class QuantimedImportStepOne extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             };
@@ -266,7 +266,7 @@ class QuantimedImportStepOne extends Component {
                                             })
                                     } else {
                                         this.setState({
-                                            message: i18n.t('static.unkownError'), color: "red", loading: false
+                                            message: i18n.t('static.unkownError'), color: "#BA0C2F", loading: false
                                         },
                                             () => {
                                                 this.hideFirstComponent()

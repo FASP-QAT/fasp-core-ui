@@ -162,7 +162,7 @@ export default class QatProblemActionNew extends Component {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     })
                                     this.hideFirstComponent()
                                 }.bind(this);
@@ -178,7 +178,7 @@ export default class QatProblemActionNew extends Component {
                                         this.setState({
                                             supplyPlanError: i18n.t('static.program.errortext'),
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         })
                                         this.hideFirstComponent()
                                     }.bind(this);
@@ -194,7 +194,7 @@ export default class QatProblemActionNew extends Component {
                                             this.setState({
                                                 supplyPlanError: i18n.t('static.program.errortext'),
                                                 loading: false,
-                                                color: "red"
+                                                color: "#BA0C2F"
                                             })
                                             this.hideFirstComponent()
                                         }.bind(this);
@@ -574,7 +574,7 @@ export default class QatProblemActionNew extends Component {
                                                                             //new for loop logic=======================================
                                                                         } else {
                                                                             //new for loop logic=======================================
-                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
                                                                             for (var d = 0; d < problemActionListForShipmentsIncompliance.length; d++) {
                                                                                 var fslShipmentIdInCompliance = problemActionListForShipmentsIncompliance[d].shipmentId;
                                                                                 var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
@@ -1400,7 +1400,7 @@ export default class QatProblemActionNew extends Component {
                                                 putRequest.onerror = function (event) {
                                                     this.setState({
                                                         message: i18n.t('static.program.errortext'),
-                                                        color: 'red'
+                                                        color: '#BA0C2F'
                                                     })
                                                     if (this.props.updateState != undefined) {
                                                         this.props.updateState(key, false);

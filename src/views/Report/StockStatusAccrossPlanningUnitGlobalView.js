@@ -74,7 +74,7 @@ const pickerLang = {
 }
 let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "red", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
@@ -1238,7 +1238,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
                     </FormGroup>
@@ -1258,7 +1258,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>

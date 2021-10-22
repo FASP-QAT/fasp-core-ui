@@ -373,7 +373,7 @@ export default class ConsumptionDetails extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -386,7 +386,7 @@ export default class ConsumptionDetails extends React.Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -480,7 +480,7 @@ export default class ConsumptionDetails extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -492,7 +492,7 @@ export default class ConsumptionDetails extends React.Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -517,7 +517,7 @@ export default class ConsumptionDetails extends React.Component {
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
-                                color: 'red'
+                                color: '#BA0C2F'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
@@ -618,7 +618,7 @@ export default class ConsumptionDetails extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -630,7 +630,7 @@ export default class ConsumptionDetails extends React.Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -758,7 +758,7 @@ export default class ConsumptionDetails extends React.Component {
         if (cont == true) {
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: "red",
+                color: "#BA0C2F",
                 consumptionBatchInfoChangedFlag: 0
             }, () => {
                 this.hideFirstComponent();

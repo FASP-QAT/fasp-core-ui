@@ -139,7 +139,7 @@ class AddprogramPlanningUnit extends Component {
                 else {
 
                     this.setState({
-                        message: response.data.messageCode, loading: false, color: 'red'
+                        message: response.data.messageCode, loading: false, color: '#BA0C2F'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -152,7 +152,7 @@ class AddprogramPlanningUnit extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false, color: 'red'
+                            loading: false, color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -168,19 +168,19 @@ class AddprogramPlanningUnit extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                         }
@@ -686,7 +686,7 @@ class AddprogramPlanningUnit extends Component {
                                                         // }
                                                     } else {
                                                         this.setState({
-                                                            message: response.data.messageCode, loading: false, color: 'red'
+                                                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
                                                         })
                                                     }
                                                 }).catch(
@@ -694,7 +694,7 @@ class AddprogramPlanningUnit extends Component {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
                                                                 message: 'static.unkownError',
-                                                                loading: false, color: 'red'
+                                                                loading: false, color: '#BA0C2F'
                                                             });
                                                         } else {
                                                             switch (error.response ? error.response.status : "") {
@@ -710,19 +710,19 @@ class AddprogramPlanningUnit extends Component {
                                                                 case 406:
                                                                     this.setState({
                                                                         message: error.response.data.messageCode,
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                                 case 412:
                                                                     this.setState({
                                                                         message: error.response.data.messageCode,
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                                 default:
                                                                     this.setState({
                                                                         message: 'static.unkownError',
-                                                                        loading: false, color: 'red'
+                                                                        loading: false, color: '#BA0C2F'
                                                                     });
                                                                     break;
                                                             }
@@ -738,7 +738,7 @@ class AddprogramPlanningUnit extends Component {
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    loading: false, color: 'red'
+                                                    loading: false, color: '#BA0C2F'
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
@@ -754,19 +754,19 @@ class AddprogramPlanningUnit extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
-                                                            loading: false, color: 'red'
+                                                            loading: false, color: '#BA0C2F'
                                                         });
                                                         break;
                                                 }
@@ -777,7 +777,7 @@ class AddprogramPlanningUnit extends Component {
                                 productCategoryListNew = []
                                 this.setState({
                                     message: response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 })
                             }
                         }).catch(
@@ -785,7 +785,7 @@ class AddprogramPlanningUnit extends Component {
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
@@ -801,19 +801,19 @@ class AddprogramPlanningUnit extends Component {
                                         case 406:
                                             this.setState({
                                                 message: error.response.data.messageCode,
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                         case 412:
                                             this.setState({
                                                 message: error.response.data.messageCode,
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                         default:
                                             this.setState({
                                                 message: 'static.unkownError',
-                                                loading: false, color: 'red'
+                                                loading: false, color: '#BA0C2F'
                                             });
                                             break;
                                     }
@@ -824,7 +824,7 @@ class AddprogramPlanningUnit extends Component {
                     productCategoryListNew = []
                     this.setState({
                         message: response.data.messageCode,
-                        loading: false, color: 'red'
+                        loading: false, color: '#BA0C2F'
                     })
                 }
 
@@ -833,7 +833,7 @@ class AddprogramPlanningUnit extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false, color: 'red'
+                            loading: false, color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -849,19 +849,19 @@ class AddprogramPlanningUnit extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false, color: 'red'
+                                    loading: false, color: '#BA0C2F'
                                 });
                                 break;
                         }
@@ -1498,7 +1498,7 @@ class AddprogramPlanningUnit extends Component {
                         // this.props.history.push(`/programProduct/addProgramProduct/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: 'red'
+                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1510,7 +1510,7 @@ class AddprogramPlanningUnit extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false, color: 'red'
+                                loading: false, color: '#BA0C2F'
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1526,7 +1526,7 @@ class AddprogramPlanningUnit extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1535,7 +1535,7 @@ class AddprogramPlanningUnit extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -1544,7 +1544,7 @@ class AddprogramPlanningUnit extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false, color: 'red'
+                                        loading: false, color: '#BA0C2F'
                                     },
                                         () => {
                                             this.hideSecondComponent();

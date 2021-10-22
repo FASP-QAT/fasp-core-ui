@@ -1173,7 +1173,7 @@ export default class syncPage extends Component {
 
       putRequest.onerror = function (event) {
         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-        this.props.updateState("color", "red");
+        this.props.updateState("color", "#BA0C2F");
         this.props.hideFirstComponent();
       }.bind(this);
       putRequest.onsuccess = function (event) {
@@ -2336,7 +2336,7 @@ export default class syncPage extends Component {
                 this.setState({
                   message: response.data.messageCode,
                   loading: false,
-                  color: "red"
+                  color: "#BA0C2F"
                 },
                   () => {
                     this.hideFirstComponent()
@@ -2392,7 +2392,7 @@ export default class syncPage extends Component {
           this.setState({
             message: response1.data.messageCode,
             loading: false,
-            color: "red"
+            color: "#BA0C2F"
           },
             () => {
               this.hideFirstComponent()
@@ -3771,7 +3771,7 @@ export default class syncPage extends Component {
                             } else {
                               this.setState({
                                 message: response.data.messageCode,
-                                color: "red",
+                                color: "#BA0C2F",
                                 loading: false
                               })
                               this.hideFirstComponent();
@@ -3786,7 +3786,7 @@ export default class syncPage extends Component {
                                   console.log("+++in catch 7")
                                   this.setState({
                                     message: 'static.common.networkError',
-                                    color: "red",
+                                    color: "#BA0C2F",
                                     loading: false
                                   }, () => {
                                     this.hideFirstComponent();
@@ -3805,7 +3805,7 @@ export default class syncPage extends Component {
                                     case 406:
                                       this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                         loading: false
                                       }, () => {
                                         this.hideFirstComponent()
@@ -3815,7 +3815,7 @@ export default class syncPage extends Component {
                                       this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                       }, () => {
                                         this.hideFirstComponent()
                                       });
@@ -3825,7 +3825,7 @@ export default class syncPage extends Component {
                                       this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                       }, () => {
                                         this.hideFirstComponent()
                                       });
@@ -3839,7 +3839,7 @@ export default class syncPage extends Component {
                           this.setState({
                             message: i18n.t("static.commitVersion.requestAlreadyExists"),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                           }, () => {
                             this.hideFirstComponent()
                             // this.checkLastModifiedDateForProgram(this.state.programId);
@@ -3849,7 +3849,7 @@ export default class syncPage extends Component {
                       } else {
                         this.setState({
                           message: response.data.messageCode,
-                          color: "red",
+                          color: "#BA0C2F",
                           loading: false
                         })
                         this.hideFirstComponent();
@@ -3864,7 +3864,7 @@ export default class syncPage extends Component {
                             console.log("+++in catch 9")
                             this.setState({
                               message: 'static.common.networkError',
-                              color: "red",
+                              color: "#BA0C2F",
                               loading: false
                             }, () => {
                               this.hideFirstComponent();
@@ -3883,7 +3883,7 @@ export default class syncPage extends Component {
                               case 406:
                                 this.setState({
                                   message: error.response.data.messageCode,
-                                  color: "red",
+                                  color: "#BA0C2F",
                                   loading: false
                                 }, () => {
                                   this.hideFirstComponent()
@@ -3893,7 +3893,7 @@ export default class syncPage extends Component {
                                 this.setState({
                                   message: error.response.data.messageCode,
                                   loading: false,
-                                  color: "red"
+                                  color: "#BA0C2F"
                                 }, () => {
                                   this.hideFirstComponent()
                                 });
@@ -3903,7 +3903,7 @@ export default class syncPage extends Component {
                                 this.setState({
                                   message: 'static.unkownError',
                                   loading: false,
-                                  color: "red"
+                                  color: "#BA0C2F"
                                 }, () => {
                                   this.hideFirstComponent()
                                 });
@@ -3917,7 +3917,7 @@ export default class syncPage extends Component {
                     this.setState({
                       message: i18n.t("static.commitVersion.versionIsOutDated"),
                       loading: false,
-                      color: "red"
+                      color: "#BA0C2F"
                     }, () => {
                       this.hideFirstComponent()
                       this.checkLastModifiedDateForProgram(this.state.programId);
@@ -3927,7 +3927,7 @@ export default class syncPage extends Component {
                 } else {
                   this.setState({
                     message: response.data.messageCode,
-                    color: "red",
+                    color: "#BA0C2F",
                     loading: false
                   })
                   this.hideFirstComponent();
@@ -3942,7 +3942,7 @@ export default class syncPage extends Component {
                       console.log("+++in catch 9")
                       this.setState({
                         message: 'static.common.networkError',
-                        color: "red",
+                        color: "#BA0C2F",
                         loading: false
                       }, () => {
                         this.hideFirstComponent();
@@ -3961,7 +3961,7 @@ export default class syncPage extends Component {
                         case 406:
                           this.setState({
                             message: error.response.data.messageCode,
-                            color: "red",
+                            color: "#BA0C2F",
                             loading: false
                           }, () => {
                             this.hideFirstComponent()
@@ -3971,7 +3971,7 @@ export default class syncPage extends Component {
                           this.setState({
                             message: error.response.data.messageCode,
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                           }, () => {
                             this.hideFirstComponent()
                           });
@@ -3981,7 +3981,7 @@ export default class syncPage extends Component {
                           this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                           }, () => {
                             this.hideFirstComponent()
                           });

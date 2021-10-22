@@ -318,7 +318,7 @@ class ApplicationDashboard extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
       // if (this.props.updateState != undefined) {
       //     this.props.updateState(false);
@@ -333,7 +333,7 @@ class ApplicationDashboard extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
         // if (this.props.updateState != undefined) {
