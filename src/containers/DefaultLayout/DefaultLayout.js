@@ -1455,18 +1455,38 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-bank',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.common.listtree'),
-                            url: '/dataset/listTree',
-                            icon: 'fa fa-list-alt ',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.common.listtree'),
+                          //   url: '/dataset/listTree',
+                          //   icon: 'fa fa-list-alt ',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
                             name: 'List Tree Template',
                             url: '/dataset/listTreeTemplate',
                             icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           }
+                        ]
+                      },
+                      {
+                        name: "Tree Forecast",
+                        icon: 'fa fa-list',
+                        // attributes: {
+                        // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        // },
+                        attributes: {
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                        },
+                        children: [
+                          
+                          {
+                            name: i18n.t('static.common.listtree'),
+                            url: '/dataset/listTree',
+                            icon: 'fa fa-list-alt ',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
