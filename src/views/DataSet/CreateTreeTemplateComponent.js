@@ -918,7 +918,7 @@ export default class CreateTreeTemplate extends Component {
 
             var autocompleteData = [];
             for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + " | " + response.data[i].label.label_en }
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " ["+response.data[i].forecastingUnitId +"]" }
             }
             this.setState({
                 autocompleteData,
@@ -2243,6 +2243,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Input type="text"
                                                     id="percentageOfParent"
                                                     name="percentageOfParent"
+                                                    bsSize="sm"
                                                     valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
                                                     invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                     onBlur={handleBlur}
@@ -2256,6 +2257,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Input type="text"
                                                     id="parentValue"
                                                     name="parentValue"
+                                                    bsSize="sm"
                                                     readOnly={true}
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={this.state.addNodeFlag != "true" ? addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas(this.state.parentValue)}
@@ -2267,6 +2269,7 @@ export default class CreateTreeTemplate extends Component {
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
+                                                bsSize="sm"
                                                 // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) != ''}
                                                 // invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
@@ -2503,7 +2506,7 @@ export default class CreateTreeTemplate extends Component {
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
                                         <div className="row">
 
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
@@ -2525,37 +2528,8 @@ export default class CreateTreeTemplate extends Component {
                                                         }, this)}
                                                 </Input>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls "
-                                                >
-                                                    <Autocomplete
-                                                        id="forecastingUnitId"
-                                                        name="forecastingUnitId"
-                                                        // value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
-                                                        defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
-                                                        options={this.state.autocompleteData}
-                                                        getOptionLabel={(option) => option.label}
-                                                        style={{ width: 450 }}
-                                                        onChange={(event, value) => {
-                                                            console.log("combo 2 ro combo box---", value);
-                                                            // if(){
-                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = value.value;
-                                                            if (value != null) {
-                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = value.label;
-                                                            }
-                                                            this.getForecastingUnitUnitByFUId(value.value);
-
-                                                        }} // prints the selected value
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
-                                                            onChange={(e) => {
-                                                                // this.searchErpOrderData(e.target.value)
-                                                            }} />}
-                                                    />
-
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-4">
+                                            
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Copy from Template</Label>
                                                 <Input
                                                     type="select"
@@ -2576,6 +2550,36 @@ export default class CreateTreeTemplate extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-12">
+                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                                                <div className="controls fuNodeAutocomplete"
+                                                >
+                                                    <Autocomplete
+                                                        id="forecastingUnitId"
+                                                        name="forecastingUnitId"
+                                                        // value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        options={this.state.autocompleteData}
+                                                        getOptionLabel={(option) => option.label}
+                                                        style={{ width: 730 }}
+                                                        onChange={(event, value) => {
+                                                            console.log("combo 2 ro combo box---", value);
+                                                            // if(){
+                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = value.value;
+                                                            if (value != null) {
+                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = value.label;
+                                                            }
+                                                            this.getForecastingUnitUnitByFUId(value.value);
+
+                                                        }} // prints the selected value
+                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                            onChange={(e) => {
+                                                                // this.searchErpOrderData(e.target.value)
+                                                            }} />}
+                                                    />
+
+                                                </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
@@ -2837,7 +2841,10 @@ export default class CreateTreeTemplate extends Component {
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
-                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <FormGroup className="pb-lg-3">
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </FormGroup>
                                 </Form>
                             )} />
                 </TabPane>
@@ -3157,11 +3164,15 @@ export default class CreateTreeTemplate extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="Card-header-reporticon pb-lg-0" style={{ display: 'contents' }}>
+                        <div className="Card-header-reporticon pb-lg-0">
                             <div className="card-header-actions">
-                                <div className="card-header-actions pr-4 pt-1">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button>
-                                </div>
+                                {/* <div className="card-header-actions pr-4 pt-1"> */}
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                    {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
+                                </a>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
+                                {/* </div> */}
                             </div>
                         </div>
                         <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
