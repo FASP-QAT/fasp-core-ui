@@ -3322,9 +3322,11 @@ export default class syncPage extends Component {
   // }
 
   synchronize() {
+    console.log("(((( in synchronize method");
     this.setState({ loading: true });
     var checkValidations = true;
     if (checkValidations) {
+      console.log("(((( before merging problem report list");
       var problemReportList = [];
       var problemJson = (this.state.mergedProblemListJexcel).getJson();
       var oldProgramDataProblem = this.state.oldProgramDataProblemList;
@@ -3366,16 +3368,18 @@ export default class syncPage extends Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
+            console.log("(((( in program request success");
             var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
             var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
             var generalJson = JSON.parse(generalData);
+            console.log("(((( after general data");
             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var consumptionList = [];
             var inventoryList = [];
             var shipmentList = [];
             var batchInfoList = [];
             var supplyPlan = [];
-
+            console.log("(((( before merging planning unit data ");
             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
               var planningUnitData = planningUnitDataList[pu];
               var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -3387,12 +3391,14 @@ export default class syncPage extends Component {
               batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
               supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
             }
+            console.log("(((( after merging planning unit data");
             var programJson = generalJson;
             programJson.consumptionList = consumptionList;
             programJson.inventoryList = inventoryList;
             programJson.shipmentList = shipmentList;
             programJson.batchInfoList = batchInfoList;
             programJson.supplyPlan = supplyPlan;
+            console.log("(((( build program json completed");
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
@@ -3453,6 +3459,7 @@ export default class syncPage extends Component {
             // programJson.inventoryList = inventoryData;
             // programJson.shipmentList = shipmentData;
             programJson.problemReportList = problemReportList;
+            console.log("(((( problem report list build completed");
             console.log("ProgramJson.consumption+++", programJson.consumptionList);
             // programJson.problemReportList = [];
             programJson.versionType = { id: document.getElementById("versionType").value };
@@ -3462,19 +3469,31 @@ export default class syncPage extends Component {
               // if (response.status == 200) {
                 // if (response.data == this.state.comparedLatestVersion) {
                   AuthenticationService.setupAxiosInterceptors();
+                  console.log("(((( before save program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                   ProgramService.saveProgramData(programJson,this.state.comparedLatestVersion).then(response => {
+                    console.log("(((( response of save program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                    console.log("(((( respoonse.status save program Data",response.status);
+                    console.log("(((( before save program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     if (response.status == 200) {
+                      console.log("(((( in response status if",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                      console.log("(((( Response.data",response.data);
+                      console.log("(((( before deleting program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                       var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                       var programDataOs1 = programDataTransaction1.objectStore('programData');
                       var programRequest1 = programDataOs1.delete((this.state.programId).value);
+                      console.log("(((( after deleting program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
 
+                      console.log("(((( before deleting program qpl details",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                       var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
                       var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
                       var programRequest3 = programDataOs3.delete((this.state.programId).value);
+                      console.log("(((( after deleting program qpl details",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
 
+                      console.log("(((( before deleting downloaded program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                       var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                       var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
                       var programRequest2 = programDataOs2.delete((this.state.programId).value);
+                      console.log("(((( after deleting downloaded program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
 
                       programRequest1.onerror = function (event) {
                         this.setState({
@@ -3482,7 +3501,7 @@ export default class syncPage extends Component {
                         })
                       }.bind(this);
                       programRequest2.onsuccess = function (e) {
-
+                        console.log("(((( in program request 2 success",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                         var json = response.data;
 //                        json.actionList = [];
                         var version = json.requestedProgramVersion;
@@ -3526,6 +3545,7 @@ export default class syncPage extends Component {
                 planningUnitDataList: planningUnitDataList
               };
               updatedJson = programDataJson;
+              console.log("(((( build of program data json completed",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
 
                         var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                         var programSaveData = transactionForSavingData.objectStore('programData');
@@ -3563,11 +3583,12 @@ export default class syncPage extends Component {
                         var putRequest = programSaveData.put(item);
                         var putRequest1 = downloadedProgramSaveData.put(item);
                         var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-
+                        console.log("(((( after put program Data",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
                         // this.redirectToDashbaord();
                       }.bind(this)
                     } else {
+                      console.log("(((( in else of response.status",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                       this.setState({
                         message: response.data.messageCode,
                         color: "red",
@@ -3578,11 +3599,13 @@ export default class syncPage extends Component {
                   })
                     .catch(
                       error => {
-                        console.log("@@@Error4", error);
-                        console.log("@@@Error4", error.message);
-                        console.log("@@@Error4", error.response ? error.response.status : "")
+                        console.log("(((( in catch",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                        console.log("(((( Error: ", error);
+                        console.log("(((( error.message : ", error.message);
+                        console.log("((((Error.response ", error.response)
+                        console.log("((((Error.response.status ", error.response.status)
                         if (error.message === "Network Error") {
-                          console.log("+++in catch 7")
+                          console.log("(((( In network error")
                           this.setState({
                             message: 'static.common.networkError',
                             color: "red",
@@ -3591,17 +3614,21 @@ export default class syncPage extends Component {
                             this.hideFirstComponent();
                           });
                         } else {
+                          console.log("((((In else of network error ", error.response)
                           switch (error.response ? error.response.status : "") {
 
                             case 401:
+                              console.log("(((( in case 401",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                               this.props.history.push(`/login/static.message.sessionExpired`)
                               break;
                             case 403:
+                              console.log("(((( in case 403",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                               this.props.history.push(`/accessDenied`)
                               break;
                             case 500:
                             case 404:
                             case 406:
+                              console.log("(((( in case 500,404,406",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                               alert(i18n.t("static.commitVersion.versionIsOutDated"));         
                               this.setState({
                                 message: error.response.data.messageCode,
@@ -3613,6 +3640,7 @@ export default class syncPage extends Component {
                               });
                               break;
                             case 412:
+                              console.log("(((( in case 412",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                               this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
@@ -3622,7 +3650,7 @@ export default class syncPage extends Component {
                               });
                               break;
                             default:
-                              console.log("+++in catch 8")
+                              console.log("(((( in default",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                               this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
