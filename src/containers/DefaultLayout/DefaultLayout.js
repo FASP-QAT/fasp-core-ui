@@ -298,9 +298,9 @@ const routes = [
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
-  { path: '/dataSet/buildTree/', exact: true, name: 'static.common.buildTree', component: BuildTree },
-  { path: '/dataSet/buildTree/tree/:treeId', name: 'static.common.buildTree', component: BuildTree },
-  { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.buildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/', exact: true, name: 'Manage Tree', component: BuildTree },
+  { path: '/dataSet/buildTree/tree/:treeId', name: 'Manage Tree', component: BuildTree },
+  { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'Manage Tree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/addProblem/:color/:message', name: 'static.breadcrum.add', entityname: 'static.report.problem', component: AddProblem },
@@ -1481,7 +1481,7 @@ class DefaultLayout extends Component {
                         children: [
                           
                           {
-                            name: i18n.t('static.common.listtree'),
+                            name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
                             icon: 'fa fa-list-alt ',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }

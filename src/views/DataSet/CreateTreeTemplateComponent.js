@@ -11,7 +11,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal,Popover, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -169,7 +169,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
                 <div style={{ marginTop: '10px', overflow: 'inherit', width: '132px' }}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
-            git        </div>
+              </div>
     ))
 }
 function addCommas(cell1, row) {
@@ -2135,7 +2135,7 @@ export default class CreateTreeTemplate extends Component {
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" aria-hidden="true" style={{color:'#5c6873'}}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -2777,7 +2777,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </>}
-                                            <div style={{ clear: 'both', width: '100%' }}>
+                                            <div style={{ clear: 'both', width: '100%' }} className="pl-lg-3 pr-lg-3">
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                                     <table className="table table-bordered">
                                                         <tr>
@@ -2815,6 +2815,7 @@ export default class CreateTreeTemplate extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="button" size="md" color="warning" className="float-right mr-1" ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </FormGroup>
                                 </Form>

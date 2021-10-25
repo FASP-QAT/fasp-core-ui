@@ -4163,7 +4163,7 @@ export default class BuildTree extends Component {
                             required
                             value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
                         >
-                            <option value="-1">Nothing Selected</option>
+                            <option value="-1">Please select a method</option>
                             {forecastMethods}
                         </Input>
                     </FormGroup>
