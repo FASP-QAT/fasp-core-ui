@@ -1072,6 +1072,9 @@ class DefaultLayout extends Component {
     // console.log("User111-----", decryptedUser1.defaultModuleId);
     this.setState({
       activeTab: decryptedUser1.defaultModuleId,
+    }, () => {
+      let id = AuthenticationService.displayDashboardBasedOnRole();
+      this.props.history.push(`/ApplicationDashboard/` + `${id}`);
     });
 
   }
