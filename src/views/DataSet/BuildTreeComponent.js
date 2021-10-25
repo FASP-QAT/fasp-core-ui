@@ -15,7 +15,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody,PopoverBody,Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -261,6 +261,7 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            popoverOpen: false,
             regionValues: [],
             selectedScenario: '',
             selectedScenarioLabel: '',
@@ -442,7 +443,14 @@ export default class BuildTree extends Component {
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
         this.getTreeTemplateById = this.getTreeTemplateById.bind(this);
+        this.toggle = this.toggle.bind(this);
     }
+    toggle() {
+        this.setState({
+          popoverOpen: !this.state.popoverOpen,
+        });
+      }
+
     exportPDF = () => {
         console.log("download pdf");
         const addFooters = doc => {
@@ -2743,8 +2751,13 @@ export default class BuildTree extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
+                                    <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                                         <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                    </Popover>
+                                    </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{color:'#5c6873',cursor:'pointer'}}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -2882,7 +2895,7 @@ export default class BuildTree extends Component {
                                         <div>
                                             <div className="row">
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
 
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
@@ -3101,7 +3114,7 @@ export default class BuildTree extends Component {
                                                     required
                                                     value={!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id : ''}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="">{i18n.t('static.common.selecttracercategory')}</option>
                                                     {this.state.tracerCategoryList.length > 0
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
@@ -3124,7 +3137,7 @@ export default class BuildTree extends Component {
                                                     required
                                                     value={this.state.usageTemplateId}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="">{i18n.t('static.common.selecttemplate')}</option>
                                                     {this.state.usageTemplateList.length > 0
                                                         && this.state.usageTemplateList.map((item, i) => {
                                                             return (
@@ -3165,7 +3178,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="usageTypeIdFU"
@@ -3420,7 +3433,7 @@ export default class BuildTree extends Component {
                                                         </tr>
                                                     </table>}
                                             </div>
-                                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                                            <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
@@ -4163,7 +4176,7 @@ export default class BuildTree extends Component {
                             required
                             value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
                         >
-                            <option value="-1">Please select a method</option>
+                            <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
                             {forecastMethods}
                         </Input>
                     </FormGroup>
@@ -4188,7 +4201,7 @@ export default class BuildTree extends Component {
                                 value={regionMultiList}
                                 onChange={(e) => { this.handleRegionChange(e) }}
                                 options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                labelledBy={i18n.t('static.common.select')}
+                                labelledBy={i18n.t('static.common.regiontext')}
                             />
                         </div>
                     </FormGroup>

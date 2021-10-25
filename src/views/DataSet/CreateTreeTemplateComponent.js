@@ -11,7 +11,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal,Popover, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal,Popover,PopoverHeader,PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -257,6 +257,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.state = {
+            popoverOpen: false,
             unitList: [],
             autocompleteData: [],
             noOfFUPatient: '',
@@ -403,7 +404,13 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
         this.getConversionFactor = this.getConversionFactor.bind(this);
+        this.toggle = this.toggle.bind(this);
     }
+    toggle() {
+        this.setState({
+          popoverOpen: !this.state.popoverOpen,
+        });
+      }
 
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
@@ -2168,8 +2175,13 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
+                                    <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                                         <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                    </Popover>
+                                    </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" aria-hidden="true" style={{color:'#5c6873'}}></i></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{color:'#5c6873',cursor:'pointer'}}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -2304,7 +2316,7 @@ export default class CreateTreeTemplate extends Component {
                                         <div>
                                             <div className="row">
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
 
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
@@ -2524,7 +2536,7 @@ export default class CreateTreeTemplate extends Component {
                                                     required
                                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="">{i18n.t('static.common.selecttracercategory')}</option>
                                                     {this.state.tracerCategoryList.length > 0
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
@@ -2547,7 +2559,7 @@ export default class CreateTreeTemplate extends Component {
                                                     required
                                                     value={this.state.usageTemplateId}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="">{i18n.t('static.common.selecttemplate')}</option>
                                                     {this.state.usageTemplateList.length > 0
                                                         && this.state.usageTemplateList.map((item, i) => {
                                                             return (
@@ -2589,7 +2601,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="usageTypeIdFU"
@@ -2844,7 +2856,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </tr>
                                                     </table>}
                                             </div>
-                                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                                            <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
@@ -3455,7 +3467,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                         value={this.state.treeTemplate.forecastMethod.id}
                                                                     >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
                                                                         {forecastMethods}
                                                                     </Input>
                                                                     <FormFeedback>{errors.forecastMethodId}</FormFeedback>

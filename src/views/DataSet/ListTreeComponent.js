@@ -388,7 +388,7 @@ export default class ListTreeComponent extends Component {
                                         }
                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
-                                                <Button type="submit" size="md" color="success" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createManualTree')}</Button>
+                                                <Button type="submit" size="md" color="info" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-plus"></i>  {i18n.t('static.common.addtree')}</Button>
                                             </FormGroup>
                                         }
                                     </div>
