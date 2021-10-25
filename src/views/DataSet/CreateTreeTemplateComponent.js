@@ -27,10 +27,13 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID ,JEXCEL_MONTH_PICKER_FORMAT} from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 
 
 const entityname = 'Tree Template';
@@ -256,7 +259,9 @@ const NodeDragDropSource = DropTarget(
 export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
+        this.pickAMonth2 = React.createRef()
         this.state = {
+            modelingEl: '',
             unitList: [],
             autocompleteData: [],
             noOfFUPatient: '',
@@ -403,8 +408,107 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
         this.getConversionFactor = this.getConversionFactor.bind(this);
+        this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
     }
 
+    buildModelingJexcel() {
+
+        let count = 0;
+        // for (var j = 0; j < treeList.length; j++) {
+        //     data = [];
+        //     data[0] = "";
+        //     data[1] = "";
+        //     data[2] = "";
+        //     data[3] = "";
+        //     data[4] = "";
+        //     data[5] = "";
+        //     data[6] = "";
+        //     data[7] = "";
+        //     data[8] = "";
+        //     treeArray[count] = data;
+        //     count++;
+        // }
+        this.el = jexcel(document.getElementById("modelingJexcel"), '');
+        this.el.destroy();
+        var json = [];
+        var data = [];
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Transfer to node',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "1 line ARV " },
+                        { id: 2, name: "1 line CON" }
+                    ]
+                },
+                {
+                    title: "Note",
+                    type: 'text',
+
+                },
+                {
+                    title: 'Modeling type',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "Linear (#)" },
+                        { id: 2, name: "Linear (%)" },
+                        { id: 3, name: "Exponential (%)" },
+                    ]
+                },
+                {
+                    title: 'Start Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: 'Stop Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "Monthly Change (%)",
+                    type: 'text',
+                },
+                {
+                    title: "Monthly Change (#)",
+                    type: 'text',
+                },
+                {
+                    title: "Modeling Calculater",
+                    type: 'text',
+                },
+                {
+                    title: "Calculated change for month",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var modelingEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = modelingEl;
+    }
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1100,6 +1204,7 @@ export default class CreateTreeTemplate extends Component {
 
     }
     componentDidMount() {
+        // this.buildModelingJexcel();
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -2856,7 +2961,43 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                    <div className="row">
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Input type="text"
+                                id="nodeTitleModeling"
+                                name="nodeTitleModeling"
+                                bsSize="sm"
+                                // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                // invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                // onBlur={handleBlur}
+                                onChange={(e) => { this.dataChange(e) }}
+                                value={this.state.currentItemConfig.context.payload.label.label_en}>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Picker
+                                ref={this.pickAMonth2}
+                                years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                value={this.state.singleValue2}
+                                lang={pickerLang.months}
+                                onChange={this.handleAMonthChange2}
+                                onDismiss={this.handleAMonthDissmis2}
+                            >
+                                <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                            </Picker>
+                        </FormGroup>
 
+                        <div>
+                            <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                            </div>
+                        </div>
+                    </div>
                 </TabPane>
 
             </>
@@ -2868,7 +3009,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     handleClickMonthBox2 = (e) => {
-        this.refs.pickAMonth2.eq(0).show();
+        this.pickAMonth2.current.show()
     }
     handleAMonthChange2 = (year, month) => {
         console.log("value>>>", year);
