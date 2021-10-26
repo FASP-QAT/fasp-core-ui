@@ -418,6 +418,7 @@ export default class CreateTreeTemplate extends Component {
         this.loaded = this.loaded.bind(this);
         this.addRow = this.addRow.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.showMomData = this.showMomData.bind(this);
     }
     toggle() {
         this.setState({
@@ -425,6 +426,9 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
+    showMomData() {
+
+    }
     addRow = function () {
         var elInstance = this.state.modelingEl;
         var data = [];
@@ -3058,6 +3062,8 @@ export default class CreateTreeTemplate extends Component {
                         <div>
                             <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                             </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-plus"></i>View month by month data</Button>
+                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-plus"></i>Save</Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                         </div>
                         {this.state.showCalculatorFields &&
