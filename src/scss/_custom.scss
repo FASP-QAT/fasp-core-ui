@@ -5063,3 +5063,10 @@ height: 0px;
     // .fuNodeAutocomplete .MuiInputBase-fullWidth {
     //     width: 78% !important;
     // }
+    
+    .listtreetable .jexcel > thead > tr >td:nth-child(3) {
+      text-align: left!important;
+  }
+  .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(3).readonly {
+    text-align: left!important;
+}

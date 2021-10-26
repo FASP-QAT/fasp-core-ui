@@ -167,7 +167,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ marginTop: '10px', overflow: 'inherit', width: '132px' }}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
+                <div style={{overflow: 'inherit',fontStyle:'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
               </div>
     ))
