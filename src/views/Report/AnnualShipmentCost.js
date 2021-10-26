@@ -1672,6 +1672,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.planningUnitValues}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                        disabled={this.state.loading}
                                                     />     </div></FormGroup>
                                             {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
