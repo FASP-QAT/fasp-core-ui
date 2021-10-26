@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -102,7 +102,9 @@ class StockStatus extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       PlanningUnitDataForExport: [],
       loading: true,
@@ -114,7 +116,8 @@ class StockStatus extends Component {
       stockStatusList: [],
       versions: [],
       show: false,
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
@@ -940,16 +943,38 @@ class StockStatus extends Component {
           }.bind(this);
           programRequest.onsuccess = function (event) {
 
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+
+            var programDataJson = programRequest.result.programData;
+            var planningUnitDataList = programDataJson.planningUnitDataList;
+            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+            }
+          }
+            var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+            var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+            var generalProgramJson = JSON.parse(generalProgramData);
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
 
 
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
             realmRequest.onerror = function (event) {
               this.setState({
                 loading: false,
@@ -1354,12 +1379,18 @@ class StockStatus extends Component {
         }.bind(this);
         programRequest.onsuccess = function (event) {
 
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
+          // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          // var programJson = JSON.parse(programData);
+
+          var programDataJson = programRequest.result.programData;
+          var planningUnitDataList = programDataJson.planningUnitDataList;
+          var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+          var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+          var generalProgramJson = JSON.parse(generalProgramData);
           var realmTransaction = db1.transaction(['realm'], 'readwrite');
           var realmOs = realmTransaction.objectStore('realm');
-          var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+          var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
           realmRequest.onerror = function (event) {
             this.setState({
               loading: false,
@@ -1410,6 +1441,22 @@ class StockStatus extends Component {
                   var pcnt = 0
                   console.log('planningunitList', planningunitList)
                   planningunitList.map(pu => {
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == pu.planningUnit.id);
+          var programJson = {}
+          if (planningUnitDataIndex != -1) {
+            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == pu.planningUnit.id))[0];
+            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            programJson = JSON.parse(programData);
+          } else {
+            programJson = {
+              consumptionList: [],
+              inventoryList: [],
+              shipmentList: [],
+              batchInfoList: [],
+              supplyPlan: []
+          }
+        }                    
                     console.log('**pu', pu)
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
@@ -1444,7 +1491,7 @@ class StockStatus extends Component {
 
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
+                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == pu.planningUnit.id && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                     var firstMonthRegionCount = 1;
                     var firstMonthRegionCountForStock = 0;
                     if (prevMonthSupplyPlan.length > 0) {
@@ -1622,7 +1669,7 @@ class StockStatus extends Component {
                                 label: i18n.t('static.supplyPlan.shipped'),
                                 yAxisID: 'A',
                                 stack: 1,
-                                backgroundColor: '#006789',
+                                backgroundColor: '#49A4A1',
                                 borderColor: 'rgba(179,181,198,1)',
                                 pointBackgroundColor: 'rgba(179,181,198,1)',
                                 pointBorderColor: '#fff',
@@ -1641,7 +1688,7 @@ class StockStatus extends Component {
                                 label: i18n.t('static.supplyPlan.approved'),
                                 yAxisID: 'A',
                                 stack: 1,
-                                backgroundColor: '#205493',
+                                backgroundColor: '#0067B9',
                                 borderColor: 'rgba(179,181,198,1)',
                                 pointBackgroundColor: 'rgba(179,181,198,1)',
                                 pointBorderColor: '#fff',
@@ -1657,7 +1704,7 @@ class StockStatus extends Component {
                               },
                               {
                                 label: i18n.t('static.supplyPlan.planned'),
-                                backgroundColor: '#a7c6ed',
+                                backgroundColor: '#A7C6ED',
                                 borderColor: 'rgba(179,181,198,1)',
                                 pointBackgroundColor: 'rgba(179,181,198,1)',
                                 pointBorderColor: '#fff',
@@ -2029,7 +2076,7 @@ class StockStatus extends Component {
                   label: i18n.t('static.supplyPlan.shipped'),
                   yAxisID: 'A',
                   stack: 1,
-                  backgroundColor: '#006789',
+                  backgroundColor: '#49A4A1',
                   borderColor: 'rgba(179,181,198,1)',
                   pointBackgroundColor: 'rgba(179,181,198,1)',
                   pointBorderColor: '#fff',
@@ -2048,7 +2095,7 @@ class StockStatus extends Component {
                   label: i18n.t('static.supplyPlan.approved'),
                   yAxisID: 'A',
                   stack: 1,
-                  backgroundColor: '#205493',
+                  backgroundColor: '#0067B9',
                   borderColor: 'rgba(179,181,198,1)',
                   pointBackgroundColor: 'rgba(179,181,198,1)',
                   pointBorderColor: '#fff',
@@ -2064,7 +2111,7 @@ class StockStatus extends Component {
                 },
                 {
                   label: i18n.t('static.supplyPlan.planned'),
-                  backgroundColor: '#a7c6ed',
+                  backgroundColor: '#A7C6ED',
                   borderColor: 'rgba(179,181,198,1)',
                   pointBackgroundColor: 'rgba(179,181,198,1)',
                   pointBorderColor: '#fff',
@@ -2500,7 +2547,7 @@ class StockStatus extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -2630,7 +2677,7 @@ class StockStatus extends Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 
@@ -3205,7 +3252,7 @@ class StockStatus extends Component {
           label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#006789',
+          backgroundColor: '#49a4a1',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -3224,7 +3271,7 @@ class StockStatus extends Component {
           label: i18n.t('static.supplyPlan.approved'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#205493',
+          backgroundColor: '#0067B9',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
@@ -3240,7 +3287,7 @@ class StockStatus extends Component {
         },
         {
           label: i18n.t('static.supplyPlan.planned'),
-          backgroundColor: '#a7c6ed',
+          backgroundColor: '#A7C6ED',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
