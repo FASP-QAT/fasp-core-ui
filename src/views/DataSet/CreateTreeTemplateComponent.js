@@ -514,6 +514,12 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loadedMom,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -647,6 +653,12 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -3144,12 +3156,13 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row">
+                    <div className="row pl-lg-2 pr-lg-2">
 
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
+                        
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
@@ -3161,10 +3174,10 @@ export default class CreateTreeTemplate extends Component {
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
                                 years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
@@ -3178,15 +3191,22 @@ export default class CreateTreeTemplate extends Component {
                         </FormGroup>
 
                         <div>
+                            <div className="calculatorimg">
                             <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                             </div>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-plus"></i>View month by month data</Button>
-                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-plus"></i>Save</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                            </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{color:'#fff'}}></i> View month by month data</Button>
+                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                         </div>
+                        <div className="row">
+                        
                         {this.state.showCalculatorFields &&
                             <>
                                 {/* <div className="row"> */}
+                                <FormGroup className="col-md-12 pt-lg-1">
+                            <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
+                        </FormGroup>
                                 <FormGroup className="col-md-6">
                                     <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                     <Picker
@@ -3274,8 +3294,8 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6"></FormGroup>
                                 <FormGroup className="col-md-6" >
-                                    <div className="check inline  pl-lg-1 pt-lg-3">
-                                        <div>
+                                    <div className="check inline  pl-lg-1 pt-lg-2">
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3290,9 +3310,9 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Exponential (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
-                                                className="form-check-input"
+                                                className="form-check-input Radioactive"
                                                 type="radio"
                                                 id="active2"
                                                 name="active2"
@@ -3305,7 +3325,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Linear (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3324,13 +3344,17 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
                                 </FormGroup>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Accept'}</Button>
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Close'}</Button>
+                                <FormGroup className="col-md-12">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                
+                                </FormGroup>
                                 {/* </div> */}
                             </>
                         }
+                        </div>
                     </div>
-                    {this.state.showMomData && <div>
+                    {this.state.showMomData && <div className="pt-lg-2">
                         <div id="momJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                         </div>
                     </div>
