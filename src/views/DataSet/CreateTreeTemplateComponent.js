@@ -541,7 +541,7 @@ export default class CreateTreeTemplate extends Component {
     };
 
     loadedMom = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance,1);
     }
 
     addRow = function () {
