@@ -10,6 +10,11 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+
 import '../../views/Forms/ValidationForms/ValidationForms.css'
 import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, Popover, PopoverHeader, PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
@@ -27,10 +32,12 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import cleanUp from '../../assets/img/calculator.png';
+
 
 
 const entityname = 'Tree Template';
@@ -256,8 +263,10 @@ const NodeDragDropSource = DropTarget(
 export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
+        this.pickAMonth2 = React.createRef()
         this.state = {
-            instance: '',
+            showCalculatorFields: false,
+            modelingEl: '',
             popoverOpen: false,
             unitList: [],
             autocompleteData: [],
@@ -405,6 +414,9 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeTyeList = this.getNodeTyeList.bind(this);
         this.getNodeTypeFollowUpList = this.getNodeTypeFollowUpList.bind(this);
         this.getConversionFactor = this.getConversionFactor.bind(this);
+        this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
+        this.loaded = this.loaded.bind(this);
+        this.addRow = this.addRow.bind(this);
         this.toggle = this.toggle.bind(this);
     }
 
@@ -415,6 +427,118 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
+    addRow = function () {
+        var elInstance = this.state.modelingEl;
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = cleanUp;
+        data[8] = "";
+        elInstance.insertRow(
+            data, 0, 1
+        );
+    };
+    buildModelingJexcel() {
+        this.el = jexcel(document.getElementById("modelingJexcel"), '');
+        this.el.destroy();
+        var data = [];
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Transfer to node',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "1 line ARV " },
+                        { id: 2, name: "1 line CON" }
+                    ]
+                },
+                {
+                    title: "Note",
+                    type: 'text',
+
+                },
+                {
+                    title: 'Modeling type',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "Linear (#)" },
+                        { id: 2, name: "Linear (%)" },
+                        { id: 3, name: "Exponential (%)" },
+                    ]
+                },
+                {
+                    title: 'Start Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: 'Stop Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "Monthly Change (%)",
+                    type: 'text',
+                },
+                {
+                    title: "Monthly Change (#)",
+                    type: 'text',
+                },
+                {
+                    title: "Modeling Calculater",
+                    type: 'image',
+                },
+                {
+                    title: "Calculated change for month",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            oneditionend: this.onedit,
+            onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var modelingEl = jexcel(document.getElementById("modelingJexcel"), options);
+        this.el = modelingEl;
+        this.setState({
+            modelingEl: modelingEl
+        }
+        );
+    }
+    loaded = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+    selected = function (instance, cell, x, y, value) {
+        if (y == 7) {
+            this.setState({
+                showCalculatorFields: true
+            });
+        }
+    }.bind(this)
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1714,6 +1838,9 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             activeTab1: newArray,
         });
+        if (tab == 2) {
+            this.buildModelingJexcel()
+        }
     }
 
     resetTree() {
@@ -2056,7 +2183,6 @@ export default class CreateTreeTemplate extends Component {
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
-        this.buildJexcelScalingTransfer();
         // const { config } = this.state;
         if (item != null) {
 
@@ -2874,7 +3000,75 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                    <div className="row">
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Input type="text"
+                                id="nodeTitleModeling"
+                                name="nodeTitleModeling"
+                                bsSize="sm"
+                                // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                // invalid={touched.nodeTitle && !!errors.nodeTitle}
+                                // onBlur={handleBlur}
+                                onChange={(e) => { this.dataChange(e) }}
+                                value={this.state.currentItemConfig.context.payload.label.label_en}>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-2">
+                            <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Picker
+                                ref={this.pickAMonth2}
+                                years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                value={this.state.singleValue2}
+                                lang={pickerLang.months}
+                                onChange={this.handleAMonthChange2}
+                                onDismiss={this.handleAMonthDissmis2}
+                            >
+                                <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                            </Picker>
+                        </FormGroup>
 
+                        <div>
+                            <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                            </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                        </div>
+                        {this.state.showCalculatorFields &&
+                            <>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-4">
+                                    <Picker
+                                        ref={this.pickAMonth2}
+                                        years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                        value={this.state.singleValue2}
+                                        lang={pickerLang.months}
+                                        onChange={this.handleAMonthChange2}
+                                        onDismiss={this.handleAMonthDissmis2}
+                                    >
+                                        <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                    </Picker>
+                                </FormGroup>
+                                <FormGroup className="col-md-2">
+                                    <Label htmlFor="">Start Value<span class="red Reqasterisk">*</span></Label>
+                                </FormGroup>
+                                <FormGroup className="col-md-4">
+                                    <Input type="text"
+                                        id="startValue"
+                                        name="startValue"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.dataChange(e) }}
+                                        value={10000}>
+                                    </Input>
+                                </FormGroup>
+                            </>
+                        }
+                    </div>
                 </TabPane>
 
             </>
@@ -2886,7 +3080,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     handleClickMonthBox2 = (e) => {
-        this.refs.pickAMonth2.eq(0).show();
+        this.pickAMonth2.current.show()
     }
     handleAMonthChange2 = (year, month) => {
         console.log("value>>>", year);
