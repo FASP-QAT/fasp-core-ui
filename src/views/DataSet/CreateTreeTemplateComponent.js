@@ -3031,6 +3031,7 @@ export default class CreateTreeTemplate extends Component {
                 </TabPane>
                 <TabPane tabId="2">
                     <div className="row">
+
                         <FormGroup className="col-md-2">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
@@ -3071,10 +3072,9 @@ export default class CreateTreeTemplate extends Component {
                         </div>
                         {this.state.showCalculatorFields &&
                             <>
-                                <FormGroup className="col-md-2">
-                                    <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
-                                </FormGroup>
-                                <FormGroup className="col-md-4">
+                                {/* <div className="row"> */}
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                     <Picker
                                         ref={this.pickAMonth2}
                                         years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
@@ -3085,19 +3085,134 @@ export default class CreateTreeTemplate extends Component {
                                     >
                                         <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
                                     </Picker>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                 </FormGroup>
-                                <FormGroup className="col-md-2">
-                                    <Label htmlFor="">Start Value<span class="red Reqasterisk">*</span></Label>
-                                </FormGroup>
-                                <FormGroup className="col-md-4">
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                     <Input type="text"
                                         id="startValue"
                                         name="startValue"
                                         bsSize="sm"
-                                        onChange={(e) => { this.dataChange(e) }}
-                                        value={10000}>
+
+                                        value={'100,00'}>
                                     </Input>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                 </FormGroup>
+                                {/* </div> */}
+                                {/* <div className="row"> */}
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                    <Picker
+                                        ref={this.pickAMonth2}
+                                        years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                        value={this.state.singleValue2}
+                                        lang={pickerLang.months}
+                                        onChange={this.handleAMonthChange2}
+                                        onDismiss={this.handleAMonthDissmis2}
+                                    >
+                                        <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                    </Picker>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Target Ending Value<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="startValue"
+                                        name="startValue"
+                                        bsSize="sm"
+
+                                        value={'2,200,000'}>
+                                    </Input>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="startValue"
+                                        name="startValue"
+                                        bsSize="sm"
+
+                                        value={'5%'}>
+                                    </Input>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="startValue"
+                                        name="startValue"
+                                        bsSize="sm"
+
+                                        value={'1,200,000'}>
+                                    </Input>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
+                                    <Input type="text"
+                                        id="startValue"
+                                        name="startValue"
+                                        bsSize="sm"
+                                        readOnly={true}
+                                        value={""}>
+                                    </Input>
+                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                </FormGroup>
+                                <FormGroup className="col-md-6"></FormGroup>
+                                <FormGroup className="col-md-6" >
+                                    <div className="check inline  pl-lg-1 pt-lg-3">
+                                        <div>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active1"
+                                                name="active1"
+                                                // checked={false}
+                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                <b>{'Exponential (%)'}</b>
+                                            </Label>
+                                        </div>
+                                        <div>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active2"
+                                                name="active2"
+                                                // checked={false}
+                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                <b>{'Linear (%)'}</b>
+                                            </Label>
+                                        </div>
+                                        <div>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="active3"
+                                                name="active3"
+                                                // checked={false}
+                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                <b>{'Linear (#)'}</b>
+                                            </Label>
+                                        </div>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                </FormGroup>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Accept'}</Button>
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Close'}</Button>
+                                {/* </div> */}
                             </>
                         }
                     </div>
