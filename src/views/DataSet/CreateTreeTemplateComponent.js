@@ -16,7 +16,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal,Popover,PopoverHeader,PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, Popover, PopoverHeader, PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -176,7 +176,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
                 <div style={{ marginTop: '10px', overflow: 'inherit', width: '132px' }}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
-              </div>
+        </div>
     ))
 }
 function addCommas(cell1, row) {
@@ -421,9 +421,9 @@ export default class CreateTreeTemplate extends Component {
     }
     toggle() {
         this.setState({
-          popoverOpen: !this.state.popoverOpen,
+            popoverOpen: !this.state.popoverOpen,
         });
-      }
+    }
 
     addRow = function () {
         var elInstance = this.state.modelingEl;
@@ -442,9 +442,34 @@ export default class CreateTreeTemplate extends Component {
         );
     };
     buildModelingJexcel() {
+        var scalingList = [
+            { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
+            { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
+            { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
+            { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
+            { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+        ]
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < scalingList.length; j++) {
+            data = [];
+            data[0] = scalingList[j].transferToNode
+            data[1] = scalingList[j].note
+            data[2] = scalingList[j].modelingType
+            data[3] = scalingList[j].startDate
+            data[4] = scalingList[j].stopDate
+            data[5] = scalingList[j].monthlyChangePer
+            data[6] = scalingList[j].monthlyChangeNo
+            data[7] = cleanUp
+            data[8] = scalingList[j].calculatedChangeFormonth
+            dataArray[count] = data;
+            count++;
+        }
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
         this.el.destroy();
-        var data = [];
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
         var options = {
             data: data,
             columnDrag: true,
@@ -455,7 +480,8 @@ export default class CreateTreeTemplate extends Component {
                     type: 'dropdown',
                     source: [
                         { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" }
+                        { id: 2, name: "1 line CON" },
+                        { id: 3, name: "3 line ARV" }
                     ]
                 },
                 {
@@ -2304,12 +2330,12 @@ export default class CreateTreeTemplate extends Component {
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
                                     <div>
-                                    <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
-                                         <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
-                                    </Popover>
+                                        <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                                            <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                        </Popover>
                                     </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{color:'#5c6873',cursor:'pointer'}}></i></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#5c6873', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
