@@ -1667,6 +1667,7 @@ class ForecastMetrics extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          disabled={this.state.loading}
                         />
 
                       </div>
