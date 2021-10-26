@@ -418,6 +418,7 @@ export default class CreateTreeTemplate extends Component {
         this.loaded = this.loaded.bind(this);
         this.addRow = this.addRow.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.showMomData = this.showMomData.bind(this);
     }
 
 
@@ -427,6 +428,9 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
+    showMomData() {
+
+    }
     addRow = function () {
         var elInstance = this.state.modelingEl;
         var data = [];
@@ -444,9 +448,34 @@ export default class CreateTreeTemplate extends Component {
         );
     };
     buildModelingJexcel() {
+        var scalingList = [
+            { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
+            { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
+            { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
+            { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
+            { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+        ]
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < scalingList.length; j++) {
+            data = [];
+            data[0] = scalingList[j].transferToNode
+            data[1] = scalingList[j].note
+            data[2] = scalingList[j].modelingType
+            data[3] = scalingList[j].startDate
+            data[4] = scalingList[j].stopDate
+            data[5] = scalingList[j].monthlyChangePer
+            data[6] = scalingList[j].monthlyChangeNo
+            data[7] = cleanUp
+            data[8] = scalingList[j].calculatedChangeFormonth
+            dataArray[count] = data;
+            count++;
+        }
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
         this.el.destroy();
-        var data = [];
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
         var options = {
             data: data,
             columnDrag: true,
@@ -457,7 +486,8 @@ export default class CreateTreeTemplate extends Component {
                     type: 'dropdown',
                     source: [
                         { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" }
+                        { id: 2, name: "1 line CON" },
+                        { id: 3, name: "3 line ARV" }
                     ]
                 },
                 {
@@ -3035,6 +3065,8 @@ export default class CreateTreeTemplate extends Component {
                         <div>
                             <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                             </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-plus"></i>View month by month data</Button>
+                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-plus"></i>Save</Button>
                             <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                         </div>
                         {this.state.showCalculatorFields &&
