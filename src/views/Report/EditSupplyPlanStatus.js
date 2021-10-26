@@ -557,6 +557,7 @@ class EditSupplyPlanStatus extends Component {
                             consumptionListUnFiltered: consumptionListUnFiltered,
                             batchInfoList: batchList,
                             programJson: programJson,
+                            generalProgramJson:programJson,
                             consumptionList: consumptionList,
                             showConsumption: 1,
                             consumptionMonth: month,
@@ -675,6 +676,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             batchInfoList: batchList,
                             programJson: programJson,
+                            generalProgramJson:programJson,
                             inventoryListUnFiltered: inventoryListUnFiltered,
                             inventoryList: inventoryList,
                             showInventory: 1,
@@ -853,7 +855,8 @@ class EditSupplyPlanStatus extends Component {
                                             showShipments: 1,
                                             shipmentList: shipmentList,
                                             shipmentListUnFiltered: shipmentListUnFiltered,
-                                            programJson: programJson
+                                            programJson: programJson,
+                                            generalProgramJson:programJson,
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
@@ -3248,8 +3251,13 @@ class EditSupplyPlanStatus extends Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
         var listLength = transList.length;
         return transList[listLength - 1].notes;
+        }
     }
 
     fetchData() {
