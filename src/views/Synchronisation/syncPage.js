@@ -1126,8 +1126,43 @@ export default class syncPage extends Component {
       programJson.consumptionList = consumptionData;
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
+      programJson.actionList = actionList;
+
+      var planningUnitDataListFromState = this.state.planningUnitDataList;
+      var updatedJson = [];
+      var consumptionList = programJson.consumptionList;
+      var inventoryList = programJson.inventoryList;
+      var shipmentList = programJson.shipmentList;
+      var batchInfoList = programJson.batchInfoList;
+      var problemReportList = programJson.problemReportList;
+      var supplyPlan = programJson.supplyPlan;
+      var generalData = programJson;
+      delete generalData.consumptionList;
+      delete generalData.inventoryList;
+      delete generalData.shipmentList;
+      delete generalData.batchInfoList;
+      delete generalData.supplyPlan;
+      delete generalData.planningUnitList;
+      var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+      var planningUnitDataList = [];
+      for (var pu = 0; pu < planningUnitDataListFromState.length; pu++) {
+        var planningUnitDataJson = {
+          consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId),
+          supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId)
+        }
+        var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+        planningUnitDataList.push({ planningUnitId: planningUnitDataListFromState[pu].planningUnitId, planningUnitData: encryptedPlanningUnitDataText })
+      }
+      var programDataJson = {
+        generalData: generalEncryptedData,
+        planningUnitDataList: planningUnitDataList
+      };
+
       var proRequestResult = this.state.programRequestResult;
-      proRequestResult.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+      proRequestResult.programData = programDataJson;
 
       var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
       var programOs = programTransaction.objectStore('whatIfProgramData');
@@ -1460,12 +1495,38 @@ export default class syncPage extends Component {
                     this.hideSecondComponent()
                   }.bind(this);
                   programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                    var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalJson = JSON.parse(generalData);
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                    var consumptionList = [];
+                    var inventoryList = [];
+                    var shipmentList = [];
+                    var batchInfoList = [];
+                    var supplyPlan = [];
+
+                    for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                      var planningUnitData = planningUnitDataList[pu];
+                      var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                      var planningUnitDataJson = JSON.parse(programData);
+                      consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                      inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                      shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                      batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                      supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+                    }
+                    var programJson = generalJson;
+                    programJson.consumptionList = consumptionList;
+                    programJson.inventoryList = inventoryList;
+                    programJson.shipmentList = shipmentList;
+                    programJson.batchInfoList = batchInfoList;
+                    programJson.supplyPlan = supplyPlan;
+
                     this.setState({
                       programRequestResult: programRequest.result,
-                      programRequestProgramJson: programJson
+                      programRequestProgramJson: programJson,
+                      planningUnitDataList: planningUnitDataList
                     })
                     console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                     // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -1607,13 +1668,11 @@ export default class syncPage extends Component {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
                                 for (var k = 0; k < fsResult.length; k++) {
-                                  if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
-                                    var fsJson = {
-                                      name: fsResult[k].fundingSourceCode,
-                                      id: fsResult[k].fundingSourceId
-                                    }
-                                    fundingSourceList.push(fsJson);
+                                  var fsJson = {
+                                    name: fsResult[k].fundingSourceCode,
+                                    id: fsResult[k].fundingSourceId
                                   }
+                                  fundingSourceList.push(fsJson);
                                 }
 
                                 var bTransaction = db1.transaction(['budget'], 'readwrite');
@@ -2701,8 +2760,13 @@ export default class syncPage extends Component {
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
-    var listLength = transList.length;
-    return transList[listLength - 1].notes;
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
+        var listLength = transList.length;
+        return transList[listLength - 1].notes;
+        }
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
@@ -3003,49 +3067,50 @@ export default class syncPage extends Component {
                           setFieldTouched,
                           setFieldError
                         }) => (
-                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
-                              <Col md="12 pl-0 pt-3">
-                                <div className="d-md-flex">
-                                  <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="select"
-                                          bsSize="sm"
-                                          name="versionType" id="versionType" onChange={this.versionTypeChanged}>
-                                          {versionTypes}
-                                        </Input>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="textarea"
-                                          name="notes"
-                                          // maxLength={600} 
-                                          id="notes"
-                                          valid={!errors.notes && this.state.notes != ''}
-                                          invalid={touched.notes && !!errors.notes}
-                                          onChange={(e) => { handleChange(e); this.notesChange(e); }}
-                                          onBlur={handleBlur}
-                                          value={this.state.notes}
-                                        >
-                                        </Input>
-                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="tab-ml-1 mt-4">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
-                                    &nbsp;
-                </FormGroup>
-                                </div>
-                              </Col>
-                            </Form>
-                          )} />
+                          <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                            <Col md="12 pl-0 pt-3">
+                              <div className="d-md-flex">
+                                <FormGroup className="col-md-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="select"
+                                        bsSize="sm"
+                                        name="versionType" id="versionType" onChange={this.versionTypeChanged}>
+                                        {versionTypes}
+                                      </Input>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="textarea"
+                                        name="notes"
+                                        // maxLength={600} 
+                                        id="notes"
+                                        valid={!errors.notes && this.state.notes != ''}
+                                        invalid={touched.notes && !!errors.notes}
+                                        onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                        onBlur={handleBlur}
+                                        value={this.state.notes}
+                                      >
+                                      </Input>
+                                      <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-4">
+                                  <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                  {/* {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>} */}
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  &nbsp;
+                                </FormGroup>
+                              </div>
+                            </Col>
+                          </Form>
+                        )} />
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -3277,7 +3342,7 @@ export default class syncPage extends Component {
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
         moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
@@ -3301,9 +3366,36 @@ export default class syncPage extends Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
+            var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+            var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+            var generalJson = JSON.parse(generalData);
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            var consumptionList = [];
+            var inventoryList = [];
+            var shipmentList = [];
+            var batchInfoList = [];
+            var supplyPlan = [];
+
+            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+              var planningUnitData = planningUnitDataList[pu];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              var planningUnitDataJson = JSON.parse(programData);
+              consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+              inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+              shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+              batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+              supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+            }
+            var programJson = generalJson;
+            programJson.consumptionList = consumptionList;
+            programJson.inventoryList = inventoryList;
+            programJson.shipmentList = shipmentList;
+            programJson.batchInfoList = batchInfoList;
+            programJson.supplyPlan = supplyPlan;
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
             // var planningUnitList = [];
             // var consumptionData = [];
             // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
@@ -3391,11 +3483,48 @@ export default class syncPage extends Component {
                       programRequest2.onsuccess = function (e) {
 
                         var json = response.data;
-                        json.actionList = [];
+//                        json.actionList = [];
                         var version = json.requestedProgramVersion;
                         if (version == -1) {
                           version = json.currentVersion.versionId
                         }
+                        
+                        var updatedJson = {};
+              var planningUnitList = json.planningUnitList;
+              var consumptionList = json.consumptionList;
+              var inventoryList = json.inventoryList;
+              var shipmentList = json.shipmentList;
+              var batchInfoList = json.batchInfoList;
+              var problemReportList = json.problemReportList;
+              var supplyPlan = json.supplyPlan;
+              var generalData = json;
+              delete generalData.consumptionList;
+              delete generalData.inventoryList;
+              delete generalData.shipmentList;
+              delete generalData.batchInfoList;
+              delete generalData.supplyPlan;
+              delete generalData.planningUnitList;
+              generalData.actionList = [];
+              var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+              var planningUnitDataList = [];
+              for (var pu = 0; pu < planningUnitList.length; pu++) {
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+                var planningUnitDataJson = {
+                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+                }
+                var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+                planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+              }
+              var programDataJson = {
+                generalData: generalEncryptedData,
+                planningUnitDataList: planningUnitDataList
+              };
+              updatedJson = programDataJson;
 
                         var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                         var programSaveData = transactionForSavingData.objectStore('programData');
@@ -3406,7 +3535,7 @@ export default class syncPage extends Component {
                         var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
                         var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
                         // for (var i = 0; i < json.length; i++) {
-                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                        var encryptedText = updatedJson;
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
@@ -3417,7 +3546,7 @@ export default class syncPage extends Component {
                           programId: json.programId,
                           version: version,
                           programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                          programData: encryptedText.toString(),
+                          programData: encryptedText,
                           userId: userId
                         };
                         var programQPLDetails = {
@@ -3633,7 +3762,7 @@ export default class syncPage extends Component {
         this.hideSecondComponent()
       }.bind(this);
       programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
         var oldProgramData = programJson;
@@ -3653,7 +3782,7 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
-                  f.region != null && f.region.id !=0 &&
+                  f.region != null && f.region.id != 0 &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
@@ -3729,7 +3858,7 @@ export default class syncPage extends Component {
           var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
           var oldData = ""
           if (oldDataList.length > 0) {
-            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0 ) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[17] = oldData;//Old data //R
           var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);

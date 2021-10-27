@@ -707,28 +707,28 @@ class ForecastMetrics extends Component {
         entries: '',
       },
 
-      updateTable: function (el, cell, x, y, source, value, id) {
-        if (y != null) {
-          var elInstance = el.jexcel;
-          var colArr = ['A', 'B', 'C', 'D', 'E']
-          var rowData = elInstance.getRowData(y);
+      // updateTable: function (el, cell, x, y, source, value, id) {
+      //   if (y != null) {
+      //     var elInstance = el.jexcel;
+      //     var colArr = ['A', 'B', 'C', 'D', 'E']
+      //     var rowData = elInstance.getRowData(y);
 
-          var forecastError = rowData[4];
+      //     var forecastError = rowData[4];
 
-          if (forecastError > 50) {
-            for (var i = 0; i < colArr.length; i++) {
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-              //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-              let textColor = 'red'//contrast('#f48282');
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-            }
-          } else {
-            for (var i = 0; i < colArr.length; i++) {
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            }
-          }
-        }
-      }.bind(this),
+      //     if (forecastError > 50) {
+      //       for (var i = 0; i < colArr.length; i++) {
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+      //         //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+      //         let textColor = 'red'//contrast('#f48282');
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+      //       }
+      //     } else {
+      //       for (var i = 0; i < colArr.length; i++) {
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+      //       }
+      //     }
+      //   }
+      // }.bind(this),
       onsearch: function (el) {
         el.jexcel.updateTable();
       },
@@ -767,6 +767,32 @@ class ForecastMetrics extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
+    console.log("INSIDE UPDATE TABLE");
+
+    var elInstance = instance.jexcel;
+    var json = elInstance.getJson();
+
+    var colArr = ['A', 'B', 'C', 'D', 'E']
+    for (var j = 0; j < json.length; j++) {
+
+
+      var rowData = elInstance.getRowData(j);
+      // console.log("elInstance---->", elInstance);
+
+      var forecastError = rowData[4];
+      if (forecastError > 50) {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+          //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+          let textColor = 'red'//contrast('#f48282');
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        }
+      } else {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        }
+      }
+    }
   }
 
 

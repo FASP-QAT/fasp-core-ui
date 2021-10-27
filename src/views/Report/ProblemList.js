@@ -185,7 +185,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
                     proListProblemStatus.sort((a, b) => {
                         var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -241,7 +241,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         procList.sort((a, b) => {
                             var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -458,7 +458,7 @@ export default class ConsumptionDetails extends React.Component {
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
                         programQPLDetailsGetRequest.onsuccess = function (event) {
                             var programObj = getRequest.result;
-                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             var programQPLDetails = programQPLDetailsGetRequest.result;
@@ -526,7 +526,7 @@ export default class ConsumptionDetails extends React.Component {
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
                             programQPLDetails.addressedCount = addressedCount;
-                            programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            programObj.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
                             var putRequest = problemOs.put(programObj);
@@ -1216,7 +1216,7 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 console.log("callback")
                             })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
@@ -1327,8 +1327,13 @@ export default class ConsumptionDetails extends React.Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
         var listLength = transList.length;
         return transList[listLength - 1].notes;
+        } 
     }
     handleProblemStatusChange = (event) => {
 

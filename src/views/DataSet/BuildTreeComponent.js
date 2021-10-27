@@ -441,6 +441,7 @@ export default class BuildTree extends Component {
         this.getScenarioList = this.getScenarioList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
+        this.getTreeTemplateById = this.getTreeTemplateById.bind(this);
     }
     exportPDF = () => {
         console.log("download pdf");
@@ -539,7 +540,36 @@ export default class BuildTree extends Component {
             console.log("regionLabels---", this.state.regionLabels);
         })
     }
+    getTreeTemplateById(treeTemplateId) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['treeTemplate'], 'readwrite');
+            var program = transaction.objectStore('treeTemplate');
+            var getRequest = program.getAll();
 
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                console.log("tree template myresult---", myResult)
+                this.setState({
+                    treeTemplate: myResult.filter(x => x.treeTemplateId == treeTemplateId)[0]
+                }, () => {
+                    console.log("tree template obj---", this.state.treeTemplate)
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("treeTemplateList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
+    }
 
     getTreeByTreeId(treeId) {
         console.log("treeId---", treeId)
@@ -1106,7 +1136,7 @@ export default class BuildTree extends Component {
 
             var autocompleteData = [];
             for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + " | " + response.data[i].label.label_en }
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " ["+response.data[i].forecastingUnitId +"]" }
             }
             this.setState({
                 autocompleteData,
@@ -1575,6 +1605,7 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             this.getTreeList();
+            this.getTreeTemplateById(this.props.match.params.templateId);
             this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
@@ -2796,6 +2827,7 @@ export default class BuildTree extends Component {
                                                 <Input type="text"
                                                     id="percentageOfParent"
                                                     name="percentageOfParent"
+                                                    bsSize="sm"
                                                     // valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue != ''}
                                                     // invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                     // onBlur={handleBlur}
@@ -2809,6 +2841,7 @@ export default class BuildTree extends Component {
                                                 <Input type="text"
                                                     id="parentValue"
                                                     name="parentValue"
+                                                    bsSize="sm"
                                                     readOnly={true}
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={this.state.addNodeFlag != "true" ? addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue) : addCommas(this.state.parentValue)}
@@ -2820,6 +2853,7 @@ export default class BuildTree extends Component {
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
+                                                bsSize="sm"
                                                 // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) != ''}
                                                 // invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
@@ -3056,7 +3090,7 @@ export default class BuildTree extends Component {
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
                                         <div className="row">
 
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
@@ -3078,36 +3112,8 @@ export default class BuildTree extends Component {
                                                         }, this)}
                                                 </Input>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls fuNodeAutocomplete"
-                                                >
-                                                    <Autocomplete
-                                                        id="forecastingUnitId"
-                                                        name="forecastingUnitId"
-                                                        value={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
-                                                        defaultValue={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
-                                                        options={this.state.autocompleteData}
-                                                        getOptionLabel={(option) => option.label}
-                                                        style={{ width: 312 }}
-                                                        onChange={(event, value) => {
-                                                            console.log("combo 2 ro combo box---", value);
-                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = value.value;
-                                                            if (value != null) {
-                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = value.label;
-                                                            }
-                                                            this.getForecastingUnitUnitByFUId(value.value);
 
-                                                        }} // prints the selected value
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
-                                                            onChange={(e) => {
-                                                                // this.searchErpOrderData(e.target.value)
-                                                            }} />}
-                                                    />
-
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Copy from Template</Label>
                                                 <Input
                                                     type="select"
@@ -3128,6 +3134,35 @@ export default class BuildTree extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-4">
+                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                                                <div className="controls fuNodeAutocomplete"
+                                                >
+                                                    <Autocomplete
+                                                        id="forecastingUnitId"
+                                                        name="forecastingUnitId"
+                                                        value={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
+                                                        defaultValue={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
+                                                        options={this.state.autocompleteData}
+                                                        getOptionLabel={(option) => option.label}
+                                                        style={{ width: 730 }}
+                                                        onChange={(event, value) => {
+                                                            console.log("combo 2 ro combo box---", value);
+                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = value.value;
+                                                            if (value != null) {
+                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = value.label;
+                                                            }
+                                                            this.getForecastingUnitUnitByFUId(value.value);
+
+                                                        }} // prints the selected value
+                                                        renderInput={(params) => <TextField {...params} variant="outlined"
+                                                            onChange={(e) => {
+                                                                // this.searchErpOrderData(e.target.value)
+                                                            }} />}
+                                                    />
+
+                                                </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
@@ -3694,8 +3729,8 @@ export default class BuildTree extends Component {
                                 <Formik
                                     enableReinitialize={true}
                                     initialValues={{
-                                        forecastMethodId: this.state.treeTemplate.forecastMethod.id,
-                                        treeName: this.state.treeTemplate.label.label_en
+                                        // forecastMethodId: this.state.curTreeObj.forecastMethod.id,
+                                        // treeName: this.state.curTreeObj.label.label_en
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
