@@ -32,11 +32,14 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import cleanUp from '../../assets/img/calculator.png';
+import { Bar } from 'react-chartjs-2';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { grey } from '@material-ui/core/colors';
 
 
 
@@ -174,7 +177,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{overflow: 'inherit',fontStyle:'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
+                <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
         </div>
     ))
@@ -379,7 +382,22 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             },
-            activeTab1: new Array(2).fill('1')
+            activeTab1: new Array(2).fill('1'),
+            momList: [
+                { month: '2021-01-01', monthStartNoSeasonality: 2000000, calculatedChange: 21875, monthEndNoSeasonality: 2021875, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1415313 },
+                { month: '2021-02-01', monthStartNoSeasonality: 2021875, calculatedChange: 21875, monthEndNoSeasonality: 2043750, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1430625 },
+                { month: '2021-03-01', monthStartNoSeasonality: 2043750, calculatedChange: 21875, monthEndNoSeasonality: 2065625, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1445938 },
+                { month: '2021-04-01', monthStartNoSeasonality: 2065625, calculatedChange: 21875, monthEndNoSeasonality: 2087500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2087500 },
+                { month: '2021-05-01', monthStartNoSeasonality: 2087500, calculatedChange: 21875, monthEndNoSeasonality: 2109375, seasonalityIndex: '0%', manualChange: '', monthEnd: 2109375 },
+                { month: '2021-06-01', monthStartNoSeasonality: 2109375, calculatedChange: 21875, monthEndNoSeasonality: 2131250, seasonalityIndex: '0%', manualChange: '', monthEnd: 2131250 },
+                { month: '2021-07-01', monthStartNoSeasonality: 2131250, calculatedChange: 21875, monthEndNoSeasonality: 2153125, seasonalityIndex: '30%', manualChange: '', monthEnd: 2799063 },
+                { month: '2021-08-01', monthStartNoSeasonality: 2153125, calculatedChange: 21875, monthEndNoSeasonality: 2175000, seasonalityIndex: '30%', manualChange: '', monthEnd: 2827500 },
+                { month: '2021-09-01', monthStartNoSeasonality: 2175000, calculatedChange: 21875, monthEndNoSeasonality: 2196875, seasonalityIndex: '30%', manualChange: '', monthEnd: 2855938 },
+                { month: '2021-10-01', monthStartNoSeasonality: 2218750, calculatedChange: 21875, monthEndNoSeasonality: 2240625, seasonalityIndex: '0%', manualChange: '', monthEnd: 2240625 },
+                { month: '2021-11-01', monthStartNoSeasonality: 2240625, calculatedChange: 21875, monthEndNoSeasonality: 2262500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2262500 },
+                { month: '2021-12-01', monthStartNoSeasonality: 2262500, calculatedChange: 21875, monthEndNoSeasonality: 2284375, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1599063 },
+
+            ]
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -437,21 +455,7 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     buildMomJexcel() {
-        var momList = [
-            { month: '2021-01-01', monthStartNoSeasonality: 2000000, calculatedChange: 21875, monthEndNoSeasonality: 2021875, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1415313 },
-            { month: '2021-02-01', monthStartNoSeasonality: 2021875, calculatedChange: 21875, monthEndNoSeasonality: 2043750, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1430625 },
-            { month: '2021-03-01', monthStartNoSeasonality: 2043750, calculatedChange: 21875, monthEndNoSeasonality: 2065625, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1445938 },
-            { month: '2021-04-01', monthStartNoSeasonality: 2065625, calculatedChange: 21875, monthEndNoSeasonality: 2087500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2087500 },
-            { month: '2021-05-01', monthStartNoSeasonality: 2087500, calculatedChange: 21875, monthEndNoSeasonality: 2109375, seasonalityIndex: '0%', manualChange: '', monthEnd: 2109375 },
-            { month: '2021-06-01', monthStartNoSeasonality: 2109375, calculatedChange: 21875, monthEndNoSeasonality: 2131250, seasonalityIndex: '0%', manualChange: '', monthEnd: 2131250 },
-            { month: '2021-07-01', monthStartNoSeasonality: 2131250, calculatedChange: 21875, monthEndNoSeasonality: 2153125, seasonalityIndex: '30%', manualChange: '', monthEnd: 2799063 },
-            { month: '2021-08-01', monthStartNoSeasonality: 2153125, calculatedChange: 21875, monthEndNoSeasonality: 2175000, seasonalityIndex: '30%', manualChange: '', monthEnd: 2827500 },
-            { month: '2021-09-01', monthStartNoSeasonality: 2175000, calculatedChange: 21875, monthEndNoSeasonality: 2196875, seasonalityIndex: '30%', manualChange: '', monthEnd: 2855938 },
-            { month: '2021-10-01', monthStartNoSeasonality: 2218750, calculatedChange: 21875, monthEndNoSeasonality: 2240625, seasonalityIndex: '0%', manualChange: '', monthEnd: 2240625 },
-            { month: '2021-11-01', monthStartNoSeasonality: 2240625, calculatedChange: 21875, monthEndNoSeasonality: 2262500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2262500 },
-            { month: '2021-12-01', monthStartNoSeasonality: 2262500, calculatedChange: 21875, monthEndNoSeasonality: 2284375, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1599063 },
-
-        ]
+        var momList = this.state.momList;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -541,7 +545,7 @@ export default class CreateTreeTemplate extends Component {
     };
 
     loadedMom = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance,1);
+        jExcelLoadedFunction(instance, 1);
     }
 
     addRow = function () {
@@ -2386,6 +2390,104 @@ export default class CreateTreeTemplate extends Component {
     }
 
     tabPane1() {
+        var chartOptions = {
+            title: {
+                display: false,
+            },
+            scales: {
+                yAxes: [
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            stepSize: 1000000
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 1
+                        },
+                        position: 'left',
+                        // scaleSteps : 100000
+                    }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: false,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+
+        let bar = {}
+        if (this.state.momList.length > 0) {
+            var datasetsArr = [];
+            datasetsArr.push(
+                {
+                    label: '',
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: grey,
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: false,
+                    data: this.state.momList.map((item, index) => (item.monthEnd > 0 ? item.monthEnd : null))
+                }
+            )
+
+            bar = {
+                labels: [...new Set(this.state.momList.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
+                datasets: datasetsArr
+
+            };
+        }
+
+
         return (
             <>
                 <TabPane tabId="1">
@@ -3329,10 +3431,19 @@ export default class CreateTreeTemplate extends Component {
                             </>
                         }
                     </div>
-                    {this.state.showMomData && <div>
-                        <div id="momJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                    {this.state.showMomData &&
+                        <div>
+                            <div id="momJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                            </div>
+                            <div className="col-md-12">
+                                <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                    <div>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     }
                 </TabPane>
 
