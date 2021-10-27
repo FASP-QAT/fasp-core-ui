@@ -171,7 +171,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
 
     return connectDropTarget(connectDragSource(
         <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-        {/* // <div className="ContactTemplate boxContactTemplate"> */}
+            {/* // <div className="ContactTemplate boxContactTemplate"> */}
             <div className="ContactTitleBackground"
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
@@ -269,10 +269,15 @@ export default class CreateTreeTemplate extends Component {
         super();
         this.pickAMonth2 = React.createRef()
         this.state = {
+            showMomDataPercent: false,
+            showModelingJexcelNumber: false,
+            showModelingJexcelPercent: false,
             showMomData: false,
             showCalculatorFields: false,
+            momElPer: '',
             momEl: '',
             modelingEl: '',
+            modelingPerEl: '',
             popoverOpen: false,
             unitList: [],
             autocompleteData: [],
@@ -398,6 +403,22 @@ export default class CreateTreeTemplate extends Component {
                 { month: '2021-11-01', monthStartNoSeasonality: 2240625, calculatedChange: 21875, monthEndNoSeasonality: 2262500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2262500 },
                 { month: '2021-12-01', monthStartNoSeasonality: 2262500, calculatedChange: 21875, monthEndNoSeasonality: 2284375, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1599063 },
 
+            ],
+
+            momListPer: [
+                { month: '2021-01-01', sexuallyActiveMenMonthStartPer: '50%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 424594, sexuallyActiveMenMonthEndPer: '51%', monthEnd: 216543 },
+                { month: '2021-02-01', sexuallyActiveMenMonthStartPer: '51%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 429188, sexuallyActiveMenMonthEndPer: '52%', monthEnd: 223178 },
+                { month: '2021-03-01', sexuallyActiveMenMonthStartPer: '52%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 433781, sexuallyActiveMenMonthEndPer: '53%', monthEnd: 229904 },
+                { month: '2021-04-01', sexuallyActiveMenMonthStartPer: '53%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 626250, sexuallyActiveMenMonthEndPer: '54%', monthEnd: 338175 },
+                { month: '2021-05-01', sexuallyActiveMenMonthStartPer: '54%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 632813, sexuallyActiveMenMonthEndPer: '55%', monthEnd: 348047 },
+                { month: '2021-06-01', sexuallyActiveMenMonthStartPer: '55%', calculatedChange: '1.00%', manualChange: '4.00%', sexuallyActiveMenMonthEnd: 639375, sexuallyActiveMenMonthEndPer: '60%', monthEnd: 383625 },
+                { month: '2021-07-01', sexuallyActiveMenMonthStartPer: '60%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 839719, sexuallyActiveMenMonthEndPer: '61%', monthEnd: 512228 },
+                { month: '2021-08-01', sexuallyActiveMenMonthStartPer: '61%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 848250, sexuallyActiveMenMonthEndPer: '62%', monthEnd: 525915 },
+                { month: '2021-09-01', sexuallyActiveMenMonthStartPer: '62%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 856781, sexuallyActiveMenMonthEndPer: '63%', monthEnd: 539772 },
+                { month: '2021-10-01', sexuallyActiveMenMonthStartPer: '63%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 665625, sexuallyActiveMenMonthEndPer: '64%', monthEnd: 426000 },
+                { month: '2021-11-01', sexuallyActiveMenMonthStartPer: '64%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 672188, sexuallyActiveMenMonthEndPer: '65%', monthEnd: 436922 },
+                { month: '2021-12-01', sexuallyActiveMenMonthStartPer: '65%', calculatedChange: '0.50%', manualChange: '', sexuallyActiveMenMonthEnd: 678750, sexuallyActiveMenMonthEndPer: '66%', monthEnd: 447975 },
+
             ]
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
@@ -438,9 +459,13 @@ export default class CreateTreeTemplate extends Component {
         this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
         this.loaded = this.loaded.bind(this);
         this.addRow = this.addRow.bind(this);
+        this.loadedPer = this.loadedPer.bind(this);
         this.toggle = this.toggle.bind(this);
         this.showMomData = this.showMomData.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
+        this.buildModelingJexcelPercent = this.buildModelingJexcelPercent.bind(this);
+        this.addRowJexcelPer = this.addRowJexcelPer.bind(this);
+        this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
     }
 
 
@@ -455,6 +480,113 @@ export default class CreateTreeTemplate extends Component {
             this.buildMomJexcel();
         });
     }
+    showMomDataPercent() {
+        this.setState({ showMomDataPercent: true }, () => {
+            this.buildMomJexcelPercent();
+        });
+    }
+    buildMomJexcelPercent() {
+        var momList = this.state.momListPer;
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < momList.length; j++) {
+            data = [];
+            data[0] = momList[j].month
+            data[1] = momList[j].sexuallyActiveMenMonthStartPer
+            data[2] = momList[j].calculatedChange
+            data[3] = momList[j].manualChange
+            data[4] = momList[j].sexuallyActiveMenMonthEndPer
+            data[5] = momList[j].sexuallyActiveMenMonthEnd
+            data[6] = momList[j].monthEnd
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("momJexcelPer"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Month',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "% of Sexually active men (Month Start)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Calculated Change (+/- %)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Manual Change (+/- %)",
+                    type: 'text',
+
+                },
+                {
+                    title: "% of Sexually active men (Month End)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Sexually active men (Month End)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Men who use condoms (Month End)",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedMomPer,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
+        this.el = momElPer;
+        this.setState({
+            momElPer: momElPer
+        }
+        );
+    };
+
+    loadedMomPer = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
+
     buildMomJexcel() {
         var momList = this.state.momList;
         var dataArray = [];
@@ -571,6 +703,21 @@ export default class CreateTreeTemplate extends Component {
             data, 0, 1
         );
     };
+    addRowJexcelPer() {
+        var elInstance = this.state.modelingPerEl;
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = "";
+        elInstance.insertRow(
+            data, 0, 1
+        );
+    }
     buildModelingJexcel() {
         var scalingList = [
             { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
@@ -699,6 +846,136 @@ export default class CreateTreeTemplate extends Component {
             });
         }
     }.bind(this)
+
+    buildModelingJexcelPercent() {
+        var scalingList = [
+            { transferToNode: 1, note: 'Growth', modelingType: 2, startDate: '2021-01-01', stopDate: '2021-12-01', percent: '12.0%', period: 1, calculatedChangeFormonth: '1.0%' },
+            { transferToNode: 1, note: 'Lost to follow up', modelingType: 2, startDate: '2022-01-01', stopDate: '2022-06-01', percent: '3.0%', period: 2, calculatedChangeFormonth: '0.0%' },
+            { transferToNode: 1, note: 'Lost to death', modelingType: 2, startDate: '2022-06-01', stopDate: '2022-12-01', percent: '0.3%', period: 4, calculatedChangeFormonth: '0.0%' },
+            // { transferToNode: 1, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
+            // { transferToNode: 1, note: 'Transfer from 1L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+        ]
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < scalingList.length; j++) {
+            data = [];
+            data[0] = scalingList[j].transferToNode
+            data[1] = scalingList[j].note
+            data[2] = scalingList[j].modelingType
+            data[3] = scalingList[j].startDate
+            data[4] = scalingList[j].stopDate
+            data[5] = scalingList[j].percent
+            data[6] = scalingList[j].period
+            data[7] = scalingList[j].calculatedChangeFormonth
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("modelingJexcelPercent"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Transfer to node',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "1 line ARV " },
+                        { id: 2, name: "1 line CON" },
+                        { id: 3, name: "3 line ARV" }
+                    ]
+                },
+                {
+                    title: "Note",
+                    type: 'text',
+
+                },
+                {
+                    title: 'Modeling type',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "Linear (#)" },
+                        { id: 2, name: "Linear (%)" },
+                        { id: 3, name: "Exponential (%)" },
+                    ]
+                },
+                {
+                    title: 'Start Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: 'Stop Date',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "(%)",
+                    type: 'text',
+                },
+                {
+                    title: "Period",
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: "Every year" },
+                        { id: 2, name: "Every 6 months" },
+                        { id: 3, name: "Every quarter" },
+                        { id: 4, name: "Every month" },
+                    ]
+                },
+                {
+                    title: "Calculated change for month",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedPer,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            oneditionend: this.onedit,
+            onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var modelingPerEl = jexcel(document.getElementById("modelingJexcelPercent"), options);
+        this.el = modelingPerEl;
+        this.setState({
+            modelingPerEl: modelingPerEl
+        }
+        );
+    }
+    loadedPer = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+    }
+    selected = function (instance, cell, x, y, value) {
+        if (y == 7) {
+            this.setState({
+                showCalculatorFields: true
+            });
+        }
+    }
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1999,7 +2276,16 @@ export default class CreateTreeTemplate extends Component {
             activeTab1: newArray,
         });
         if (tab == 2) {
-            this.buildModelingJexcel()
+            console.log("***>>>", this.state.currentItemConfig);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                this.setState({ showModelingJexcelNumber: true }, () => {
+                    this.buildModelingJexcel()
+                })
+            } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                this.setState({ showModelingJexcelPercent: true }, () => {
+                    this.buildModelingJexcelPercent()
+                })
+            }
         }
     }
 
@@ -2495,6 +2781,135 @@ export default class CreateTreeTemplate extends Component {
 
             bar = {
                 labels: [...new Set(this.state.momList.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
+                datasets: datasetsArr
+
+            };
+        }
+
+        var chartOptions1 = {
+            title: {
+                display: false,
+            },
+            scales: {
+                yAxes: [
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            stepSize: 100000
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 1
+                        },
+                        position: 'left',
+                        // scaleSteps : 100000
+                    },
+                    {
+                        id: 'B',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black'
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 0
+                        },
+                        position: 'right',
+                    }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+
+        let bar1 = {}
+        if (this.state.momListPer.length > 0) {
+            var datasetsArr = [];
+            datasetsArr.push({
+                label: 'Men who use condoms (Month End)',
+                stack: 1,
+                yAxisID: 'A',
+                backgroundColor: '#D3D3D3',
+                borderColor: grey,
+                pointBackgroundColor: grey,
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: grey,
+                data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEnd)),
+            }
+            )
+            datasetsArr.push(
+                {
+                    label: '% of sexually active men (Month End)',
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: '#006789',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: false,
+                    yAxisID: 'B',
+                    data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEndPer.replaceAll("%",'') > 0 ? item.sexuallyActiveMenMonthEndPer.replaceAll("%",'') : null))
+                }
+            )
+           
+
+            bar1 = {
+                labels: [...new Set(this.state.momListPer.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
                 datasets: datasetsArr
 
             };
@@ -3264,7 +3679,7 @@ export default class CreateTreeTemplate extends Component {
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
-                        
+
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
@@ -3293,176 +3708,204 @@ export default class CreateTreeTemplate extends Component {
                         </FormGroup>
 
                         <div>
-                            <div className="calculatorimg">
-                            <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
-                            </div>
-                            </div>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{color:'#fff'}}></i> View month by month data</Button>
-                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                            {this.state.showModelingJexcelNumber &&
+                                <> <div className="calculatorimg">
+                                    <div id="modelingJexcel" className={"RowClickable"}>
+                                    </div>
+                                </div>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                </>
+                            }
+                            {this.state.showModelingJexcelPercent &&
+                                <><div className="calculatorimg">
+                                    <div id="modelingJexcelPercent" className={"RowClickable"}>
+                                    </div>
+                                </div>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowJexcelPer()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                </>
+                            }
+
                         </div>
                         <div className="row">
-                        
-                        {this.state.showCalculatorFields &&
-                            <>
-                                {/* <div className="row"> */}
-                                <FormGroup className="col-md-12 pt-lg-1">
-                            <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
-                        </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
-                                    <Picker
-                                        ref={this.pickAMonth2}
-                                        years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
-                                        value={this.state.singleValue2}
-                                        lang={pickerLang.months}
-                                        onChange={this.handleAMonthChange2}
-                                        onDismiss={this.handleAMonthDissmis2}
-                                    >
-                                        <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-                                    </Picker>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        id="startValue"
-                                        name="startValue"
-                                        bsSize="sm"
 
-                                        value={'100,00'}>
-                                    </Input>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                {/* </div> */}
-                                {/* <div className="row"> */}
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
-                                    <Picker
-                                        ref={this.pickAMonth2}
-                                        years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
-                                        value={this.state.singleValue2}
-                                        lang={pickerLang.months}
-                                        onChange={this.handleAMonthChange2}
-                                        onDismiss={this.handleAMonthDissmis2}
-                                    >
-                                        <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-                                    </Picker>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Target Ending Value<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        id="startValue"
-                                        name="startValue"
-                                        bsSize="sm"
+                            {this.state.showCalculatorFields &&
+                                <>
+                                    {/* <div className="row"> */}
+                                    <FormGroup className="col-md-12 pt-lg-1">
+                                        <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
+                                        <Picker
+                                            ref={this.pickAMonth2}
+                                            years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                            value={this.state.singleValue2}
+                                            lang={pickerLang.months}
+                                            onChange={this.handleAMonthChange2}
+                                            onDismiss={this.handleAMonthDissmis2}
+                                        >
+                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                        </Picker>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startValue"
+                                            name="startValue"
+                                            bsSize="sm"
 
-                                        value={'2,200,000'}>
-                                    </Input>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        id="startValue"
-                                        name="startValue"
-                                        bsSize="sm"
+                                            value={'100,00'}>
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    {/* </div> */}
+                                    {/* <div className="row"> */}
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                        <Picker
+                                            ref={this.pickAMonth2}
+                                            years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
+                                            value={this.state.singleValue2}
+                                            lang={pickerLang.months}
+                                            onChange={this.handleAMonthChange2}
+                                            onDismiss={this.handleAMonthDissmis2}
+                                        >
+                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                        </Picker>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Target Ending Value<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startValue"
+                                            name="startValue"
+                                            bsSize="sm"
 
-                                        value={'5%'}>
-                                    </Input>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        id="startValue"
-                                        name="startValue"
-                                        bsSize="sm"
+                                            value={'2,200,000'}>
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startValue"
+                                            name="startValue"
+                                            bsSize="sm"
 
-                                        value={'1,200,000'}>
-                                    </Input>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
-                                    <Input type="text"
-                                        id="startValue"
-                                        name="startValue"
-                                        bsSize="sm"
-                                        readOnly={true}
-                                        value={""}>
-                                    </Input>
-                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                </FormGroup>
-                                <FormGroup className="col-md-6"></FormGroup>
-                                <FormGroup className="col-md-6" >
-                                    <div className="check inline  pl-lg-1 pt-lg-2">
-                                        <div className="col-md-12 form-group">
-                                            <Input
-                                                className="form-check-input"
-                                                type="radio"
-                                                id="active1"
-                                                name="active1"
-                                                // checked={false}
-                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                            />
-                                            <Label
-                                                className="form-check-label"
-                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                <b>{'Exponential (%)'}</b>
-                                            </Label>
+                                            value={'5%'}>
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startValue"
+                                            name="startValue"
+                                            bsSize="sm"
+
+                                            value={'1,200,000'}>
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startValue"
+                                            name="startValue"
+                                            bsSize="sm"
+                                            readOnly={true}
+                                            value={""}>
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6"></FormGroup>
+                                    <FormGroup className="col-md-6" >
+                                        <div className="check inline  pl-lg-1 pt-lg-2">
+                                            <div className="col-md-12 form-group">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="active1"
+                                                    name="active1"
+                                                    // checked={false}
+                                                    onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Exponential (%)'}</b>
+                                                </Label>
+                                            </div>
+                                            <div className="col-md-12 form-group">
+                                                <Input
+                                                    className="form-check-input Radioactive"
+                                                    type="radio"
+                                                    id="active2"
+                                                    name="active2"
+                                                    // checked={false}
+                                                    onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Linear (%)'}</b>
+                                                </Label>
+                                            </div>
+                                            <div className="col-md-12 form-group">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="active3"
+                                                    name="active3"
+                                                    // checked={false}
+                                                    onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Linear (#)'}</b>
+                                                </Label>
+                                            </div>
                                         </div>
-                                        <div className="col-md-12 form-group">
-                                            <Input
-                                                className="form-check-input Radioactive"
-                                                type="radio"
-                                                id="active2"
-                                                name="active2"
-                                                // checked={false}
-                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                            />
-                                            <Label
-                                                className="form-check-label"
-                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                <b>{'Linear (%)'}</b>
-                                            </Label>
-                                        </div>
-                                        <div className="col-md-12 form-group">
-                                            <Input
-                                                className="form-check-input"
-                                                type="radio"
-                                                id="active3"
-                                                name="active3"
-                                                // checked={false}
-                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                            />
-                                            <Label
-                                                className="form-check-label"
-                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                <b>{'Linear (#)'}</b>
-                                            </Label>
-                                        </div>
-                                    </div>
-                                </FormGroup>
-                                <FormGroup className="col-md-6">
-                                </FormGroup>
-                                <FormGroup className="col-md-12">
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
-                                
-                                </FormGroup>
-                                {/* </div> */}
-                            </>
-                        }
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                    </FormGroup>
+                                    <FormGroup className="col-md-12">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
+
+                                    </FormGroup>
+                                    {/* </div> */}
+                                </>
+                            }
                         </div>
                     </div>
                     {this.state.showMomData &&
                         <div>
-                            <div id="momJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                            <div id="momJexcel" className={"RowClickable"}>
                             </div>
                             <div className="col-md-12">
                                 <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
                                     <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                    <div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    {this.state.showMomDataPercent &&
+                        <div>
+                            <div id="momJexcelPer" className={"RowClickable"}>
+                            </div>
+                            <div className="col-md-12">
+                                <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                    <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
                                     <div>
 
                                     </div>
@@ -3717,7 +4160,7 @@ export default class CreateTreeTemplate extends Component {
 
 
                                     }
-                                    this.buildJexcelScalingTransfer();
+                                    // this.buildJexcelScalingTransfer();
                                 });
                                 // this.onAddButtonClick(itemConfig);
                             }}>
@@ -4167,7 +4610,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh',border:'1px solid #a7c6ed' }} >
+                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
