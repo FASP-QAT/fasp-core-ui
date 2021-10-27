@@ -205,7 +205,8 @@ class EquivalancyUnit extends Component {
                 data = [];
                 data[0] = papuList[j].equivalencyUnitId
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[2] = papuList[j].healthArea.id
+                // data[2] = papuList[j].healthArea.id
+                data[2] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
                 data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
                 data[4] = ''
                 data[5] = papuList[j].active
@@ -262,7 +263,8 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.program.healtharea'),
                     type: 'autocomplete',
                     source: this.state.technicalAreaList,
-                    filter: this.filterHealthArea
+                    filter: this.filterHealthArea,
+                    multiple: true,
                 },
                 {
                     title: i18n.t('static.healtharea.realm'),
@@ -494,17 +496,21 @@ class EquivalancyUnit extends Component {
 
     buildJexcel() {
         var papuList = this.state.selSource;
+
         var data = [];
         var papuDataArr = [];
 
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
+                // console.log("papuList-------->2", papuList[j].equivalencyUnit.healthAreaList.map(a => a.id));
+                // console.log("papuList-------->3", papuList[j].equivalencyUnit.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';'));
 
                 data = [];
                 data[0] = papuList[j].equivalencyUnitMappingId
                 data[1] = papuList[j].equivalencyUnit.equivalencyUnitId
-                data[2] = papuList[j].equivalencyUnit.healthArea.id
+                // data[2] = papuList[j].equivalencyUnit.healthArea.id
+                data[2] = papuList[j].equivalencyUnit.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
                 data[3] = papuList[j].tracerCategory.id
                 data[4] = papuList[j].forecastingUnit.id
 
@@ -572,6 +578,7 @@ class EquivalancyUnit extends Component {
                 {
                     title: i18n.t('static.program.healtharea'),
                     type: 'autocomplete',
+                    multiple: true,
                     // readOnly: true,
                     source: this.state.technicalAreaList,
                     filter: this.filterTechnicalAreaList
@@ -864,14 +871,33 @@ class EquivalancyUnit extends Component {
     filterTechnicalAreaList = function (instance, cell, c, r, source) {
         var selectedEquivalencyUnitId = (instance.jexcel.getJson(null, false)[r])[1];
         let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
-        console.log("selectedEqObj-------->", selectedEqObj);
-        let mylist = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id);
+        // console.log("selectedEqObj-------->", selectedEqObj);
+        let mylist = [];
+        let selectedHealthAreaList = selectedEqObj.healthAreaList;
+        for (let k = 0; k < selectedHealthAreaList.length; k++) {
+            mylist.push(this.state.technicalAreaList.filter(c => c.id == selectedHealthAreaList[k].id)[0]);
+        }
+        // console.log("selectedEqObj-------->", mylist);
+        // let mylist = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id);
         return mylist;
     }.bind(this)
 
     filterTracerCategoryList = function (instance, cell, c, r, source) {
-        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2];
-        let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
+        // var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2];
+        // let mylist = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId);
+        // return mylist;
+
+        var selectedHealthAreaId = (instance.jexcel.getJson(null, false)[r])[2].toString().split(';');
+        let mylist = [];
+        // console.log("mylist-------->0", (instance.jexcel.getJson(null, false)[r])[2]);
+        // console.log("mylist-------->1", selectedHealthAreaId);
+        for (let k = 0; k < selectedHealthAreaId.length; k++) {
+            let temp = this.state.tracerCategoryList.filter(c => c.healthArea.id == selectedHealthAreaId[k]);
+            for (let j = 0; j < temp.length; j++) {
+                mylist.push(temp[j]);
+            }
+        }
+        // console.log("mylist-------->2", mylist);
         return mylist;
     }.bind(this)
 
@@ -1344,7 +1370,7 @@ class EquivalancyUnit extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].equivalencyUnitId),
                             active: listArray[i].active,
-                            healthArea: listArray[i].healthArea
+                            healthAreaList: listArray[i].healthAreaList
                         }
                         tempList[i] = paJson
                     }
@@ -1609,13 +1635,19 @@ class EquivalancyUnit extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("8 map---" + map1.get("8"))
                 if (parseInt(map1.get("8")) === 1) {
+                    let equivalancyUnitSplit = elInstance.getValueFromCoords(2, i).split(';');
+                    let equivalencyUnitTempList = []
+                    for (let k = 0; k < equivalancyUnitSplit.length; k++) {
+                        equivalencyUnitTempList.push({ id: equivalancyUnitSplit[k] });
+                    }
                     let json = {
 
                         equivalencyUnitId: parseInt(map1.get("0")),
                         label: {
                             label_en: map1.get("1"),
                         },
-                        healthArea: { id: parseInt(map1.get("2")) },
+                        // healthArea: { id: parseInt(map1.get("2")) },
+                        healthAreaList: equivalencyUnitTempList,
                         active: map1.get("5"),
 
 
@@ -1846,15 +1878,16 @@ class EquivalancyUnit extends Component {
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
 
-            let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
-            if(selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined){
-                let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
-                let healthAreaId = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id)[0].id;
-                elInstance.setValueFromCoords(2, y, healthAreaId, true);//calculate
-            }else{
-                elInstance.setValueFromCoords(2, y, '', true);
-            }
-            
+            // let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
+            // if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
+            //     let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
+            //     let healthAreaId = this.state.technicalAreaList.filter(c => c.id == selectedEqObj.healthArea.id)[0].id;
+            //     elInstance.setValueFromCoords(2, y, healthAreaId, true);//calculate
+            // } else {
+            //     elInstance.setValueFromCoords(2, y, '', true);
+            // }
+
+            elInstance.setValueFromCoords(2, y, '', true);
             elInstance.setValueFromCoords(3, y, '', true);
             elInstance.setValueFromCoords(4, y, '', true);
             elInstance.setValueFromCoords(5, y, '', true);
