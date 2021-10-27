@@ -5073,9 +5073,11 @@ height: 0px;
 // .boxContactTemplate{
 //     opacity: 1!important;
 //     background-color: #fefefe!important;
-//     border-color: none!important;
-//     border-color: transparent!important;
-//     border-radius: 0px!important;
+//     // border-color: none!important;
+//     // border-radius: 6px !important;
+//     border-top: 2px solid #002f6c;
+//     // border-color: transparent!important;
+//     border-radius: 1px!important;
 //     box-shadow: 0 8px 16px #0000001f!important;
 // }
 .calculatorimg .jexcel>tbody>tr>td>img {
@@ -5084,3 +5086,6 @@ height: 0px;
 .Radioactive{
   margin-left: -20px!important;
 }
+// .ContactTitle i{
+//   color: #002f6c!important;
+// }

@@ -1491,7 +1491,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
-                            icon: 'fa fa-list-alt ',
+                            icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           
