@@ -949,8 +949,8 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            oneditionend: this.onedit,
-            onselection: this.selected,
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -969,13 +969,7 @@ export default class CreateTreeTemplate extends Component {
     loadedPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    selected = function (instance, cell, x, y, value) {
-        if (y == 7) {
-            this.setState({
-                showCalculatorFields: true
-            });
-        }
-    }
+    
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
