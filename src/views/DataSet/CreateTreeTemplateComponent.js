@@ -170,7 +170,8 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        {/* // <div className="ContactTemplate boxContactTemplate"> */}
             <div className="ContactTitleBackground"
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
@@ -517,6 +518,12 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loadedMom,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -650,6 +657,12 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -3245,12 +3258,13 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row">
+                    <div className="row pl-lg-2 pr-lg-2">
 
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
+                        
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
@@ -3262,10 +3276,10 @@ export default class CreateTreeTemplate extends Component {
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
                                 years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
@@ -3279,15 +3293,22 @@ export default class CreateTreeTemplate extends Component {
                         </FormGroup>
 
                         <div>
+                            <div className="calculatorimg">
                             <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                             </div>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-plus"></i>View month by month data</Button>
-                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-plus"></i>Save</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                            </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{color:'#fff'}}></i> View month by month data</Button>
+                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                         </div>
+                        <div className="row">
+                        
                         {this.state.showCalculatorFields &&
                             <>
                                 {/* <div className="row"> */}
+                                <FormGroup className="col-md-12 pt-lg-1">
+                            <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
+                        </FormGroup>
                                 <FormGroup className="col-md-6">
                                     <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                     <Picker
@@ -3375,8 +3396,8 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6"></FormGroup>
                                 <FormGroup className="col-md-6" >
-                                    <div className="check inline  pl-lg-1 pt-lg-3">
-                                        <div>
+                                    <div className="check inline  pl-lg-1 pt-lg-2">
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3391,9 +3412,9 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Exponential (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
-                                                className="form-check-input"
+                                                className="form-check-input Radioactive"
                                                 type="radio"
                                                 id="active2"
                                                 name="active2"
@@ -3406,7 +3427,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Linear (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3425,11 +3446,15 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
                                 </FormGroup>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Accept'}</Button>
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Close'}</Button>
+                                <FormGroup className="col-md-12">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                
+                                </FormGroup>
                                 {/* </div> */}
                             </>
                         }
+                        </div>
                     </div>
                     {this.state.showMomData &&
                         <div>
@@ -3518,7 +3543,7 @@ export default class CreateTreeTemplate extends Component {
                     opacity: 0,
                     borderColor: Colors.Gray,
                     fillColor: Colors.Gray,
-                    lineType: LineType.Solid
+                    lineType: LineType.Dotted
                 })
                 );
             }
@@ -3741,7 +3766,7 @@ export default class CreateTreeTemplate extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 190, height: 75 },
+                itemSize: { width: 200, height: 75 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 onItemRender: ({ context: itemConfig }) => {
@@ -4142,7 +4167,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh' }} >
+                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh',border:'1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>

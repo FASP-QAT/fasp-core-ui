@@ -460,7 +460,7 @@ label.arrow_label:after {
   position: absolute;
 }
 #active2 {
-  margin-left: 0rem !important;
+  margin-left: 0rem;
 }
 @media (min-width: 768px) {
   .tab-ml-1 {
@@ -5069,4 +5069,18 @@ height: 0px;
   }
   .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(3).readonly {
     text-align: left!important;
+}
+// .boxContactTemplate{
+//     opacity: 1!important;
+//     background-color: #fefefe!important;
+//     border-color: none!important;
+//     border-color: transparent!important;
+//     border-radius: 0px!important;
+//     box-shadow: 0 8px 16px #0000001f!important;
+// }
+.calculatorimg .jexcel>tbody>tr>td>img {
+  width: 21px!important;  
+}
+.Radioactive{
+  margin-left: -20px!important;
 }
