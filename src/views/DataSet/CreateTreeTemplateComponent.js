@@ -167,7 +167,8 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+        {/* // <div className="ContactTemplate boxContactTemplate"> */}
             <div className="ContactTitleBackground"
             >
                 <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
@@ -265,7 +266,9 @@ export default class CreateTreeTemplate extends Component {
         super();
         this.pickAMonth2 = React.createRef()
         this.state = {
+            showMomData: false,
             showCalculatorFields: false,
+            momEl: '',
             modelingEl: '',
             popoverOpen: false,
             unitList: [],
@@ -419,6 +422,7 @@ export default class CreateTreeTemplate extends Component {
         this.addRow = this.addRow.bind(this);
         this.toggle = this.toggle.bind(this);
         this.showMomData = this.showMomData.bind(this);
+        this.buildMomJexcel = this.buildMomJexcel.bind(this);
     }
 
 
@@ -429,8 +433,124 @@ export default class CreateTreeTemplate extends Component {
     }
 
     showMomData() {
-
+        this.setState({ showMomData: true }, () => {
+            this.buildMomJexcel();
+        });
     }
+    buildMomJexcel() {
+        var momList = [
+            { month: '2021-01-01', monthStartNoSeasonality: 2000000, calculatedChange: 21875, monthEndNoSeasonality: 2021875, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1415313 },
+            { month: '2021-02-01', monthStartNoSeasonality: 2021875, calculatedChange: 21875, monthEndNoSeasonality: 2043750, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1430625 },
+            { month: '2021-03-01', monthStartNoSeasonality: 2043750, calculatedChange: 21875, monthEndNoSeasonality: 2065625, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1445938 },
+            { month: '2021-04-01', monthStartNoSeasonality: 2065625, calculatedChange: 21875, monthEndNoSeasonality: 2087500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2087500 },
+            { month: '2021-05-01', monthStartNoSeasonality: 2087500, calculatedChange: 21875, monthEndNoSeasonality: 2109375, seasonalityIndex: '0%', manualChange: '', monthEnd: 2109375 },
+            { month: '2021-06-01', monthStartNoSeasonality: 2109375, calculatedChange: 21875, monthEndNoSeasonality: 2131250, seasonalityIndex: '0%', manualChange: '', monthEnd: 2131250 },
+            { month: '2021-07-01', monthStartNoSeasonality: 2131250, calculatedChange: 21875, monthEndNoSeasonality: 2153125, seasonalityIndex: '30%', manualChange: '', monthEnd: 2799063 },
+            { month: '2021-08-01', monthStartNoSeasonality: 2153125, calculatedChange: 21875, monthEndNoSeasonality: 2175000, seasonalityIndex: '30%', manualChange: '', monthEnd: 2827500 },
+            { month: '2021-09-01', monthStartNoSeasonality: 2175000, calculatedChange: 21875, monthEndNoSeasonality: 2196875, seasonalityIndex: '30%', manualChange: '', monthEnd: 2855938 },
+            { month: '2021-10-01', monthStartNoSeasonality: 2218750, calculatedChange: 21875, monthEndNoSeasonality: 2240625, seasonalityIndex: '0%', manualChange: '', monthEnd: 2240625 },
+            { month: '2021-11-01', monthStartNoSeasonality: 2240625, calculatedChange: 21875, monthEndNoSeasonality: 2262500, seasonalityIndex: '0%', manualChange: '', monthEnd: 2262500 },
+            { month: '2021-12-01', monthStartNoSeasonality: 2262500, calculatedChange: 21875, monthEndNoSeasonality: 2284375, seasonalityIndex: '-30%', manualChange: '', monthEnd: 1599063 },
+
+        ]
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < momList.length; j++) {
+            data = [];
+            data[0] = momList[j].month
+            data[1] = momList[j].monthStartNoSeasonality
+            data[2] = momList[j].calculatedChange
+            data[3] = momList[j].monthEndNoSeasonality
+            data[4] = momList[j].seasonalityIndex
+            data[5] = momList[j].manualChange
+            data[6] = momList[j].monthEnd
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("momJexcel"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Month',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "Month Start (no seasonality)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Calculated change (+/-)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Monthly End (no seasonality)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Seasonality index",
+                    type: 'text',
+                },
+                {
+                    title: "Manual Change (+/-)",
+                    type: 'text',
+
+                },
+                {
+                    title: "Month End",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedMom,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var momEl = jexcel(document.getElementById("momJexcel"), options);
+        this.el = momEl;
+        this.setState({
+            momEl: momEl
+        }
+        );
+    };
+
+    loadedMom = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance,1);
+    }
+
     addRow = function () {
         var elInstance = this.state.modelingEl;
         var data = [];
@@ -533,6 +653,12 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -3030,12 +3156,13 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row">
+                    <div className="row pl-lg-2 pr-lg-2">
 
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
+                        
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
@@ -3047,10 +3174,10 @@ export default class CreateTreeTemplate extends Component {
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
                         </FormGroup>
-                        <FormGroup className="col-md-2">
+                        <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4">
+                        <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
                                 years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
@@ -3064,15 +3191,22 @@ export default class CreateTreeTemplate extends Component {
                         </FormGroup>
 
                         <div>
+                            <div className="calculatorimg">
                             <div id="modelingJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
                             </div>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-plus"></i>View month by month data</Button>
-                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-plus"></i>Save</Button>
-                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                            </div>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{color:'#fff'}}></i> View month by month data</Button>
+                            <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                         </div>
+                        <div className="row">
+                        
                         {this.state.showCalculatorFields &&
                             <>
                                 {/* <div className="row"> */}
+                                <FormGroup className="col-md-12 pt-lg-1">
+                            <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
+                        </FormGroup>
                                 <FormGroup className="col-md-6">
                                     <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                     <Picker
@@ -3160,8 +3294,8 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6"></FormGroup>
                                 <FormGroup className="col-md-6" >
-                                    <div className="check inline  pl-lg-1 pt-lg-3">
-                                        <div>
+                                    <div className="check inline  pl-lg-1 pt-lg-2">
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3176,9 +3310,9 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Exponential (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
-                                                className="form-check-input"
+                                                className="form-check-input Radioactive"
                                                 type="radio"
                                                 id="active2"
                                                 name="active2"
@@ -3191,7 +3325,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <b>{'Linear (%)'}</b>
                                             </Label>
                                         </div>
-                                        <div>
+                                        <div className="col-md-12 form-group">
                                             <Input
                                                 className="form-check-input"
                                                 type="radio"
@@ -3210,12 +3344,21 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
                                 </FormGroup>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Accept'}</Button>
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {'Close'}</Button>
+                                <FormGroup className="col-md-12">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                
+                                </FormGroup>
                                 {/* </div> */}
                             </>
                         }
+                        </div>
                     </div>
+                    {this.state.showMomData && <div className="pt-lg-2">
+                        <div id="momJexcel" className={"jexcelremoveReadonlybackground RowClickable"}>
+                        </div>
+                    </div>
+                    }
                 </TabPane>
 
             </>
@@ -3289,7 +3432,7 @@ export default class CreateTreeTemplate extends Component {
                     opacity: 0,
                     borderColor: Colors.Gray,
                     fillColor: Colors.Gray,
-                    lineType: LineType.Solid
+                    lineType: LineType.Dotted
                 })
                 );
             }
@@ -3512,7 +3655,7 @@ export default class CreateTreeTemplate extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 190, height: 75 },
+                itemSize: { width: 200, height: 75 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 onItemRender: ({ context: itemConfig }) => {
@@ -3913,7 +4056,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh' }} >
+                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh',border:'1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
