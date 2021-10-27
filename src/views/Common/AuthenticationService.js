@@ -1313,6 +1313,7 @@ class AuthenticationService {
                     case "/dataset/listTreeTemplate/:color/:message":
                     case "/dataSet/buildTree/template/:templateId":
                     case "/dataset/listTree/:color/:message":
+                    case "/dataset/versionSettings":
                         if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                             return true;
                         }
