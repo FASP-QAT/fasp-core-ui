@@ -3467,7 +3467,7 @@ export default class CreateTreeTemplate extends Component {
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
+                        <button key="1" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -3621,7 +3621,7 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
+                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
@@ -3631,7 +3631,7 @@ export default class CreateTreeTemplate extends Component {
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
+                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px'}}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
