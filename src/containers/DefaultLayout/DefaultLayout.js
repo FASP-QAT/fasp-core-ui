@@ -285,6 +285,7 @@ const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponen
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
+const VersionSettingsComponent = React.lazy(() => import('../../views/DataSet/VersionSettingsComponent'));
 
 
 const AddDataSet = React.lazy(() => import('../../views/DataSet/AddDataSet'));
@@ -293,6 +294,7 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/dataset/versionSettings', name: 'Version Settings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
@@ -1466,7 +1468,13 @@ class DefaultLayout extends Component {
                             url: '/dataset/listTreeTemplate',
                             icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          }
+                          },
+                          {
+                            name: 'Version Settings',
+                            url: '/dataset/versionSettings',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                         ]
                       },
                       {
