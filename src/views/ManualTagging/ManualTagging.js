@@ -3013,8 +3013,8 @@ export default class ManualTagging extends Component {
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1" style={{color:'#BA0C2F'}}>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2" style={{color:'#BA0C2F'}}>{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <div className="Card-header-reporticon">
