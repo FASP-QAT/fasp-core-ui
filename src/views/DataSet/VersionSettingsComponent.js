@@ -132,7 +132,35 @@ export default class VersionSettingsComponent extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.getDatasetList = this.getDatasetList.bind(this);
 
+    }
+    getDatasetList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    datasetList: myResult
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
