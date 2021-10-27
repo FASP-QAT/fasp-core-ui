@@ -167,14 +167,14 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-        {/* // <div className="ContactTemplate boxContactTemplate"> */}
-            <div className="ContactTitleBackground"
+        // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+         <div className="ContactTemplate boxContactTemplate"> 
+            <div className="ContactTitleBackground" style={{background:'#a7c6ed',border:'none',borderRadius:'0px'}}
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
+                <div className="ContactTitle" style={{ color:'#002f6c'}}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
-                <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
+                <span style={{ textAlign: 'center', fontWeight: '500',marginTop:'4px' }}>{getPayloadData(itemConfig, 1)}</span>
                 <div style={{overflow: 'inherit',fontStyle:'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
         </div>
@@ -3467,7 +3467,7 @@ export default class CreateTreeTemplate extends Component {
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        <button key="1" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -3610,7 +3610,8 @@ export default class CreateTreeTemplate extends Component {
                                 });
                                 // this.onAddButtonClick(itemConfig);
                             }}>
-                            <FontAwesomeIcon icon={faPlus} />
+                            {/* <FontAwesomeIcon icon={faPlus} /> */}
+                            <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                         </button>}
                     {/* <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
                         onClick={(event) => {
@@ -3620,16 +3621,17 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
-                                <FontAwesomeIcon icon={faCopy} />
+                                {/* <FontAwesomeIcon icon={faCopy} /> */}
+                                <i class="fa fa-clone" aria-hidden="true"></i>
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px',border:'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -3647,7 +3649,8 @@ export default class CreateTreeTemplate extends Component {
                                         ]
                                     });
                                 }}>
-                                <FontAwesomeIcon icon={faTrash} />
+                                {/* <FontAwesomeIcon icon={faTrash} /> */}
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
                             </button></>}
 
                 </>
