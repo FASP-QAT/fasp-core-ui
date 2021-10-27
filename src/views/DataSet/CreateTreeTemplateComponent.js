@@ -3673,8 +3673,16 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                    <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
+                    <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <a className="">
+                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+                                    
+                                </a>
+                        </div> 
+                    </div>
                     <div className="row pl-lg-2 pr-lg-2">
-
+                        
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
@@ -3887,10 +3895,59 @@ export default class CreateTreeTemplate extends Component {
                     </div>
                     {this.state.showMomData &&
                         <div>
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="col-md-5">
+                                    <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                    </div>
+                                    <div className="col-md-5 float-right pl-lg-5">
+                                    <FormGroup className="" >
+                                                                    <div className="check inline  pl-lg-1 pt-lg-0">
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="active6"
+                                                                                name="active6"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Does manual changes affect future month'}</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                id="active7"
+                                                                                name="active7"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Show Seasonality'}</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                    </div>
+                                                                </FormGroup>
+                                    </div>
+                                </div>
                             <div id="momJexcel" className={"RowClickable"}>
                             </div>
-                            <div className="col-md-12">
-                                <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                            <div className="col-md-12 pr-lg-0">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+
+                                    </div>
+                                    </div>
+
+                            <div className="row pl-lg-0 pt-lg-3">
+                                <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
                                     <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                     <div>
 
@@ -3901,10 +3958,18 @@ export default class CreateTreeTemplate extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div>
+                            <div className="row">
                             <div id="momJexcelPer" className={"RowClickable"}>
                             </div>
-                            <div className="col-md-12">
-                                <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                            <div className="col-md-12 pr-lg-0">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+
+                                    </div>
+                                    </div>
+
+                            <div className="row pl-lg-0 pt-lg-3">
+                                <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
                                     <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
                                     <div>
 
