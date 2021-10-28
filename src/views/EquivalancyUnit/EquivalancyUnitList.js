@@ -140,9 +140,9 @@ class EquivalancyUnit extends Component {
         console.log("LOG---------->2", elInstance);
 
         //Equivalancy Unit
-        if (x == 1) {
+        if (x == 2) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
+            var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -160,10 +160,10 @@ class EquivalancyUnit extends Component {
         }
 
         //HealthArea
-        if (x == 2) {
+        if (x == 1) {
             console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
+            var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -204,9 +204,10 @@ class EquivalancyUnit extends Component {
 
                 data = [];
                 data[0] = papuList[j].equivalencyUnitId
-                data[1] = getLabelText(papuList[j].label, this.state.lang)
+                data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+                data[2] = getLabelText(papuList[j].label, this.state.lang)
                 // data[2] = papuList[j].healthArea.id
-                data[2] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+
                 data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
                 data[4] = ''
                 data[5] = papuList[j].active
@@ -254,18 +255,19 @@ class EquivalancyUnit extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
-                    type: 'text',
-                    // readOnly: true
-                    textEditor: true,
-                },
-                {
                     title: i18n.t('static.program.healtharea'),
                     type: 'autocomplete',
                     source: this.state.technicalAreaList,
                     filter: this.filterHealthArea,
                     multiple: true,
                 },
+                {
+                    title: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                    type: 'text',
+                    // readOnly: true
+                    textEditor: true,
+                },
+
                 {
                     title: i18n.t('static.healtharea.realm'),
                     type: 'text',
@@ -314,13 +316,13 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     } else {
                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
 
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     }
                 }
@@ -579,7 +581,7 @@ class EquivalancyUnit extends Component {
                     title: i18n.t('static.program.healtharea'),
                     type: 'autocomplete',
                     multiple: true,
-                    // readOnly: true,
+                    readOnly: true,
                     source: this.state.technicalAreaList,
                     filter: this.filterTechnicalAreaList
                 },
@@ -667,8 +669,8 @@ class EquivalancyUnit extends Component {
                     var typeId = rowData[14];
                     // console.log("updateTable------>", rowData[11]);
                     if (forecastingUnitId == 0) {
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell1.classList.remove('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
@@ -687,8 +689,8 @@ class EquivalancyUnit extends Component {
 
 
                     } else {
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -713,8 +715,8 @@ class EquivalancyUnit extends Component {
                     if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
 
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -752,8 +754,8 @@ class EquivalancyUnit extends Component {
 
 
                     if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -1635,19 +1637,19 @@ class EquivalancyUnit extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("8 map---" + map1.get("8"))
                 if (parseInt(map1.get("8")) === 1) {
-                    let equivalancyUnitSplit = elInstance.getValueFromCoords(2, i).split(';');
-                    let equivalencyUnitTempList = []
-                    for (let k = 0; k < equivalancyUnitSplit.length; k++) {
-                        equivalencyUnitTempList.push({ id: equivalancyUnitSplit[k] });
+                    let healthAreaSplit = elInstance.getValueFromCoords(1, i).split(';');
+                    let healthAreaTempList = []
+                    for (let k = 0; k < healthAreaSplit.length; k++) {
+                        healthAreaTempList.push({ id: healthAreaSplit[k] });
                     }
                     let json = {
 
                         equivalencyUnitId: parseInt(map1.get("0")),
                         label: {
-                            label_en: map1.get("1"),
+                            label_en: map1.get("2"),
                         },
                         // healthArea: { id: parseInt(map1.get("2")) },
-                        healthAreaList: equivalencyUnitTempList,
+                        healthAreaList: healthAreaTempList,
                         active: map1.get("5"),
 
 
@@ -1887,7 +1889,18 @@ class EquivalancyUnit extends Component {
             //     elInstance.setValueFromCoords(2, y, '', true);
             // }
 
-            elInstance.setValueFromCoords(2, y, '', true);
+
+            let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
+            if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
+                let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
+                console.log("selectedEqObj--------->", selectedEqObj);
+                let healthAreaList = selectedEqObj.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+                elInstance.setValueFromCoords(2, y, healthAreaList, true);//calculate
+            } else {
+                elInstance.setValueFromCoords(2, y, '', true);
+            }
+
+            // elInstance.setValueFromCoords(2, y, '', true);
             elInstance.setValueFromCoords(3, y, '', true);
             elInstance.setValueFromCoords(4, y, '', true);
             elInstance.setValueFromCoords(5, y, '', true);
@@ -1909,28 +1922,28 @@ class EquivalancyUnit extends Component {
 
 
         //HealthArea
-        if (x == 2) {
-            // console.log("LOG---------->2", value);
-            var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
-            elInstance.setValueFromCoords(3, y, '', true);
-            elInstance.setValueFromCoords(4, y, '', true);
-            elInstance.setValueFromCoords(5, y, '', true);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(budgetRegx.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
+        // if (x == 2) {
+        //     // console.log("LOG---------->2", value);
+        //     var budgetRegx = /^\S+(?: \S+)*$/;
+        //     var col = ("C").concat(parseInt(y) + 1);
+        //     elInstance.setValueFromCoords(3, y, '', true);
+        //     elInstance.setValueFromCoords(4, y, '', true);
+        //     elInstance.setValueFromCoords(5, y, '', true);
+        //     if (value == "") {
+        //         elInstance.setStyle(col, "background-color", "transparent");
+        //         elInstance.setStyle(col, "background-color", "yellow");
+        //         elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         if (!(budgetRegx.test(value))) {
+        //             elInstance.setStyle(col, "background-color", "transparent");
+        //             elInstance.setStyle(col, "background-color", "yellow");
+        //             elInstance.setComments(col, i18n.t('static.message.spacetext'));
+        //         } else {
+        //             elInstance.setStyle(col, "background-color", "transparent");
+        //             elInstance.setComments(col, "");
+        //         }
+        //     }
+        // }
 
 
         //Tracer Category
@@ -2050,10 +2063,10 @@ class EquivalancyUnit extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = elInstance.getValueFromCoords(8, y);
             if (parseInt(value) == 1) {
-                //UsagePeriod
+                //Equivalency unit
                 var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(1, y);
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
                 console.log("value-----", value);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -2074,8 +2087,8 @@ class EquivalancyUnit extends Component {
 
 
                 //HealthAreaId
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -2115,17 +2128,17 @@ class EquivalancyUnit extends Component {
                 }
 
                 //HealthArea
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
+                // var col = ("C").concat(parseInt(y) + 1);
+                // var value = elInstance.getValueFromCoords(2, y);
+                // if (value == "") {
+                //     elInstance.setStyle(col, "background-color", "transparent");
+                //     elInstance.setStyle(col, "background-color", "yellow");
+                //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     elInstance.setStyle(col, "background-color", "transparent");
+                //     elInstance.setComments(col, "");
+                // }
 
                 //TracerCategory
                 var col = ("D").concat(parseInt(y) + 1);

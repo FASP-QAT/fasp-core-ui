@@ -981,6 +981,30 @@ label.arrow_label:after {
   content: "*" !important; 
 font-size: 14px;
 }
+
+.jexcel > thead.resizable > tr > .CalculatorTheadtr::after {
+//   position: relative;
+//    width: 3px;
+//    height: 100%;
+//    color: #BA0C2F; 
+//    top: 0px;
+//    left: 2px;
+//    cursor: col-resize;
+//    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+//  font-size: 14px;
+
+font-family: 'FontAwesome';
+content: '\f1ec';
+  position: relative;
+   width: 3px;
+   height: 100%;
+  //  color: #BA0C2F; 
+   top: 0px;
+   left: 2px;
+   cursor: col-resize;
+   font-size: 14px;
+ }
+
 // Multiselect selectcontrol border none
 .Selectcontrol-bdrNone .Select .Select-control {
   border: none !important;

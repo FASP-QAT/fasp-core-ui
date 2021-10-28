@@ -58,7 +58,7 @@ const validationSchema = function (values) {
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .matches(/^(?=.*[1-9])\d{1,10}$/, i18n.t('static.program.validvaluetext'))
             .required(i18n.t('static.label.fieldRequired'))
-            // .min(1, i18n.t('static.program.validvaluetext'))
+        // .min(1, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -1651,6 +1651,10 @@ class usageTemplate extends Component {
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
+
+        tr.children[16].classList.add('CalculatorTheadtr');
+        tr.children[17].classList.add('CalculatorTheadtr');
+        tr.children[18].classList.add('CalculatorTheadtr');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -2530,7 +2534,8 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
-                            <h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
+                            <h5 className="red">{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
+                            <span className=""><i class="fa fa-calculator" aria-hidden="true"></i><h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
