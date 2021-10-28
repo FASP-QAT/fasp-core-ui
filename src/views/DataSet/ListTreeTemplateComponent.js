@@ -75,12 +75,12 @@ export default class ListTreeTemplate extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: 'Template name',
+                    title: 'Template Name',
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Forecast method',
+                    title: 'Forecast Method',
                     type: 'text',
                     readOnly: true
                 },

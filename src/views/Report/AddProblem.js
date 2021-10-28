@@ -137,7 +137,7 @@ class AddRoleComponent extends Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson1 = JSON.parse(programData);
             var programJson = {
@@ -265,7 +265,7 @@ class AddRoleComponent extends Component {
               })
             }.bind(this);
             programRequest.onsuccess = function (event) {
-              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
               var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
               var programJson = JSON.parse(programData);
 
@@ -341,7 +341,7 @@ class AddRoleComponent extends Component {
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         let username = decryptedUser.username;
 
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
         // console.log("programJson===>", programJson);
@@ -491,7 +491,7 @@ class AddRoleComponent extends Component {
                 var problemOs = problemTransaction.objectStore('programData');
                 var paList = problemActionList.filter(c => c.program.id == programObj.programId)
                 programObj.problemReportList = paList;
-                programRequestList.programData = (CryptoJS.AES.encrypt(JSON.stringify(programObj), SECRET_KEY)).toString();
+                programRequestList.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programObj), SECRET_KEY)).toString();
                 var putRequest = problemOs.put(programRequestList);
                 putRequest.onerror = function (event) {
                   this.setState({

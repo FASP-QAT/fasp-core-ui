@@ -15,7 +15,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody,PopoverBody,Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -174,7 +174,7 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
             </div>
             <div className="ContactPhone" style={{ color: Colors.Black }}>
                 <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ marginTop: '10px', overflow: 'inherit', width: '132px' }}><p className="float-lg-right pl-lg-5" style={{ textAlign: 'right' }}>{getPayloadData(itemConfig, 2)}</p></div>
+                <div style={{ overflow: 'inherit',fontStyle:'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
             git        </div>
     ))
@@ -261,6 +261,7 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            popoverOpen: false,
             regionValues: [],
             selectedScenario: '',
             selectedScenarioLabel: '',
@@ -441,7 +442,15 @@ export default class BuildTree extends Component {
         this.getScenarioList = this.getScenarioList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
+        this.getTreeTemplateById = this.getTreeTemplateById.bind(this);
+        this.toggle = this.toggle.bind(this);
     }
+    toggle() {
+        this.setState({
+          popoverOpen: !this.state.popoverOpen,
+        });
+      }
+
     exportPDF = () => {
         console.log("download pdf");
         const addFooters = doc => {
@@ -539,7 +548,36 @@ export default class BuildTree extends Component {
             console.log("regionLabels---", this.state.regionLabels);
         })
     }
+    getTreeTemplateById(treeTemplateId) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['treeTemplate'], 'readwrite');
+            var program = transaction.objectStore('treeTemplate');
+            var getRequest = program.getAll();
 
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                console.log("tree template myresult---", myResult)
+                this.setState({
+                    treeTemplate: myResult.filter(x => x.treeTemplateId == treeTemplateId)[0]
+                }, () => {
+                    console.log("tree template obj---", this.state.treeTemplate)
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("treeTemplateList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
+    }
 
     getTreeByTreeId(treeId) {
         console.log("treeId---", treeId)
@@ -1106,7 +1144,7 @@ export default class BuildTree extends Component {
 
             var autocompleteData = [];
             for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + " | " + response.data[i].label.label_en }
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " ["+response.data[i].forecastingUnitId +"]" }
             }
             this.setState({
                 autocompleteData,
@@ -1575,6 +1613,7 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             this.getTreeList();
+            this.getTreeTemplateById(this.props.match.params.templateId);
             this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
@@ -2712,8 +2751,13 @@ export default class BuildTree extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
+                                    <div>
+                                    <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                                         <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                    </Popover>
+                                    </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{color:'#5c6873',cursor:'pointer'}}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -2796,6 +2840,7 @@ export default class BuildTree extends Component {
                                                 <Input type="text"
                                                     id="percentageOfParent"
                                                     name="percentageOfParent"
+                                                    bsSize="sm"
                                                     // valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue != ''}
                                                     // invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                     // onBlur={handleBlur}
@@ -2809,6 +2854,7 @@ export default class BuildTree extends Component {
                                                 <Input type="text"
                                                     id="parentValue"
                                                     name="parentValue"
+                                                    bsSize="sm"
                                                     readOnly={true}
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={this.state.addNodeFlag != "true" ? addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue) : addCommas(this.state.parentValue)}
@@ -2820,6 +2866,7 @@ export default class BuildTree extends Component {
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
+                                                bsSize="sm"
                                                 // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) != ''}
                                                 // invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
@@ -2848,7 +2895,7 @@ export default class BuildTree extends Component {
                                         <div>
                                             <div className="row">
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
 
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
@@ -3056,7 +3103,7 @@ export default class BuildTree extends Component {
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
                                         <div className="row">
 
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
@@ -3067,11 +3114,34 @@ export default class BuildTree extends Component {
                                                     required
                                                     value={!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id : ''}
                                                 >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="">{i18n.t('static.common.selecttracercategory')}</option>
                                                     {this.state.tracerCategoryList.length > 0
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.tracerCategoryId}>
+                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+                                                </Input>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">Copy from Template</Label>
+                                                <Input
+                                                    type="select"
+                                                    name="usageTemplateId"
+                                                    id="usageTemplateId"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.copyDataFromUsageTemplate(e); this.dataChange(e) }}
+                                                    required
+                                                    value={this.state.usageTemplateId}
+                                                >
+                                                    <option value="">{i18n.t('static.common.selecttemplate')}</option>
+                                                    {this.state.usageTemplateList.length > 0
+                                                        && this.state.usageTemplateList.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.usageTemplateId}>
                                                                     {getLabelText(item.label, this.state.lang)}
                                                                 </option>
                                                             )
@@ -3089,7 +3159,7 @@ export default class BuildTree extends Component {
                                                         defaultValue={{ value: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en : '') }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        style={{ width: 312 }}
+                                                        style={{ width: 730 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
                                                             (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = value.value;
@@ -3107,30 +3177,8 @@ export default class BuildTree extends Component {
 
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="currencyId">Copy from Template</Label>
-                                                <Input
-                                                    type="select"
-                                                    name="usageTemplateId"
-                                                    id="usageTemplateId"
-                                                    bsSize="sm"
-                                                    onChange={(e) => { this.copyDataFromUsageTemplate(e); this.dataChange(e) }}
-                                                    required
-                                                    value={this.state.usageTemplateId}
-                                                >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                    {this.state.usageTemplateList.length > 0
-                                                        && this.state.usageTemplateList.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.usageTemplateId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                            </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Type<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="usageTypeIdFU"
@@ -3385,7 +3433,7 @@ export default class BuildTree extends Component {
                                                         </tr>
                                                     </table>}
                                             </div>
-                                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
+                                            <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
                                         </div>
                                     </div>}
                                     {/* disabled={!isValid} */}
@@ -3694,8 +3742,8 @@ export default class BuildTree extends Component {
                                 <Formik
                                     enableReinitialize={true}
                                     initialValues={{
-                                        forecastMethodId: this.state.treeTemplate.forecastMethod.id,
-                                        treeName: this.state.treeTemplate.label.label_en
+                                        // forecastMethodId: this.state.curTreeObj.forecastMethod.id,
+                                        // treeName: this.state.curTreeObj.label.label_en
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -4128,7 +4176,7 @@ export default class BuildTree extends Component {
                             required
                             value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
                         >
-                            <option value="-1">Nothing Selected</option>
+                            <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
                             {forecastMethods}
                         </Input>
                     </FormGroup>
@@ -4153,7 +4201,7 @@ export default class BuildTree extends Component {
                                 value={regionMultiList}
                                 onChange={(e) => { this.handleRegionChange(e) }}
                                 options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                labelledBy={i18n.t('static.common.select')}
+                                labelledBy={i18n.t('static.common.regiontext')}
                             />
                         </div>
                     </FormGroup>
