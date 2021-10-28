@@ -65,7 +65,7 @@ export default class VersionSettingsComponent extends Component {
         })
 
         console.log("versionSettingsList---", versionSettingsList);
-        this.setState({ versionSettingsList });
+        this.setState({ versionSettingsList }, () => { this.buildJExcel() });
     }
     getVersionTypeList() {
         var db1;
@@ -111,10 +111,20 @@ export default class VersionSettingsComponent extends Component {
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
+                var proList = [];
                 myResult = getRequest.result;
                 console.log("myResult---", myResult)
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                console.log("userId---", userId);
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("inside for---", myResult[i]);
+                    if (myResult[i].userId == userId) {
+                        proList.push(myResult[i])
+                    }
+                }
                 this.setState({
-                    datasetList: myResult
+                    datasetList: proList
                 });
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("datasetList--->", myResult[i])
@@ -195,31 +205,51 @@ export default class VersionSettingsComponent extends Component {
 
     buildJExcel() {
         let versionSettingsList = this.state.versionSettingsList;
-        // console.log("programList---->", programList);
+        console.log("versionSettingsList---->", versionSettingsList.length);
         let versionSettingsArray = [];
         let count = 0;
 
         for (var j = 0; j < versionSettingsList.length; j++) {
+            console.log("versionSettingsList[j]---", versionSettingsList[j]);
+            var versionList = versionSettingsList[j].programData.versionList;
+            console.log("versionList---", versionList);
             data = [];
-            data[0] = versionSettingsList[j].programId
-            data[1] = versionSettingsList[j].programCode
-            data[2] = versionSettingsList[j].versionId
-            data[3] = versionSettingsList[j].versionType;
-            data[4] = versionSettingsList[j].datasetDescription
-            data[5] = versionSettingsList[j].dateCommitted
-            data[6] = versionSettingsList[j].committedByUser
-            data[7] = versionSettingsList[j].forecastStart
-            data[8] = versionSettingsList[j].forecastEnd
-
-
-            versionSettingsArray[count] = data;
-            count++;
+            if (j == 0) {
+                console.log("inside if-----------");
+                data[0] = versionSettingsList[j].programId
+                data[1] = versionSettingsList[j].programCode
+                data[2] = versionSettingsList[j].programData.currentVersion.versionId+"(Local)"
+                data[3] = '';
+                data[4] = ''
+                data[5] = ''
+                data[6] = ''
+                data[7] = versionSettingsList[j].programData.currentVersion.forecastStartDate
+                data[8] = versionSettingsList[j].programData.currentVersion.forecastStopDate
+                versionSettingsArray[count] = data;
+                count++;
+            }
+            for (var k = 0; k < versionList.length; k++) {
+                data = [];
+                console.log("count----1>", count);
+                data[0] = versionSettingsList[j].programId
+                data[1] = versionSettingsList[j].programCode
+                data[2] = versionList[j].versionId
+                data[3] = getLabelText(versionList[j].versionType.label, this.state.lang);
+                data[4] = versionList[j].notes
+                data[5] = versionList[j].createdDate
+                data[6] = versionList[j].createdBy.username
+                data[7] = versionList[j].forecastStartDate
+                data[8] = versionList[j].forecastStopDate
+                versionSettingsArray[count] = data;
+                count++;
+                console.log("versionSettingsArray----2>", versionSettingsArray);
+            }
         }
         // if (programList.length == 0) {
         //   data = [];
         //   programArray[0] = data;
         // }
-        // console.log("programArray---->", programArray);
+        // console.log("versionSettingsArray---->", versionSettingsArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var json = [];
@@ -256,8 +286,13 @@ export default class VersionSettingsComponent extends Component {
                 },
                 {
                     title: 'Date Committed',
-                    type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    type: 'calendar',
+                    options: {
+                        format: JEXCEL_DATE_FORMAT_SM
+                    }
+
+
                 },
                 {
                     title: 'Commited by User',
