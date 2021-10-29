@@ -1564,29 +1564,29 @@ class ShipmentSummery extends Component {
                         // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         // var programJson = JSON.parse(programData);
-                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                        
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+
 
                         let data = [];
                         let planningUnitFilter = [];
                         for (let i = 0; i < planningUnitIds.length; i++) {
 
                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitIds[i]);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitIds[i]))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
+                            var programJson = {}
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitIds[i]))[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
                             }
-                        }
 
                             var shipmentList = (programJson.shipmentList);
 
@@ -1598,7 +1598,7 @@ class ShipmentSummery extends Component {
                             // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
                             let dateFilter = activeFilter.filter(c => (c.receivedDate == null || c.receivedDate === '') ? (c.expectedDeliveryDate >= moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <= moment(endDate).format('YYYY-MM-DD')) : (c.receivedDate >= moment(startDate).format('YYYY-MM-DD') && c.receivedDate <= moment(endDate).format('YYYY-MM-DD')))
                             console.log('dateFilter', dateFilter)
-    
+
                             for (let j = 0; j < dateFilter.length; j++) {
                                 if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
                                     planningUnitFilter.push(dateFilter[j]);
@@ -2485,6 +2485,7 @@ class ShipmentSummery extends Component {
                                                                     { label: item.fundingSourceCode, value: item.fundingSourceId }
                                                                 )
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
