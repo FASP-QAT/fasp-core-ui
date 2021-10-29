@@ -1874,6 +1874,7 @@ export default class StockStatusMatrix extends React.Component {
                       bsSize="sm"
                       value={this.state.tracerCategoryValues}
                       onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                      disabled={this.state.loading}
                       options=
                       {tracerCategories.length > 0 ?
                         tracerCategories.map((item, i) => {

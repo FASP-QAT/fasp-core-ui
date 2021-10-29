@@ -1814,6 +1814,7 @@ class SupplierLeadTimes extends Component {
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
@@ -1830,6 +1831,7 @@ class SupplierLeadTimes extends Component {
                                             value={this.state.procurementAgenttValues}
                                             onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                             options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
+                                            disabled={this.state.loading}
                                         />
                                     </div>
                                 </FormGroup>
