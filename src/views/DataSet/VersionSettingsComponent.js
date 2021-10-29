@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Button} from 'reactstrap';
+import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Button } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -9,12 +9,12 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { jExcelLoadedFunction} from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 import MultiSelect from 'react-multi-select-component';
-import CryptoJS from 'crypto-js'
+import CryptoJS from 'crypto-js';
 
-const entityname = i18n.t('static.program.programMaster');
+const entityname = i18n.t('static.versionSettings.versionSettings');
 export default class VersionSettingsComponent extends Component {
 
     constructor(props) {
@@ -211,9 +211,9 @@ export default class VersionSettingsComponent extends Component {
                     transaction.oncomplete = function (event) {
                         this.setState({
                             loading: false,
-                            message: 'Data updated successfully.',
+                            message: i18n.t('static.mt.dataUpdateSuccess'),
                             color: "green",
-                            isChanged : false
+                            isChanged: false
                         }, () => {
                             this.hideSecondComponent();
                             this.buildJExcel();
@@ -223,7 +223,7 @@ export default class VersionSettingsComponent extends Component {
                     transaction.onerror = function (event) {
                         this.setState({
                             loading: false,
-                            message: 'Error occured.',
+                            // message: 'Error occured.',
                             color: "red",
                         }, () => {
                             this.hideSecondComponent();
@@ -348,7 +348,9 @@ export default class VersionSettingsComponent extends Component {
             data[5] = ''
             data[6] = ''
             data[7] = pd.currentVersion.forecastStartDate
-            data[8] = pd.currentVersion.forecastStopDate
+            // data[8] = "2024-12-30 00:00:00"
+            var parts = pd.currentVersion.forecastStopDate.split('-');
+            data[8] = parts[0] + "-" + parts[1] + "-01 00:00:00"
             // 1-Local 0-Live
             data[9] = 1
             data[10] = downloadedDataset[j].id
@@ -404,26 +406,26 @@ export default class VersionSettingsComponent extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: 'Dataset',
+                    title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Version',
+                    title: i18n.t('static.report.version'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Version Type',
+                    title: i18n.t('static.report.versiontype'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Dataset Description',
+                    title: i18n.t('static.program.programDiscription'),
                     type: 'text'
                 },
                 {
-                    title: 'Date Committed',
+                    title: i18n.t('static.program.dateCommitted'),
                     readOnly: true,
                     type: 'calendar',
                     options: {
@@ -433,19 +435,19 @@ export default class VersionSettingsComponent extends Component {
 
                 },
                 {
-                    title: 'Commited by User',
+                    title: i18n.t('static.program.commitedbyUser'),
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: 'Forecast Start',
+                    title: i18n.t('static.program.forecastStart'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
                     }
                 },
                 {
-                    title: 'Forecast End',
+                    title: i18n.t('static.program.forecastEnd'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
@@ -591,7 +593,7 @@ export default class VersionSettingsComponent extends Component {
                         <div className="pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{'Dataset'}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                     <div className="controls ">
                                         {/* <InMultiputGroup> */}
                                         <MultiSelect
@@ -601,12 +603,12 @@ export default class VersionSettingsComponent extends Component {
                                             value={this.state.programValues}
                                             onChange={(e) => { this.handleChangeProgram(e) }}
                                             options={programMultiList && programMultiList.length > 0 ? programMultiList : []}
-                                            labelledBy={i18n.t('static.common.regiontext')}
+                                            labelledBy={i18n.t('static.common.pleaseSelect')}
                                         />
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{'Version Type'}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
