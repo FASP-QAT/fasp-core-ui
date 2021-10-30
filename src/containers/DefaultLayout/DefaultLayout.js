@@ -294,7 +294,7 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/dataset/versionSettings', name: 'Version Settings', component: VersionSettingsComponent },
+  { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
@@ -1473,7 +1473,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: 'Version Settings',
+                            name: i18n.t('static.versionSettings.versionSettings'),
                             url: '/dataset/versionSettings',
                             icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
