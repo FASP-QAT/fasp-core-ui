@@ -347,10 +347,18 @@ export default class VersionSettingsComponent extends Component {
             data[4] = pd.currentVersion.notes
             data[5] = ''
             data[6] = ''
-            data[7] = pd.currentVersion.forecastStartDate
-            // data[8] = "2024-12-30 00:00:00"
-            var parts = pd.currentVersion.forecastStopDate.split('-');
-            data[8] = parts[0] + "-" + parts[1] + "-01 00:00:00"
+            if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStartDate != "") {
+                var parts1 = pd.currentVersion.forecastStartDate.split('-');
+                data[7] = parts1[0] + "-" + parts1[1] + "-01 00:00:00"
+            } else {
+                data[7] = pd.currentVersion.forecastStartDate
+            }
+            if (pd.currentVersion.forecastStopDate != null && pd.currentVersion.forecastStopDate != "") {
+                var parts2 = pd.currentVersion.forecastStopDate.split('-');
+                data[8] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
+            } else {
+                data[8] = pd.currentVersion.forecastStopDate
+            }
             // 1-Local 0-Live
             data[9] = 1
             data[10] = downloadedDataset[j].id
