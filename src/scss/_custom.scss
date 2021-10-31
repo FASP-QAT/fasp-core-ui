@@ -4577,7 +4577,8 @@ height: 0px;
   width: 100%;
   height: 480px;
   border-width: 1px;
-  border-style: dotted; }
+  border-style: solid; 
+}
 
 
   .TemplateItem, .InfoTemplate, .CursorFrame, .CursorBadge, .HighlightFrame, .HighlightBadgePlaceholder, .HighlightBadge, .DepartmentTemplate, .DepartmentTemplate .DepartmentTitleBackground, .DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle, .ContactTemplate, .ContactTemplate .ContactTitleBackground, .ContactTemplate .ContactTitleBackground .ContactTitle, .ContactTemplate .ContactPhotoFrame, .ContactTemplate .ContactPhone, .ContactTemplate .ContactEmail, .ContactTemplate .ContactDescription, .ContactTemplate .ContactLabel, .ContactTemplate .ContactCheckboxElement, .ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption, .PERTTemplate, .PERTTemplate .PERTTitleBackground, .PERTTemplate .PERTTitleBackground .PERTTitle, .PERTTemplate .PERTETTitle, .PERTTemplate .PERTLTTitle, .PERTTemplate .PERTET, .PERTTemplate .PERTLT, .PERTTemplate .PERTVerticalLine, .PERTTemplate .PERTHorizontalLine, .xlTemplate, .xlTemplate .xlTitleBackground, .xlTemplate .xlTitleBackground .xlTitle, .xlTemplate .xlPhotoFrame, .xlTemplate .xlPhone, .xlTemplate .xlEmail, .xlTemplate .xlDescription, .lgTemplate, .lgTemplate .lgTitleBackground, .lgTemplate .lgTitleBackground .lgTitle, .lgTemplate .lgPhotoFrame, .lgTemplate .lgEmail, .lgTemplate .lgDescription, .mdTemplate, .mdTemplate .mdPhotoFrame, .mdTemplate .mdTitle, .mdTemplate .mdDescription, .smTemplate, .smTemplate .smTitle, .smTemplate .smDescription, .xsTemplate, .xsTemplate .xsTitle {
@@ -4596,7 +4597,8 @@ height: 0px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     -khtml-border-radius: 4px;
-    border-radius: 4px; }
+    border-radius: 4px; 
+  }
   
   .TemplateItemFrame, .InfoTemplate, .DepartmentTemplate, .DepartmentTemplate .DepartmentTitleBackground, .ContactTemplate, .ContactTemplate .ContactTitleBackground, .PERTTemplate, .PERTTemplate .PERTTitleBackground, .xlTemplate, .xlTemplate .xlTitleBackground, .lgTemplate, .lgTemplate .lgTitleBackground, .mdTemplate, .smTemplate, .xsTemplate {
     border: 1px solid #dddddd;
@@ -5070,22 +5072,96 @@ height: 0px;
   .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(3).readonly {
     text-align: left!important;
 }
-// .boxContactTemplate{
-//     opacity: 1!important;
-//     background-color: #fefefe!important;
-//     // border-color: none!important;
-//     // border-radius: 6px !important;
-//     border-top: 2px solid #002f6c;
-//     // border-color: transparent!important;
-//     border-radius: 1px!important;
-//     box-shadow: 0 8px 16px #0000001f!important;
-// }
+.boxContactTemplate{
+    opacity: 1!important;
+    background-color: #fefefe!important;
+    border: 2px solid #002f6c;
+    // border-bottom-color: #ddd;
+    // border-left-color: #ddd;
+    // border-right-color: #ddd;
+    border-radius: 1px!important;
+    box-shadow: 0 8px 16px #0000001f!important;
+    cursor: pointer;
+}
+
 .calculatorimg .jexcel>tbody>tr>td>img {
-  width: 21px!important;  
+  width: 17px!important;  
 }
 .Radioactive{
   margin-left: -20px!important;
 }
-// .ContactTitle i{
-//   color: #002f6c!important;
-// }
+.ContactTitle i{
+  // color: #002f6c!important;
+  color: #002f6c !important;
+    background: #fff!important;
+    padding: 4px 6px 3px 6px!important;
+    // margin-top: -1px!important;
+    // border: 1px solid #002f6c!important;
+    border-radius: 5px!important;
+    cursor: pointer;
+}
+.TreeIconStyle{
+  width: 23px;
+  height: 23px;
+  color: #002f6c;
+  outline: none!important;
+  border: none !important;
+  background: none;
+  padding-top: 6px;
+  margin-left: -4px;
+}
+
+.TreeIconStyle i {
+  // box-shadow: 0 8px 16px #0000001f!important;
+    font-size: 14px!important;
+    cursor: pointer;
+    font-weight: 500;
+}
+.TreeIconStyle i :hover{
+  box-shadow: 0 8px 16px #0000001f!important;
+    font-size: 14px!important;
+    cursor: pointer;
+    font-weight: 500;
+}
+.HighlightFrame {
+  border: 0px solid #fbcb09!important;
+  background: transparent!important;
+  color: transparent!important;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+.CursorFrame {
+  border: 2px solid #ffc107!important;
+  background: transparent!important;
+  color: transparent!important;
+  width: 100%;
+  border-radius: 0px!important;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+.placeholder table {
+  transform: rotate(270deg)!important;
+  font-weight: bold!important;
+}
+.TemplateTitleBg{
+  background:#002f6c!important;
+  border:none!important;
+  border-radius:0px!important;
+  padding:0px 0px 2px 0px!important;
+}
+.btn-warning {
+  color: #fff;
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+.btn-warning:hover {
+  color: #fff;
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+.checkboxMargin{
+  margin-top: 3px!important;
+}
