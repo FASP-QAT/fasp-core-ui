@@ -106,8 +106,8 @@ class ProgramService {
         );
     }
 
-    saveProgramData(json) {
-        return axios.put(`${API_URL}/api/programData/`, json, {}
+    saveProgramData(json,comparedVersionId) {
+        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
 

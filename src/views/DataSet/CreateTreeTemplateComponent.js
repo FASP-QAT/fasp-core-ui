@@ -950,8 +950,8 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            oneditionend: this.onedit,
-            onselection: this.selected,
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -970,13 +970,7 @@ export default class CreateTreeTemplate extends Component {
     loadedPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-    selected = function (instance, cell, x, y, value) {
-        if (y == 7) {
-            this.setState({
-                showCalculatorFields: true
-            });
-        }
-    }
+
     getConversionFactor(planningUnitId) {
         console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1386,7 +1380,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             noOfMonthsInUsagePeriod
         }, () => {
-            console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                this.getUsageText();
+            } else {
+                console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            }
         });
     }
     getUsageText() {
@@ -1453,14 +1451,14 @@ export default class CreateTreeTemplate extends Component {
             }
         } else {
             //PU
+            console.log("pu>>>", this.state.currentItemConfig);
             if (this.state.addNodeFlag) {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
             } else {
                 var planningUnit = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.label.label_en;
             }
-            // if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.usageType.id == 1) {
-            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
+            if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                 var sharePu;
                 if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true") {
                     sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
@@ -1470,7 +1468,11 @@ export default class CreateTreeTemplate extends Component {
                 usageText = "For each " + "we need " + sharePu + " " + planningUnit;
             } else {
                 // need grand parent here 
-                var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
+                console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
+                console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
+                console.log("3>>>", this.state.conversionFactor);
+                console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
+                var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / 1) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 usageText = "For each " + "we need " + addCommas(puPerInterval) + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
             }
         }
@@ -2647,7 +2649,8 @@ export default class CreateTreeTemplate extends Component {
                 //             // cursorItem: item.id
                 //         },
                 highlightItem: item.id,
-                cursorItem: item.id
+                cursorItem: item.id,
+                usageText: ''
             }, () => {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
@@ -2664,7 +2667,17 @@ export default class CreateTreeTemplate extends Component {
                     this.getUsageText();
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    console.log("(puNode>>>", (data.context.payload.nodeDataMap[0])[0].puNode);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
+                    (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                    this.setState({
+                        // conversionFactor: pu.multiplier
+                        conversionFactor: 1
+                    }, () => {
+                        this.getNoOfMonthsInUsagePeriod();
+                    });
+
                     // this.getUsageText();
                     // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
                 }
@@ -2904,10 +2917,10 @@ export default class CreateTreeTemplate extends Component {
                     pointRadius: 0,
                     showInLegend: false,
                     yAxisID: 'B',
-                    data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEndPer.replaceAll("%",'') > 0 ? item.sexuallyActiveMenMonthEndPer.replaceAll("%",'') : null))
+                    data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEndPer.replaceAll("%", '') > 0 ? item.sexuallyActiveMenMonthEndPer.replaceAll("%", '') : null))
                 }
             )
-           
+
 
             bar1 = {
                 labels: [...new Set(this.state.momListPer.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
@@ -3675,15 +3688,15 @@ export default class CreateTreeTemplate extends Component {
                 </TabPane>
                 <TabPane tabId="2">
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
-                    <div className="offset-md-9 col-md-6 pr-lg-3">
-                        <a className="">
-                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
-                                    
-                                </a>
-                        </div> 
+                        <div className="offset-md-9 col-md-6 pr-lg-3">
+                            <a className="">
+                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+
+                            </a>
+                        </div>
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
-                        
+
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
@@ -3899,53 +3912,53 @@ export default class CreateTreeTemplate extends Component {
                             <div className="row pl-lg-2 pr-lg-2">
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-5">
-                                    <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                        <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
                                     </div>
                                     <div className="col-md-5 float-right pl-lg-5">
-                                    <FormGroup className="" >
-                                                                    <div className="check inline  pl-lg-1 pt-lg-0">
-                                                                        <div>
-                                                                            <Input
-                                                                                className="form-check-input checkboxMargin"
-                                                                                type="checkbox"
-                                                                                id="active6"
-                                                                                name="active6"
-                                                                                // checked={false}
-                                                                                onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                                                            />
-                                                                            <Label
-                                                                                className="form-check-label"
-                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                <b>{'Does manual changes affect future month'}</b>
-                                                                            </Label>
-                                                                        </div>
-                                                                        <div>
-                                                                            <Input
-                                                                                className="form-check-input checkboxMargin"
-                                                                                type="checkbox"
-                                                                                id="active7"
-                                                                                name="active7"
-                                                                                // checked={false}
-                                                                                onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                                            />
-                                                                            <Label
-                                                                                className="form-check-label"
-                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                <b>{'Show Seasonality'}</b>
-                                                                            </Label>
-                                                                        </div>
-                                                                    </div>
-                                                                </FormGroup>
+                                        <FormGroup className="" >
+                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="active6"
+                                                        name="active6"
+                                                        // checked={false}
+                                                        onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Does manual changes affect future month'}</b>
+                                                    </Label>
+                                                </div>
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="active7"
+                                                        name="active7"
+                                                        // checked={false}
+                                                        onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Show Seasonality'}</b>
+                                                    </Label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
                                     </div>
                                 </div>
-                            <div id="momJexcel" className={"RowClickable"}>
-                            </div>
-                            <div className="col-md-12 pr-lg-0">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+                                <div id="momJexcel" className={"RowClickable"}>
+                                </div>
+                                <div className="col-md-12 pr-lg-0">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
-                                    </div>
-                                    </div>
+                                </div>
+                            </div>
 
                             <div className="row pl-lg-0 pt-lg-3">
                                 <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
@@ -3960,14 +3973,14 @@ export default class CreateTreeTemplate extends Component {
                     {this.state.showMomDataPercent &&
                         <div>
                             <div className="row">
-                            <div id="momJexcelPer" className={"RowClickable"}>
-                            </div>
-                            <div className="col-md-12 pr-lg-0">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+                                <div id="momJexcelPer" className={"RowClickable"}>
+                                </div>
+                                <div className="col-md-12 pr-lg-0">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
-                                    </div>
-                                    </div>
+                                </div>
+                            </div>
 
                             <div className="row pl-lg-0 pt-lg-3">
                                 <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
