@@ -165,6 +165,8 @@ const ExportProgram = React.lazy(() => import('../../views/Program/ExportProgram
 const ImportProgram = React.lazy(() => import('../../views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('../../views/SyncMasterData/SyncMasterData'));
 const ConsumptionDetails = React.lazy(() => import('../../views/Consumption/ConsumptionDetails'));
+const ConsumptionTemplate = React.lazy(() => import('../../views/Consumption/ConsumptionTemplate'));
+const consumptionDataEntryandAdjustment = React.lazy(() => import('../../views/Consumption/consumptionDataEntryandAdjustment'));
 
 const AddLanguage = React.lazy(() => import('../../views/Language/AddLanguageComponent'));
 const ListLanguage = React.lazy(() => import('../../views/Language/LanguageListComponent'));
@@ -455,7 +457,9 @@ const routes = [
   // { path: '/masterDataSync/:message',  component: MasterDataSync },
 
   { path: '/consumptionDetails', exact: true, name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
-
+  { path: '/consumptionTemplate', exact: true, name: 'static.dashboard.generateTemplate', component: ConsumptionTemplate },
+  { path: '/consumptionDataEntryandAdjustment', exact: true, name: 'static.dashboard.consumptionDataEntryandAdjustment', component: consumptionDataEntryandAdjustment},
+  
   { path: '/language/addLanguage', name: 'static.breadcrum.add', entityname: 'static.dashboard.languageheader', component: AddLanguage },
   { path: '/language/listLanguage', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.language', component: ListLanguage },
   { path: '/language/listLanguage/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.language', component: ListLanguage },
@@ -1232,6 +1236,31 @@ class DefaultLayout extends Component {
 
 
 
+                        ]
+                      },
+                      {
+                        name: i18n.t('static.dashboard.consumptionBasedForecast'),
+                        icon: 'fa fa-list',
+                        attributes: {
+                          hidden: (
+                            (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM')) ? false : true)
+                        },
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.generateTemplate'),
+                            url: '/consumptionTemplate',
+                            icon: 'fa fa-upload',
+                            },
+                          {
+                            name: i18n.t('static.dashboard.consumptionDataEntryandAdjustment'),
+                            url: '/consumptionDataEntryandAdjustment',
+                            icon: 'fa fa-bar-chart',
+                            },
+                          {
+                            name: i18n.t('static.dashboard.Extrapolation'),
+                            url: '/consumptionExtrapolation',
+                            icon: 'fa fa-bar-chart',
+                            }
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&

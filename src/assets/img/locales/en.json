@@ -1808,5 +1808,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.consumption.templateUpload": "Generate Consumption Template",
+"static.consumption.dataset":"Dataset",
+"static.consumption.planningUnit":"Planning Unit",
+"static.consumption.reportingRate":"Reporting Rate (%)",
+"static.dashboard.consumptionBasedForecast":"Consumption-Based Forecast",
+"static.dashboard.generateTemplate":"Import Template",
+"static.dashboard.consumptionDataEntryandAdjustment":"Data Entry & Adjustment",
+"static.dashboard.Extrapolation":"Extrapolation"
 }

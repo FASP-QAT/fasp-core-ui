@@ -132,6 +132,8 @@ const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
 // const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
 const ConsumptionDetails = React.lazy(() => import('./views/Consumption/ConsumptionDetails'));
+const ConsumptionTemplate = React.lazy(() => import('./views/Consumption/ConsumptionTemplate'));
+const consumptionDataEntryandAdjustment = React.lazy(() => import('./views/Consumption/consumptionDataEntryandAdjustment'));
 
 const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageComponent'));
 const ListLanguage = React.lazy(() => import('./views/Language/LanguageListComponent'));
@@ -415,6 +417,8 @@ const routes = [
   // { path: '/masterDataSync/:message',  component: MasterDataSync },
 
   { path: '/consumptionDetails', exact: true, name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
+  { path: '/consumptionTemplate', exact: true, name: i18n.t('static.dashboard.generateTemplate'), component: ConsumptionTemplate },
+  { path: '/consumptionDataEntryandAdjustment', exact: true, name: i18n.t('static.dashboard.consumptionDataEntryandAdjustment'), component: consumptionDataEntryandAdjustment},
 
   { path: '/language/addLanguage', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.languageheader') }), component: AddLanguage },
   { path: '/language/listLanguage', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.language') }), component: ListLanguage },
