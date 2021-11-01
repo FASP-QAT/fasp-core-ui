@@ -268,6 +268,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.pickAMonth2 = React.createRef()
+        this.pickAMonth1 = React.createRef()
         this.state = {
             showMomDataPercent: false,
             showModelingJexcelNumber: false,
@@ -1460,7 +1461,7 @@ export default class CreateTreeTemplate extends Component {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
             } else {
-                var planningUnit = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.label.label_en;
+                var planningUnit = this.state.planningUnitList.filter(c => c.planningUnitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id)[0].label.label_en;
             }
             if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                 var sharePu;
@@ -1472,10 +1473,10 @@ export default class CreateTreeTemplate extends Component {
                 usageText = "For each " + "we need " + sharePu + " " + planningUnit;
             } else {
                 // need grand parent here 
-                console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
-                console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
-                console.log("3>>>", this.state.conversionFactor);
-                console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
+                // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
+                // console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
+                // console.log("3>>>", this.state.conversionFactor);
+                // console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / 1) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 usageText = "For each " + "we need " + addCommas(puPerInterval) + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
             }
@@ -3062,16 +3063,16 @@ export default class CreateTreeTemplate extends Component {
                                             <Picker
                                                 id="month"
                                                 name="month"
-                                                ref="pickAMonth2"
+                                                ref={this.pickAMonth1}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                theme="dark"
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                // theme="dark"
+                                                onChange={this.handleAMonthChange1}
+                                                onDismiss={this.handleAMonthDissmis1}
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })}
-                                                    onClick={this.handleClickMonthBox2} />
+                                                    onClick={this.handleClickMonthBox1} />
                                             </Picker>
                                         </div>
                                     </FormGroup>
@@ -4009,9 +4010,13 @@ export default class CreateTreeTemplate extends Component {
     handleClickMonthBox2 = (e) => {
         this.pickAMonth2.current.show()
     }
+    handleClickMonthBox1 = (e) => {
+        this.pickAMonth1.current.show()
+    }
+
     handleAMonthChange2 = (year, month) => {
-        console.log("value>>>", year);
-        console.log("text>>>", month)
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
@@ -4022,8 +4027,29 @@ export default class CreateTreeTemplate extends Component {
         //
         //
     }
+    handleAMonthChange1 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
+        //
+        //
+    }
+
     handleAMonthDissmis2 = (value) => {
-        console.log("dismiss>>", value);
+        // console.log("dismiss>>", value);
+        this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        })
+
+    }
+    handleAMonthDissmis1 = (value) => {
+        // console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
         })
