@@ -178,6 +178,12 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('treeTemplate')){
             storeOS = db1.createObjectStore('treeTemplate', { keyPath: 'treeTemplateId'});
         }
+        if(!db1.objectStoreNames.contains('versionType')){
+            storeOS = db1.createObjectStore('versionType', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('versionStatus')){
+            storeOS = db1.createObjectStore('versionStatus', { keyPath: 'id'});
+        }
         console.log("indexed db completed----------------------")
         
     };
