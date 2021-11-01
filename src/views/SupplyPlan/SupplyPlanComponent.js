@@ -2563,6 +2563,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             supplyPlan: []
                                         }
                                     }
+                                    console.log("ProgramJson+++",programJson);
                                     this.setState({
                                         planningUnit: planningUnit,
                                         planningUnitId: planningUnitIdProp,
