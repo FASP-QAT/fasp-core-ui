@@ -40,6 +40,7 @@ import cleanUp from '../../assets/img/calculator.png';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
+import Draggable from 'react-draggable';
 
 
 
@@ -170,15 +171,15 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     }
 
     return connectDropTarget(connectDragSource(
-        <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-            {/* // <div className="ContactTemplate boxContactTemplate"> */}
-            <div className="ContactTitleBackground"
+        // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+            <div className="ContactTemplate boxContactTemplate"> 
+            <div className="ContactTitleBackground TemplateTitleBg"
             >
-                <div className="ContactTitle" style={{ color: Colors.Black }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
+                <div className="ContactTitle" style={{color:'#002f6c',fontWeight:'bold'}}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
             </div>
-            <div className="ContactPhone" style={{ color: Colors.Black }}>
-                <span style={{ textAlign: 'center', fontWeight: '600' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
+            <div className="ContactPhone ContactPhoneValue">
+                <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
+                <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}> {getPayloadData(itemConfig, 2)}</p></div>
             </div>
         </div>
     ))
@@ -223,7 +224,7 @@ function getPayloadData(itemConfig, type) {
             if (type == 1) {
                 return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
             } else {
-                return ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
             }
         }
     } else {
@@ -268,6 +269,7 @@ export default class CreateTreeTemplate extends Component {
     constructor() {
         super();
         this.pickAMonth2 = React.createRef()
+        this.pickAMonth1 = React.createRef()
         this.state = {
             showMomDataPercent: false,
             showModelingJexcelNumber: false,
@@ -474,7 +476,7 @@ export default class CreateTreeTemplate extends Component {
             popoverOpen: !this.state.popoverOpen,
         });
     }
-
+   
     showMomData() {
         this.setState({ showMomData: true }, () => {
             this.buildMomJexcel();
@@ -1412,7 +1414,9 @@ export default class CreateTreeTemplate extends Component {
                 var forecastingUnitUnit = document.getElementById("forecastingUnitUnit");
                 selectedText1 = forecastingUnitUnit.options[forecastingUnitUnit.selectedIndex].text;
             } else {
-                selectedText1 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.label.label_en;
+                // console.log("***ul>",this.state.unitList);
+                // console.log("***uId>",(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id);
+                selectedText1 = this.state.unitList.filter(c => c.unitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id)[0].label.label_en;
             }
 
 
@@ -1423,7 +1427,10 @@ export default class CreateTreeTemplate extends Component {
                     var usagePeriodId = document.getElementById("usagePeriodId");
                     selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
                 } else {
-                    selectedText2 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.label.label_en;
+                    // console.log("usagePeriodList>>>", this.state.usagePeriodList);
+                    // var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
+                    // console.log("usagePeriodId>>>", usagePeriodId);
+                    selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
                 }
             }
         }
@@ -1455,7 +1462,7 @@ export default class CreateTreeTemplate extends Component {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
             } else {
-                var planningUnit = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.label.label_en;
+                var planningUnit = this.state.planningUnitList.filter(c => c.planningUnitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id)[0].label.label_en;
             }
             if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                 var sharePu;
@@ -1467,10 +1474,10 @@ export default class CreateTreeTemplate extends Component {
                 usageText = "For each " + "we need " + sharePu + " " + planningUnit;
             } else {
                 // need grand parent here 
-                console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
-                console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
-                console.log("3>>>", this.state.conversionFactor);
-                console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
+                // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
+                // console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
+                // console.log("3>>>", this.state.conversionFactor);
+                // console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / 1) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 usageText = "For each " + "we need " + addCommas(puPerInterval) + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
             }
@@ -2993,12 +3000,12 @@ export default class CreateTreeTemplate extends Component {
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
                                     <div>
-                                        <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" toggle={this.toggle}>
+                                        <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
                                             <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
                                         </Popover>
                                     </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#5c6873', cursor: 'pointer' }}></i></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -3057,16 +3064,16 @@ export default class CreateTreeTemplate extends Component {
                                             <Picker
                                                 id="month"
                                                 name="month"
-                                                ref="pickAMonth2"
+                                                ref={this.pickAMonth1}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                theme="dark"
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                // theme="dark"
+                                                onChange={this.handleAMonthChange1}
+                                                onDismiss={this.handleAMonthDissmis1}
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })}
-                                                    onClick={this.handleClickMonthBox2} />
+                                                    onClick={this.handleClickMonthBox1} />
                                             </Picker>
                                         </div>
                                     </FormGroup>
@@ -3757,7 +3764,7 @@ export default class CreateTreeTemplate extends Component {
                                 <>
                                     {/* <div className="row"> */}
                                     <FormGroup className="col-md-12 pt-lg-1">
-                                        <Label htmlFor=""><b>Modaling Calculater Tool</b></Label>
+                                        <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
@@ -3849,7 +3856,7 @@ export default class CreateTreeTemplate extends Component {
                                         <div className="check inline  pl-lg-1 pt-lg-2">
                                             <div className="col-md-12 form-group">
                                                 <Input
-                                                    className="form-check-input"
+                                                    className="form-check-input checkboxMargin"
                                                     type="radio"
                                                     id="active1"
                                                     name="active1"
@@ -3864,7 +3871,7 @@ export default class CreateTreeTemplate extends Component {
                                             </div>
                                             <div className="col-md-12 form-group">
                                                 <Input
-                                                    className="form-check-input Radioactive"
+                                                    className="form-check-input Radioactive checkboxMargin"
                                                     type="radio"
                                                     id="active2"
                                                     name="active2"
@@ -3879,7 +3886,7 @@ export default class CreateTreeTemplate extends Component {
                                             </div>
                                             <div className="col-md-12 form-group">
                                                 <Input
-                                                    className="form-check-input"
+                                                    className="form-check-input checkboxMargin"
                                                     type="radio"
                                                     id="active3"
                                                     name="active3"
@@ -3918,7 +3925,7 @@ export default class CreateTreeTemplate extends Component {
                                             <div className="check inline  pl-lg-1 pt-lg-0">
                                                 <div>
                                                     <Input
-                                                        className="form-check-input"
+                                                        className="form-check-input checkboxMargin"
                                                         type="checkbox"
                                                         id="active6"
                                                         name="active6"
@@ -3933,7 +3940,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </div>
                                                 <div>
                                                     <Input
-                                                        className="form-check-input"
+                                                        className="form-check-input checkboxMargin"
                                                         type="checkbox"
                                                         id="active7"
                                                         name="active7"
@@ -4004,9 +4011,13 @@ export default class CreateTreeTemplate extends Component {
     handleClickMonthBox2 = (e) => {
         this.pickAMonth2.current.show()
     }
+    handleClickMonthBox1 = (e) => {
+        this.pickAMonth1.current.show()
+    }
+
     handleAMonthChange2 = (year, month) => {
-        console.log("value>>>", year);
-        console.log("text>>>", month)
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
@@ -4017,8 +4028,29 @@ export default class CreateTreeTemplate extends Component {
         //
         //
     }
+    handleAMonthChange1 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
+        //
+        //
+    }
+
     handleAMonthDissmis2 = (value) => {
-        console.log("dismiss>>", value);
+        // console.log("dismiss>>", value);
+        this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        })
+
+    }
+    handleAMonthDissmis1 = (value) => {
+        // console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
         })
@@ -4045,12 +4077,14 @@ export default class CreateTreeTemplate extends Component {
                     annotationType: AnnotationType.Level,
                     levels: [0],
                     title: "Level 0",
-                    titleColor: Colors.RoyalBlue,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
                     offset: new Thickness(0, 0, 0, -1),
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
+                    // fillColor: Colors.Gray,
                     lineType: LineType.Dotted
                 });
             }
@@ -4058,12 +4092,14 @@ export default class CreateTreeTemplate extends Component {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
                     title: "Level " + i,
-                    titleColor: Colors.RoyalBlue,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
                     offset: new Thickness(0, 0, 0, -1),
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
+                    // fillColor: Colors.Gray,
                     lineType: LineType.Dotted
                 })
                 );
@@ -4072,12 +4108,15 @@ export default class CreateTreeTemplate extends Component {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
                     title: "Level " + i,
-                    titleColor: Colors.RoyalBlue,
+                    // titleColor: Colors.RoyalBlue,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
                     offset: new Thickness(0, 0, 0, -1),
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0.08,
                     borderColor: Colors.Gray,
-                    fillColor: Colors.Gray,
+                    // fillColor: Colors.Gray,
                     lineType: LineType.Dotted
                 }));
             }
@@ -4099,7 +4138,7 @@ export default class CreateTreeTemplate extends Component {
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -4242,7 +4281,8 @@ export default class CreateTreeTemplate extends Component {
                                 });
                                 // this.onAddButtonClick(itemConfig);
                             }}>
-                            <FontAwesomeIcon icon={faPlus} />
+                            {/* <FontAwesomeIcon icon={faPlus} /> */}
+                            <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                         </button>}
                     {/* <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
                         onClick={(event) => {
@@ -4252,16 +4292,17 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
-                                <FontAwesomeIcon icon={faCopy} />
+                                {/* <FontAwesomeIcon icon={faCopy} /> */}
+                                <i class="fa fa-clone" aria-hidden="true"></i>
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton" style={{ width: '23px', height: '23px' }}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -4279,7 +4320,8 @@ export default class CreateTreeTemplate extends Component {
                                         ]
                                     });
                                 }}>
-                                <FontAwesomeIcon icon={faTrash} />
+                                {/* <FontAwesomeIcon icon={faTrash} /> */}
+                                <i class="fa fa-trash-o" aria-hidden="true" style={{fontSize: '16px'}}></i>
                             </button></>}
 
                 </>
@@ -4290,7 +4332,18 @@ export default class CreateTreeTemplate extends Component {
                 itemSize: { width: 200, height: 75 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
-                onItemRender: ({ context: itemConfig }) => {
+                highlightBorderWidth: 1,
+                cursorBorderWidth: 2,
+                onCursorRender: ({ context: itemConfig }) => {
+                    return <div className="CursorFrame ">
+                 </div>;
+                  },
+                onHighlightRender: ({ context: itemConfig }) => {
+                return <div className="HighlightFrame " >
+                
+                </div>;
+                },
+                        onItemRender: ({ context: itemConfig }) => {
                     return <NodeDragDropSource
                         itemConfig={itemConfig}
                         onRemoveItem={this.onRemoveItem}
@@ -4651,7 +4704,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
                                                                         <div>
                                                                             <Input
-                                                                                className="form-check-input"
+                                                                                className="form-check-input checkboxMargin"
                                                                                 type="checkbox"
                                                                                 id="active6"
                                                                                 name="active6"
@@ -4666,7 +4719,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                         <div>
                                                                             <Input
-                                                                                className="form-check-input"
+                                                                                className="form-check-input checkboxMargin"
                                                                                 type="checkbox"
                                                                                 id="active7"
                                                                                 name="active7"
@@ -4708,6 +4761,7 @@ export default class CreateTreeTemplate extends Component {
 
                     </Card></Col></Row>
             {/* Modal start------------------- */}
+            <Draggable handle=".modal-title">
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-lg '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
@@ -4751,6 +4805,7 @@ export default class CreateTreeTemplate extends Component {
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                 </ModalFooter>
             </Modal>
+            </Draggable>
             {/* Scenario Modal end------------------------ */}
 
         </div>
