@@ -441,23 +441,23 @@ export default class StockStatusMatrix extends React.Component {
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
-            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             planningUnitIds.map(planningUnitId => {
               var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
               var programJson = {}
               if (planningUnitDataIndex != -1) {
-                  var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                  var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                  var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                  programJson = JSON.parse(programData);
+                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                programJson = JSON.parse(programData);
               } else {
-                  programJson = {
-                      consumptionList: [],
-                      inventoryList: [],
-                      shipmentList: [],
-                      batchInfoList: [],
-                      supplyPlan: []
-                  }
+                programJson = {
+                  consumptionList: [],
+                  inventoryList: [],
+                  shipmentList: [],
+                  batchInfoList: [],
+                  supplyPlan: []
+                }
               }
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
@@ -698,25 +698,25 @@ export default class StockStatusMatrix extends React.Component {
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
             let productCategories = [];
-            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-            for(var pu=0;pu<planningUnitDataList.length;pu++){
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
               var planningUnitData = (planningUnitDataList)[pu];
-                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        var InventoryList = (programJson.inventoryList);
-            var json;
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              var programJson = JSON.parse(programData);
+              var InventoryList = (programJson.inventoryList);
+              var json;
 
-            InventoryList.map(ele => (
-              productCategories.push({
-                payload: {
-                  productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
-                  label: ele.planningUnit.forecastingUnit.productCategory.label,
-                  active: true
-                }
-              })
+              InventoryList.map(ele => (
+                productCategories.push({
+                  payload: {
+                    productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
+                    label: ele.planningUnit.forecastingUnit.productCategory.label,
+                    active: true
+                  }
+                })
 
-            ))
+              ))
             }
 
 
@@ -1874,6 +1874,7 @@ export default class StockStatusMatrix extends React.Component {
                       bsSize="sm"
                       value={this.state.tracerCategoryValues}
                       onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                      disabled={this.state.loading}
                       options=
                       {tracerCategories.length > 0 ?
                         tracerCategories.map((item, i) => {
@@ -1895,6 +1896,7 @@ export default class StockStatusMatrix extends React.Component {
                       value={this.state.planningUnitValues}
                       onChange={(e) => { this.handlePlanningUnitChange(e) }}
                       options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                      disabled={this.state.loading}
                     />     </div></FormGroup>
 
                 <FormGroup className="col-md-3">

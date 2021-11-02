@@ -167,7 +167,7 @@ class AnnualShipmentCost extends Component {
                             // var programJson = JSON.parse(programData);
                             // console.log("3----", programJson);
 
-                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgent');
                             var papuRequest = papuOs.getAll();
@@ -1672,6 +1672,7 @@ class AnnualShipmentCost extends Component {
                                                         value={this.state.planningUnitValues}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                        disabled={this.state.loading}
                                                     />     </div></FormGroup>
                                             {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
@@ -1709,6 +1710,7 @@ class AnnualShipmentCost extends Component {
                                                             && procurementAgents.map((item, i) => {
                                                                 return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -1729,6 +1731,7 @@ class AnnualShipmentCost extends Component {
                                                                     { label: item.fundingSourceCode, value: item.fundingSourceId }
                                                                 )
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -1751,6 +1754,7 @@ class AnnualShipmentCost extends Component {
                                                                     { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
                                                                 )
                                                             }, this)}
+                                                        disabled={this.state.loading}
                                                     /></div>
 
                                             </FormGroup>
