@@ -56,8 +56,9 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.datasource.datasourcetext')),
         number1: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .matches(/^(?=.*[1-9])\d{1,10}$/, i18n.t('static.program.validvaluetext'))
             .required(i18n.t('static.label.fieldRequired'))
-            .min(0, i18n.t('static.program.validvaluetext'))
+        // .min(1, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -1190,15 +1191,39 @@ class usageTemplate extends Component {
                                 title: i18n.t('static.usageTemplate.calculateUsageFrequency'),
                                 onclick: function () {
                                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                                    let value = this.el.getValueFromCoords(17, y);
+                                    let tempUsagePeriodList = [];
+
+                                    if (typeof value === 'number') {
+                                        //it's a number
+
+                                        let tempList = this.state.usagePeriodListLong;
+                                        let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
+
+
+                                        for (var i = 0; i < tempList.length; i++) {
+                                            if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
+                                                tempUsagePeriodList.push(tempList[i]);
+                                            }
+                                        }
+
+                                        // this.setState({
+                                        //     usagePeriodDisplayList: tempUsagePeriodList,
+                                        // }, () => { });
+
+                                    }
+
+
+
                                     this.setState({
                                         isModalOpen: true,
                                         x: x,
                                         y: y,
-                                        number1: '',
-                                        number2: '',
-                                        picker1: '',
-                                        picker2: '',
-                                        usagePeriodDisplayList: []
+                                        number1: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
+                                        number2: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
+                                        picker1: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
+                                        picker2: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
+                                        usagePeriodDisplayList: (tempUsagePeriodList.length == 0 ? [] : tempUsagePeriodList)
                                     })
 
                                 }.bind(this)
@@ -1626,6 +1651,10 @@ class usageTemplate extends Component {
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
+
+        tr.children[16].classList.add('CalculatorTheadtr');
+        tr.children[17].classList.add('CalculatorTheadtr');
+        tr.children[18].classList.add('CalculatorTheadtr');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -2505,7 +2534,8 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
-                            <h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5>
+                            <h5 className="red">{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
+                            <span className=""><i class="fa fa-calculator" aria-hidden="true"></i><h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -2548,7 +2578,12 @@ class usageTemplate extends Component {
                                 <Card>
                                     <Formik
                                         enableReinitialize={true}
-                                        initialValues={initialValues}
+                                        initialValues={{
+                                            number1: this.state.number1,
+                                            picker1: this.state.picker1,
+                                            number2: this.state.number2,
+                                            picker2: this.state.picker2,
+                                        }}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
 
@@ -2704,7 +2739,7 @@ class usageTemplate extends Component {
                                                         {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                                                             <FormGroup>
                                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
 
                                                             </FormGroup>
@@ -2787,7 +2822,8 @@ class usageTemplate extends Component {
             this.setState({
                 picker1: event.target.value,
                 usagePeriodDisplayList: tempUsagePeriodList,
-                number2: number2
+                number2: number2,
+                picker2: ''
             }, () => { });
         } else if (event.target.name == "picker2") {
             let tempList = this.state.usagePeriodListLong;
