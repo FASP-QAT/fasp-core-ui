@@ -172,10 +172,10 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
 
     return connectDropTarget(connectDragSource(
         // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-            <div className="ContactTemplate boxContactTemplate"> 
+        <div className="ContactTemplate boxContactTemplate">
             <div className="ContactTitleBackground TemplateTitleBg"
             >
-                <div className="ContactTitle" style={{color:'#002f6c',fontWeight:'bold'}}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
+                <div className="ContactTitle" style={{ color: '#002f6c', fontWeight: 'bold' }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
             </div>
             <div className="ContactPhone ContactPhoneValue">
                 <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
@@ -271,6 +271,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            sameLevelNodeList: [],
             showMomDataPercent: false,
             showModelingJexcelNumber: false,
             showModelingJexcelPercent: false,
@@ -468,15 +469,28 @@ export default class CreateTreeTemplate extends Component {
         this.buildModelingJexcelPercent = this.buildModelingJexcelPercent.bind(this);
         this.addRowJexcelPer = this.addRowJexcelPer.bind(this);
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
+        this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
     }
-
+    getSameLevelNodeList(level, id) {
+        console.log("level---", level);
+        console.log("id---", id);
+        var sameLevelNodeList = [];
+        var arr = this.state.items.filter(x => x.level == level && x.id != id);
+        console.log("arr---", arr);
+        for (var i = 0; i < arr.length; i++) {
+            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang)}
+        }
+        this.setState({
+            sameLevelNodeList 
+        });
+    }
 
     toggle() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
         });
     }
-   
+
     showMomData() {
         this.setState({ showMomData: true }, () => {
             this.buildMomJexcel();
@@ -757,11 +771,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Transfer to node',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" },
-                        { id: 3, name: "3 line ARV" }
-                    ]
+                    source: this.state.sameLevelNodeList
                 },
                 {
                     title: "Note",
@@ -885,11 +895,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Transfer to node',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" },
-                        { id: 3, name: "3 line ARV" }
-                    ]
+                    source: this.state.sameLevelNodeList
                 },
                 {
                     title: "Note",
@@ -2634,13 +2640,10 @@ export default class CreateTreeTemplate extends Component {
         }
     };
     onCursoChanged(event, data) {
-        // this.setState({ openAddNodeModal: true });
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
-        // const { config } = this.state;
         if (item != null) {
-
             this.setState({
                 openAddNodeModal: true,
                 addNodeFlag: false,
@@ -2660,6 +2663,7 @@ export default class CreateTreeTemplate extends Component {
             }, () => {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
+
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     // this.getNoOfMonthsInUsagePeriod();
@@ -2686,6 +2690,8 @@ export default class CreateTreeTemplate extends Component {
 
                     // this.getUsageText();
                     // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
+                } else if (data.context.payload.nodeType.id != 1) {
+                    this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
 
 
@@ -4138,7 +4144,7 @@ export default class CreateTreeTemplate extends Component {
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -4292,7 +4298,7 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
@@ -4302,7 +4308,7 @@ export default class CreateTreeTemplate extends Component {
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -4321,7 +4327,7 @@ export default class CreateTreeTemplate extends Component {
                                     });
                                 }}>
                                 {/* <FontAwesomeIcon icon={faTrash} /> */}
-                                <i class="fa fa-trash-o" aria-hidden="true" style={{fontSize: '16px'}}></i>
+                                <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                             </button></>}
 
                 </>
@@ -4336,14 +4342,14 @@ export default class CreateTreeTemplate extends Component {
                 cursorBorderWidth: 2,
                 onCursorRender: ({ context: itemConfig }) => {
                     return <div className="CursorFrame ">
-                 </div>;
-                  },
-                onHighlightRender: ({ context: itemConfig }) => {
-                return <div className="HighlightFrame " >
-                
-                </div>;
+                    </div>;
                 },
-                        onItemRender: ({ context: itemConfig }) => {
+                onHighlightRender: ({ context: itemConfig }) => {
+                    return <div className="HighlightFrame " >
+
+                    </div>;
+                },
+                onItemRender: ({ context: itemConfig }) => {
                     return <NodeDragDropSource
                         itemConfig={itemConfig}
                         onRemoveItem={this.onRemoveItem}
@@ -4762,49 +4768,49 @@ export default class CreateTreeTemplate extends Component {
                     </Card></Col></Row>
             {/* Modal start------------------- */}
             <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openAddNodeModal}
-                className={'modal-lg '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <Row>
-                        <Col xs="12" md="12" className="mb-4">
+                <Modal isOpen={this.state.openAddNodeModal}
+                    className={'modal-lg '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Node</strong>
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <Row>
+                            <Col xs="12" md="12" className="mb-4">
 
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '1'}
-                                        onClick={() => { this.toggleModal(0, '1'); }}
-                                    >
-                                        Node Data
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '2'}
-                                        onClick={() => { this.toggleModal(0, '2'); }}
-                                    >
-                                        Scaling/Transfer
-                                    </NavLink>
-                                </NavItem>
+                                <Nav tabs>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '1'}
+                                            onClick={() => { this.toggleModal(0, '1'); }}
+                                        >
+                                            Node Data
+                                        </NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '2'}
+                                            onClick={() => { this.toggleModal(0, '2'); }}
+                                        >
+                                            Scaling/Transfer
+                                        </NavLink>
+                                    </NavItem>
 
-                            </Nav>
-                            <TabContent activeTab={this.state.activeTab1[0]}>
-                                {this.tabPane1()}
-                            </TabContent>
-                        </Col>
-                    </Row>
+                                </Nav>
+                                <TabContent activeTab={this.state.activeTab1[0]}>
+                                    {this.tabPane1()}
+                                </TabContent>
+                            </Col>
+                        </Row>
 
-                </ModalBody>
-                <ModalFooter>
-                    {/* <Button size="md" onClick={(e) => {
+                    </ModalBody>
+                    <ModalFooter>
+                        {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                </ModalFooter>
-            </Modal>
+                    </ModalFooter>
+                </Modal>
             </Draggable>
             {/* Scenario Modal end------------------------ */}
 
