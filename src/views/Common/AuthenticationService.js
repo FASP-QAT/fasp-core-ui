@@ -1296,6 +1296,7 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {

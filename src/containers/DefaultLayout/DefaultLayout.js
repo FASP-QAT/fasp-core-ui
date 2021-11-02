@@ -292,6 +292,8 @@ const AddDataSet = React.lazy(() => import('../../views/DataSet/AddDataSet'));
 const DataSetList = React.lazy(() => import('../../views/DataSet/DataSetList'));
 const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
+const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
@@ -687,6 +689,9 @@ const routes = [
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
+
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
 
 ];
 
