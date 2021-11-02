@@ -1172,15 +1172,15 @@ class ProcurementAgentExport extends Component {
                             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             // var programJson = JSON.parse(programData);
-                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                            var shipmentList=[];
-                            for(var pu=0;pu<planningUnitDataList.length;pu++){
-                                var planningUnitData=planningUnitDataList[pu];
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var shipmentList = [];
+                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                                var planningUnitData = planningUnitDataList[pu];
                                 var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                 var programJson = JSON.parse(programData);
-                                var sList=programJson.shipmentList;
-                                shipmentList=shipmentList.concat(sList);
+                                var sList = programJson.shipmentList;
+                                shipmentList = shipmentList.concat(sList);
                             }
 
                             var programTransaction = db1.transaction(['program'], 'readwrite');
@@ -1505,15 +1505,15 @@ class ProcurementAgentExport extends Component {
                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             // var programJson = JSON.parse(programData);
 
-                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                            var shipmentList=[];
-                            for(var pu=0;pu<planningUnitDataList.length;pu++){
-                                var planningUnitData=planningUnitDataList[pu];
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var shipmentList = [];
+                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                                var planningUnitData = planningUnitDataList[pu];
                                 var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                 var programJson = JSON.parse(programData);
-                                var sList=programJson.shipmentList;
-                                shipmentList=shipmentList.concat(sList);
+                                var sList = programJson.shipmentList;
+                                shipmentList = shipmentList.concat(sList);
                             }
 
 
@@ -1832,15 +1832,15 @@ class ProcurementAgentExport extends Component {
                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             // var programJson = JSON.parse(programData);
 
-                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                            var shipmentList=[];
-                            for(var pu=0;pu<planningUnitDataList.length;pu++){
-                                var planningUnitData=planningUnitDataList[pu];
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var shipmentList = [];
+                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                                var planningUnitData = planningUnitDataList[pu];
                                 var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                 var programJson = JSON.parse(programData);
-                                var sList=programJson.shipmentList;
-                                shipmentList=shipmentList.concat(sList);
+                                var sList = programJson.shipmentList;
+                                shipmentList = shipmentList.concat(sList);
                             }
 
 
@@ -2663,6 +2663,7 @@ class ProcurementAgentExport extends Component {
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
@@ -2722,6 +2723,7 @@ class ProcurementAgentExport extends Component {
                                                 && procurementAgents.map((item, i) => {
                                                     return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
                                                 }, this)}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
