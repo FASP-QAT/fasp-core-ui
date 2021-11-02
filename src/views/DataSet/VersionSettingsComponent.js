@@ -28,17 +28,7 @@ export default class VersionSettingsComponent extends Component {
             message: '',
             lang: localStorage.getItem('lang'),
             loading: true,
-            versionTypeList: [{
-                versionTypeId: 1,
-                label: {
-                    label_en: 'Draft'
-                }
-            }, {
-                versionTypeId: 2,
-                label: {
-                    label_en: 'Final'
-                }
-            }],
+            versionTypeList: [],
             versionSettingsList: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -543,7 +533,7 @@ export default class VersionSettingsComponent extends Component {
 
 
     componentDidMount() {
-        // this.getVersionTypeList();
+        this.getVersionTypeList();
         this.getDatasetList();
     }
 
@@ -581,7 +571,7 @@ export default class VersionSettingsComponent extends Component {
         let versionTypes = versionTypeList.length > 0
             && versionTypeList.map((item, i) => {
                 return (
-                    <option key={i} value={item.versionTypeId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
