@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Button } from 'reactstrap';
+import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label,Col, Button } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -406,7 +406,7 @@ export default class VersionSettingsComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 50, 50, 200, 100, 100, 100, 100],
+            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -596,13 +596,12 @@ export default class VersionSettingsComponent extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
 
-                    <CardBody className="pb-lg-2 pt-lg-0">
-
-                        <div className="pl-0">
-                            <div className="row">
-                                <FormGroup className="col-md-3">
+                    <CardBody className="pb-lg-5 pt-lg-2">
+                    <Col md="9 pl-0">
+                        <div className="d-md-flex">
+                                <FormGroup className="mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
-                                    <div className="controls ">
+                                    <div className="controls SelectGoVesionSetting">
                                         {/* <InMultiputGroup> */}
                                         <MultiSelect
                                             name="datasetId"
@@ -615,9 +614,9 @@ export default class VersionSettingsComponent extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls SelectGoVesionSetting">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -633,11 +632,13 @@ export default class VersionSettingsComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                            </div>
                         </div>
-
+                        </Col>
                         {/* <div id="loader" className="center"></div> */}
+                
+                        <div className="VersionSettingMarginTop">
                         <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -652,7 +653,7 @@ export default class VersionSettingsComponent extends Component {
                         </div>
 
                     </CardBody>
-                    <CardFooter>
+                    <CardFooter className="CardFooterVesionsettingMarginTop">
                         {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

@@ -3536,7 +3536,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 });
             }
@@ -3551,7 +3551,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Solid
                 })
                 );
@@ -3567,7 +3567,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0.08,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 }));
             }
