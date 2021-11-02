@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Formik } from 'formik';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
@@ -254,7 +254,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       columnSorting: false,
       tableOverflow: false,
@@ -441,7 +441,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsInventory
     };
@@ -634,7 +634,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsShipment
     };
@@ -749,7 +749,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsProblem
     };
@@ -1904,6 +1904,8 @@ export default class syncPage extends Component {
                                               this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
                                             }.bind(this)
                                           })
+                                        }else{
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -2088,6 +2090,8 @@ export default class syncPage extends Component {
                                               this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
                                             }.bind(this)
                                           })
+                                        }else{
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -2269,6 +2273,8 @@ export default class syncPage extends Component {
                                               this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
                                             }.bind(this)
                                           })
+                                        }else{
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -3988,6 +3994,8 @@ export default class syncPage extends Component {
                   this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
                 }.bind(this)
               })
+            }else{
+              return false;
             }
 
             // if (rowData[0].toString() > 0) {

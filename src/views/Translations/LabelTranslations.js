@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../ProductCategory/style.css"
 import {
@@ -105,7 +105,7 @@ export default class DatabaseTranslations extends React.Component {
                             filters: true,
                             license: JEXCEL_PRO_KEY,
                             contextMenu: function (obj, x, y, e) {
-                                return [];
+                                return false;
                             }.bind(this),
                             // tableHeight: '500px',
                         };
