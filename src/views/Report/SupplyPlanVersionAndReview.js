@@ -214,8 +214,7 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
-                    // options: { isTime: 1, format: "DD-Mon-YY HH24:MM PM" },
-                    options: { isTime: 1, format: "DD-Mon-YY HH24:MM" },
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
                     readOnly: true,
                     type: 'calendar'
                 }, {
