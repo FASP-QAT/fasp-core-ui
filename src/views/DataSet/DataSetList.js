@@ -704,7 +704,7 @@ export default class ProgramList extends Component {
                                     id="countryId"
                                     bsSize="sm"
                                 ></Input>
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
