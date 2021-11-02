@@ -522,15 +522,15 @@ class Budgets extends Component {
                             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             // var programJson = JSON.parse(programData);
-                            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
-                            var shipmentList=[];
-                            for(var pu=0;pu<planningUnitDataList.length;pu++){
-                                var planningUnitData=planningUnitDataList[pu];
+                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            var shipmentList = [];
+                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                                var planningUnitData = planningUnitDataList[pu];
                                 var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                 var programJson = JSON.parse(programData);
-                                var sList=programJson.shipmentList;
-                                shipmentList=shipmentList.concat(sList);
+                                var sList = programJson.shipmentList;
+                                shipmentList = shipmentList.concat(sList);
                             }
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
@@ -1454,6 +1454,7 @@ class Budgets extends Component {
                                                         { label: item.fundingSourceCode, value: item.fundingSourceId }
                                                     )
                                                 }, this)}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>
