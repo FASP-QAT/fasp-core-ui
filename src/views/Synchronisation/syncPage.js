@@ -4331,7 +4331,7 @@ export default class syncPage extends Component {
     console.log("ProgramIds++++", programIds);
     console.log("this props++++", this)
     console.log("this props++++", this.props)
-    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } });
+    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
 
   updateState(parameterName, value) {

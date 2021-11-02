@@ -179,6 +179,11 @@ class ProgramService {
         );
     }
 
+    getLatestVersionsForPrograms(programIds) {
+        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`,programIds, {}
+        );
+    }
+
     getLastModifiedDateForProgram(programId, versionId) {
         return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
         );
