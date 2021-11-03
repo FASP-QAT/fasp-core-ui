@@ -1074,6 +1074,9 @@ class DefaultLayout extends Component {
     // console.log("User111-----", decryptedUser1.defaultModuleId);
     this.setState({
       activeTab: decryptedUser1.defaultModuleId,
+    }, () => {
+      let id = AuthenticationService.displayDashboardBasedOnRole();
+      this.props.history.push(`/ApplicationDashboard/` + `${id}`);
     });
 
   }
@@ -1472,7 +1475,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.versionSettings.versionSettings'),
                             url: '/dataset/versionSettings',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-code-fork',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                         ]
