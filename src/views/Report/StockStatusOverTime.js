@@ -912,24 +912,24 @@ class StockStatusOverTime extends Component {
                         // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         // var programJson = JSON.parse(programData);
-                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         planningUnitIds.map(planningUnitId => {
                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
+                            var programJson = {}
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
                             }
-                        }
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                             var monthstartfrom = this.state.rangeValue.from.month
@@ -1662,6 +1662,7 @@ class StockStatusOverTime extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     labelledBy={i18n.t('static.common.select')}
+                                                    disabled={this.state.loading}
                                                 />
                                                 {/* </InputGroup> */}
                                                 {/* <ReactMultiSelectCheckboxes
