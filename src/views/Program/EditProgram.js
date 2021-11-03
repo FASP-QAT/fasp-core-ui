@@ -613,7 +613,7 @@ export default class EditProgram extends Component {
             healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
         }
         this.setState({
-            healthAreaCode: healthAreaCode.slice(0,-1)
+            healthAreaCode: healthAreaCode.slice(0, -1)
         })
     }
 
@@ -803,8 +803,8 @@ export default class EditProgram extends Component {
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
                                     regionId: this.state.program.regionArray,
-                                    programCode1:this.state.uniqueCode,
-                                    programCode:this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
+                                    programCode1: this.state.uniqueCode,
+                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -1120,7 +1120,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.airFreightPerc}
                                                         bsSize="sm"
                                                         valid={!errors.airFreightPerc}
-                                                        invalid={touched.airFreightPerc && !!errors.airFreightPerc || this.state.program.airFreightPerc == ''}
+                                                        invalid={touched.airFreightPerc && !!errors.airFreightPerc || this.state.program.airFreightPerc === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1137,7 +1137,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.seaFreightPerc}
                                                         bsSize="sm"
                                                         valid={!errors.seaFreightPerc}
-                                                        invalid={touched.seaFreightPerc && !!errors.seaFreightPerc || this.state.program.seaFreightPerc == ''}
+                                                        invalid={touched.seaFreightPerc && !!errors.seaFreightPerc || this.state.program.seaFreightPerc === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1154,7 +1154,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.plannedToSubmittedLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.plannedToSubmittedLeadTime}
-                                                        invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime || this.state.program.plannedToSubmittedLeadTime == ''}
+                                                        invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime || this.state.program.plannedToSubmittedLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1171,7 +1171,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.submittedToApprovedLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.submittedToApprovedLeadTime}
-                                                        invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime || this.state.program.submittedToApprovedLeadTime == ''}
+                                                        invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime || this.state.program.submittedToApprovedLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1188,7 +1188,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.approvedToShippedLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.approvedToShippedLeadTime}
-                                                        invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.program.approvedToShippedLeadTime == ''}
+                                                        invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime || this.state.program.approvedToShippedLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1222,7 +1222,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.shippedToArrivedByAirLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.shippedToArrivedByAirLeadTime && this.state.program.shippedToArrivedByAirLeadTime != ''}
-                                                        invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime || this.state.program.shippedToArrivedByAirLeadTime == ''}
+                                                        invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime || this.state.program.shippedToArrivedByAirLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1239,7 +1239,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.shippedToArrivedBySeaLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.shippedToArrivedBySeaLeadTime && this.state.program.shippedToArrivedBySeaLeadTime != ''}
-                                                        invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime || this.state.program.shippedToArrivedBySeaLeadTime == ''}
+                                                        invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime || this.state.program.shippedToArrivedBySeaLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
@@ -1256,7 +1256,7 @@ export default class EditProgram extends Component {
                                                         value={this.state.program.arrivedToDeliveredLeadTime}
                                                         bsSize="sm"
                                                         valid={!errors.arrivedToDeliveredLeadTime && this.state.program.arrivedToDeliveredLeadTime != ''}
-                                                        invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime || this.state.program.arrivedToDeliveredLeadTime == ''}
+                                                        invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime || this.state.program.arrivedToDeliveredLeadTime === ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         type="number"
