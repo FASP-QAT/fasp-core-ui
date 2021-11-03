@@ -41,6 +41,7 @@ import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
 import Draggable from 'react-draggable';
+import ModelingTypeService from "../../api/ModelingTypeService";
 
 
 
@@ -271,6 +272,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            modelingTypeList: [],
             sameLevelNodeList: [],
             showMomDataPercent: false,
             showModelingJexcelNumber: false,
@@ -478,10 +480,10 @@ export default class CreateTreeTemplate extends Component {
         var arr = this.state.items.filter(x => x.level == level && x.id != id);
         console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
-            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang)}
+            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
         this.setState({
-            sameLevelNodeList 
+            sameLevelNodeList
         });
     }
 
@@ -781,11 +783,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Modeling type',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "Linear (#)" },
-                        { id: 2, name: "Linear (%)" },
-                        { id: 3, name: "Exponential (%)" },
-                    ]
+                    source: this.state.modelingTypeList
                 },
                 {
                     title: 'Start Date',
@@ -905,11 +903,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Modeling type',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "Linear (#)" },
-                        { id: 2, name: "Linear (%)" },
-                        { id: 3, name: "Exponential (%)" },
-                    ]
+                    source: this.state.modelingTypeList
                 },
                 {
                     title: 'Start Date',
@@ -2000,6 +1994,62 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
+        ModelingTypeService.getModelingTypeListActive().then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var modelingTypeList  = [];
+            for (var i = 0; i < listArray.length; i++) {
+                modelingTypeList[i] = { id: listArray[i].modelingTypeId, name: getLabelText(listArray[i].label, this.state.lang) }
+            }
+
+            this.setState({
+                modelingTypeList
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
         // DatasetService.getNodeTypeList().then(response => {
         //     console.log("node type list---", response.data);
         //     var listArray = response.data;
@@ -2962,6 +3012,10 @@ export default class CreateTreeTemplate extends Component {
                             } else {
                                 this.updateNodeInfoInJson(this.state.currentItemConfig)
                             }
+                            this.setState({
+                                cursorItem: 0,
+                                highlightItem: 0
+                            })
 
                         }}
                         render={
@@ -3691,7 +3745,7 @@ export default class CreateTreeTemplate extends Component {
                                     </div>}
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </FormGroup>
@@ -4090,7 +4144,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 });
             }
@@ -4105,7 +4159,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 })
                 );
@@ -4122,7 +4176,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0.08,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 }));
             }
@@ -4772,7 +4826,7 @@ export default class CreateTreeTemplate extends Component {
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>
-                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
                         <Row>
