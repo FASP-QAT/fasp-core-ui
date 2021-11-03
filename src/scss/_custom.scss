@@ -5104,7 +5104,8 @@ height: 0px;
     // border-left-color: #ddd;
     // border-right-color: #ddd;
     border-radius: 1px!important;
-    box-shadow: 0 8px 16px #0000001f!important;
+    box-shadow: 0 4px 7px #0000001f !important;
+    // box-shadow: 0 8px 16px #0000001f!important;
     cursor: pointer;
 }
 // .boxContactTemplate :hover{
@@ -5121,14 +5122,24 @@ height: 0px;
 }
 .ContactTitle i{
   // color: #002f6c!important;
-  color: #fff !important;
-    background: #002f6c!important;
-    padding: 4px 6px 3px 6px!important;
+  // color: #002f6c !important;
+    // background: #002f6c!important;
+    padding: 4px 4px 3px 3px!important;
     // margin-top: -1px!important;
     // border: 1px solid #002f6c!important;
-    border-radius: 5px!important;
+    border-radius: 0px!important;
     cursor: pointer;
 }
+// .ContactTitleWhite i{
+//   // color: #002f6c!important;
+//   color: #fff !important;
+//   // background: #002f6c!important;
+//   padding: 4px 6px 3px 6px!important;
+//   // margin-top: -1px!important;
+//   // border: 1px solid #002f6c!important;
+//   border-radius: 0px!important;
+//   cursor: pointer;
+// }
 .TreeIconStyle{
   width: 23px;
   height: 23px;
@@ -5150,12 +5161,14 @@ height: 0px;
 .TreeIconStyle i:hover {
   /* font-size: 14px !important; */
   cursor: pointer;
-  color: #8C8985;
+  // color: #8C8985;
+  color: #212721;
+  box-shadow: 0 8px 16px #0000001f!important;
   // font-weight: 500;
 }
 
 .HighlightFrame {
-  border: 1px solid #fbcb09!important;
+  border: 0px solid #fbcb09!important;
   background: transparent!important;
   color: transparent!important;
   border-radius: 0px!important;
@@ -5164,6 +5177,7 @@ height: 0px;
   left: -1px;
   top: -1px;
   padding-bottom: 0px;
+  box-shadow: 0 8px 16px #0000001f!important;
   
 }
 .CursorFrame {
@@ -5195,18 +5209,41 @@ height: 0px;
   font-weight: bold!important;
 }
 .TemplateTitleBg{
-  // background:#bcd4f1!important;
-  background: #eee!important;
+  background:#a7c6ed!important;
+  // background: #eee!important;
   border:none!important;
   border-radius:0px!important;
-  padding:0px 0px 2px 0px!important;
+  padding:0px 0px 1px 0px!important;
+  top: 0px!important;
+  left: 0px!important;
+  right: 0px!important;
 }
+.TemplateTitleBgblue{
+  background:#002f6c!important;
+  // background: #eee!important;
+  border:none!important;
+  border-radius:0px!important;
+  padding:0px 0px 1px 0px!important;
+  top: 0px!important;
+  left: 0px!important;
+  right: 0px!important;
+}
+.TitleColorWhite{
+  color:#fff!important;
+  font-weight: bold!important;
+  margin-left:1px;
+}
+
 .ContactPhoneValue{
     color: rgb(0, 0, 0);
     margin-top: 6px;
     left: 0!important;
     right: 0!important;
     text-align: center;
+}
+.TitleColor{
+  color:#002f6c!important;
+  font-weight: bold!important;
 }
 .btn-warning {
   color: #fff;
