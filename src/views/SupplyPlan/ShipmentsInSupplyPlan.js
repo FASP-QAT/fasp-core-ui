@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1048,8 +1048,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 return false;
                                                                             },
                                                                             contextMenu: function (obj, x, y, e) {
-                                                                                var items = [];
-                                                                                return items;
+                                                                                return false;
                                                                             },
                                                                             license: JEXCEL_PRO_KEY,
                                                                             text: {
@@ -4023,8 +4022,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 editable: tableEditable,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    var items = [];
-                    return items;
+                    return false;
                 },
                 onchange: this.shipmentQtyChanged,
                 text: {
@@ -4101,8 +4099,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     onload: this.loadedQtyCalculator1,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
-                        var items = [];
-                        return items;
+                        return false;
                     },
 
                 }

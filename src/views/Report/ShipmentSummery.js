@@ -62,8 +62,8 @@ import MultiSelect from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { red } from '@material-ui/core/colors';
 
@@ -957,7 +957,7 @@ class ShipmentSummery extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var shipmentDetailsEl = jexcel(document.getElementById("shipmentDetailsListTableDiv"), options);
