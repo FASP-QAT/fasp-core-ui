@@ -1092,6 +1092,11 @@ export default class CreateTreeTemplate extends Component {
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                    this.getUsageText();
+                } else {
+                    console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                }
                 // const { currentItemConfig } = this.state;
                 // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                 // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
@@ -1380,11 +1385,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             noOfMonthsInUsagePeriod
         }, () => {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
-                this.getUsageText();
-            } else {
-                console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-            }
+            // if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+            //     this.getUsageText();
+            // } else {
+            //     console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            // }
         });
     }
     getUsageText() {
@@ -1457,6 +1462,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             //PU
             console.log("pu>>>", this.state.currentItemConfig);
+            console.log("puList>>>", this.state.planningUnitList);
             if (this.state.addNodeFlag) {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
@@ -2401,7 +2407,8 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name === "oneTimeUsage") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.value;
+            // (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.id === "oneTimeUsage2" ? "false" : "true";
             this.getUsageText();
         }
 
@@ -2673,7 +2680,7 @@ export default class CreateTreeTemplate extends Component {
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     console.log("(puNode>>>", (data.context.payload.nodeDataMap[0])[0].puNode);
-                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.idString);
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
                     this.setState({
@@ -3525,7 +3532,42 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                 <>
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-12">
+                                                        <Label for="isSync">Single Use </Label>
+                                                        <FormGroup className="ml-lg-3" check inline >
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="oneTimeUsage1"
+                                                                name="oneTimeUsage"
+                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
+                                                                checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "true"}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="oneTimeUsage2"
+                                                                name="oneTimeUsage"
+                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
+                                                                checked={this.state.addNodeFlag ? true : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "false"}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
+                                                    {/* <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
@@ -3541,7 +3583,7 @@ export default class CreateTreeTemplate extends Component {
                                                             <option value="false">No</option>
 
                                                         </Input>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                     {/* <FormGroup className="col-md-5"></FormGroup> */}
                                                     {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" &&
                                                         <>
