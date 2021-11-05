@@ -76,6 +76,7 @@
     "react-codemirror2": "^6.0.0",
     "react-color": "2.18.1",
     "react-confirm-alert": "^2.6.1",
+    "react-confirm-box": "^1.2.0",
     "react-contexify": "^4.1.1",
     "react-contextmenu": "^2.13.0",
     "react-datepicker": "^2.15.0",

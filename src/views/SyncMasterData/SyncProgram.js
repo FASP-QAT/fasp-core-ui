@@ -84,15 +84,15 @@ export default class SyncProgram extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 myResult = getRequest.result.filter(c => c.userId == userId);
                 var programList = myResult;
-                var readonlyProgramList = myResult.filter(c => c.readonly);
+                // var readonlyProgramList = myResult.filter(c => c.readonly);
                 console.log("MyResult+++", myResult);
                 this.setState({
-                    totalMasters: readonlyProgramList.length,
+                    totalMasters: myResult.length,
                     loading: false,
                     programList: programList
                 }, () => {
-                    if (readonlyProgramList.length > 0) {
-                        this.syncPrograms(readonlyProgramList, programList);
+                    if (programList.length > 0) {
+                        this.syncPrograms(programList);
                     } else {
                         let id = AuthenticationService.displayDashboardBasedOnRole();
                         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
@@ -102,11 +102,16 @@ export default class SyncProgram extends Component {
         }.bind(this)
     }
 
-    syncPrograms(readonlyProgramList, programList) {
+    syncPrograms(programList) {
         var programIdsToLoad = this.state.programIdsToLoad;
         var pIds = [];
-        for (var i = 0; i < readonlyProgramList.length; i++) {
-            pIds.push(readonlyProgramList[i].programId);
+        var uniqueProgramList = []
+        for (var i = 0; i < programList.length; i++) {
+            var index = uniqueProgramList.findIndex(c => c == programList[i].programId);
+            if (index == -1) {
+                uniqueProgramList.push(programList[i].programId);
+            }
+            pIds.push(programList[i].programId);
         }
         // for (var i = 0; i < readonlyProgramList.length; i++) {
         AuthenticationService.setupAxiosInterceptors();
@@ -115,73 +120,79 @@ export default class SyncProgram extends Component {
                 var list = response1.data;
                 var readonlyProgramToBeDeleted = [];
                 console.log("List+++", list);
-                for (var i = 0; i < readonlyProgramList.length; i++) {
+                for (var i = 0; i < programList.length; i++) {
                     console.log("In i+++", i)
-                    var latestVersion = list.filter(c => c.programId == readonlyProgramList[i].programId)[0].versionId;
+                    var latestVersion = list.filter(c => c.programId == programList[i].programId)[0].versionId;
                     console.log("LatestVersion+++", latestVersion);
-                    console.log("Readonly rogramId+++", readonlyProgramList[i].programId);
-                    console.log("readonlyProgramList[i].version+++", readonlyProgramList[i].version);
-                    if (latestVersion > readonlyProgramList[i].version) {
-                        var programCode = readonlyProgramList[i].programCode + "~v" + readonlyProgramList[i].version;
-                        var cf = window.confirm(i18n.t('static.syncProgram.laterVersionAvailable', { programCode }));
-                        if (cf == true) {
-                            var checkIfLatestVersionExists = programList.filter(c => c.programId == readonlyProgramList[i].programId && c.version == latestVersion);
-                            readonlyProgramToBeDeleted.push(readonlyProgramList[i])
-                            if (checkIfLatestVersionExists.length > 0) {
-                                var cf1 = window.confirm(i18n.t('static.syncProgram.programwithsameversion', { programCode }));
-                                if (cf1 == true) {
-                                    if (checkIfLatestVersionExists[0].programModified == 1) {
-                                        var cf2 = window.confirm(i18n.t('static.syncProgram.confirmLoad', { programCode }));
-                                        if (cf2 == true) {
-                                            programIdsToLoad.push(readonlyProgramList[i].id);
-                                            var syncedMasters = this.state.syncedMasters;
-                                            this.setState({
-                                                syncedMasters: syncedMasters + 1,
-                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                            })
-                                        } else {
-                                            var syncedMasters = this.state.syncedMasters;
-                                            this.setState({
-                                                syncedMasters: syncedMasters + 1,
-                                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                            })
-                                        }
-                                    } else {
-                                        programIdsToLoad.push(readonlyProgramList[i].id);
-                                        var syncedMasters = this.state.syncedMasters;
-                                        this.setState({
-                                            syncedMasters: syncedMasters + 1,
-                                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                        })
+                    var checkIfLatestVersionExists = []
+                    checkIfLatestVersionExists = programList.filter(c => c.programId == programList[i].programId && c.version == latestVersion);
+                    // Means user ke pass latest version nhi hai
+                    if (checkIfLatestVersionExists.length == 0) {
+                        if (programList[i].readonly) {
+                            var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
+                            if (index == -1) {
+                                readonlyProgramToBeDeleted.push(programList[i]);
+                            }
+                            programIdsToLoad.push(programList[i].programId);
+                            var syncedMasters = this.state.syncedMasters;
+                            this.setState({
+                                syncedMasters: syncedMasters + 1
+                            })
+                        } else {
+                            if (programList[i].programModified) {
+                                var programCode = programList[i].programCode + "~v" + programList[i].version;
+                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode }));
+                                if (cf == true) {
+                                    var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
+                                    if (index == -1) {
+                                        readonlyProgramToBeDeleted.push(programList[i]);
                                     }
+                                    programIdsToLoad.push(programList[i].programId);
+                                    var syncedMasters = this.state.syncedMasters;
+                                    this.setState({
+                                        syncedMasters: syncedMasters + 1
+                                    })
                                 } else {
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1,
-                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                        syncedMasters: syncedMasters + 1
                                     })
                                 }
                             } else {
-                                programIdsToLoad.push(readonlyProgramList[i].id);
-                                var syncedMasters = this.state.syncedMasters;
-                                this.setState({
-                                    syncedMasters: syncedMasters + 1,
-                                    syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                })
+                                var programCode = programList[i].programCode + "~v" + programList[i].version;
+                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode }));
+                                if (cf == true) {
+                                    var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
+                                    if (index == -1) {
+                                        readonlyProgramToBeDeleted.push(programList[i]);
+                                    }
+                                    programIdsToLoad.push(programList[i].programId);
+                                    var syncedMasters = this.state.syncedMasters;
+                                    this.setState({
+                                        syncedMasters: syncedMasters + 1
+                                    })
+                                } else {
+                                    var syncedMasters = this.state.syncedMasters;
+                                    this.setState({
+                                        syncedMasters: syncedMasters + 1
+                                    })
+                                }
                             }
-                        } else {
-                            var syncedMasters = this.state.syncedMasters;
-                            this.setState({
-                                syncedMasters: syncedMasters + 1,
-                                syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                            })
                         }
-
                     } else {
+                        // User ka pass latest version hai
+                        // Readonly version ki list lao
+                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly);
+                        // Sare readonly versions ko delete karo
+                        for (var j = 0; j < readonlyProgramList.length; j++) {
+                            var index = readonlyProgramToBeDeleted.findIndex(c => c.id == readonlyProgramList[j].id);
+                            if (index == -1) {
+                                readonlyProgramToBeDeleted.push(readonlyProgramList[j]);
+                            }
+                        }
                         var syncedMasters = this.state.syncedMasters;
                         this.setState({
-                            syncedMasters: syncedMasters + 1,
-                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                            syncedMasters: syncedMasters + 1
                         })
                     }
                 }
@@ -200,12 +211,17 @@ export default class SyncProgram extends Component {
     }
 
     loadLatestVersion(programIds, readonlyProgramToBeDeleted) {
+        console.log("In load latest version+++", programIds.length);
         if (programIds.length > 0) {
+            console.log("In if===")
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
-                var program = this.state.programList.filter(c => c.id == programIds)[0];
+                console.log("In for", programIds[i])
+                var program = this.state.programList.filter(c => c.programId == programIds[i])[0];
+                console.log("Program+++", program)
                 checkboxesChecked.push({ programId: program.programId, versionId: -1 })
             }
+            console.log("checkbozes checked+++", checkboxesChecked)
             ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
                     console.log(")))) After calling get notification api")
@@ -282,39 +298,21 @@ export default class SyncProgram extends Component {
                             var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                             var programDataOs1 = programDataTransaction1.objectStore('programData');
                             for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                                console.log("checkIfProgramExists+++", checkIfProgramExists);
-                                var programIdToDelete = 0;
-                                if (checkIfProgramExists.length > 0) {
-                                    programIdToDelete = checkIfProgramExists[0].id;
-                                }
-                                var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+                                var programRequest1 = programDataOs1.delete(readonlyProgramToBeDeleted[dpd].id);
                             }
                             programDataTransaction1.oncomplete = function (event) {
                                 var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
                                 var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
 
                                 for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                    var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                                    console.log("checkIfProgramExists+++", checkIfProgramExists);
-                                    var programIdToDelete = 0;
-                                    if (checkIfProgramExists.length > 0) {
-                                        programIdToDelete = checkIfProgramExists[0].id;
-                                    }
-                                    var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
+                                    var programRequest3 = programDataOs3.delete(readonlyProgramToBeDeleted[dpd].id);
                                 }
                                 programDataTransaction3.oncomplete = function (event) {
                                     var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
                                     var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
 
                                     for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                        var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                                        console.log("checkIfProgramExists+++", checkIfProgramExists);
-                                        var programIdToDelete = 0;
-                                        if (checkIfProgramExists.length > 0) {
-                                            programIdToDelete = checkIfProgramExists[0].id;
-                                        }
-                                        var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                                        var programRequest2 = programDataOs2.delete(readonlyProgramToBeDeleted[dpd].id);
                                     }
                                     programDataTransaction2.oncomplete = function (event) {
 
