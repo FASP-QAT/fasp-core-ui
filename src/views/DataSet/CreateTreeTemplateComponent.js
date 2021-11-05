@@ -41,6 +41,7 @@ import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
 import Draggable from 'react-draggable';
+import ModelingTypeService from "../../api/ModelingTypeService";
 
 
 
@@ -56,7 +57,9 @@ const ItemTypes = {
 
 let initialValues = {
     forecastMethodId: "",
-    treeName: ""
+    treeName: "",
+    monthsInPast: "",
+    monthsInFuture: ""
 }
 
 let initialValuesNodeData = {
@@ -133,6 +136,15 @@ const validationSchema = function (values) {
             .required("Please select forecast method"),
         treeName: Yup.string()
             .required("Please enter tree name"),
+        monthsInPast: Yup.number()
+            .typeError('Please enter months in past')
+            .integer("Please enter only values")
+            .required("Please enter months in past"),
+        monthsInFuture: Yup.number()
+            .typeError('Please enter months in future')
+            .integer("Please enter only values")
+            .required("Please enter months in future")
+            .positive("Please enter positive values")
 
     })
 }
@@ -271,6 +283,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            modelingTypeList: [],
+            sameLevelNodeList: [],
             showMomDataPercent: false,
             showModelingJexcelNumber: false,
             showModelingJexcelPercent: false,
@@ -482,6 +496,7 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMomByEndValue = this.calculateMomByEndValue.bind(this);
         this.calculateMomByChangeInPercent = this.calculateMomByChangeInPercent.bind(this);
         this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
+        this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
     }
 
     calculateMomByEndValue(e) {
@@ -536,6 +551,22 @@ export default class CreateTreeTemplate extends Component {
             currentCalculatedMomChange: e.target.value != '' ? getmomValue : ''
         });
     }
+       
+    
+    getSameLevelNodeList(level, id) {
+        console.log("level---", level);
+        console.log("id---", id);
+        var sameLevelNodeList = [];
+        var arr = this.state.items.filter(x => x.level == level && x.id != id);
+        console.log("arr---", arr);
+        for (var i = 0; i < arr.length; i++) {
+            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
+        }
+        this.setState({
+            sameLevelNodeList
+        });
+    }
+
     toggle() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
@@ -822,11 +853,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Transfer to node',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" },
-                        { id: 3, name: "3 line ARV" }
-                    ]
+                    source: this.state.sameLevelNodeList
                 },
                 {
                     title: "Note",
@@ -836,11 +863,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Modeling type',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "Linear (#)" },
-                        { id: 2, name: "Linear (%)" },
-                        { id: 3, name: "Exponential (%)" },
-                    ]
+                    source: this.state.modelingTypeList
                 },
                 {
                     title: 'Start Date',
@@ -957,11 +980,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Transfer to node',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "1 line ARV " },
-                        { id: 2, name: "1 line CON" },
-                        { id: 3, name: "3 line ARV" }
-                    ]
+                    source: this.state.sameLevelNodeList
                 },
                 {
                     title: "Note",
@@ -971,11 +990,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Modeling type',
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: "Linear (#)" },
-                        { id: 2, name: "Linear (%)" },
-                        { id: 3, name: "Exponential (%)" },
-                    ]
+                    source: this.state.modelingTypeList
                 },
                 {
                     title: 'Start Date',
@@ -1694,7 +1709,9 @@ export default class CreateTreeTemplate extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             'forecastMethodId': true,
-            'treeName': true
+            'treeName': true,
+            'monthsInPast': true,
+            'monthsInFuture': true
         }
         )
         this.validateForm(errors)
@@ -2072,6 +2089,62 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
+        ModelingTypeService.getModelingTypeListActive().then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var modelingTypeList = [];
+            for (var i = 0; i < listArray.length; i++) {
+                modelingTypeList[i] = { id: listArray[i].modelingTypeId, name: getLabelText(listArray[i].label, this.state.lang) }
+            }
+
+            this.setState({
+                modelingTypeList
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
         // DatasetService.getNodeTypeList().then(response => {
         //     console.log("node type list---", response.data);
         //     var listArray = response.data;
@@ -2404,6 +2477,15 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "treeName") {
             treeTemplate.label.label_en = event.target.value;
         }
+
+        if (event.target.name === "monthsInPast") {
+            treeTemplate.monthsInPast = event.target.value;
+        }
+
+        if (event.target.name === "monthsInFuture") {
+            treeTemplate.monthsInFuture = event.target.value;
+        }
+
         if (event.target.name === "usageTemplateId") {
             this.setState({
                 usageTemplateId: event.target.value
@@ -2736,13 +2818,10 @@ export default class CreateTreeTemplate extends Component {
         }
     };
     onCursoChanged(event, data) {
-        // this.setState({ openAddNodeModal: true });
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
-        // const { config } = this.state;
         if (item != null) {
-
             this.setState({
                 openAddNodeModal: true,
                 addNodeFlag: false,
@@ -2762,6 +2841,7 @@ export default class CreateTreeTemplate extends Component {
             }, () => {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
+
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     // this.getNoOfMonthsInUsagePeriod();
@@ -2788,6 +2868,8 @@ export default class CreateTreeTemplate extends Component {
 
                     // this.getUsageText();
                     // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
+                } else if (data.context.payload.nodeType.id != 1) {
+                    this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
 
 
@@ -4528,7 +4610,9 @@ export default class CreateTreeTemplate extends Component {
                                     enableReinitialize={true}
                                     initialValues={{
                                         forecastMethodId: this.state.treeTemplate.forecastMethod.id,
-                                        treeName: this.state.treeTemplate.label.label_en
+                                        treeName: this.state.treeTemplate.label.label_en,
+                                        monthsInPast: this.state.treeTemplate.monthsInPast,
+                                        monthsInFuture: this.state.treeTemplate.monthsInFuture
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -4580,6 +4664,8 @@ export default class CreateTreeTemplate extends Component {
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
                                             active: template.active,
+                                            monthsInPast: template.monthsInPast,
+                                            monthsInFuture: template.monthsInFuture,
                                             label: {
                                                 label_en: template.label.label_en
                                             },
@@ -4884,7 +4970,41 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
-
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        name="monthsInPast"
+                                                                        id="monthsInPast"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.monthsInPast && this.state.treeTemplate.monthsInPast != ''}
+                                                                        invalid={touched.monthsInPast && !!errors.monthsInPast}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.monthsInPast}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.monthsInPast}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        name="monthsInFuture"
+                                                                        id="monthsInFuture"
+                                                                        bsSize="sm"
+                                                                        min="0"
+                                                                        valid={!errors.monthsInFuture && this.state.treeTemplate.monthsInFuture != ''}
+                                                                        invalid={touched.monthsInFuture && !!errors.monthsInFuture}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.monthsInFuture}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.monthsInFuture}</FormFeedback>
+                                                                </FormGroup>
                                                             </Row>
                                                         </div>
 
