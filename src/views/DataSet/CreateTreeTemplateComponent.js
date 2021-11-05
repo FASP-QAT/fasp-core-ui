@@ -57,7 +57,9 @@ const ItemTypes = {
 
 let initialValues = {
     forecastMethodId: "",
-    treeName: ""
+    treeName: "",
+    monthsInPast: "",
+    monthsInFuture: ""
 }
 
 let initialValuesNodeData = {
@@ -134,6 +136,15 @@ const validationSchema = function (values) {
             .required("Please select forecast method"),
         treeName: Yup.string()
             .required("Please enter tree name"),
+        monthsInPast: Yup.number()
+            .typeError('Please enter months in past')
+            .integer("Please enter only values")
+            .required("Please enter months in past"),
+        monthsInFuture: Yup.number()
+            .typeError('Please enter months in future')
+            .integer("Please enter only values")
+            .required("Please enter months in future")
+            .positive("Please enter positive values")
 
     })
 }
@@ -1616,7 +1627,9 @@ export default class CreateTreeTemplate extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             'forecastMethodId': true,
-            'treeName': true
+            'treeName': true,
+            'monthsInPast': true,
+            'monthsInFuture': true
         }
         )
         this.validateForm(errors)
@@ -2001,7 +2014,7 @@ export default class CreateTreeTemplate extends Component {
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
-            var modelingTypeList  = [];
+            var modelingTypeList = [];
             for (var i = 0; i < listArray.length; i++) {
                 modelingTypeList[i] = { id: listArray[i].modelingTypeId, name: getLabelText(listArray[i].label, this.state.lang) }
             }
@@ -2382,6 +2395,15 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "treeName") {
             treeTemplate.label.label_en = event.target.value;
         }
+
+        if (event.target.name === "monthsInPast") {
+            treeTemplate.monthsInPast = event.target.value;
+        }
+
+        if (event.target.name === "monthsInFuture") {
+            treeTemplate.monthsInFuture = event.target.value;
+        }
+
         if (event.target.name === "usageTemplateId") {
             this.setState({
                 usageTemplateId: event.target.value
@@ -4438,7 +4460,9 @@ export default class CreateTreeTemplate extends Component {
                                     enableReinitialize={true}
                                     initialValues={{
                                         forecastMethodId: this.state.treeTemplate.forecastMethod.id,
-                                        treeName: this.state.treeTemplate.label.label_en
+                                        treeName: this.state.treeTemplate.label.label_en,
+                                        monthsInPast: this.state.treeTemplate.monthsInPast,
+                                        monthsInFuture: this.state.treeTemplate.monthsInFuture
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -4490,6 +4514,8 @@ export default class CreateTreeTemplate extends Component {
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
                                             active: template.active,
+                                            monthsInPast: template.monthsInPast,
+                                            monthsInFuture: template.monthsInFuture,
                                             label: {
                                                 label_en: template.label.label_en
                                             },
@@ -4794,7 +4820,41 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
-
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        name="monthsInPast"
+                                                                        id="monthsInPast"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.monthsInPast && this.state.treeTemplate.monthsInPast != ''}
+                                                                        invalid={touched.monthsInPast && !!errors.monthsInPast}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.monthsInPast}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.monthsInPast}</FormFeedback>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        name="monthsInFuture"
+                                                                        id="monthsInFuture"
+                                                                        bsSize="sm"
+                                                                        min="0"
+                                                                        valid={!errors.monthsInFuture && this.state.treeTemplate.monthsInFuture != ''}
+                                                                        invalid={touched.monthsInFuture && !!errors.monthsInFuture}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.monthsInFuture}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.monthsInFuture}</FormFeedback>
+                                                                </FormGroup>
                                                             </Row>
                                                         </div>
 
