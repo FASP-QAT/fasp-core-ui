@@ -184,10 +184,10 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
 
     return connectDropTarget(connectDragSource(
         // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-        <div className="ContactTemplate boxContactTemplate">
-            <div className="ContactTitleBackground TemplateTitleBg"
+            <div className="ContactTemplate boxContactTemplate"> 
+            <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :"ContactTitleBackground TemplateTitleBg" }
             >
-                <div className="ContactTitle" style={{ color: '#002f6c', fontWeight: 'bold' }}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
+                <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px',color:'#002f6c'}}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px',color:'#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px',color:'#002f6c' }} ></i> : ""))))}</b></div>
             </div>
             <div className="ContactPhone ContactPhoneValue">
                 <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
@@ -1104,6 +1104,11 @@ export default class CreateTreeTemplate extends Component {
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                    this.getUsageText();
+                } else {
+                    console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                }
                 // const { currentItemConfig } = this.state;
                 // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                 // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
@@ -1392,11 +1397,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             noOfMonthsInUsagePeriod
         }, () => {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
-                this.getUsageText();
-            } else {
-                console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-            }
+            // if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+            //     this.getUsageText();
+            // } else {
+            //     console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            // }
         });
     }
     getUsageText() {
@@ -1469,6 +1474,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             //PU
             console.log("pu>>>", this.state.currentItemConfig);
+            console.log("puList>>>", this.state.planningUnitList);
             if (this.state.addNodeFlag) {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
@@ -2480,7 +2486,8 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name === "oneTimeUsage") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.value;
+            // (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.id === "oneTimeUsage2" ? "false" : "true";
             this.getUsageText();
         }
 
@@ -2750,7 +2757,7 @@ export default class CreateTreeTemplate extends Component {
                 } else if (data.context.payload.nodeType.id == 5) {
                     console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                     console.log("(puNode>>>", (data.context.payload.nodeDataMap[0])[0].puNode);
-                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.idString);
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
                     this.setState({
@@ -3608,7 +3615,42 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                 <>
-                                                    <FormGroup className="col-md-2">
+                                                    <FormGroup className="col-md-12">
+                                                        <Label for="isSync">Single Use </Label>
+                                                        <FormGroup className="ml-lg-3" check inline >
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="oneTimeUsage1"
+                                                                name="oneTimeUsage"
+                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
+                                                                checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "true"}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="oneTimeUsage2"
+                                                                name="oneTimeUsage"
+                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
+                                                                checked={this.state.addNodeFlag ? true : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "false"}
+                                                                onChange={(e) => { this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
+                                                    {/* <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
@@ -3624,7 +3666,7 @@ export default class CreateTreeTemplate extends Component {
                                                             <option value="false">No</option>
 
                                                         </Input>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                     {/* <FormGroup className="col-md-5"></FormGroup> */}
                                                     {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" &&
                                                         <>
@@ -4166,7 +4208,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    fillColor: "#f5f5f5",
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 });
             }
@@ -4181,7 +4223,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    fillColor: "#f5f5f5",
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 })
                 );
@@ -4198,7 +4240,7 @@ export default class CreateTreeTemplate extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0.08,
                     borderColor: Colors.Gray,
-                    fillColor: "#f5f5f5",
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 }));
             }
