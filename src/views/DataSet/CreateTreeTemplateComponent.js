@@ -510,11 +510,30 @@ export default class CreateTreeTemplate extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getmomValue = ((parseFloat(e.target.value - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
-        // console.log("month diff>>>", monthDifference);
-        // console.log("mom value>>>", getmomValue);
+        var momValue = ''
+        var getValue = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
+            getValue = parseFloat(this.state.currentCalculatorStartValue + getPervalue);
+        } else {
+            getValue = e.target.value
+        }
+        if (this.state.currentModelingType == 2) {
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+        if (this.state.currentModelingType == 3) {
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+        }
+        if (this.state.currentModelingType == 4) {
+            var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+        }
+        console.log("getmomValue>>>", momValue);
+        var targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue);
+        var targetChangePer = parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100;
         this.setState({
-            currentCalculatedMomChange: e.target.value != '' ? getmomValue : ''
+            currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
+            currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
     calculateMomByChangeInPercent(e) {
@@ -528,10 +547,21 @@ export default class CreateTreeTemplate extends Component {
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * e.target.value) / 100;
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage);
-        var getmomValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+
+        var momValue = ''
+        if (this.state.currentModelingType == 2) {
+            var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+        if (this.state.currentModelingType == 3) {
+            var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+        }
+        if (this.state.currentModelingType == 4) {
+            var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+        }
+
         this.setState({
             currentEndValue: e.target.value != '' ? targetEndValue : '',
-            currentCalculatedMomChange: e.target.value != '' ? getmomValue : ''
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
     calculateMomByChangeInNumber(e) {
@@ -545,14 +575,24 @@ export default class CreateTreeTemplate extends Component {
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
-        var getmomValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+
+        var momValue = ''
+        if (this.state.currentModelingType == 2) {
+            momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+        if (this.state.currentModelingType == 3) {
+            momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+        }
+        if (this.state.currentModelingType == 4) {
+            momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+        }
         this.setState({
             currentEndValue: e.target.value != '' ? targetEndValue : '',
-            currentCalculatedMomChange: e.target.value != '' ? getmomValue : ''
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
-       
-    
+
+
     getSameLevelNodeList(level, id) {
         console.log("level---", level);
         console.log("id---", id);
@@ -818,11 +858,11 @@ export default class CreateTreeTemplate extends Component {
     }
     buildModelingJexcel() {
         var scalingList = [
-            { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
-            { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
+            { transferToNode: "", note: 'Growth', modelingType: 4, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
+            { transferToNode: "", note: 'Lost to follow up', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
             { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
             { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
-            { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+            { transferToNode: 1, note: 'Transfer from 1L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
         ]
         var dataArray = [];
         let count = 0;
@@ -4035,7 +4075,7 @@ export default class CreateTreeTemplate extends Component {
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Target Ending Value<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentEndValue"
                                             name="currentEndValue"
@@ -4059,7 +4099,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
+                                    {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentTargetChangeNumber"
@@ -4072,6 +4112,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
+                                    }
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
@@ -4086,13 +4127,13 @@ export default class CreateTreeTemplate extends Component {
                                     <FormGroup className="col-md-6"></FormGroup>
                                     <FormGroup className="col-md-6" >
                                         <div className="check inline  pl-lg-1 pt-lg-2">
-                                            <div className="col-md-12 form-group">
+                                            {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                 <Input
                                                     className="form-check-input checkboxMargin"
                                                     type="radio"
                                                     id="active1"
                                                     name="modelingType"
-                                                    checked={this.state.currentModelingType == 1 ? false : true}
+                                                    checked={this.state.currentModelingType == 4 ? true : false}
                                                 // onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                 />
                                                 <Label
@@ -4100,14 +4141,14 @@ export default class CreateTreeTemplate extends Component {
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>{'Exponential (%)'}</b>
                                                 </Label>
-                                            </div>
+                                            </div>}
                                             <div className="col-md-12 form-group">
                                                 <Input
                                                     className="form-check-input Radioactive checkboxMargin"
                                                     type="radio"
                                                     id="active2"
                                                     name="modelingType"
-                                                    checked={this.state.currentModelingType == 2 ? false : true}
+                                                    checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
                                                 // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                 />
                                                 <Label
@@ -4116,13 +4157,13 @@ export default class CreateTreeTemplate extends Component {
                                                     <b>{'Linear (%)'}</b>
                                                 </Label>
                                             </div>
-                                            <div className="col-md-12 form-group">
+                                            {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                 <Input
                                                     className="form-check-input checkboxMargin"
                                                     type="radio"
                                                     id="active3"
                                                     name="modelingType"
-                                                    checked={this.state.currentModelingType == 3 ? false : true}
+                                                    checked={this.state.currentModelingType == 2 ? true : false}
                                                 // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                 />
                                                 <Label
@@ -4130,7 +4171,7 @@ export default class CreateTreeTemplate extends Component {
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>{'Linear (#)'}</b>
                                                 </Label>
-                                            </div>
+                                            </div>}
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
