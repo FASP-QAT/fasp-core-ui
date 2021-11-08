@@ -283,6 +283,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            minMonth: '',
+            maxMonth: '',
             scalingList: [],
             modelingTypeList: [],
             sameLevelNodeList: [],
@@ -552,8 +554,8 @@ export default class CreateTreeTemplate extends Component {
             currentCalculatedMomChange: e.target.value != '' ? getmomValue : ''
         });
     }
-       
-    
+
+
     getSameLevelNodeList(level, id) {
         console.log("level---", level);
         console.log("id---", id);
@@ -840,21 +842,18 @@ export default class CreateTreeTemplate extends Component {
             data[7] = cleanUp
             var monthDifference = moment(scalingList[j].stopDate).diff(scalingList[j].startDate, 'months', true);
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
+            console.log("endValue---", endValue);
             console.log("monthDifference---", monthDifference);
             var calculatedChangeForMonth;
             if (scalingList[j].modelingType.id == 2) {
                 calculatedChangeForMonth = scalingList[j].dataValue / monthDifference;
                 // `=ROUND(G${parseInt(j) + 1}/${monthDifference},2)`;
             } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (scalingList[j].dataValue * nodeValue / 100) / monthDifference;
-                // `=ROUND((F${parseInt(j) + 1} * ${nodeValue}/100)/${monthDifference},2)`;
-                if (scalingList[j].modelingType.id == 4) {
-                    // var endValue = `=ROUND((F${parseInt(j) + 1} * ${nodeValue}/100)+${nodeValue},2)`;
-                    var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
-                    // var totalValue = percentValue + nodeValue;
-                    console.log("endValue---", endValue);
-                    // console.log("totalValue---", totalValue);
-                    // console.log("nodeValue---", nodeValue);
+                if (scalingList[j].modelingType.id == 3) {
+                    calculatedChangeForMonth = (endValue - nodeValue) / monthDifference / nodeValue * 100;
+                }
+                else if (scalingList[j].modelingType.id == 4) {
                     calculatedChangeForMonth = ((Math.pow(parseFloat(endValue / nodeValue), parseFloat(1 / monthDifference)) - 1) * 100);
                     // calculatedChangeForMonth = endValue;
                 }
@@ -891,12 +890,12 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'Start Date',
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
                 },
                 {
                     title: 'Stop Date',
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
                 },
                 {
                     title: "Monthly Change (%)",
@@ -932,6 +931,7 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (y != null) {
@@ -964,6 +964,7 @@ export default class CreateTreeTemplate extends Component {
         }
         );
     }
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -981,7 +982,102 @@ export default class CreateTreeTemplate extends Component {
             });
         }
     }.bind(this)
+    changed = function (instance, cell, x, y, value) {
 
+        //Modeling type
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        // Start date
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+            this.state.modelingEl.setValueFromCoords(4, y, '', true);
+        }
+        var startDate = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        var stopDate = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        // Stop date
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            var diff = moment(stopDate).diff(moment(startDate),'months');
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } 
+            else if(diff <= 0){
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, 'Please enter valid date');
+            }
+            else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        var modelingTypeId = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        console.log("modelingTypeId---", modelingTypeId)
+        if (modelingTypeId != "") {
+           
+            var monthDifference = moment(stopDate).diff(startDate, 'months', true);
+            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            var calculatedChangeForMonth;
+            // var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
+            // console.log("endValue---", endValue);
+            console.log("monthDifference---", monthDifference);
+            // Monthly change %
+            if (x == 5) {
+                var col = ("F").concat(parseInt(y) + 1);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    var endValue = (value * nodeValue / 100) + nodeValue;
+                    if (modelingTypeId == 3) {
+                        calculatedChangeForMonth = (endValue - nodeValue) / monthDifference / nodeValue * 100;
+                    }
+                    else if (modelingTypeId == 4) {
+                        calculatedChangeForMonth = ((Math.pow(parseFloat(endValue / nodeValue), parseFloat(1 / monthDifference)) - 1) * 100);
+                        // calculatedChangeForMonth = endValue;
+                    }
+                    this.state.modelingEl.setValueFromCoords(8, y,calculatedChangeForMonth, true);
+                }
+            }
+            // Monthly change #
+            if (x == 6) {
+                var col = ("G").concat(parseInt(y) + 1);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.state.modelingEl.setValueFromCoords(8, y,(value / monthDifference), true);
+                    // calculatedChangeForMonth = value / monthDifference;
+                }
+            }
+        }
+    }.bind(this);
     buildModelingJexcelPercent() {
         var scalingList = this.state.scalingList;
         // [
@@ -2477,9 +2573,17 @@ export default class CreateTreeTemplate extends Component {
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                this.setState({ showModelingJexcelNumber: true }, () => {
+                var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+                var minMonth = moment(curDate).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(curDate).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+
+                this.setState({
+                    showModelingJexcelNumber: true,
+                    minMonth, maxMonth
+                }, () => {
                     this.buildModelingJexcel()
                 })
+
             }
             //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
             //     this.setState({ showModelingJexcelPercent: true }, () => {
