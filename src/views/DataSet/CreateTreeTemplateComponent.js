@@ -283,6 +283,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            scalingList: [],
             modelingTypeList: [],
             sameLevelNodeList: [],
             showMomDataPercent: false,
@@ -857,26 +858,48 @@ export default class CreateTreeTemplate extends Component {
         );
     }
     buildModelingJexcel() {
-        var scalingList = [
-            { transferToNode: "", note: 'Growth', modelingType: 4, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
-            { transferToNode: "", note: 'Lost to follow up', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
-            { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
-            { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
-            { transferToNode: 1, note: 'Transfer from 1L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
-        ]
+        // var scalingList = [
+        //     { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
+        //     { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
+        //     { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
+        //     { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
+        //     { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+        // ]
+        var scalingList = this.state.scalingList;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < scalingList.length; j++) {
             data = [];
-            data[0] = scalingList[j].transferToNode
-            data[1] = scalingList[j].note
-            data[2] = scalingList[j].modelingType
+            data[0] = scalingList[j].transferNodeDataId
+            data[1] = scalingList[j].notes
+            data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].monthlyChangePer
-            data[6] = scalingList[j].monthlyChangeNo
+            data[5] = scalingList[j].modelingType.id != 2 ? scalingList[j].dataValue : ''
+            data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
             data[7] = cleanUp
-            data[8] = scalingList[j].calculatedChangeFormonth
+            var monthDifference = moment(scalingList[j].stopDate).diff(scalingList[j].startDate, 'months', true);
+            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            console.log("monthDifference---", monthDifference);
+            var calculatedChangeForMonth;
+            if (scalingList[j].modelingType.id == 2) {
+                calculatedChangeForMonth = scalingList[j].dataValue / monthDifference;
+                // `=ROUND(G${parseInt(j) + 1}/${monthDifference},2)`;
+            } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
+                calculatedChangeForMonth = (scalingList[j].dataValue * nodeValue / 100) / monthDifference;
+                // `=ROUND((F${parseInt(j) + 1} * ${nodeValue}/100)/${monthDifference},2)`;
+                if (scalingList[j].modelingType.id == 4) {
+                    // var endValue = `=ROUND((F${parseInt(j) + 1} * ${nodeValue}/100)+${nodeValue},2)`;
+                    var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
+                    // var totalValue = percentValue + nodeValue;
+                    console.log("endValue---", endValue);
+                    // console.log("totalValue---", totalValue);
+                    // console.log("nodeValue---", nodeValue);
+                    calculatedChangeForMonth = ((Math.pow(parseFloat(endValue / nodeValue), parseFloat(1 / monthDifference)) - 1) * 100);
+                    // calculatedChangeForMonth = endValue;
+                }
+            }
+            data[8] = calculatedChangeForMonth
             dataArray[count] = data;
             count++;
         }
@@ -921,7 +944,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Monthly Change (#)",
-                    type: 'text',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'text' : 'hidden',
                 },
                 {
                     title: "Modeling Calculater",
@@ -949,6 +972,21 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (y != null) {
+                    var rowData = elInstance.getRowData(y);
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        // elInstance.hideIndex(6);
+                    } else {
+                        var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        // elInstance.showIndex(6);
+                    }
+                }
+            }.bind(this),
             oneditionend: this.onedit,
             onselection: this.selected,
             copyCompatibility: true,
@@ -985,13 +1023,14 @@ export default class CreateTreeTemplate extends Component {
     }.bind(this)
 
     buildModelingJexcelPercent() {
-        var scalingList = [
-            { transferToNode: 1, note: 'Growth', modelingType: 2, startDate: '2021-01-01', stopDate: '2021-12-01', percent: '12.0%', period: 1, calculatedChangeFormonth: '1.0%' },
-            { transferToNode: 1, note: 'Lost to follow up', modelingType: 2, startDate: '2022-01-01', stopDate: '2022-06-01', percent: '3.0%', period: 2, calculatedChangeFormonth: '0.0%' },
-            { transferToNode: 1, note: 'Lost to death', modelingType: 2, startDate: '2022-06-01', stopDate: '2022-12-01', percent: '0.3%', period: 4, calculatedChangeFormonth: '0.0%' },
-            // { transferToNode: 1, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
-            // { transferToNode: 1, note: 'Transfer from 1L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
-        ]
+        var scalingList = this.state.scalingList;
+        // [
+        //     { transferToNode: 1, note: 'Growth', modelingType: 2, startDate: '2021-01-01', stopDate: '2021-12-01', percent: '12.0%', period: 1, calculatedChangeFormonth: '1.0%' },
+        //     { transferToNode: 1, note: 'Lost to follow up', modelingType: 2, startDate: '2022-01-01', stopDate: '2022-06-01', percent: '3.0%', period: 2, calculatedChangeFormonth: '0.0%' },
+        //     { transferToNode: 1, note: 'Lost to death', modelingType: 2, startDate: '2022-06-01', stopDate: '2022-12-01', percent: '0.3%', period: 4, calculatedChangeFormonth: '0.0%' },
+        //     // { transferToNode: 1, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
+        //     // { transferToNode: 1, note: 'Transfer from 1L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
+        // ]
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < scalingList.length; j++) {
@@ -2477,15 +2516,16 @@ export default class CreateTreeTemplate extends Component {
         });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 this.setState({ showModelingJexcelNumber: true }, () => {
                     this.buildModelingJexcel()
                 })
-            } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                this.setState({ showModelingJexcelPercent: true }, () => {
-                    this.buildModelingJexcelPercent()
-                })
             }
+            //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            //     this.setState({ showModelingJexcelPercent: true }, () => {
+            //         this.buildModelingJexcelPercent()
+            //     })
+            // }
         }
     }
 
@@ -2869,6 +2909,7 @@ export default class CreateTreeTemplate extends Component {
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
+                scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList,
                 //         title: item.title,
                 //         config: {
                 //             ...config,
@@ -3975,6 +4016,7 @@ export default class CreateTreeTemplate extends Component {
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
                                 bsSize="sm"
+                                readOnly="true"
                                 // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
                                 // invalid={touched.nodeTitle && !!errors.nodeTitle}
                                 // onBlur={handleBlur}
@@ -3983,7 +4025,7 @@ export default class CreateTreeTemplate extends Component {
                             </Input>
                         </FormGroup>
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">Start Date<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="">Start Month<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
@@ -3994,7 +4036,8 @@ export default class CreateTreeTemplate extends Component {
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                             >
-                                <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                <MonthBox value={this.makeText(this.state.singleValue2)}
+                                    onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
 
