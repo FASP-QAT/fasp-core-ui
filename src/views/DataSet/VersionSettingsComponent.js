@@ -162,7 +162,7 @@ export default class VersionSettingsComponent extends Component {
     }.bind(this);
     // -----end of changed function
 
-    formSubmit = function () {
+    formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
