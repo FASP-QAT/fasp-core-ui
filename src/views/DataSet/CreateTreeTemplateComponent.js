@@ -321,6 +321,7 @@ export default class CreateTreeTemplate extends Component {
             addNodeFlag: false,
             level0: true,
             numberNode: false,
+            scalingTotal: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -500,8 +501,19 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMomByChangeInPercent = this.calculateMomByChangeInPercent.bind(this);
         this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
         this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
+        this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
     }
-
+    calculateScalingTotal() {
+        var scalingTotal;
+        var tableJson = this.state.modelingEl.getJson(null, false);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            var calculatedChangeForMonth  =  map1.get("0");
+        }
+        this.setState({
+            scalingTotal
+        });
+    }
     calculateMomByEndValue(e) {
         this.setState({
             // currentEndValue: '',
@@ -860,13 +872,6 @@ export default class CreateTreeTemplate extends Component {
         );
     }
     buildModelingJexcel() {
-        // var scalingList = [
-        //     { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
-        //     { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
-        //     { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
-        //     { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
-        //     { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
-        // ]
         var scalingList = this.state.scalingList;
         var dataArray = [];
         let count = 0;
@@ -924,6 +929,7 @@ export default class CreateTreeTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
+            // colWidths: [40, 50, 40,40, 40, 10, 10,10, 10],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
