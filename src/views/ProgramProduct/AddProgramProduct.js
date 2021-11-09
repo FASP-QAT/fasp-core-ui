@@ -418,7 +418,8 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: 'Id',
-                                                                    type: 'hidden'
+                                                                    type: 'hidden',
+                                                                    readOnly:true
                                                                 },
                                                                 {
                                                                     title: 'Active',
