@@ -1975,6 +1975,7 @@ class ShipmentGlobalView extends Component {
                                                 value={this.state.countryValues}
                                                 onChange={(e) => { this.handleChange(e) }}
                                                 options={countryList && countryList.length > 0 ? countryList : []}
+                                                disabled={this.state.loading}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1994,6 +1995,7 @@ class ShipmentGlobalView extends Component {
                                                 value={this.state.programValues}
                                                 onChange={(e) => { this.handleChangeProgram(e) }}
                                                 options={programList && programList.length > 0 ? programList : []}
+                                                disabled={this.state.loading}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -2104,6 +2106,7 @@ class ShipmentGlobalView extends Component {
                                                     value={this.state.fundingSourceValues}
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                    disabled={this.state.loading}
                                                 />
 
                                             </div>

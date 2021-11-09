@@ -170,9 +170,9 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
     return connectDropTarget(connectDragSource(
         // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
         <div className="ContactTemplate boxContactTemplate"> 
-            <div className="ContactTitleBackground TemplateTitleBg"
+            <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :"ContactTitleBackground TemplateTitleBg" }
             >
-                <div className="ContactTitle" style={{color:'#002f6c',fontWeight:'bold'}}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px' }} ></i> : ""))))}</b></div>
+                <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px',color:'#002f6c'}}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px',color:'#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px',color:'#002f6c' }} ></i> : ""))))}</b></div>
             </div>
             <div className="ContactPhone ContactPhoneValue">
                 <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
@@ -2701,6 +2701,8 @@ export default class BuildTree extends Component {
                             } else {
                                 this.updateNodeInfoInJson(this.state.currentItemConfig)
                             }
+                            this.setState({cursorItem: 0,
+                                highlightItem: 0})
 
                         }}
                         render={
@@ -3440,7 +3442,7 @@ export default class BuildTree extends Component {
                                     </div>}
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false,cursorItem: 0,highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </FormGroup>
                                 </Form>
@@ -3536,7 +3538,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 });
             }
@@ -3551,7 +3553,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Solid
                 })
                 );
@@ -3567,7 +3569,7 @@ export default class BuildTree extends Component {
                     lineWidth: new Thickness(0, 0, 0, 0),
                     opacity: 0.08,
                     borderColor: Colors.Gray,
-                    // fillColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
                     lineType: LineType.Dotted
                 }));
             }
@@ -4314,7 +4316,7 @@ export default class BuildTree extends Component {
                 className={'modal-lg '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>Add/Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false,cursorItem: 0,highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>

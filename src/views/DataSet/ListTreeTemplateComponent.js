@@ -55,7 +55,9 @@ export default class ListTreeTemplate extends Component {
             data[0] = treeTemplateList[j].treeTemplateId;
             data[1] = getLabelText(treeTemplateList[j].label, this.state.lang)
             data[2] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
-            data[3] = treeTemplateList[j].active;
+            data[3] = treeTemplateList[j].monthsInPast;
+            data[4] = treeTemplateList[j].monthsInFuture;
+            data[5] = treeTemplateList[j].active;
             treeTemplateArray[count] = data;
             count++;
         }
@@ -81,6 +83,16 @@ export default class ListTreeTemplate extends Component {
                 },
                 {
                     title: 'Forecast Method',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.monthsInPast'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.monthsInFuture'),
                     type: 'text',
                     readOnly: true
                 },
