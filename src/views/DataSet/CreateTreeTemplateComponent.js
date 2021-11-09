@@ -446,6 +446,10 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangePercentage: '',
             currentTargetChangeNumber: '',
             currentCalculatedMomChange: '',
+            currentEndValueEdit: false,
+            currentTargetChangePercentageEdit: false,
+            currentTargetChangeNumberEdit: false,
+            currentRowIndex: ''
 
 
         }
@@ -498,8 +502,27 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMomByChangeInPercent = this.calculateMomByChangeInPercent.bind(this);
         this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
         this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
+        this.acceptValue = this.acceptValue.bind(this);
     }
 
+    acceptValue() {
+        console.log(">>>>", this.state.currentRowIndex);
+        var elInstance = this.state.modelingEl;
+        if (this.state.currentModelingType == 2) {
+            elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
+            elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
+            elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+        } else if (this.state.currentModelingType == 3) {
+            elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+            elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+            elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+        } else if (this.state.currentModelingType == 4) {
+            elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+            elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+            elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
+        }
+
+    }
     calculateMomByEndValue(e) {
         this.setState({
             // currentEndValue: '',
@@ -510,27 +533,40 @@ export default class CreateTreeTemplate extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
-        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var monthDifference = moment(endDate).endOf('month').diff(startDate, 'months', true);
+        // console.log("month diff>>>", monthDifference);
         var momValue = ''
-        var getValue = '';
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
-            getValue = parseFloat(this.state.currentCalculatorStartValue + getPervalue);
-        } else {
-            getValue = e.target.value
-        }
+        var getValue = e.target.value;
+        // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
+        //     // getValue = getPervalue;
+        //     var momValue = e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue;
+        // } else {
+        //     getValue = e.target.value
+        // }
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                var momValue = (parseFloat(e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) / monthDifference).toFixed(2);
+            } else {
+                // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            }
         }
         if (this.state.currentModelingType == 4) {
-            var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            // var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
         }
-        console.log("getmomValue>>>", momValue);
-        var targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue);
-        var targetChangePer = parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100;
+        // console.log("getmomValue>>>", momValue);
+        var targetChangeNumber = '';
+        var targetChangePer = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
+            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue);
+            targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
+        }
         this.setState({
             currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
             currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
@@ -547,17 +583,32 @@ export default class CreateTreeTemplate extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * e.target.value) / 100;
+
+
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     var targetEndValue = (parseFloat(getEndValueFromPercentage) + parseFloat(this.state.currentCalculatorStartValue)) / this.state.currentCalculatorStartValue * 100;
+        // } else {
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage);
+        // }
 
         var momValue = ''
         if (this.state.currentModelingType == 2) {
-            var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                var momValue = e.target.value;
+            } else {
+                // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+                var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+            }
+
         }
         if (this.state.currentModelingType == 4) {
-            var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+
         }
 
         this.setState({
@@ -579,13 +630,16 @@ export default class CreateTreeTemplate extends Component {
 
         var momValue = ''
         if (this.state.currentModelingType == 2) {
-            momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            momValue = e.target.value;
         }
         if (this.state.currentModelingType == 3) {
-            momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+            // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+            momValue = e.target.value;
         }
         if (this.state.currentModelingType == 4) {
-            momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            // momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            momValue = e.target.value;
         }
         this.setState({
             currentEndValue: e.target.value != '' ? targetEndValue : '',
@@ -954,7 +1008,7 @@ export default class CreateTreeTemplate extends Component {
                     title: "Calculated change for month",
                     type: 'text',
                     readOnly: true
-                }
+                },
 
             ],
             text: {
@@ -1013,11 +1067,12 @@ export default class CreateTreeTemplate extends Component {
             var elInstance = this.state.modelingEl;
             var rowData = elInstance.getRowData(x);
             this.setState({
+                currentRowIndex: x,
                 showCalculatorFields: true,
                 currentModelingType: rowData[2],
                 currentCalculatorStartDate: rowData[3],
                 currentCalculatorStopDate: rowData[4],
-                currentCalculatorStartValue: 50000
+                currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue
             });
         }
     }.bind(this)
@@ -2695,19 +2750,29 @@ export default class CreateTreeTemplate extends Component {
         // currentTargetChangeNumber: '',
         // currentCalculatedMomChange: ''
         if (event.target.name === "currentEndValue") {
+
             this.setState({
-                currentEndValue: event.target.value
+                currentEndValue: event.target.value,
+                currentEndValueEdit: false,
+                currentTargetChangePercentageEdit: event.target.value != '' ? true : false,
+                currentTargetChangeNumberEdit: event.target.value != '' ? true : false
             });
         }
 
         if (event.target.name === "currentTargetChangePercentage") {
             this.setState({
-                currentTargetChangePercentage: event.target.value
+                currentTargetChangePercentage: event.target.value,
+                currentEndValueEdit: event.target.value != '' ? true : false,
+                currentTargetChangePercentageEdit: false,
+                currentTargetChangeNumberEdit: event.target.value != '' ? true : false
             });
         }
         if (event.target.name === "currentTargetChangeNumber") {
             this.setState({
-                currentTargetChangeNumber: event.target.value
+                currentTargetChangeNumber: event.target.value,
+                currentEndValueEdit: event.target.value != '' ? true : false,
+                currentTargetChangePercentageEdit: event.target.value != '' ? true : false,
+                currentTargetChangeNumberEdit: false
             });
         }
 
@@ -4094,12 +4159,26 @@ export default class CreateTreeTemplate extends Component {
                                             name="startValue"
                                             bsSize="sm"
                                             readOnly={true}
-                                            value={this.state.currentCalculatorStartValue}
+                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue}
 
                                         >
                                         </Input>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
+                                    {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <FormGroup className="col-md-6">
+                                        <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="startPercentage"
+                                            name="startPercentage"
+                                            bsSize="sm"
+                                            readOnly={true}
+                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+
+                                        >
+                                        </Input>
+                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                    </FormGroup>
+                                    }
                                     {/* </div> */}
                                     {/* <div className="row"> */}
                                     <FormGroup className="col-md-6">
@@ -4125,8 +4204,10 @@ export default class CreateTreeTemplate extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
                                             value={this.state.currentEndValue}
+                                            readOnly={this.state.currentEndValueEdit}
                                         >
                                         </Input>
+
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -4137,6 +4218,7 @@ export default class CreateTreeTemplate extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInPercent(e) }}
                                             value={this.state.currentTargetChangePercentage}
+                                            readOnly={this.state.currentTargetChangePercentageEdit}
 
                                         >
                                         </Input>
@@ -4150,7 +4232,7 @@ export default class CreateTreeTemplate extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
                                             value={this.state.currentTargetChangeNumber}
-
+                                            readOnly={this.state.currentTargetChangeNumberEdit}
                                         >
                                         </Input>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
@@ -4221,7 +4303,7 @@ export default class CreateTreeTemplate extends Component {
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
                                     </FormGroup>
                                     {/* </div> */}
