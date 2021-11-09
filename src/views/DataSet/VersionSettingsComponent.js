@@ -15,7 +15,7 @@ import MultiSelect from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
-export default class VersionSettingsComponent extends Component {
+class VersionSettingsComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -712,3 +712,4 @@ export default class VersionSettingsComponent extends Component {
         )
     }
 }
+export default VersionSettingsComponent;
