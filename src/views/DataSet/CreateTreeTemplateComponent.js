@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -504,12 +504,14 @@ export default class CreateTreeTemplate extends Component {
         this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
     }
     calculateScalingTotal() {
-        var scalingTotal;
+        var scalingTotal = 0;
         var tableJson = this.state.modelingEl.getJson(null, false);
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
-            var calculatedChangeForMonth  =  map1.get("0");
+            scalingTotal = scalingTotal + parseFloat(map1.get("8"));
+            console.log("map1.get(8)---", map1.get("8"));
         }
+        console.log("scalingTotal---", scalingTotal);
         this.setState({
             scalingTotal
         });
@@ -873,6 +875,7 @@ export default class CreateTreeTemplate extends Component {
     }
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
+        console.log("scalingList---", scalingList);
         var dataArray = [];
         let count = 0;
 
@@ -890,10 +893,12 @@ export default class CreateTreeTemplate extends Component {
             dataArray[count] = data;
             count++;
         }
+        var scalingTotal = 0;
         for (var j = 0; j < scalingList.length; j++) {
             data = [];
             data[0] = scalingList[j].transferNodeDataId
             data[1] = scalingList[j].notes
+            console.log("modeling type---", scalingList[j].modelingType.id);
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
@@ -917,10 +922,12 @@ export default class CreateTreeTemplate extends Component {
                 //     // calculatedChangeForMonth = endValue;
                 // }
             }
-            data[8] = calculatedChangeForMonth
+            data[8] = calculatedChangeForMonth.toFixed(2)
+            scalingTotal = scalingTotal + calculatedChangeForMonth;
             dataArray[count] = data;
             count++;
         }
+        this.setState({ scalingTotal });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
         this.el.destroy();
         var data = dataArray;
@@ -959,11 +966,13 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Monthly Change (%)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.####', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'text' : 'hidden',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
+                    mask: '#,##'
                 },
                 {
                     title: "Modeling Calculater",
@@ -971,7 +980,8 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Calculated change for month",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.##', decimal: '.',
                     readOnly: true
                 }
 
@@ -1061,7 +1071,6 @@ export default class CreateTreeTemplate extends Component {
         }
     }.bind(this)
     changed = function (instance, cell, x, y, value) {
-
         //Modeling type
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -1109,46 +1118,56 @@ export default class CreateTreeTemplate extends Component {
                 this.el.setComments(col, "");
             }
         }
-        var modelingTypeId = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-        console.log("modelingTypeId---", modelingTypeId)
-        if (modelingTypeId != "") {
-
+        var elInstance = this.state.modelingEl;
+        var rowData = elInstance.getRowData(y);
+        console.log("modelingTypeId-3--", rowData[2])
+        if (rowData[2] != "") {
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
-            // var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
-            // console.log("endValue---", endValue);
-            console.log("monthDifference---", monthDifference);
             // Monthly change %
-            if (x == 5) {
+            if (x == 5 && rowData[2] != 2) {
                 var col = ("F").concat(parseInt(y) + 1);
+
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
+                }
+                else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var endValue = (value * nodeValue / 100) + nodeValue;
-                    calculatedChangeForMonth = (nodeValue * value) / 100;
+                    calculatedChangeForMonth = ((nodeValue * value) / 100).toFixed(2);
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
             }
             // Monthly change #
-            if (x == 6) {
+            if (x == 6 && rowData[2] == 2) {
                 var col = ("G").concat(parseInt(y) + 1);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
+                }
+                else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, (value / monthDifference), true);
-                    // calculatedChangeForMonth = value / monthDifference;
+                    this.state.modelingEl.setValueFromCoords(8, y, value.toFixed(2), true);
                 }
             }
         }
+        this.calculateScalingTotal();
     }.bind(this);
     buildModelingJexcelPercent() {
         var scalingList = this.state.scalingList;
@@ -2653,7 +2672,7 @@ export default class CreateTreeTemplate extends Component {
                     showModelingJexcelNumber: true,
                     minMonth, maxMonth
                 }, () => {
-                    this.buildModelingJexcel()
+                    this.buildModelingJexcel();
                 })
 
             }
@@ -4183,9 +4202,11 @@ export default class CreateTreeTemplate extends Component {
                                     <div id="modelingJexcel" className={"RowClickable"}>
                                     </div>
                                 </div>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
-                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <div style={{ 'float': 'right','fontSize':'18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(this.state.scalingTotal.toFixed(2))}</b></div><br /><br />
+                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    </div>
                                 </>
                             }
                             {this.state.showModelingJexcelPercent &&
