@@ -4554,3 +4554,10 @@ height: 0px;
 .marginTopmsgtext{
   margin-top: -13px;
 }
+// #leftAlignAdjustedJexcel>.jexcel_content>.jexcel > tbody > tr > td:nth-child(1)  {text-align:left !important; }
+
+.leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
+	text-align:left !important
+}
+
+.adjustedGraph canvas{height: 500px !important}
