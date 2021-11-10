@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -321,6 +321,7 @@ export default class CreateTreeTemplate extends Component {
             addNodeFlag: false,
             level0: true,
             numberNode: false,
+            scalingTotal: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -505,8 +506,196 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
         this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
         this.acceptValue = this.acceptValue.bind(this);
+        this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
     }
 
+    formSubmit() {
+        var validation = this.checkValidation();
+        if (validation == true) {
+            // this.setState({
+            //     loading: true
+            // })
+            var tableJson = this.el.getJson(null, false);
+            var data = this.state.scalingList;
+            var obj;
+            var items = this.state.items;
+            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("10 map---" + map1.get("10"))
+                if (parseInt(map1.get("10")) === 1) {
+                    if (map1.get("9") != "" && map1.get("9") != 0) {
+                        obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                        obj.transferNodeDataId = map1.get("0");
+                        obj.notes = map1.get("1");
+                        obj.modelingType.id = map1.get("2");
+                        obj.startDate = map1.get("3");
+                        obj.stopDate = map1.get("4");
+                        obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
+                        obj.nodeDataModelingId = map1.get("9")
+                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                        data[itemIndex] = obj;
+                    } else {
+                        obj = {
+                            transferNodeDataId: map1.get("0"),
+                            notes: map1.get("1"),
+                            modelingType: {
+                                id: map1.get("2")
+                            },
+                            startDate: map1.get("3"),
+                            stopDate: map1.get("4"),
+                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                            nodeDataModelingId: ''
+                        }
+                        data.push(obj);
+                    }
+                    console.log("obj---", obj);
+                    console.log("data--->>>", data);
+                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = data;
+                    console.log("item---", item);
+                    items[itemIndex1] = item;
+                    console.log("items---", items);
+                    // Call function by dolly
+                    this.setState({
+                        items,
+                        scalingList: data,
+                        openAddNodeModal: false,
+                        activeTab1: new Array(2).fill('1')
+                    });
+                }
+            }
+        }
+    }
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(10, y);
+            if (parseInt(value) == 1) {
+
+                //Modeling type
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                // Start date
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+                var startDate = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+
+                // Stop date
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var diff = moment(stopDate).diff(moment(startDate), 'months');
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                }
+                else if (diff <= 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter valid date');
+                    valid = false;
+                }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(y);
+                console.log("modelingTypeId-valid--", rowData[2])
+                if (rowData[2] != "") {
+                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+
+                    // Month change %
+                    if (rowData[2] != 2) {
+                        var col = ("F").concat(parseInt(y) + 1);
+                        var value = this.el.getValueFromCoords(5, y);
+                        if (value == "") {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        }
+                        else if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        }
+                        else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+
+                    // Month change #
+                    if (rowData[2] == 2) {
+                        var col = ("G").concat(parseInt(y) + 1);
+                        var value = this.el.getValueFromCoords(6, y);
+                        if (value == "") {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        }
+                        else if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        }
+                        else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+
+                }
+
+            }
+        }
+        return valid;
+    }
+    calculateScalingTotal() {
+        var scalingTotal = 0;
+        var tableJson = this.state.modelingEl.getJson(null, false);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (map1.get("8") != "") {
+                scalingTotal = scalingTotal + parseFloat(map1.get("8"));
+                console.log("map1.get(8)---", map1.get("8"));
+            }
+        }
+        console.log("scalingTotal---", scalingTotal);
+        this.setState({
+            scalingTotal
+        });
+    }
     acceptValue() {
         console.log(">>>>", this.state.currentRowIndex);
         var elInstance = this.state.modelingEl;
@@ -666,7 +855,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("level---", level);
         console.log("id---", id);
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id);
         console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
@@ -908,6 +1097,8 @@ export default class CreateTreeTemplate extends Component {
         data[6] = "";
         data[7] = cleanUp;
         data[8] = "";
+        data[9] = "";
+        data[10] = 1;
         elInstance.insertRow(
             data, 0, 1
         );
@@ -928,14 +1119,8 @@ export default class CreateTreeTemplate extends Component {
         );
     }
     buildModelingJexcel() {
-        // var scalingList = [
-        //     { transferToNode: "", note: 'Growth', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 5000, calculator: '', calculatedChangeFormonth: 5000 },
-        //     { transferToNode: "", note: 'Lost to follow up', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: -120, calculator: '', calculatedChangeFormonth: -120 },
-        //     { transferToNode: "", note: 'Lost to death', modelingType: 3, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -5.0, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 8000 },
-        //     { transferToNode: 3, note: 'Lost to 3L', modelingType: 2, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: -0.3, monthlyChangeNo: '', calculator: '', calculatedChangeFormonth: 4000 },
-        //     { transferToNode: 1, note: 'Transfer from 1L', modelingType: 1, startDate: '2021-01-01', stopDate: '2023-12-01', monthlyChangePer: '', monthlyChangeNo: 2000, calculator: '', calculatedChangeFormonth: 4995 },
-        // ]
         var scalingList = this.state.scalingList;
+        console.log("scalingList---", scalingList);
         var dataArray = [];
         let count = 0;
 
@@ -950,13 +1135,17 @@ export default class CreateTreeTemplate extends Component {
             data[6] = ''
             data[7] = cleanUp
             data[8] = ''
+            data[9] = ''
+            data[10] = ''
             dataArray[count] = data;
             count++;
         }
+        var scalingTotal = 0;
         for (var j = 0; j < scalingList.length; j++) {
             data = [];
             data[0] = scalingList[j].transferNodeDataId
             data[1] = scalingList[j].notes
+            console.log("modeling type---", scalingList[j].modelingType.id);
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
@@ -980,10 +1169,14 @@ export default class CreateTreeTemplate extends Component {
                 //     // calculatedChangeForMonth = endValue;
                 // }
             }
-            data[8] = calculatedChangeForMonth
+            data[8] = parseFloat(calculatedChangeForMonth).toFixed(2)
+            data[9] = scalingList[j].nodeDataModelingId
+            data[10] = 0
+            scalingTotal = scalingTotal + calculatedChangeForMonth;
             dataArray[count] = data;
             count++;
         }
+        this.setState({ scalingTotal });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
         this.el.destroy();
         var data = dataArray;
@@ -1022,11 +1215,13 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Monthly Change (%)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.####', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'text' : 'hidden',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
+                    mask: '#,##'
                 },
                 {
                     title: "Modeling Calculater",
@@ -1034,8 +1229,17 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Calculated change for month",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.##', decimal: '.',
                     readOnly: true
+                },
+                {
+                    title: 'nodeDataModelingId',
+                    type: 'hidden'
+                },
+                {
+                    title: 'isChanged',
+                    type: 'hidden'
                 },
 
             ],
@@ -1133,7 +1337,6 @@ export default class CreateTreeTemplate extends Component {
         }
     }.bind(this)
     changed = function (instance, cell, x, y, value) {
-
         //Modeling type
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -1181,46 +1384,59 @@ export default class CreateTreeTemplate extends Component {
                 this.el.setComments(col, "");
             }
         }
-        var modelingTypeId = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-        console.log("modelingTypeId---", modelingTypeId)
-        if (modelingTypeId != "") {
-
+        var elInstance = this.state.modelingEl;
+        var rowData = elInstance.getRowData(y);
+        console.log("modelingTypeId-3--", rowData[2])
+        if (rowData[2] != "") {
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
-            // var endValue = (scalingList[j].dataValue * nodeValue / 100) + nodeValue;
-            // console.log("endValue---", endValue);
-            console.log("monthDifference---", monthDifference);
             // Monthly change %
-            if (x == 5) {
+            if (x == 5 && rowData[2] != 2) {
                 var col = ("F").concat(parseInt(y) + 1);
+
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
+                }
+                else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    var endValue = (value * nodeValue / 100) + nodeValue;
-                    calculatedChangeForMonth = (nodeValue * value) / 100;
+                    calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(2);
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
             }
             // Monthly change #
-            if (x == 6) {
+            if (x == 6 && rowData[2] == 2) {
                 var col = ("G").concat(parseInt(y) + 1);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
+                }
+                else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, (value / monthDifference), true);
-                    // calculatedChangeForMonth = value / monthDifference;
+                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(2), true);
                 }
             }
         }
+        if (x != 10) {
+            this.el.setValueFromCoords(10, y, 1, true);
+        }
+        this.calculateScalingTotal();
     }.bind(this);
     buildModelingJexcelPercent() {
         var scalingList = this.state.scalingList;
@@ -2726,7 +2942,7 @@ export default class CreateTreeTemplate extends Component {
                     showModelingJexcelNumber: true,
                     minMonth, maxMonth
                 }, () => {
-                    this.buildModelingJexcel()
+                    this.buildModelingJexcel();
                 })
 
             }
@@ -4208,7 +4424,7 @@ export default class CreateTreeTemplate extends Component {
                                     </div>}
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </FormGroup>
@@ -4225,7 +4441,7 @@ export default class CreateTreeTemplate extends Component {
                         </div>
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
-
+                        {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
@@ -4242,7 +4458,7 @@ export default class CreateTreeTemplate extends Component {
                                 onChange={(e) => { this.dataChange(e) }}
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
-                        </FormGroup>
+                        </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Start Month<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
@@ -4266,9 +4482,11 @@ export default class CreateTreeTemplate extends Component {
                                     <div id="modelingJexcel" className={"RowClickable"}>
                                     </div>
                                 </div>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
-                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
+                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View month by month data</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i> Save</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    </div>
                                 </>
                             }
                             {this.state.showModelingJexcelPercent &&
@@ -4970,7 +5188,8 @@ export default class CreateTreeTemplate extends Component {
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
-                                                                notes: (item.payload.nodeDataMap[0])[0].notes
+                                                                notes: (item.payload.nodeDataMap[0])[0].notes,
+                                                                nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList
                                                             }
                                                         ]
                                                     }
@@ -5355,8 +5574,14 @@ export default class CreateTreeTemplate extends Component {
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong>
-                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        <strong>Add/Edit Node</strong>     {
+                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))
+                        } {this.state.activeTab1[0] === '2' && <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b>}
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
                         <Row>
@@ -5376,7 +5601,7 @@ export default class CreateTreeTemplate extends Component {
                                             active={this.state.activeTab1[0] === '2'}
                                             onClick={() => { this.toggleModal(0, '2'); }}
                                         >
-                                            Scaling/Transfer
+                                            Modeling/Transfer
                                         </NavLink>
                                     </NavItem>
 
