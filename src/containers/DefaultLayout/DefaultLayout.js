@@ -1480,7 +1480,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.versionSettings.versionSettings'),
                             url: '/dataset/versionSettings',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-code-fork',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                         ]

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Button } from 'reactstrap';
+import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -10,12 +10,12 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
 import MultiSelect from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
-export default class VersionSettingsComponent extends Component {
+class VersionSettingsComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -28,17 +28,7 @@ export default class VersionSettingsComponent extends Component {
             message: '',
             lang: localStorage.getItem('lang'),
             loading: true,
-            versionTypeList: [{
-                versionTypeId: 1,
-                label: {
-                    label_en: 'Draft'
-                }
-            }, {
-                versionTypeId: 2,
-                label: {
-                    label_en: 'Final'
-                }
-            }],
+            versionTypeList: [],
             versionSettingsList: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
@@ -86,6 +76,26 @@ export default class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+                // No of days in month
+
+                var col = ("M").concat(parseInt(y) + 1);
+                var reg = JEXCEL_INTEGER_REGEX;
+                var value = this.el.getValueFromCoords(12, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
         return valid;
@@ -119,6 +129,26 @@ export default class VersionSettingsComponent extends Component {
             }
         }
 
+        //End date
+        if (x == 12) {
+            var col = ("M").concat(parseInt(y) + 1);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+            else if (!(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
 
         if (x != 11) {
             this.el.setValueFromCoords(11, y, 1, true);
@@ -132,7 +162,7 @@ export default class VersionSettingsComponent extends Component {
     }.bind(this);
     // -----end of changed function
 
-    formSubmit = function () {
+    formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
@@ -146,19 +176,23 @@ export default class VersionSettingsComponent extends Component {
                 console.log("11 map---" + map1.get("11"))
                 if (parseInt(map1.get("11")) === 1) {
                     console.log("map1.get(10)---", map1.get("10"));
+                    console.log("map1.get(12)---", map1.get("12"));
                     console.log("map1.get(7)---", map1.get("7"));
                     console.log("map1.get(8)---", map1.get("8"));
                     var notes = map1.get("4");
                     var startDate = map1.get("7");
                     var stopDate = map1.get("8");
                     var id = map1.get("10");
+                    var noOfDaysInMonth = map1.get("12");
                     console.log("start date ---", startDate);
                     console.log("stop date ---", stopDate);
+                    console.log("noOfDaysInMonth ---", noOfDaysInMonth);
                     var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                     var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                     programData.currentVersion.forecastStartDate = startDate;
                     programData.currentVersion.forecastStopDate = stopDate;
+                    programData.currentVersion.daysInMonth = noOfDaysInMonth;
                     programData.currentVersion.notes = notes;
                     programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                     program.programData = programData;
@@ -363,6 +397,7 @@ export default class VersionSettingsComponent extends Component {
             data[9] = 1
             data[10] = downloadedDataset[j].id
             data[11] = 0
+            data[12] = pd.currentVersion.daysInMonth
             versionSettingsArray[count] = data;
             count++;
 
@@ -387,6 +422,7 @@ export default class VersionSettingsComponent extends Component {
                 data[9] = 0
                 data[10] = versionList[k].versionId
                 data[11] = 0
+                data[12] = versionList[k].daysInMonth
                 if (versionTypeId != "") {
                     if (versionList[k].versionType.id == versionTypeId) {
                         versionSettingsArray[count] = data;
@@ -406,7 +442,7 @@ export default class VersionSettingsComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 50, 50, 200, 100, 100, 100, 100],
+            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -473,6 +509,10 @@ export default class VersionSettingsComponent extends Component {
                     title: 'isChanged',
                     type: 'hidden',
                 },
+                {
+                    title: i18n.t('static.program.noOfDaysInMonth'),
+                    type: 'numeric'
+                },
 
             ],
             text: {
@@ -501,6 +541,8 @@ export default class VersionSettingsComponent extends Component {
                         cell.classList.remove('readonly');
                         cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
+                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
                     }
                     else {
                         var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
@@ -508,6 +550,8 @@ export default class VersionSettingsComponent extends Component {
                         cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                         cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
                 }
@@ -543,7 +587,7 @@ export default class VersionSettingsComponent extends Component {
 
 
     componentDidMount() {
-        // this.getVersionTypeList();
+        this.getVersionTypeList();
         this.getDatasetList();
     }
 
@@ -581,7 +625,7 @@ export default class VersionSettingsComponent extends Component {
         let versionTypes = versionTypeList.length > 0
             && versionTypeList.map((item, i) => {
                 return (
-                    <option key={i} value={item.versionTypeId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -596,13 +640,12 @@ export default class VersionSettingsComponent extends Component {
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
 
-                    <CardBody className="pb-lg-2 pt-lg-0">
-
-                        <div className="pl-0">
-                            <div className="row">
-                                <FormGroup className="col-md-3">
+                    <CardBody className="pb-lg-5 pt-lg-2">
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex">
+                                <FormGroup className="mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
-                                    <div className="controls ">
+                                    <div className="controls SelectGoVesionSetting">
                                         {/* <InMultiputGroup> */}
                                         <MultiSelect
                                             name="datasetId"
@@ -615,9 +658,9 @@ export default class VersionSettingsComponent extends Component {
                                         />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls SelectGoVesionSetting">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -634,10 +677,12 @@ export default class VersionSettingsComponent extends Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                        </div>
-
+                        </Col>
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
+
+                        <div className="VersionSettingMarginTop">
+                            <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -652,7 +697,7 @@ export default class VersionSettingsComponent extends Component {
                         </div>
 
                     </CardBody>
-                    <CardFooter>
+                    <CardFooter className="CardFooterVesionsettingMarginTop">
                         {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -667,3 +712,4 @@ export default class VersionSettingsComponent extends Component {
         )
     }
 }
+export default VersionSettingsComponent;
