@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -629,7 +629,7 @@ export default class CreateTreeTemplate extends Component {
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[2])
                 if (rowData[2] != "") {
-                    var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
 
                     // Month change %
                     if (rowData[2] != 2) {
@@ -1388,7 +1388,7 @@ export default class CreateTreeTemplate extends Component {
         var rowData = elInstance.getRowData(y);
         console.log("modelingTypeId-3--", rowData[2])
         if (rowData[2] != "") {
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
@@ -2935,8 +2935,9 @@ export default class CreateTreeTemplate extends Component {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-                var minMonth = moment(curDate).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(curDate).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month;
+                var minMonth = moment(month).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(month).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
 
                 this.setState({
                     showModelingJexcelNumber: true,
@@ -4699,13 +4700,13 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="active6"
                                                         name="active6"
-                                                        // checked={false}
+                                                        checked={true}
                                                         onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Does manual changes affect future month'}</b>
+                                                        <b>{'Manual Change affects future month'}</b>
                                                     </Label>
                                                 </div>
                                                 <div>
@@ -4714,13 +4715,13 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="active7"
                                                         name="active7"
-                                                        // checked={false}
+                                                        checked={true}
                                                         onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Show Seasonality'}</b>
+                                                        <b>{'Show Seasonality & manual change'}</b>
                                                     </Label>
                                                 </div>
                                             </div>
