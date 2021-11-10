@@ -43,6 +43,7 @@
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
     "date-fns": "^2.11.0",
+    "docx": "^7.1.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "exceljs": "^4.2.1",
