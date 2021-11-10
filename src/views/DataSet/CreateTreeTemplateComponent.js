@@ -2178,6 +2178,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 1,
                         level: 0,
                         parent: null,
+                        sortOrder:"00",
                         payload: {
                             label: {
                                 label_en: ''
@@ -2223,6 +2224,7 @@ export default class CreateTreeTemplate extends Component {
                     id: 1,
                     level: 0,
                     parent: null,
+                    sortOrder:"00",
                     payload: {
                         label: {
                             label_en: ''
