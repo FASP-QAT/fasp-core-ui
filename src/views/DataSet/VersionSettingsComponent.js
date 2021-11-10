@@ -15,7 +15,7 @@ import MultiSelect from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
-export default class VersionSettingsComponent extends Component {
+class VersionSettingsComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -162,7 +162,7 @@ export default class VersionSettingsComponent extends Component {
     }.bind(this);
     // -----end of changed function
 
-    formSubmit = function () {
+    formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
@@ -712,3 +712,4 @@ export default class VersionSettingsComponent extends Component {
         )
     }
 }
+export default VersionSettingsComponent;

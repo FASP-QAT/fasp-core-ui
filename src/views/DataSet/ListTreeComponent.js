@@ -169,11 +169,14 @@ export default class ListTreeComponent extends Component {
             // for (var k = 0; k < trees.length; k++) {
             // console.log("trees[k]---", trees[k]);
             data = [];
+            
             data[0] = treeList[j].treeId
-            data[1] = getLabelText(treeList[j].label, this.state.lang)
-            data[2] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-            data[3] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
-            data[4] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            var dataset = document.getElementById("datasetId");
+            data[1] = dataset.options[dataset.selectedIndex].text
+            data[2] = getLabelText(treeList[j].label, this.state.lang)
+            data[3] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+            data[4] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
+            data[5] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
             treeArray[count] = data;
             count++;
             // }
@@ -192,6 +195,11 @@ export default class ListTreeComponent extends Component {
                 {
                     title: 'Tree Id',
                     type: 'hidden'
+                },
+                {
+                    title: 'Program',
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.common.treeName'),
