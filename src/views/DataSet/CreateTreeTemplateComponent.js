@@ -733,7 +733,7 @@ export default class CreateTreeTemplate extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
         var monthDifference = moment(endDate).endOf('month').diff(startDate, 'months', true);
-        // console.log("month diff>>>", monthDifference);
+        console.log("month diff>>>", monthDifference);
         var momValue = ''
         var getValue = e.target.value;
         // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
@@ -766,7 +766,7 @@ export default class CreateTreeTemplate extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
-            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue);
+            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
         this.setState({
@@ -790,7 +790,7 @@ export default class CreateTreeTemplate extends Component {
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
         //     var targetEndValue = (parseFloat(getEndValueFromPercentage) + parseFloat(this.state.currentCalculatorStartValue)) / this.state.currentCalculatorStartValue * 100;
         // } else {
-        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage);
+        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage).toFixed(2);
         // }
 
         var momValue = ''
@@ -845,7 +845,7 @@ export default class CreateTreeTemplate extends Component {
             momValue = e.target.value;
         }
         this.setState({
-            currentEndValue: e.target.value != '' ? targetEndValue : '',
+            currentEndValue: e.target.value != '' ? targetEndValue.toFixed(2) : '',
             currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
@@ -1324,7 +1324,15 @@ export default class CreateTreeTemplate extends Component {
                 currentModelingType: rowData[2],
                 currentCalculatorStartDate: rowData[3],
                 currentCalculatorStopDate: rowData[4],
-                currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue
+                currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
+                
+                currentCalculatedMomChange:'',
+                currentTargetChangeNumber:'',
+                currentTargetChangeNumberEdit:false,
+                currentTargetChangePercentage:'',
+                currentTargetChangePercentageEdit:false,
+                currentEndValue:'',
+                currentEndValueEdit:false
             });
         }
     }.bind(this)
