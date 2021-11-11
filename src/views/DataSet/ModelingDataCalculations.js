@@ -14,7 +14,7 @@ export function calculateModelingData(dataset, props) {
         var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
         var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
         var datasetJson = JSON.parse(datasetData);
-        console.log("DatasetJson###",datasetJson);
+        console.log("DatasetJson###", datasetJson);
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var treeList = datasetJson.treeList;
@@ -103,10 +103,14 @@ export function calculateModelingData(dataset, props) {
                                 //Linear %
                                 else if (nodeDataModeling.modelingType.id == 3 && nodeDataModeling.transferNodeDataId == null) {
                                     var dv = 0;
-                                    if (nodeDataMapForScenario.calculatedDataValue == null) {
-                                        dv = nodeDataMapForScenario.dataValue;
+                                    if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
+                                        if (nodeDataMapForScenario.calculatedDataValue == null) {
+                                            dv = nodeDataMapForScenario.dataValue;
+                                        } else {
+                                            dv = nodeDataMapForScenario.calculatedDataValue;
+                                        }
                                     } else {
-                                        dv = nodeDataMapForScenario.calculatedDataValue;
+                                        dv = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD") && c.id == nodeDataMapForScenario.nodeDataId)[0]).calculatedValue;
                                     }
                                     difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
@@ -123,8 +127,13 @@ export function calculateModelingData(dataset, props) {
                                     transferNodeValue += Number(nodeDataModeling.dataValue);
                                 }
                             }
-
-                            var endValue = startValue + difference;
+                            var endValue = 0;
+                            if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
+                                endValue = startValue
+                                differnce=0;
+                            } else {
+                                endValue = startValue + difference;
+                            }
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
@@ -137,7 +146,12 @@ export function calculateModelingData(dataset, props) {
                                 console.log("ParentNodeDataId$$$$", parentValue);
                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
                             }
-                            calculatedValue = Number(calculatedValue) + Number(transferNodeValue)
+                            // calculatedValue = Number(calculatedValue)
+                            if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
+                                calculatedValue = Number(calculatedValue);
+                            } else {
+                                calculatedValue = Number(calculatedValue) + Number(transferNodeValue);
+                            }
                             nodeDataList.push(
                                 {
                                     month: curDate,

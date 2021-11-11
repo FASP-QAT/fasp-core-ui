@@ -609,9 +609,9 @@ export default class SyncMasterData extends Component {
                                     datasetListFiltered = datasetList.filter(c => (this.props.location.state.programIds).includes(c.id));
                                 }
                                 // var datasetListFiltered=datasetList;
-                                // this.setState({
-                                    // totalMasters: tm + myResult.length + datasetListFiltered.length
-                                // })
+                                this.setState({
+                                    totalMasters: tm + myResult.length + datasetListFiltered.length
+                                })
 
 
                                 // console.log("Validation", validation);
