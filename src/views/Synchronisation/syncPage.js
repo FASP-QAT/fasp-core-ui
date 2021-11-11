@@ -1377,6 +1377,7 @@ export default class syncPage extends Component {
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
         if (response1.status == 200) {
           var lastModifiedDate = response1.data;
+          console.log("LastModifiedDate+++",lastModifiedDate);
           var db1;
           var storeOS;
           getDatabase();
@@ -1399,7 +1400,7 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
-              if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+              if (lastModifiedDate!=undefined && lastModifiedDate!=null && lastModifiedDate!="" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
                 this.props.history.push(`/masterDataSync`)
               } else {
