@@ -5184,7 +5184,11 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                 </div>
                                 <FormGroup className="col-md-12">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({
+                                            showCalculatorFields: false
+                                        });
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
                                 </FormGroup>
@@ -5242,7 +5246,9 @@ export default class BuildTree extends Component {
                                 <div id="momJexcel">
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({ showMomData: false })
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                 </div>
