@@ -3389,12 +3389,26 @@ export default class BuildTree extends Component {
         // console.log("tab data---", newTabObject);
         scenarioList = [...scenarioList, newTabObject];
         // console.log("tabList---", tabList1)
+        if (this.state.treeId != "") {
+            var items = this.state.items;
+            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+            var obj = {
+                nodeDataId: scenarioId,
+                label: {
+                    label_en: scenario.label.label_en
+                },
+                notes: scenario.notes
+            }
+                (item.payload.nodeDataMap[scenarioId])[0] = obj;
+            items[itemIndex1] = item;
+        }
         this.setState({
-            selectedScenario : scenarioId,
+            selectedScenario: scenarioId,
             scenarioList,
             openAddScenarioModal: false
         }, () => {
-            console.log("final tab list---", this.state.scenarioList);
+            console.log("final tab list---", this.state.items);
         });
     }
     nodeTypeChange(value) {
