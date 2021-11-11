@@ -1323,25 +1323,35 @@ export default class CreateTreeTemplate extends Component {
     }
     selected = function (instance, cell, x, y, value) {
         if (y == 7) {
-            console.log("x row data===>", this.el.getRowData(x));
-            var elInstance = this.state.modelingEl;
-            var rowData = elInstance.getRowData(x);
             this.setState({
-                currentRowIndex: x,
-                showCalculatorFields: true,
-                currentModelingType: rowData[2],
-                currentCalculatorStartDate: rowData[3],
-                currentCalculatorStopDate: rowData[4],
-                currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
+                currentRowIndex: '',
+                showCalculatorFields: '',
+                currentModelingType: '',
+                currentCalculatorStartDate: '',
+                currentCalculatorStopDate: '',
+                currentCalculatorStartValue: '',
+            }, () => {
+                console.log("x row data===>", this.el.getRowData(x));
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(x);
+                this.setState({
+                    currentRowIndex: x,
+                    showCalculatorFields: true,
+                    currentModelingType: rowData[2],
+                    currentCalculatorStartDate: rowData[3],
+                    currentCalculatorStopDate: rowData[4],
+                    currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
 
-                currentCalculatedMomChange: '',
-                currentTargetChangeNumber: '',
-                currentTargetChangeNumberEdit: false,
-                currentTargetChangePercentage: '',
-                currentTargetChangePercentageEdit: false,
-                currentEndValue: '',
-                currentEndValueEdit: false
-            });
+                    currentCalculatedMomChange: '',
+                    currentTargetChangeNumber: '',
+                    currentTargetChangeNumberEdit: false,
+                    currentTargetChangePercentage: '',
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValue: '',
+                    currentEndValueEdit: false
+                });
+            })
+
         }
     }.bind(this)
     changed = function (instance, cell, x, y, value) {
@@ -3347,6 +3357,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("cursor changed item---", item);
         if (item != null) {
             this.setState({
+                showCalculatorFields:false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
                 currentItemConfig: data,
