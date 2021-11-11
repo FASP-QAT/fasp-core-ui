@@ -45,6 +45,7 @@ import ModelingTypeService from "../../api/ModelingTypeService";
 
 
 
+
 const entityname = 'Tree Template';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -728,13 +729,13 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     acceptValue() {
-        console.log(">>>>", this.state.currentRowIndex);
+        // console.log(">>>>", this.state.currentRowIndex);
         var elInstance = this.state.modelingEl;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            if (this.state.currentModelingType == 3) {
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, ((this.state.currentCalculatedMomChange / this.state.currentCalculatorStartValue) * 100).toFixed(2), true);
+            if (this.state.currentModelingType == 5) {
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
@@ -748,7 +749,7 @@ export default class CreateTreeTemplate extends Component {
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             }
         }
 
@@ -792,6 +793,10 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+
+        if (this.state.currentModelingType == 5) {
+            var momValue = (parseFloat(e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) / monthDifference).toFixed(2);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -844,9 +849,12 @@ export default class CreateTreeTemplate extends Component {
             var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
 
         }
+        if (this.state.currentModelingType == 5) {
+            var momValue = (parseFloat(e.target.value)).toFixed(2);
+        }
 
         this.setState({
-            currentEndValue: (e.target.value != '' && this.state.currentModelingType != 3) ? targetEndValue : '',
+            currentEndValue: (e.target.value != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
@@ -4682,7 +4690,7 @@ export default class CreateTreeTemplate extends Component {
                                     </FormGroup>
                                     }
                                     {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                    {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
+                                    {this.state.currentModelingType != 5 && this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentTargetChangeNumber"
@@ -4727,7 +4735,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <b>{'Exponential (%)'}</b>
                                                 </Label>
                                             </div>}
-                                            <div className="col-md-12 form-group">
+                                            {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                 <Input
                                                     className="form-check-input Radioactive checkboxMargin"
                                                     type="radio"
@@ -4741,7 +4749,7 @@ export default class CreateTreeTemplate extends Component {
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>{'Linear (%)'}</b>
                                                 </Label>
-                                            </div>
+                                            </div>}
                                             {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                 <Input
                                                     className="form-check-input checkboxMargin"
@@ -4755,6 +4763,21 @@ export default class CreateTreeTemplate extends Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>{'Linear (#)'}</b>
+                                                </Label>
+                                            </div>}
+                                            {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <div className="col-md-12 form-group">
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="radio"
+                                                    id="active4"
+                                                    name="modelingType"
+                                                    checked={this.state.currentModelingType == 5 ? true : false}
+                                                // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Linear (% point)'}</b>
                                                 </Label>
                                             </div>}
                                         </div>
@@ -4839,7 +4862,34 @@ export default class CreateTreeTemplate extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div>
-                            <div className="row">
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="col-md-5">
+                                        <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                    </div>
+                                    <div className="col-md-5 float-right pl-lg-5">
+                                        <FormGroup className="" >
+                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="manualChange"
+                                                        name="manualChange"
+                                                        checked={true}
+                                                        // checked={this.state.manualChange}
+                                                        // onClick={(e) => { this.momCheckbox(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Manual Change affects future month'}</b>
+                                                    </Label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </div>
+                                </div>
                                 <div id="momJexcelPer" className={"RowClickable"}>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
