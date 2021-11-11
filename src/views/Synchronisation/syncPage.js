@@ -1375,7 +1375,7 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
-              if (lastModifiedDate!=null && lastModifiedDate!="" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+              if (lastModifiedDate!=undefined && lastModifiedDate!=null && lastModifiedDate!="" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
                 this.props.history.push(`/masterDataSync`)
               } else {
