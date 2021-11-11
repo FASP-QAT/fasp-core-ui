@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';

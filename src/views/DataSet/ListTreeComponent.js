@@ -142,11 +142,14 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
-
-        this.props.history.push({
-            pathname: `/dataSet/buildTree/template/${event.target.value}`,
-            // state: { role }
-        });
+        if (event.target.value == 0 || event.target.value == "") {
+            this.buildTree();
+        } else {
+            this.props.history.push({
+                pathname: `/dataSet/buildTree/template/${event.target.value}`,
+                // state: { role }
+            });
+        }
 
     }
 
@@ -169,7 +172,7 @@ export default class ListTreeComponent extends Component {
             // for (var k = 0; k < trees.length; k++) {
             // console.log("trees[k]---", trees[k]);
             data = [];
-            
+
             data[0] = treeList[j].treeId
             var dataset = document.getElementById("datasetId");
             data[1] = dataset.options[dataset.selectedIndex].text
@@ -386,7 +389,8 @@ export default class ListTreeComponent extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="0">{'Select Template'}</option>
+                                                            <option value="">{'+ Add Tree'}</option>
+                                                            <option value="0">{'(blank)'}</option>
                                                             {treeTemplates}
                                                         </Input>
                                                     </InputGroup>
@@ -394,11 +398,11 @@ export default class ListTreeComponent extends Component {
                                             </FormGroup>
                                             // </Col>
                                         }
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                        {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
                                                 <Button type="submit" size="md" color="info" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-plus"></i>  {i18n.t('static.common.addtree')}</Button>
                                             </FormGroup>
-                                        }
+                                        } */}
                                     </div>
                                 </Col>
                             </div>
@@ -427,8 +431,8 @@ export default class ListTreeComponent extends Component {
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
                         <div className="listtreetable">
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
