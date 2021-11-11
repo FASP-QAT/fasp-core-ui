@@ -50,6 +50,7 @@ import { grey } from '@material-ui/core/colors';
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -186,9 +187,10 @@ function addCommas(cell1, row) {
 }
 
 export default class BuildTree extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
+            programId: this.props.match.params.programId,
             showMomDataPercent: false,
             currentTargetChangePercentage: '',
             currentTargetChangeNumber: '',
@@ -1602,6 +1604,10 @@ export default class BuildTree extends Component {
                 myResult = getRequest.result;
                 this.setState({
                     datasetList: myResult
+                }, () => {
+                    var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
+                    // console.log("dataSetObj>>>", dataSetObj);
+                    calculateModelingData(dataSetObj, '');
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("datasetList--->", myResult[i])
@@ -2769,6 +2775,8 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
+
+
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId

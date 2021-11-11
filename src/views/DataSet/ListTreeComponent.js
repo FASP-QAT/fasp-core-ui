@@ -163,6 +163,7 @@ export default class ListTreeComponent extends Component {
     }
     buildJexcel() {
         let programList = this.state.treeData;
+        console.log(">>>",programList);
         let treeArray = [];
         let count = 0;
         for (var j = 0; j < programList.length; j++) {
@@ -176,6 +177,7 @@ export default class ListTreeComponent extends Component {
                 data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
                 data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
                 data[6] = treeList[k].notes
+                data[7] = programList[j].programId
                 treeArray[count] = data;
                 count++;
             }
@@ -225,7 +227,13 @@ export default class ListTreeComponent extends Component {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
                     readOnly: true
+                },
+                {
+                    title: 'ProgramId',
+                    type: 'text',
+                    readOnly: true
                 }
+
 
             ],
             text: {
@@ -319,9 +327,11 @@ export default class ListTreeComponent extends Component {
         } else {
 
             var treeId = this.el.getValueFromCoords(0, x);
+            var programId = this.el.getValueFromCoords(7, x);
+            console.log("programId>>>", programId);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
-                pathname: `/dataSet/buildTree/tree/${treeId}`,
+                pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
                 // state: { role }
             });
             // }
