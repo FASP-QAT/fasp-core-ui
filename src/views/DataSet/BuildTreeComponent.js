@@ -1126,8 +1126,8 @@ export default class BuildTree extends Component {
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].modelingType.id != 2 ? scalingList[j].dataValue : ''
-            data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
+            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
+            data[6] = scalingList[j].modelingType.id == 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
             data[7] = cleanUp
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -1183,7 +1183,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Monthly Change (%)",
                     type: 'numeric',
-                    mask: '#,##.####', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
@@ -1197,7 +1197,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.##', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
