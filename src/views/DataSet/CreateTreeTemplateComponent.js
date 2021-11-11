@@ -4862,7 +4862,34 @@ export default class CreateTreeTemplate extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div>
-                            <div className="row">
+                            <div className="row pl-lg-2 pr-lg-2">
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="col-md-5">
+                                        <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                    </div>
+                                    <div className="col-md-5 float-right pl-lg-5">
+                                        <FormGroup className="" >
+                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="manualChange"
+                                                        name="manualChange"
+                                                        checked={true}
+                                                        // checked={this.state.manualChange}
+                                                        // onClick={(e) => { this.momCheckbox(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Manual Change affects future month'}</b>
+                                                    </Label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
+                                    </div>
+                                </div>
                                 <div id="momJexcelPer" className={"RowClickable"}>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
