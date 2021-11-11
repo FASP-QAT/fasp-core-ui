@@ -515,16 +515,29 @@ export default class CreateTreeTemplate extends Component {
         this.momCheckbox = this.momCheckbox.bind(this);
     }
     momCheckbox(e) {
+        var checked = e.target.checked;
         if (e.target.name === "manualChange") {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
+
                 console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
             this.setState({
                 seasonality: e.target.checked == true ? true : false
             }, () => {
+                if (this.state.momEl != "") {
+                    if (checked) {
+                        this.state.momEl.showColumn(3);
+                        this.state.momEl.showColumn(4);
+                        this.state.momEl.showColumn(5);
+                    } else {
+                        this.state.momEl.hideColumn(3);
+                        this.state.momEl.hideColumn(4);
+                        this.state.momEl.hideColumn(5);
+                    }
+                }
                 console.log('seasonality---', this.state.seasonality);
             });
         }
@@ -1054,8 +1067,8 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Monthly End (no seasonality)---" + this.state.seasonality,
-                    type: this.state.seasonality == true ? 'text' : 'hidden',
+                    title: "Monthly End (no seasonality)",
+                    type: 'text',
                     readOnly: true
                 },
                 {
@@ -2991,14 +3004,14 @@ export default class CreateTreeTemplate extends Component {
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                   arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                    arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
                 } else {
                     arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
                 }
-                console.log("arr---",arr);
+                console.log("arr---", arr);
                 var modelingTypeListNew = [];
                 for (var i = 0; i < arr.length; i++) {
-                    console.log("arr[i]---",arr[i]);
+                    console.log("arr[i]---", arr[i]);
                     modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
                 }
                 this.setState({
@@ -3401,7 +3414,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("cursor changed item---", item);
         if (item != null) {
             this.setState({
-                showCalculatorFields:false,
+                showCalculatorFields: false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
                 currentItemConfig: data,
