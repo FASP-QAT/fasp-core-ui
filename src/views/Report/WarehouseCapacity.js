@@ -745,7 +745,7 @@ class warehouseCapacity extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         // this.setState({ loading: true })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var regionList = (programJson.regionList);
@@ -1010,6 +1010,7 @@ class warehouseCapacity extends Component {
                                                         value={this.state.programValues}
                                                         onChange={(e) => { this.handleChangeProgram(e) }}
                                                         options={programList && programList.length > 0 ? programList : []}
+                                                        disabled={this.state.loading}
 
                                                     />
                                                     {!!this.props.error &&

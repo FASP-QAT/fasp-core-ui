@@ -146,6 +146,15 @@ class AuthenticationService {
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
+    getLoggedInUserRealm() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("get realm id decryptedUser---", decryptedUser);
+        // console.log(decryptedUser);
+        return decryptedUser.realm;
+    }
 
     checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
@@ -1304,14 +1313,48 @@ class AuthenticationService {
 
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                            // if (true) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree":
+                    case "/dataset/loadDeleteDataSet":
+                    case "/dataset/loadDeleteDataSet/:message":
+                    case "/dataSet/buildTree/tree/:treeId":
+                    case "/dataSet/buildTree/":
+                    case "/dataset/createTreeTemplate/:templateId":
+                    case "/dataset/listTreeTemplate/":
+                    case "/dataset/listTreeTemplate/:color/:message":
+                    case "/dataSet/buildTree/template/:templateId":
+                    case "/dataset/listTree/:color/:message":
+                    case "/dataset/versionSettings":
+                        if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
                             return true;
                         }
                         break;
 
+
                     case "/usageTemplate/listUsageTemplate":
                     case "/usageTemplate/listUsageTemplate/:color/:message":
-                        if (true) {
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/dataset/addDataSet":
+                        if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/editDataSet/:dataSetId":
+                        if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listDataSet":
+                    case "/dataset/listDataSet/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
                             return true;
                         }
                         break;

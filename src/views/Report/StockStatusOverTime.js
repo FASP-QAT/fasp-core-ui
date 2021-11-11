@@ -20,7 +20,7 @@ import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import MultiSelect from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
 import moment from "moment";
 import {
@@ -123,7 +123,9 @@ class StockStatusOverTime extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             matricsList: [],
             dropdownOpen: false,
@@ -142,12 +144,13 @@ class StockStatusOverTime extends Component {
             planningUnitlines: [],
             lineData: [],
             lineDates: [],
-            monthsInPastForAmc: 0,
+            monthsInPastForAmc: "",
             monthsInFutureForAmc: 0,
             planningUnitMatrix: {
                 date: []
             },
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
@@ -472,7 +475,7 @@ class StockStatusOverTime extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -531,7 +534,7 @@ class StockStatusOverTime extends Component {
             console.log(program)
             if (program.length == 1) {
                 this.setState({
-                    monthsInPastForAmc: 0,
+                    monthsInPastForAmc: "",
                     monthsInFutureForAmc: 0
                 }, () => { this.fetchData() })
 
@@ -635,7 +638,7 @@ class StockStatusOverTime extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -873,7 +876,7 @@ class StockStatusOverTime extends Component {
         let monthsInFutureForAmc = this.state.monthsInFutureForAmc
         let monthsInPastForAmc = this.state.monthsInPastForAmc
         console.log(monthsInFutureForAmc, monthsInPastForAmc)
-        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != 0) {
+        if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != "") {
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
                 let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
@@ -906,11 +909,27 @@ class StockStatusOverTime extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        console.log(programJson)
+                        // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         planningUnitIds.map(planningUnitId => {
+                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                            var programJson = {}
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
+                            }
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                             var monthstartfrom = this.state.rangeValue.from.month
@@ -1079,7 +1098,7 @@ class StockStatusOverTime extends Component {
                     "programId": programId,
                     "versionId": versionId,
                     "planningUnitIds": planningUnitIds,
-                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
+                    "mosPast": document.getElementById("monthsInPastForAmc").selectedOptions[0].value == "" ? null : document.getElementById("monthsInPastForAmc").selectedOptions[0].value,
                     "mosFuture": document.getElementById("monthsInFutureForAmc").selectedOptions[0].value == 0 ? null : document.getElementById("monthsInFutureForAmc").selectedOptions[0].value,
                     "startDate": startDate,
                     "stopDate": stopDate
@@ -1123,6 +1142,7 @@ class StockStatusOverTime extends Component {
                         // lineDates = response.data[0].map(ele => (ele.dt))
                         // planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
+                        console.log("RESP-------->", response.data);
                         this.setState({
                             matricsList: response.data,
                             message: '', loading: false
@@ -1207,7 +1227,7 @@ class StockStatusOverTime extends Component {
         } else if (planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), matricsList: [] });
 
-        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == 0) {
+        } else if (monthsInPastForAmc == undefined || monthsInPastForAmc == "") {
             this.setState({ message: i18n.t('static.realm.monthInPastForAmcText'), matricsList: [] });
 
         } else {
@@ -1642,6 +1662,7 @@ class StockStatusOverTime extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     labelledBy={i18n.t('static.common.select')}
+                                                    disabled={this.state.loading}
                                                 />
                                                 {/* </InputGroup> */}
                                                 {/* <ReactMultiSelectCheckboxes
@@ -1671,7 +1692,8 @@ class StockStatusOverTime extends Component {
                                                         value={this.state.monthsInPastForAmc}
                                                         onChange={(e) => { this.changeMonthsForamc(e) }}
                                                     >
-                                                        <option value="0">-</option>
+                                                        <option value="">-</option>
+                                                        <option value="0">{0}</option>
                                                         <option value="1">{1}</option>
                                                         <option value="2">{2}</option>
                                                         <option value="3">{3}</option>

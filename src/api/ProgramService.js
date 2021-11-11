@@ -106,8 +106,8 @@ class ProgramService {
         );
     }
 
-    saveProgramData(json) {
-        return axios.put(`${API_URL}/api/programData/`, json, {}
+    saveProgramData(json,comparedVersionId) {
+        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
 
@@ -193,6 +193,21 @@ class ProgramService {
 
     getLastModifiedDateForProgram(programId, versionId) {
         return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
+        );
+    }
+
+    addDataset(json) {
+        return axios.post(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getDatasetById(json) {
+        return axios.get(`${API_URL}/api/dataset/${json}`, {}
+        );
+    }
+
+    editDataset(json) {
+        return axios.put(`${API_URL}/api/dataset/`, json, {}
         );
     }
 

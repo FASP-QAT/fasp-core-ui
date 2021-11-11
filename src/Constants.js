@@ -1,6 +1,6 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
-export const API_URL='http://localhost:8084'
-// export const API_URL = 'http://localhost:8081'
+// export const API_URL='https://api-mod2.altius.cc'
+export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
@@ -9,6 +9,9 @@ export const API_URL='http://localhost:8084'
 
 
 // export const API_URL='http://192.168.43.70:8080/FASP'
+
+export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
+export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
 
 export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
@@ -47,7 +50,7 @@ export const FIRST_DATA_ENTRY_DATE = '2017-01-01'
 export const NOTES_FOR_QAT_ADJUSTMENTS = 'Adjustment calculated by the system due to an actual stock count'
 export const TBD_PROCUREMENT_AGENT_ID = 11
 export const TBD_FUNDING_SOURCE = 8
-export const TOTAL_NO_OF_MASTERS_IN_SYNC = 38
+export const TOTAL_NO_OF_MASTERS_IN_SYNC = 42
 export const QAT_REALM_COUNTRY_PLANNING_UNIT = 1
 export const DECIMAL_NO_REGEX = /^\d+(\.\d{1,4})?$/
 export const INTEGER_NO_REGEX = /^[0-9\b]+$/
@@ -64,7 +67,7 @@ export const SPACE_REGEX = /^[^\s]+(\s+[^\s]+)*$/
 export const PERCENTAGE_REGEX = /^0?[0-9]?[0-9]$|^(100)$/
 export const NO_DECIMAL_PERCENTAGE_REGEX = /^[0-9\b]+$/
 export const INDEXED_DB_NAME = "fasp"
-export const INDEXED_DB_VERSION = 4
+export const INDEXED_DB_VERSION = 6
 export const ACTUAL_CONSUMPTION_TYPE = 1;
 export const FORCASTED_CONSUMPTION_TYPE = 2;
 export const LATEST_VERSION_COLOUR = "#e5edf5"
@@ -78,7 +81,7 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
-export const APP_VERSION_REACT = "[4947]"
+export const APP_VERSION_REACT = "[5062]"
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
 export const JEXCEL_PAGINATION_OPTION = [15, 25, 50, 5000000]
@@ -104,7 +107,7 @@ export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.n
 export const JEXCEL_MONTH_PICKER_FORMAT = "Mon-YYYY"
 export const FINAL_VERSION_TYPE = 2;
 export const OPEN_PROBLEM_STATUS_ID=1
-export const JEXCEL_PRO_KEY="YTliMDJhNzEzZjBjZjg3NGJhOTE1ODI5MzRiOWMxMTFjZjQ3MDUyNjAxZGM1Njc5MzYyNjlhODYzYjZjMzQxODhjODFlYjI5NDJiMTI4YjQ3OGQ5ZDIyYmU1NTgwMzFkNGVhMWNjYjdmZTUxZGQ5NDQ2Zjc2OTFjNjgyODY3NjgsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqb3hOak0wT1RRek5qQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2liRzlqWVd4b2IzTjBJbDBzSW5Cc1lXNGlPaUl6SW4wPQ=="
+export const JEXCEL_PRO_KEY="ZDUwNjRmMTA3YTQ4MDc2MWQyODU2YjhhNDFmYzc3MDQzY2Q3ZWU2Nzg0ZWI4MjU1Y2Q4NGM3OWU2NWM4YmVlNTM3MzQ1NTQ2MWU5NzE3MWM3MjJmZjUxODYzMDNkMmNlYTM5MDYxMDNlYTQ2NzI3MTQwYzdkYWJlNzg1OTkyZmMsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqb3hOalkyTmpVeU5EQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2lZV3gwYVhWekxtTmpJaXdpYlc5a01pNWhiSFJwZFhNdVkyTWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2SWpNaUxDSnpZMjl3WlNJNld5SjJOeUlzSW5ZNElsMTk="
 export const SPECIAL_CHARECTER_WITHOUT_NUM = /^([^0-9\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM = /^([^\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE = /^(?!.*\s\s)\S(.*\S)?$/
@@ -132,3 +135,6 @@ export const polling = {url: API_URL}
 export const APPLICATION_STATUS_URL=API_URL+"/actuator/health"
 export const PROBLEM_STATUS_IN_COMPLIANCE=4
 export const MAX_PROGRAM_CODE_LENGTH = 50;
+export const TREE_DIMENSION_ID = 5;
+export const REPORT_DATEPICKER_START_MONTH = 6;
+export const REPORT_DATEPICKER_END_MONTH = 12;

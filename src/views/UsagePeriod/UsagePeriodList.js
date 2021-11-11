@@ -256,7 +256,7 @@ class UsagePeriod extends Component {
             }
             else {
                 this.setState({
-                    message: response.data.messageCode, loading: false, color: "red",
+                    message: response.data.messageCode, loading: false, color: "#BA0C2F",
                 },
                     () => {
                         this.hideSecondComponent();
@@ -270,7 +270,7 @@ class UsagePeriod extends Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -287,21 +287,21 @@ class UsagePeriod extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 });
                                 break;
                         }
@@ -503,7 +503,7 @@ class UsagePeriod extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red", loading: false
+                            color: "#BA0C2F", loading: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -517,7 +517,7 @@ class UsagePeriod extends Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: "red",
+                                color: "#BA0C2F",
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -533,7 +533,7 @@ class UsagePeriod extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                         // message: i18n.t('static.region.duplicateGLN'),
                                         loading: false
                                     },
@@ -545,7 +545,7 @@ class UsagePeriod extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     },
                                         () => {
                                             this.hideSecondComponent();
@@ -555,7 +555,7 @@ class UsagePeriod extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     });
                                     break;
                             }
@@ -603,7 +603,8 @@ class UsagePeriod extends Component {
             var col = ("C").concat(parseInt(y) + 1);
             value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
-            var reg = /^\d{1,5}(\.\d{1,4})?$/;
+            // var reg = /^\d{1,5}(\.\d{1,4})?$/;
+            var reg = /^\d{1,5}(\.\d{1,8})?$/;
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -613,7 +614,7 @@ class UsagePeriod extends Component {
                 if (!(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTest'));
+                    this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
                 } else {
                     if (isNaN(Number.parseInt(value)) || value <= 0) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -672,7 +673,7 @@ class UsagePeriod extends Component {
                 //conversion factor decimal 9,4
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = /^\d{1,5}(\.\d{1,4})?$/;
+                var reg = /^\d{1,5}(\.\d{1,8})?$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -682,7 +683,7 @@ class UsagePeriod extends Component {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTest'));
+                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionFactorTestString'));
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
@@ -714,7 +715,7 @@ class UsagePeriod extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                        <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5>
+                        <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
                             {/* <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> */}
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block",marginTop:'-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>

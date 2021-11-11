@@ -92,12 +92,14 @@ export default class QatProblemActionNew extends Component {
                     let username = decryptedUser.username;
                     // console.log("end time after user decryption+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                     // console.log("program decryption start+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    var planningUnitDataList = getRequest.result.programData.planningUnitDataList;
+
                     // console.log("programJson+++", programJson);
                     // console.log("program decryption end+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                    programList.push(programJson);
+                    programList.push({ generalData: programJson, planningUnitDataList: planningUnitDataList });
                     programRequestList.push(getRequest.result);
                     versionIDs.push(getRequest.result.version);
                     // console.log("start time bfor taking list of programPlanningUnit+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
@@ -213,13 +215,13 @@ export default class QatProblemActionNew extends Component {
                                                     // var shipmentList = programList[pp].shipmentList;
                                                     // console.log("program===>", programList[pp]);
                                                     var actionList = [];
-                                                    var qplLastModifiedDate = programList[pp].qplLastModifiedDate;
+                                                    var qplLastModifiedDate = programList[pp].generalData.qplLastModifiedDate;
                                                     var actionPlanningUnitIds = [];
                                                     var versionID = versionIDs[pp];
                                                     var problemActionIndex = 0;
-                                                    problemActionList = programList[pp].problemReportList;
-                                                    problemActionIndex = programList[pp].problemReportList.length;
-                                                    actionList = programList[pp].actionList;
+                                                    problemActionList = programList[pp].generalData.problemReportList;
+                                                    problemActionIndex = programList[pp].generalData.problemReportList.length;
+                                                    actionList = programList[pp].generalData.actionList;
                                                     console.log("actionList+++", actionList);
 
                                                     // ******* update logic for active inactive planning units===========================================================
@@ -229,10 +231,10 @@ export default class QatProblemActionNew extends Component {
                                                             actionPlanningUnitIds.push(parseInt(m.planningUnitId));
                                                         });
                                                     programPlanningUnitList.filter(
-                                                        c => c.active == false && c.program.id == programList[pp].programId).map(m => {
+                                                        c => c.active == false && c.program.id == programList[pp].generalData.programId).map(m => {
                                                             actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
                                                         });
-                                                    programList[pp].problemReportList.filter(
+                                                    programList[pp].generalData.problemReportList.filter(
                                                         c => c.planningUnitActive == false).map(m => {
                                                             actionPlanningUnitIds.push(parseInt(m.planningUnit.id));
                                                         });
@@ -245,14 +247,14 @@ export default class QatProblemActionNew extends Component {
 
                                                     //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
                                                     var regionIdArray = [];
-                                                    var regionList = programList[pp].regionList;
+                                                    var regionList = programList[pp].generalData.regionList;
                                                     regionList.map(rm => {
                                                         regionIdArray.push(parseInt(rm.regionId));
                                                     });
                                                     console.log("regionIdArray+++", regionIdArray);
                                                     var problemReportIdForRegion = [];
                                                     problemActionList.filter(c =>
-                                                        c.region!=null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
+                                                        c.region != null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
                                                         map(m => {
                                                             problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                         });
@@ -267,10 +269,10 @@ export default class QatProblemActionNew extends Component {
                                                     //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
 
                                                     problemList = problemRequest.result.filter(c =>
-                                                        c.realm.id == programList[pp].realmCountry.realm.realmId
+                                                        c.realm.id == programList[pp].generalData.realmCountry.realm.realmId
                                                         && c.active.toString() == "true");
                                                     planningUnitList = planningUnitResult.filter(c =>
-                                                        c.program.id == programList[pp].programId
+                                                        c.program.id == programList[pp].generalData.programId
                                                     );
 
                                                     // console.log("qplLastModifiedDate+++", moment(qplLastModifiedDate).format("YYYY-MM"));
@@ -286,6 +288,22 @@ export default class QatProblemActionNew extends Component {
                                                     var curMonth = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM'));
                                                     for (var p = 0; p < planningUnitList.length; p++) {
                                                         // console.log("in for+++");
+                                                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[p].planningUnit.id);
+                                                        var programJsonForPlanningUnit = {}
+                                                        if (planningUnitDataIndex != -1) {
+                                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id))[0];
+                                                            var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                            var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                            programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+                                                        } else {
+                                                            programJsonForPlanningUnit = {
+                                                                consumptionList: [],
+                                                                inventoryList: [],
+                                                                shipmentList: [],
+                                                                batchInfoList: [],
+                                                                supplyPlan: []
+                                                            }
+                                                        }
                                                         var checkPlanningUnitObj = planningUnitListAll.filter(c => c.planningUnitId == planningUnitList[p].planningUnit.id)[0];
                                                         var checkProgramPlanningUnitObj = planningUnitList[p];
                                                         if (checkPlanningUnitObj.active == true && checkProgramPlanningUnitObj.active == true) {
@@ -296,7 +314,7 @@ export default class QatProblemActionNew extends Component {
                                                                 }
                                                             }
 
-                                                            var shipmentListForMonths = programList[pp].shipmentList.filter(c =>
+                                                            var shipmentListForMonths = programJsonForPlanningUnit.shipmentList.filter(c =>
                                                                 c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                 && c.active.toString() == "true"
                                                                 && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS
@@ -352,7 +370,7 @@ export default class QatProblemActionNew extends Component {
                                                                         // CASE 1 START (missing recent actual consumption in last three month including current month.)
                                                                         for (var r = 0; r < regionList.length; r++) {
 
-                                                                            var consumptionList = programList[pp].consumptionList;
+                                                                            var consumptionList = programJsonForPlanningUnit.consumptionList;
                                                                             var numberOfMonths = parseInt(typeProblemList[prob].data1);
                                                                             var numberOfMonthsData2 = parseInt(typeProblemList[prob].data2);
                                                                             var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
@@ -382,7 +400,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && c.realmProblem.problem.problemId == 1
                                                                             );
                                                                             // if (filteredConsumptionList.length == 0 && filteredConsumptionListForSixMonthRange.length > 0) {
@@ -400,7 +418,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 // console.log("cause json+++",causeJson);
                                                                                 if (index == -1) {
                                                                                     // crete problem
-                                                                                    createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    createDataQualityProblems(programList[pp].generalData, versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // auto open logic for index problemstatus 4 means we are checking for status incompliance
@@ -425,7 +443,7 @@ export default class QatProblemActionNew extends Component {
                                                                     case 2:
                                                                         // CASE 2 START (missing recent  inventory inputs for last three month including current month.) actual qty inputs are checked
                                                                         for (var r = 0; r < regionList.length; r++) {
-                                                                            var inventoryList = programList[pp].inventoryList;
+                                                                            var inventoryList = programJsonForPlanningUnit.inventoryList;
                                                                             var numberOfMonthsInventory = parseInt(typeProblemList[prob].data1);
                                                                             var numberOfMonthsInventoryData2 = parseInt(typeProblemList[prob].data2);
                                                                             var myStartDateInventory = moment(curDate).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
@@ -460,7 +478,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && c.realmProblem.problem.problemId == 2
 
                                                                             );
@@ -477,7 +495,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     causeJson.push(item);
                                                                                 }
                                                                                 if (index == -1) {
-                                                                                    createDataQualityProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    createDataQualityProblems(programList[pp].generalData, versionID, typeProblemList[prob], regionList[r], planningUnitList[p], causeJson, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     problemActionList[index].dt = curDate;
@@ -520,13 +538,13 @@ export default class QatProblemActionNew extends Component {
                                                                                 var indexShipment = 0;
                                                                                 var newAddShipment = false;
                                                                                 indexShipment = problemActionList.findIndex(
-                                                                                    c => c.program.id == programList[pp].programId
+                                                                                    c => c.program.id == programList[pp].generalData.programId
                                                                                         && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                                         && c.realmProblem.problem.problemId == 3
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
+                                                                                    createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
@@ -537,14 +555,14 @@ export default class QatProblemActionNew extends Component {
                                                                                 }
                                                                             }
                                                                             //new for loop logic=======================================
-                                                                            var problemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0)
+                                                                            var problemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0)
                                                                             for (var fsl = 0; fsl < problemActionListForShipments.length; fsl++) {
                                                                                 var fslShipmentId = problemActionListForShipments[fsl].shipmentId
                                                                                 // console.log("fslShipmentId===>", fslShipmentId);
                                                                                 if (!shipmentIdsFromShipmnetList.includes(fslShipmentId)) {
                                                                                     var notIncludedShipmentIndex = problemActionList.findIndex(c =>
                                                                                         c.realmProblem.problem.problemId == 3
-                                                                                        && c.program.id == programList[pp].programId
+                                                                                        && c.program.id == programList[pp].generalData.programId
                                                                                         && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                         && c.shipmentId != 0 &&
@@ -556,12 +574,12 @@ export default class QatProblemActionNew extends Component {
                                                                             //new for loop logic=======================================
                                                                         } else {
                                                                             //new for loop logic=======================================
-                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
                                                                             for (var d = 0; d < problemActionListForShipmentsIncompliance.length; d++) {
                                                                                 var fslShipmentIdInCompliance = problemActionListForShipmentsIncompliance[d].shipmentId;
                                                                                 var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
                                                                                     c.realmProblem.problem.problemId == 3
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.shipmentId != 0 &&
@@ -594,7 +612,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (filteredShipmentList[s].localProcurement) {
                                                                                     var addLeadTimes = programPlanningUnitList.filter(c =>
                                                                                         c.planningUnit.id == filteredShipmentList[s].planningUnit.id
-                                                                                        && c.program.id == programList[pp].programId
+                                                                                        && c.program.id == programList[pp].generalData.programId
                                                                                     )[0].localProcurementLeadTime;
                                                                                     var leadTimesPerStatus = addLeadTimes / 5;
                                                                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -644,14 +662,14 @@ export default class QatProblemActionNew extends Component {
                                                                                     var indexShipment = 0;
                                                                                     var newAddShipment = false;
                                                                                     indexShipment = problemActionList.findIndex(
-                                                                                        c => c.program.id == programList[pp].programId
+                                                                                        c => c.program.id == programList[pp].generalData.programId
                                                                                             && c.shipmentId == filteredShipmentList[s].shipmentId
                                                                                             && c.realmProblem.problem.problemId == 4
                                                                                         // && c.versionId == versionID
                                                                                     );
                                                                                     if (indexShipment == -1) {
                                                                                         var index = 0;
-                                                                                        createProcurementScheduleProblems(programList[pp], versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
+                                                                                        createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                         problemActionIndex++;
                                                                                     } else {
                                                                                         // make shipmet problem status eual to open========
@@ -664,7 +682,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 }
                                                                             }
                                                                             //new for loop logic=======================================
-                                                                            var problemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0)
+                                                                            var problemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0)
                                                                             // console.log("shipmentIdsFromShipmnetList",shipmentIdsFromShipmnetList);s
                                                                             for (var fsl = 0; fsl < problemActionListForShipments.length; fsl++) {
                                                                                 var fslShipmentId = problemActionListForShipments[fsl].shipmentId
@@ -672,7 +690,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (!shipmentIdsFromShipmnetList.includes(fslShipmentId)) {
                                                                                     var notIncludedShipmentIndex = problemActionList.findIndex(c =>
                                                                                         c.realmProblem.problem.problemId == 4
-                                                                                        && c.program.id == programList[pp].programId
+                                                                                        && c.program.id == programList[pp].generalData.programId
                                                                                         && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                         && c.shipmentId != 0 &&
@@ -683,13 +701,13 @@ export default class QatProblemActionNew extends Component {
                                                                             }
                                                                             //new for loop logic=======================================
                                                                         } else {
-                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
+                                                                            var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
                                                                             for (var d = 0; d < problemActionListForShipmentsIncompliance.length; d++) {
                                                                                 var fslShipmentIdInCompliance = problemActionListForShipmentsIncompliance[d].shipmentId;
                                                                                 // console.log("fslShipmentIdInCompliance===>", fslShipmentIdInCompliance);
                                                                                 var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
                                                                                     c.realmProblem.problem.problemId == 4
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.shipmentId != 0 &&
@@ -711,7 +729,7 @@ export default class QatProblemActionNew extends Component {
                                                                     case 8:
                                                                         for (var r = 0; r < regionList.length; r++) {
                                                                             //  no forecasted consumption for future 18 months
-                                                                            var consumptionList = programList[pp].consumptionList;
+                                                                            var consumptionList = programJsonForPlanningUnit.consumptionList;
                                                                             // consumptionList = consumptionList.filter(c =>
                                                                             //     c.region.id == regionList[r].regionId
                                                                             //     && c.planningUnit.id == planningUnitList[p].planningUnit.id);
@@ -733,7 +751,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && c.realmProblem.problem.problemId == 8
                                                                                 // && c.versionId == versionID
                                                                             );
@@ -752,7 +770,7 @@ export default class QatProblemActionNew extends Component {
                                                                             if (filteredConsumptionListTwo.length < 18) {
                                                                                 if (index == -1) {
                                                                                     // console.log("in create logic+++");
-                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    createSupplyPlanningProblems(programList[pp].generalData, versionID, typeProblemList[prob], regionList[r], planningUnitList[p], monthWithNoForecastedConsumption, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // problemActionList[index].isFound = 1===== auto open logic;
@@ -795,7 +813,7 @@ export default class QatProblemActionNew extends Component {
                                                                             }
 
                                                                             if (tracerArray.includes(planningUnitObj.forecastingUnit.tracerCategory.id)) {
-                                                                                var consumptionList = programList[pp].consumptionList;
+                                                                                var consumptionList = programJsonForPlanningUnit.consumptionList;
                                                                                 var myStartDate = moment(curDate).add(1, 'months').startOf('month').format("YYYY-MM-DD");
                                                                                 var myEndDate = moment(curDate).add(numberOfMonthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                                                                                 consumptionList = consumptionList.filter(c =>
@@ -806,10 +824,10 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>// moment(c.dt).format("YYYY-MM") == moment(Date.now()).format("YYYY-MM") &&
-                                                                                    c.region != null &&
+                                                                                        c.region != null &&
                                                                                         c.region.id == regionList[r].regionId
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                        && c.program.id == programList[pp].programId
+                                                                                        && c.program.id == programList[pp].generalData.programId
                                                                                         && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                                     // && c.versionId == versionID
                                                                                 );
@@ -857,7 +875,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     if (cause.length > 0) {
                                                                                         // console.log("flag problem=====>", index);
                                                                                         if (index == -1) {
-                                                                                            createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                            createSupplyPlanningProblems(programList[pp].generalData, versionID, typeProblemList[prob], regionList[r], planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                             problemActionIndex++;
                                                                                         } else {
                                                                                             // auto open problem logic for index
@@ -1012,7 +1030,7 @@ export default class QatProblemActionNew extends Component {
 
                                                                         for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                             var m = moment(curDate).add(mosCounter, 'months');
-                                                                            var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
+                                                                            var supplyPlanJson = programJsonForPlanningUnit.supplyPlan.filter(c =>
                                                                                 c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                             var mos = "";
@@ -1054,7 +1072,7 @@ export default class QatProblemActionNew extends Component {
                                                                         }
                                                                         for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
                                                                             var m7to18 = moment(curDate).add(mosCounter7to18, 'months');
-                                                                            var supplyPlanJson7to18 = programList[pp].supplyPlan.filter(c =>
+                                                                            var supplyPlanJson7to18 = programJsonForPlanningUnit.supplyPlan.filter(c =>
                                                                                 c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                             var mos7to18 = "";
@@ -1118,7 +1136,7 @@ export default class QatProblemActionNew extends Component {
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                && c.program.id == programList[pp].programId
+                                                                                && c.program.id == programList[pp].generalData.programId
                                                                                 && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                         );
 
@@ -1137,7 +1155,7 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("cId+++", getProblemCriticality(problemCriticality));
 
                                                                             if (index == -1) {
-                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                createMinMaxProblems(programList[pp].generalData, versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 //auto open for index=======>
@@ -1151,7 +1169,7 @@ export default class QatProblemActionNew extends Component {
                                                                             }
 
                                                                         } else {
-                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
                                                                                 incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
@@ -1168,7 +1186,7 @@ export default class QatProblemActionNew extends Component {
 
                                                                         for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
                                                                             var m = moment(curDate).add(mosCounter, 'months');
-                                                                            var supplyPlanJson = programList[pp].supplyPlan.filter(c =>
+                                                                            var supplyPlanJson = programJsonForPlanningUnit.supplyPlan.filter(c =>
                                                                                 c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                             var mos = "";
@@ -1182,7 +1200,7 @@ export default class QatProblemActionNew extends Component {
                                                                         }
                                                                         for (var mosCounter7to18 = parseInt(typeProblemList[prob].data1) + 1; mosCounter7to18 <= parseInt(typeProblemList[prob].data2); mosCounter7to18++) {
                                                                             var m7to18 = moment(curDate).add(mosCounter7to18, 'months');
-                                                                            var supplyPlanJson7to18 = programList[pp].supplyPlan.filter(c =>
+                                                                            var supplyPlanJson7to18 = programJsonForPlanningUnit.supplyPlan.filter(c =>
                                                                                 c.planningUnitId == planningUnitList[p].planningUnit.id
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                             var mos7to18 = "";
@@ -1212,13 +1230,13 @@ export default class QatProblemActionNew extends Component {
                                                                         var index = problemActionList.findIndex(
                                                                             c =>
                                                                                 c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                && c.program.id == programList[pp].programId
+                                                                                && c.program.id == programList[pp].generalData.programId
                                                                                 && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                         );
 
                                                                         if (stockoutsWithing6months.length > 0 || stockoutsWithing7to18months.length > 0) {
                                                                             if (index == -1) {
-                                                                                createMinMaxProblems(programList[pp], versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                createMinMaxProblems(programList[pp].generalData, versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                 problemActionIndex++;
                                                                             } else {
                                                                                 //auto open for index=======>
@@ -1230,7 +1248,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 }
                                                                             }
                                                                         } else {
-                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
                                                                                 incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
@@ -1285,16 +1303,16 @@ export default class QatProblemActionNew extends Component {
                                                                             // console.log("actual cause months***", actualCauseMonths);
                                                                             var index = problemActionList.findIndex(
                                                                                 c =>
-                                                                                c.region != null &&
+                                                                                    c.region != null &&
                                                                                     c.region.id == regionList[r].regionId
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.program.id == programList[pp].programId
+                                                                                    && c.program.id == programList[pp].generalData.programId
                                                                                     && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
                                                                             );
                                                                             if (actualCauseMonths.length > 0) {
                                                                                 if (index == -1) {
                                                                                     // console.log("in create logic+++");
-                                                                                    createSupplyPlanningProblems(programList[pp], versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    createSupplyPlanningProblems(programList[pp].generalData, versionID, typeProblemList[prob], regionList[r], planningUnitList[p], actualCauseMonths, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     // problemActionList[index].isFound = 1===== auto open logic;
@@ -1333,41 +1351,41 @@ export default class QatProblemActionNew extends Component {
                                                     // console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     console.log("*****palash");
-                                                    console.log("problemTransaction+++",problemTransaction);
+                                                    console.log("problemTransaction+++", problemTransaction);
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                                     //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
-                                                    // console.log("time taken to get object store+++", problemOs);
-                                                    // console.log("problemActionList***", problemActionList);
-                                                    var paList = problemActionList.filter(c => c.program.id == programList[pp].programId)
-                                                    programList[pp].problemReportList = paList;
-                                                    // console.log("paList***", paList);
+                                                    console.log("time taken to get object store+++", problemOs);
+                                                    console.log("problemActionList***", problemActionList);
+                                                    var paList = problemActionList.filter(c => c.program.id == programList[pp].generalData.programId)
+                                                    programList[pp].generalData.problemReportList = paList;
+                                                    console.log("paList***", paList);
 
                                                     // after the logic for QPL is run accordign to the type and planning unit list we are clearing the action list and update the date on which QPL is calcukated
-                                                    programList[pp].actionList = [];
-                                                    programList[pp].qplLastModifiedDate = curDate;
+                                                    programList[pp].generalData.actionList = [];
+                                                    programList[pp].generalData.qplLastModifiedDate = curDate;
 
                                                     var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                    // console.log("openCount***", openCount, "addressedCount***", addressedCount);
+                                                    console.log("openCount***", openCount, "addressedCount***", addressedCount);
                                                     var programQPLDetailsJson = {
                                                         id: programRequestList[pp].id,
                                                         openCount: openCount,
                                                         addressedCount: addressedCount,
-                                                        programCode: programList[pp].programCode,
+                                                        programCode: programList[pp].generalData.programCode,
                                                         version: programRequestList[pp].version,
                                                         userId: programRequestList[pp].userId,
-                                                        programId: programList[pp].programId,
+                                                        programId: programList[pp].generalData.programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified
                                                     }
-                                                    // console.log("open+++", openCount, "addressed+++", addressedCount);
-                                                    // console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
+                                                    console.log("open+++", openCount, "addressed+++", addressedCount);
+                                                    console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
                                                     // programRequestList[pp].openCount=openCount;
                                                     // programRequestList[pp].addressedCount=addressedCount;
                                                     // console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
-                                                    programRequestList[pp].programData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp]), SECRET_KEY)).toString();
-                                                    // console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                    programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
+                                                    console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 } catch (err) {
-                                                    console.log("In error@@@*******",err)
+                                                    console.log("In error@@@*******", err)
                                                     if (this.props.fetchData != undefined) {
                                                         if (this.props.page == "syncMasterData") {
                                                             this.props.fetchData(1, programId);

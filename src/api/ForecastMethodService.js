@@ -8,8 +8,18 @@ class ForecastMethodService {
         });
     }
 
+    getActiveForecastMethodList() {
+        return axios.get(`${API_URL}/api/forecastMethod`, {
+        });
+    }
+
     addUpdateForecastMethod(json) {
         return axios.post(`${API_URL}/api/forecastMethod`, json, {});
+    }
+
+    getForecastMethodTypeList() {
+        return axios.get(`${API_URL}/api/forecastMethodType`, {
+        });
     }
 
 }

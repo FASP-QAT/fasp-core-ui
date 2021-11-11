@@ -243,6 +243,11 @@ const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/Forec
 const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTemplateList'));
 
+const AddDataSet = React.lazy(() => import('./views/DataSet/AddDataSet'));
+const DataSetList = React.lazy(() => import('./views/DataSet/DataSetList'));
+const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -606,10 +611,17 @@ const routes = [
   { path: '/modelingTypeType/listModelingType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
   { path: '/modelingTypeType/listModelingType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
 
-  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
-  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnit') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+
+  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataset.manageProgram') }), component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataset.manageProgram') }), component: EditDataSet },
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
 ];
 export default routes;
