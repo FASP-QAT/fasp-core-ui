@@ -130,7 +130,7 @@ export function calculateModelingData(dataset, props) {
                             var endValue = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 endValue = startValue
-                                differnce=0;
+                                difference=0;
                             } else {
                                 endValue = startValue + difference;
                             }
