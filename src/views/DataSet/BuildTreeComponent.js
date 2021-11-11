@@ -15,7 +15,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody,PopoverBody,Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -169,16 +169,16 @@ const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, conn
 
     return connectDropTarget(connectDragSource(
         // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-        <div className="ContactTemplate boxContactTemplate"> 
-            <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :"ContactTitleBackground TemplateTitleBg" }
+        <div className="ContactTemplate boxContactTemplate">
+            <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
             >
-                <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px',color:'#002f6c'}}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px',color:'#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px',color:'#fff'}} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px',color:'#002f6c' }} ></i> : ""))))}</b></div>
+                <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
             </div>
             <div className="ContactPhone ContactPhoneValue">
                 <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ overflow: 'inherit',fontStyle:'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
+                <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
             </div>
-              </div>
+        </div>
     ))
 }
 function addCommas(cell1, row) {
@@ -396,6 +396,7 @@ export default class BuildTree extends Component {
             usageTemplateList: [],
             forecastingUnitByTracerCategory: [],
             planningUnitByTracerCategory: [],
+            datasetList: []
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -446,12 +447,41 @@ export default class BuildTree extends Component {
         this.getTreeByTreeId = this.getTreeByTreeId.bind(this);
         this.getTreeTemplateById = this.getTreeTemplateById.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.getDatasetList = this.getDatasetList.bind(this);
     }
     toggle() {
         this.setState({
-          popoverOpen: !this.state.popoverOpen,
+            popoverOpen: !this.state.popoverOpen,
         });
-      }
+    }
+
+    getDatasetList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    datasetList: myResult
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
+    }
 
     exportPDF = () => {
         console.log("download pdf");
@@ -1146,7 +1176,7 @@ export default class BuildTree extends Component {
 
             var autocompleteData = [];
             for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " ["+response.data[i].forecastingUnitId +"]" }
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
             }
             this.setState({
                 autocompleteData,
@@ -1627,6 +1657,7 @@ export default class BuildTree extends Component {
             this.getPlanningUnitListByForecastingUnitId(1);
 
             this.getNodeTyeList();
+            this.getDatasetList();
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -2701,8 +2732,10 @@ export default class BuildTree extends Component {
                             } else {
                                 this.updateNodeInfoInJson(this.state.currentItemConfig)
                             }
-                            this.setState({cursorItem: 0,
-                                highlightItem: 0})
+                            this.setState({
+                                cursorItem: 0,
+                                highlightItem: 0
+                            })
 
                         }}
                         render={
@@ -2756,12 +2789,12 @@ export default class BuildTree extends Component {
                                         <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                     </FormGroup>
                                     <div>
-                                    <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
-                                         <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
-                                    </Popover>
+                                        <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
+                                            <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                        </Popover>
                                     </div>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{color:'#002f6c',cursor:'pointer'}}></i></Label>
+                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
                                             id="nodeTypeId"
@@ -3442,7 +3475,7 @@ export default class BuildTree extends Component {
                                     </div>}
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false,cursorItem: 0,highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     </FormGroup>
                                 </Form>
@@ -3485,6 +3518,16 @@ export default class BuildTree extends Component {
     }
 
     render() {
+        const { datasetList } = this.state;
+        let datasets = datasetList.length > 0
+            && datasetList.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {item.programCode}
+                    </option>
+                )
+            }, this);
+
         const { singleValue2 } = this.state
         const { forecastMethodList } = this.state;
         let forecastMethods = forecastMethodList.length > 0
@@ -3591,7 +3634,7 @@ export default class BuildTree extends Component {
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -3666,7 +3709,7 @@ export default class BuildTree extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
@@ -3676,7 +3719,7 @@ export default class BuildTree extends Component {
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{background:'none'}}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -3695,7 +3738,7 @@ export default class BuildTree extends Component {
                                     });
                                 }}>
                                 {/* <FontAwesomeIcon icon={faTrash} /> */}
-                                <i class="fa fa-trash-o" aria-hidden="true" style={{fontSize:'16px'}}></i>
+                                <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                             </button></>}
 
                 </>
@@ -3710,14 +3753,14 @@ export default class BuildTree extends Component {
                 cursorBorderWidth: 2,
                 onCursorRender: ({ context: itemConfig }) => {
                     return <div className="CursorFrame">
-                 </div>;
-                  },
-                onHighlightRender: ({ context: itemConfig }) => {
-                return <div className="HighlightFrame" >
-                
-                </div>;
+                    </div>;
                 },
-                
+                onHighlightRender: ({ context: itemConfig }) => {
+                    return <div className="HighlightFrame" >
+
+                    </div>;
+                },
+
                 onItemRender: ({ context: itemConfig }) => {
                     return <NodeDragDropSource
                         itemConfig={itemConfig}
@@ -4164,7 +4207,7 @@ export default class BuildTree extends Component {
                                                     </CardBody>
                                                     <div class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh',border: '1px solid #a7c6ed' }} >
+                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
@@ -4185,176 +4228,192 @@ export default class BuildTree extends Component {
                     </Card></Col></Row>
             {/* tree fields Modal start------------------- */}
             <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openTreeDataModal}
-                className={'modal-md '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Tree Data</strong>
-                    <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="nodeTypeId"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
-                        >
-                            <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
-                            {forecastMethods}
-                        </Input>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            id="scenarioDesc"
-                            name="scenarioDesc"
-                            onChange={(e) => { this.scenarioChange(e) }}
-                            value={this.state.curTreeObj != "" ? this.state.curTreeObj.label.label_en : ''}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
-                        <div className="controls ">
-                            {/* <InMultiputGroup> */}
-                            <MultiSelect
-                                // type="select"
-                                name="regionId"
-                                id="regionId"
+                <Modal isOpen={this.state.openTreeDataModal}
+                    className={'modal-md '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Tree Data</strong>
+                        <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <FormGroup className="col-md-12">
+                        <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
+                                <InputGroup>
+                                    <Input
+                                        type="select"
+                                        name="datasetId"
+                                        id="datasetId"
+                                        bsSize="sm"
+                                    // onChange={(e) => { this.getTreeList(e.target.value) }}
+                                    >
+                                        <option value="0">{i18n.t('static.common.all')}</option>
+                                        {datasets}
+                                    </Input>
+                                </InputGroup>
+                            
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="nodeTypeId"
                                 bsSize="sm"
-                                value={regionMultiList}
-                                onChange={(e) => { this.handleRegionChange(e) }}
-                                options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                labelledBy={i18n.t('static.common.regiontext')}
-                            />
-                        </div>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                        <FormGroup check inline>
-                            <Input
-                                className="form-check-input"
-                                type="radio"
-                                id="active1"
-                                name="active"
-                                value={true}
-                                checked={this.state.curTreeObj.active === true}
                                 onChange={(e) => { this.dataChange(e) }}
-                            />
-                            <Label
-                                className="form-check-label"
-                                check htmlFor="inline-radio1">
-                                {i18n.t('static.common.active')}
-                            </Label>
+                                required
+                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
+                            >
+                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                {forecastMethods}
+                            </Input>
                         </FormGroup>
-                        <FormGroup check inline>
-                            <Input
-                                className="form-check-input"
-                                type="radio"
-                                id="active2"
-                                name="active"
-                                value={false}
-                                checked={this.state.curTreeObj.active === false}
-                                onChange={(e) => { this.dataChange(e) }}
-                            />
-                            <Label
-                                className="form-check-label"
-                                check htmlFor="inline-radio2">
-                                {i18n.t('static.common.disabled')}
-                            </Label>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="scenarioDesc"
+                                name="scenarioDesc"
+                                onChange={(e) => { this.scenarioChange(e) }}
+                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.label.label_en : ''}
+                            ></Input>
                         </FormGroup>
-                    </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                            <div className="controls ">
+                                {/* <InMultiputGroup> */}
+                                <MultiSelect
+                                    // type="select"
+                                    name="regionId"
+                                    id="regionId"
+                                    bsSize="sm"
+                                    value={regionMultiList}
+                                    onChange={(e) => { this.handleRegionChange(e) }}
+                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                    labelledBy={i18n.t('static.common.regiontext')}
+                                />
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active1"
+                                    name="active"
+                                    value={true}
+                                    checked={this.state.curTreeObj.active === true}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio1">
+                                    {i18n.t('static.common.active')}
+                                </Label>
+                            </FormGroup>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active2"
+                                    name="active"
+                                    value={false}
+                                    checked={this.state.curTreeObj.active === false}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2">
+                                    {i18n.t('static.common.disabled')}
+                                </Label>
+                            </FormGroup>
+                        </FormGroup>
 
-                </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </Modal>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
             </Draggable>
             {/* Scenario Modal start------------------- */}
             <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openAddScenarioModal}
-                className={'modal-md '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Scenario</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            id="scenarioName"
-                            name="scenarioName"
-                            onChange={(e) => { this.scenarioChange(e) }}
-                        // value={this.state.scenario.scenarioName}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Notes</Label>
-                        <Input type="text"
-                            id="scenarioDesc"
-                            name="scenarioDesc"
-                            onChange={(e) => { this.scenarioChange(e) }}
-                        // value={this.state.scenario.scenarioDesc}
-                        ></Input>
-                    </FormGroup>
+                <Modal isOpen={this.state.openAddScenarioModal}
+                    className={'modal-md '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Scenario</strong>
+                        <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="scenarioName"
+                                name="scenarioName"
+                                onChange={(e) => { this.scenarioChange(e) }}
+                            // value={this.state.scenario.scenarioName}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Notes</Label>
+                            <Input type="text"
+                                id="scenarioDesc"
+                                name="scenarioDesc"
+                                onChange={(e) => { this.scenarioChange(e) }}
+                            // value={this.state.scenario.scenarioDesc}
+                            ></Input>
+                        </FormGroup>
 
-                </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </Modal>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
             </Draggable>
             {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
             <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openAddNodeModal}
-                className={'modal-lg '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false,cursorItem: 0,highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <Row>
-                        <Col xs="12" md="12" className="mb-4">
+                <Modal isOpen={this.state.openAddNodeModal}
+                    className={'modal-lg '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Node</strong>
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <Row>
+                            <Col xs="12" md="12" className="mb-4">
 
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '1'}
-                                        onClick={() => { this.toggleModal(0, '1'); }}
-                                    >
-                                        Node Data
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '2'}
-                                        onClick={() => { this.toggleModal(0, '2'); }}
-                                    >
-                                        Scaling/Transfer
-                                    </NavLink>
-                                </NavItem>
+                                <Nav tabs>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '1'}
+                                            onClick={() => { this.toggleModal(0, '1'); }}
+                                        >
+                                            Node Data
+                                        </NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '2'}
+                                            onClick={() => { this.toggleModal(0, '2'); }}
+                                        >
+                                            Scaling/Transfer
+                                        </NavLink>
+                                    </NavItem>
 
-                            </Nav>
-                            <TabContent activeTab={this.state.activeTab1[0]}>
-                                {this.tabPane1()}
-                            </TabContent>
-                        </Col>
-                    </Row>
+                                </Nav>
+                                <TabContent activeTab={this.state.activeTab1[0]}>
+                                    {this.tabPane1()}
+                                </TabContent>
+                            </Col>
+                        </Row>
 
-                </ModalBody>
-                <ModalFooter>
-                    {/* <Button size="md" onClick={(e) => {
+                    </ModalBody>
+                    <ModalFooter>
+                        {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                </ModalFooter>
-            </Modal>
+                    </ModalFooter>
+                </Modal>
             </Draggable>
             {/* Scenario Modal end------------------------ */}
 
