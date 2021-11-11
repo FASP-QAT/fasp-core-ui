@@ -1125,7 +1125,7 @@ export default class BuildTree extends Component {
                     currentModelingType: rowData[2],
                     currentCalculatorStartDate: rowData[3],
                     currentCalculatorStopDate: rowData[4],
-                    currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
+                    currentCalculatorStartValue: this.state.currentScenario.calculatedDataValue,
 
                     currentCalculatedMomChange: '',
                     currentTargetChangeNumber: '',
@@ -4676,7 +4676,7 @@ export default class BuildTree extends Component {
                                             name="startValue"
                                             bsSize="sm"
                                             readOnly={true}
-                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue}
+                                            value={this.state.currentScenario.calculatedDataValue}
 
                                         >
                                         </Input>
@@ -4689,7 +4689,7 @@ export default class BuildTree extends Component {
                                             name="startPercentage"
                                             bsSize="sm"
                                             readOnly={true}
-                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}
+                                            value={this.state.currentScenario.dataValue}
 
                                         >
                                         </Input>
