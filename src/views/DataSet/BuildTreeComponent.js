@@ -683,12 +683,15 @@ export default class BuildTree extends Component {
                     var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    console.log("hi bro", programJson)
-                }
+                    // console.log("hi bro", programJson.nodeDataModelingList)
+                    var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
+                    console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode }, () => {
+                        this.buildMomJexcel();
+                    });
+                }.bind(this)
             }.bind(this)
-            this.setState({ showMomData: true }, () => {
-                this.buildMomJexcel();
-            });
+
         }
     }
     setStartAndStopDateOfProgram(dataSetId) {
