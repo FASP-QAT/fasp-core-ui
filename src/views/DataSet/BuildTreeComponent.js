@@ -475,8 +475,35 @@ export default class BuildTree extends Component {
         this.toggle = this.toggle.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
+        this.getModelingTypeList = this.getModelingTypeList.bind(this);
     }
+    getModelingTypeList(){
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['modelingType'], 'readwrite');
+            var program = transaction.objectStore('modelingType');
+            var getRequest = program.getAll();
 
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    modelingTypeList: myResult
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
+    }
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
         console.log("scalingList---", scalingList);
@@ -2012,6 +2039,7 @@ export default class BuildTree extends Component {
 
             this.getNodeTyeList();
             this.getDatasetList();
+            this.getModelingTypeList();
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
