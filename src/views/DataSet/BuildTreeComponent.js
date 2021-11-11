@@ -423,8 +423,8 @@ export default class BuildTree extends Component {
             forecastingUnitByTracerCategory: [],
             planningUnitByTracerCategory: [],
             datasetList: [],
-            forecastStartDate:'',
-            forecastStopDate:''
+            forecastStartDate: '',
+            forecastStopDate: ''
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -478,8 +478,18 @@ export default class BuildTree extends Component {
         this.getDatasetList = this.getDatasetList.bind(this);
         this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
         this.setStartAndStopDateOfProgram = this.setStartAndStopDateOfProgram.bind(this);
+        this.getModelingTypeList = this.getModelingTypeList.bind(this);
+        this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
+        this.momCheckbox = this.momCheckbox.bind(this);
+        this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
+        this.acceptValue = this.acceptValue.bind(this);
+        this.calculateMomByEndValue = this.calculateMomByEndValue.bind(this);
+        this.calculateMomByChangeInPercent = this.calculateMomByChangeInPercent.bind(this);
+        this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
+        this.addRow = this.addRow.bind(this);
     }
-
     setStartAndStopDateOfProgram(dataSetId) {
         // console.log("programId>>>", dataSetId);
         // console.log("dataSetList>>>", this.state.datasetList);
@@ -493,7 +503,422 @@ export default class BuildTree extends Component {
             forecastStartDate: programData.currentVersion.forecastStartDate,
             forecastStopDate: programData.currentVersion.forecastStopDate,
         });
+    }
+    momCheckbox(e) {
+        var checked = e.target.checked;
+        if (e.target.name === "manualChange") {
+            this.setState({
+                manualChange: e.target.checked == true ? true : false
+            }, () => {
 
+                console.log('manual change---', this.state.manualChange);
+            });
+        } else if (e.target.name === "seasonality") {
+            this.setState({
+                seasonality: e.target.checked == true ? true : false
+            }, () => {
+                if (this.state.momEl != "") {
+                    if (checked) {
+                        this.state.momEl.showColumn(3);
+                        this.state.momEl.showColumn(4);
+                        this.state.momEl.showColumn(5);
+                    } else {
+                        this.state.momEl.hideColumn(3);
+                        this.state.momEl.hideColumn(4);
+                        this.state.momEl.hideColumn(5);
+                    }
+                }
+                console.log('seasonality---', this.state.seasonality);
+            });
+        }
+    }
+    formSubmit() {
+        var validation = this.checkValidation();
+        if (validation == true) {
+            // this.setState({
+            //     loading: true
+            // })
+            var tableJson = this.el.getJson(null, false);
+            var data = this.state.scalingList;
+            var obj;
+            var items = this.state.items;
+            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("10 map---" + map1.get("10"))
+                if (parseInt(map1.get("10")) === 1) {
+                    if (map1.get("9") != "" && map1.get("9") != 0) {
+                        obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                        obj.transferNodeDataId = map1.get("0");
+                        obj.notes = map1.get("1");
+                        obj.modelingType.id = map1.get("2");
+                        obj.startDate = map1.get("3");
+                        obj.stopDate = map1.get("4");
+                        obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
+                        obj.nodeDataModelingId = map1.get("9")
+                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                        data[itemIndex] = obj;
+                    } else {
+                        obj = {
+                            transferNodeDataId: map1.get("0"),
+                            notes: map1.get("1"),
+                            modelingType: {
+                                id: map1.get("2")
+                            },
+                            startDate: map1.get("3"),
+                            stopDate: map1.get("4"),
+                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                            nodeDataModelingId: ''
+                        }
+                        data.push(obj);
+                    }
+                    console.log("obj---", obj);
+                    console.log("data--->>>", data);
+                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = data;
+                    console.log("item---", item);
+                    items[itemIndex1] = item;
+                    console.log("items---", items);
+                    // Call function by dolly
+                    this.setState({
+                        items,
+                        scalingList: data,
+                        openAddNodeModal: false,
+                        activeTab1: new Array(2).fill('1')
+                    });
+                }
+            }
+        }
+    }
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(10, y);
+            if (parseInt(value) == 1) {
+
+                //Modeling type
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                // Start date
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(3, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+                var startDate = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+
+                // Stop date
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                var diff = moment(stopDate).diff(moment(startDate), 'months');
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                }
+                else if (diff <= 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter valid date');
+                    valid = false;
+                }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(y);
+                console.log("modelingTypeId-valid--", rowData[2])
+                if (rowData[2] != "") {
+                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+
+                    // Month change %
+                    if (rowData[2] != 2) {
+                        var col = ("F").concat(parseInt(y) + 1);
+                        var value = this.el.getValueFromCoords(5, y);
+                        if (value == "") {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        }
+                        else if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        }
+                        else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+
+                    // Month change #
+                    if (rowData[2] == 2) {
+                        var col = ("G").concat(parseInt(y) + 1);
+                        var value = this.el.getValueFromCoords(6, y);
+                        if (value == "") {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            valid = false;
+                        }
+                        else if (!(reg.test(value))) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                            valid = false;
+                        }
+                        else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+
+                }
+
+            }
+        }
+        return valid;
+    }
+    calculateScalingTotal() {
+        var scalingTotal = 0;
+        var tableJson = this.state.modelingEl.getJson(null, false);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            if (map1.get("8") != "") {
+                scalingTotal = scalingTotal + parseFloat(map1.get("8"));
+                console.log("map1.get(8)---", map1.get("8"));
+            }
+        }
+        console.log("scalingTotal---", scalingTotal);
+        this.setState({
+            scalingTotal
+        });
+    }
+    acceptValue() {
+        // console.log(">>>>", this.state.currentRowIndex);
+        var elInstance = this.state.modelingEl;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentModelingType == 5) {
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
+            }
+        } else {
+            if (this.state.currentModelingType == 2) {
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+            } else if (this.state.currentModelingType == 3) {
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+            } else if (this.state.currentModelingType == 4) {
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+            }
+        }
+
+    }
+    calculateMomByEndValue(e) {
+        this.setState({
+            // currentEndValue: '',
+            currentCalculatedMomChange: '',
+            currentTargetChangeNumber: '',
+            currentTargetChangePercentage: '',
+        });
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
+        var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
+        console.log("month diff>>>", monthDifference);
+        var momValue = ''
+        var getValue = e.target.value;
+        // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
+        //     // getValue = getPervalue;
+        //     var momValue = e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue;
+        // } else {
+        //     getValue = e.target.value
+        // }
+        if (this.state.currentModelingType == 2) {
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+        if (this.state.currentModelingType == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                var getChangeInPercent = (parseFloat(e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) / monthDifference).toFixed(2);
+                var momValue = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue * getChangeInPercent / 100).toFixed(2);
+                // console.log("getChangeInPercent>>>",getChangeInPercent);
+                // console.log("momValue>>>",momValue)
+            } else {
+                // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            }
+        }
+        if (this.state.currentModelingType == 4) {
+            // var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+        }
+
+        if (this.state.currentModelingType == 5) {
+            var momValue = (parseFloat(e.target.value - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) / monthDifference).toFixed(2);
+        }
+        // console.log("getmomValue>>>", momValue);
+        var targetChangeNumber = '';
+        var targetChangePer = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
+            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue).toFixed(2);
+            targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
+        }
+        this.setState({
+            currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
+            currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+        });
+    }
+    calculateMomByChangeInPercent(e) {
+        this.setState({
+            currentEndValue: '',
+            currentCalculatedMomChange: '',
+            currentTargetChangeNumber: ''
+        });
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * e.target.value) / 100;
+
+
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     var targetEndValue = (parseFloat(getEndValueFromPercentage) + parseFloat(this.state.currentCalculatorStartValue)) / this.state.currentCalculatorStartValue * 100;
+        // } else {
+        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage).toFixed(2);
+        // }
+
+        var momValue = ''
+        if (this.state.currentModelingType == 2) {
+            // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+        }
+        if (this.state.currentModelingType == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                var getChangeInPercent = e.target.value;
+                var momValue = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue * getChangeInPercent / 100).toFixed(2);
+            } else {
+                // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+                var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+            }
+
+        }
+        if (this.state.currentModelingType == 4) {
+            // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+
+        }
+        if (this.state.currentModelingType == 5) {
+            var momValue = (parseFloat(e.target.value)).toFixed(2);
+        }
+
+        this.setState({
+            currentEndValue: (e.target.value != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+        });
+    }
+    calculateMomByChangeInNumber(e) {
+        this.setState({
+            currentEndValue: '',
+            currentCalculatedMomChange: '',
+            currentTargetChangePercentage: '',
+        });
+        var startDate = this.state.currentCalculatorStartDate;
+        var endDate = this.state.currentCalculatorStopDate;
+        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
+        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
+
+        var momValue = ''
+        if (this.state.currentModelingType == 2) {
+            // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            momValue = e.target.value;
+        }
+        if (this.state.currentModelingType == 3) {
+            // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
+            momValue = e.target.value;
+        }
+        if (this.state.currentModelingType == 4) {
+            // momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
+            momValue = e.target.value;
+        }
+        this.setState({
+            currentEndValue: e.target.value != '' ? targetEndValue.toFixed(2) : '',
+            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+        });
+    }
+
+
+    getSameLevelNodeList(level, id) {
+        console.log("level---", level);
+        console.log("id---", id);
+        var sameLevelNodeList = [];
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id);
+        console.log("arr---", arr);
+        for (var i = 0; i < arr.length; i++) {
+            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
+        }
+        this.setState({
+            sameLevelNodeList
+        });
+    }
+
+    getModelingTypeList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['modelingType'], 'readwrite');
+            var program = transaction.objectStore('modelingType');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    modelingTypeList: myResult
+                });
+                // for (var i = 0; i < myResult.length; i++) {
+                //     console.log("datasetList--->", myResult[i])
+
+                // }
+
+            }.bind(this);
+        }.bind(this);
     }
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
@@ -820,7 +1245,28 @@ export default class BuildTree extends Component {
         }
         this.calculateScalingTotal();
     }.bind(this);
+    loadedMom = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
 
+    addRow = function () {
+        var elInstance = this.state.modelingEl;
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = cleanUp;
+        data[8] = "";
+        data[9] = "";
+        data[10] = 1;
+        elInstance.insertRow(
+            data, 0, 1
+        );
+    };
     toggle() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
@@ -2030,6 +2476,7 @@ export default class BuildTree extends Component {
 
             this.getNodeTyeList();
             this.getDatasetList();
+            this.getModelingTypeList();
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -2637,8 +3084,8 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                var minMonth = moment(month).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(month).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                var minMonth = moment(month).subtract('2021-01-01', 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(month).add('2024-12-01', 'months').endOf('month').format("YYYY-MM-DD");
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -5381,48 +5828,55 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong>
-                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        <strong>Add/Edit Node</strong> {this.state.activeTab1[0] === '2' && <> {
+                        this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                            (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
+                                    )))}
+                        <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
-                    <ModalBody>
-                        <Row>
-                            <Col xs="12" md="12" className="mb-4">
+                <ModalBody>
+                    <Row>
+                        <Col xs="12" md="12" className="mb-4">
 
-                                <Nav tabs>
-                                    <NavItem>
-                                        <NavLink
-                                            active={this.state.activeTab1[0] === '1'}
-                                            onClick={() => { this.toggleModal(0, '1'); }}
-                                        >
-                                            Node Data
-                                        </NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink
-                                            active={this.state.activeTab1[0] === '2'}
-                                            onClick={() => { this.toggleModal(0, '2'); }}
-                                        >
-                                            Scaling/Transfer
+                            <Nav tabs>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '1'}
+                                        onClick={() => { this.toggleModal(0, '1'); }}
+                                    >
+                                        Node Data
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '2'}
+                                        onClick={() => { this.toggleModal(0, '2'); }}
+                                    >
+                                            Modeling/Transfer
                                         </NavLink>
                                     </NavItem>
 
                                 </Nav>
-                                <TabContent activeTab={this.state.activeTab1[0]}>
-                                    {this.tabPane1()}
-                                </TabContent>
+                        <TabContent activeTab={this.state.activeTab1[0]}>
+                            {this.tabPane1()}
+                        </TabContent>
                             </Col>
                         </Row>
 
                     </ModalBody>
-                    <ModalFooter>
-                        {/* <Button size="md" onClick={(e) => {
+            <ModalFooter>
+                {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                    </ModalFooter>
+            </ModalFooter>
                 </Modal>
-            </Draggable>
-            {/* Scenario Modal end------------------------ */}
+            </Draggable >
+            {/* Scenario Modal end------------------------ */ }
 
         </div >
     }
