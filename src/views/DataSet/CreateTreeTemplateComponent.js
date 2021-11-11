@@ -516,16 +516,29 @@ export default class CreateTreeTemplate extends Component {
         this.momCheckbox = this.momCheckbox.bind(this);
     }
     momCheckbox(e) {
+        var checked = e.target.checked;
         if (e.target.name === "manualChange") {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
+
                 console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
             this.setState({
                 seasonality: e.target.checked == true ? true : false
             }, () => {
+                if (this.state.momEl != "") {
+                    if (checked) {
+                        this.state.momEl.showColumn(3);
+                        this.state.momEl.showColumn(4);
+                        this.state.momEl.showColumn(5);
+                    } else {
+                        this.state.momEl.hideColumn(3);
+                        this.state.momEl.hideColumn(4);
+                        this.state.momEl.hideColumn(5);
+                    }
+                }
                 console.log('seasonality---', this.state.seasonality);
             });
         }
@@ -1062,8 +1075,8 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Monthly End (no seasonality)---" + this.state.seasonality,
-                    type: this.state.seasonality == true ? 'text' : 'hidden',
+                    title: "Monthly End (no seasonality)",
+                    type: 'text',
                     readOnly: true
                 },
                 {

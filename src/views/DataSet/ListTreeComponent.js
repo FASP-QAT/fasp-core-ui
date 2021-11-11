@@ -92,15 +92,15 @@ export default class ListTreeComponent extends Component {
                         console.log("5--->", programData);
                         // var f = 0
                         var treeList = programData.treeList;
-                        for (var k = 0; k < treeList.length; k++) {
-                            if (datasetId == 0) {
-                                console.log('inside else')
-                                proList.push(treeList[k])
-                            } else if (programData.programId == datasetId) {
-                                console.log('inside if')
-                                proList.push(treeList[k])
-                            }
+                        // for (var k = 0; k < treeList.length; k++) {
+                        if (datasetId == 0) {
+                            console.log('inside else')
+                            proList.push(programData)
+                        } else if (programData.programId == datasetId) {
+                            console.log('inside if')
+                            proList.push(programData)
                         }
+                        // }
                     }
                 }
                 console.log("pro list---", proList);
@@ -142,11 +142,14 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
-
-        this.props.history.push({
-            pathname: `/dataSet/buildTree/template/${event.target.value}`,
-            // state: { role }
-        });
+        if (event.target.value == 0 || event.target.value == "") {
+            this.buildTree();
+        } else {
+            this.props.history.push({
+                pathname: `/dataSet/buildTree/template/${event.target.value}`,
+                // state: { role }
+            });
+        }
 
     }
 
@@ -159,27 +162,23 @@ export default class ListTreeComponent extends Component {
 
     }
     buildJexcel() {
-        let treeList = this.state.treeData;
+        let programList = this.state.treeData;
         let treeArray = [];
         let count = 0;
-
-        for (var j = 0; j < treeList.length; j++) {
-            console.log("treeList[j]---", treeList[j]);
-            // var trees = treeList[j].treeList;
-            // for (var k = 0; k < trees.length; k++) {
-            // console.log("trees[k]---", trees[k]);
-            data = [];
-            
-            data[0] = treeList[j].treeId
-            var dataset = document.getElementById("datasetId");
-            data[1] = dataset.options[dataset.selectedIndex].text
-            data[2] = getLabelText(treeList[j].label, this.state.lang)
-            data[3] = treeList[j].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-            data[4] = getLabelText(treeList[j].forecastMethod.label, this.state.lang)
-            data[5] = treeList[j].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-            treeArray[count] = data;
-            count++;
-            // }
+        for (var j = 0; j < programList.length; j++) {
+            var treeList = programList[j].treeList;
+            for (var k = 0; k < treeList.length; k++) {
+                data = [];
+                data[0] = treeList[k].treeId
+                data[1] = programList[j].programCode
+                data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
+                data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
+                data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                data[6] = treeList[k].notes
+                treeArray[count] = data;
+                count++;
+            }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -219,6 +218,11 @@ export default class ListTreeComponent extends Component {
 
                 {
                     title: i18n.t('static.common.scenarioName'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.program.notes'),
                     type: 'text',
                     readOnly: true
                 }
@@ -386,7 +390,8 @@ export default class ListTreeComponent extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="0">{'Select Template'}</option>
+                                                            <option value="">{'+ Add Tree'}</option>
+                                                            <option value="0">{'(blank)'}</option>
                                                             {treeTemplates}
                                                         </Input>
                                                     </InputGroup>
@@ -394,11 +399,11 @@ export default class ListTreeComponent extends Component {
                                             </FormGroup>
                                             // </Col>
                                         }
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                        {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
                                                 <Button type="submit" size="md" color="info" onClick={this.buildTree} className="float-right pt-1 pb-1" ><i className="fa fa-plus"></i>  {i18n.t('static.common.addtree')}</Button>
                                             </FormGroup>
-                                        }
+                                        } */}
                                     </div>
                                 </Col>
                             </div>
@@ -427,8 +432,8 @@ export default class ListTreeComponent extends Component {
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
                         <div className="listtreetable">
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
