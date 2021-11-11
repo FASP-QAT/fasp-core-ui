@@ -271,6 +271,14 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            showMomDataPercent: false,
+            currentTargetChangePercentage: '',
+            currentTargetChangeNumber: '',
+            currentTargetChangePercentageEdit: false,
+            currentTargetChangeNumberEdit: false,
+            currentRowIndex: '',
+            currentEndValue: '',
+            currentEndValueEdit: false,
             momList: [],
             momListPer: [],
             modelingTypeList: [],
@@ -411,6 +419,7 @@ export default class BuildTree extends Component {
                     }
                 }
             },
+            momList:[],
             activeTab1: new Array(2).fill('1'),
             tracerCategoryList: [],
             tracerCategoryList: [],
@@ -424,7 +433,8 @@ export default class BuildTree extends Component {
             planningUnitByTracerCategory: [],
             datasetList: [],
             forecastStartDate: '',
-            forecastStopDate: ''
+            forecastStopDate: '',
+            momListPer:[]
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -489,6 +499,252 @@ export default class BuildTree extends Component {
         this.calculateMomByChangeInPercent = this.calculateMomByChangeInPercent.bind(this);
         this.calculateMomByChangeInNumber = this.calculateMomByChangeInNumber.bind(this);
         this.addRow = this.addRow.bind(this);
+        this.showMomData = this.showMomData.bind(this);
+        this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
+        this.buildMomJexcel = this.buildMomJexcel.bind(this);
+    }
+
+    buildMomJexcelPercent() {
+        var momList = this.state.momListPer;
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < momList.length; j++) {
+            data = [];
+            data[0] = momList[j].month
+            if (j == 0) {
+                data[1] = momList[j].sexuallyActiveMenMonthStartPer
+            } else {
+                data[1] = `=E${parseInt(j)}`
+            }
+            data[2] = momList[j].calculatedChange
+            data[3] = momList[j].manualChange
+            data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
+            data[5] = momList[j].sexuallyActiveMenMonthEnd
+            data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("momJexcelPer"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Month',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "% of Sexually active men (Month Start)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Calculated Change (+/- %)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Manual Change (+/- %)",
+                    type: 'text',
+
+                },
+                {
+                    title: "% of Sexually active men (Month End)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Sexually active men (Month End)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Men who use condoms (Month End)",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedMomPer,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
+        this.el = momElPer;
+        this.setState({
+            momElPer: momElPer
+        }
+        );
+    };
+
+    loadedMomPer = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
+
+    buildMomJexcel() {
+        var momList = this.state.momList;
+        var dataArray = [];
+        let count = 0;
+        for (var j = 0; j < momList.length; j++) {
+            data = [];
+            data[0] = momList[j].month
+            data[1] = momList[j].monthStartNoSeasonality
+            data[2] = momList[j].calculatedChange
+            data[3] = momList[j].monthEndNoSeasonality
+            data[4] = momList[j].seasonalityIndex
+            data[5] = momList[j].manualChange
+            data[6] = momList[j].monthEnd
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("momJexcel"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [50, 80, 80, 80, 80, 80, 80, 80, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: 'Month',
+                    type: 'calendar',
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: "Month Start (no seasonality)",
+                    type: 'text',
+                    readOnly: true
+
+                },
+                {
+                    title: "Calculated change (+/-)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Monthly End (no seasonality)",
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: "Seasonality index",
+                    type: this.state.seasonality == true ? 'text' : 'hidden',
+                },
+                {
+                    title: "Manual Change (+/-)",
+                    type: this.state.seasonality == true ? 'text' : 'hidden',
+
+                },
+                {
+                    title: "Month End",
+                    type: 'text',
+                    readOnly: true
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedMom,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            updateTable: function (el, cell, x, y, source, value, id) {
+                var elInstance = el.jexcel;
+                if (y != null) {
+                    var rowData = elInstance.getRowData(y);
+                    // console.log("this.state.seasonality---", this.state.seasonality);
+                    // if (this.state.seasonality) {
+                    //     if (x == 5) {
+                    //         // cell.classList.add('readonly');
+                    //         // cell.style.readOnly = 'true';
+                    //         cell.style.backgroundColor = '#fff';
+                    //         // $(cell).addClass('readonly');
+                    //     }
+                    // }
+                    // else {
+                    //     if (x == 5) {
+                    //         // cell.classList.add('readonly');
+                    //         // cell.style.readOnly = 'true';
+                    //         cell.style.backgroundColor = '#f46e42';
+                    //         // $(cell).addClass('readonly');
+                    //     }
+                    // }
+                }
+            }.bind(this),
+            // oneditionend: this.onedit,
+            // onselection: this.selected,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+
+        };
+        var momEl = jexcel(document.getElementById("momJexcel"), options);
+        this.el = momEl;
+        this.setState({
+            momEl: momEl
+        }
+        );
+    };
+
+    loadedMom = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
+
+    showMomData() {
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            this.setState({ showMomDataPercent: true }, () => {
+                this.buildMomJexcelPercent();
+            });
+        } else {
+            this.setState({ showMomData: true }, () => {
+                this.buildMomJexcel();
+            });
+        }
     }
     setStartAndStopDateOfProgram(dataSetId) {
         // console.log("programId>>>", dataSetId);
@@ -921,7 +1177,7 @@ export default class BuildTree extends Component {
         }.bind(this);
     }
     buildModelingJexcel() {
-        var scalingList = this.state.scalingList;
+        var scalingList = this.state.currentScenario.nodeDataModelingList;
         console.log("scalingList---", scalingList);
         var dataArray = [];
         let count = 0;
@@ -954,7 +1210,7 @@ export default class BuildTree extends Component {
             data[5] = scalingList[j].modelingType.id != 2 ? scalingList[j].dataValue : ''
             data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
             data[7] = cleanUp
-            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
             if (scalingList[j].modelingType.id == 2 || scalingList[j].modelingType.id == 5) {
                 calculatedChangeForMonth = scalingList[j].dataValue;
@@ -1193,7 +1449,7 @@ export default class BuildTree extends Component {
         if (rowData[2] != "") {
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
-            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
             // Monthly change %
             if (x == 5 && rowData[2] != 2) {
@@ -3084,8 +3340,8 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                var minMonth = moment(month).subtract('2021-01-01', 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(month).add('2024-12-01', 'months').endOf('month').format("YYYY-MM-DD");
+                var minMonth = moment(month).subtract(this.state.forecastStartDate, 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(month).add(this.state.forecastStopDate, 'months').endOf('month').format("YYYY-MM-DD");
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -3125,6 +3381,36 @@ export default class BuildTree extends Component {
         let { curTreeObj } = this.state;
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
+
+
+
+
+        if (event.target.name === "currentEndValue") {
+
+            this.setState({
+                currentEndValue: event.target.value,
+                currentEndValueEdit: false,
+                currentTargetChangePercentageEdit: event.target.value != '' ? true : false,
+                currentTargetChangeNumberEdit: event.target.value != '' ? true : false
+            });
+        }
+
+        if (event.target.name === "currentTargetChangePercentage") {
+            this.setState({
+                currentTargetChangePercentage: event.target.value,
+                currentEndValueEdit: event.target.value != '' ? true : false,
+                currentTargetChangePercentageEdit: false,
+                currentTargetChangeNumberEdit: event.target.value != '' ? true : false
+            });
+        }
+        if (event.target.name === "currentTargetChangeNumber") {
+            this.setState({
+                currentTargetChangeNumber: event.target.value,
+                currentEndValueEdit: event.target.value != '' ? true : false,
+                currentTargetChangePercentageEdit: event.target.value != '' ? true : false,
+                currentTargetChangeNumberEdit: false
+            });
+        }
 
 
         if (event.target.name == "treeId") {
@@ -5829,54 +6115,54 @@ export default class BuildTree extends Component {
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong> {this.state.activeTab1[0] === '2' && <> {
-                        this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
-                            (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
-                                (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                    (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
-                                    )))}
-                        <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
+                                        )))}
+                            <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
-                <ModalBody>
-                    <Row>
-                        <Col xs="12" md="12" className="mb-4">
+                    <ModalBody>
+                        <Row>
+                            <Col xs="12" md="12" className="mb-4">
 
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '1'}
-                                        onClick={() => { this.toggleModal(0, '1'); }}
-                                    >
-                                        Node Data
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '2'}
-                                        onClick={() => { this.toggleModal(0, '2'); }}
-                                    >
+                                <Nav tabs>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '1'}
+                                            onClick={() => { this.toggleModal(0, '1'); }}
+                                        >
+                                            Node Data
+                                        </NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '2'}
+                                            onClick={() => { this.toggleModal(0, '2'); }}
+                                        >
                                             Modeling/Transfer
                                         </NavLink>
                                     </NavItem>
 
                                 </Nav>
-                        <TabContent activeTab={this.state.activeTab1[0]}>
-                            {this.tabPane1()}
-                        </TabContent>
+                                <TabContent activeTab={this.state.activeTab1[0]}>
+                                    {this.tabPane1()}
+                                </TabContent>
                             </Col>
                         </Row>
 
                     </ModalBody>
-            <ModalFooter>
-                {/* <Button size="md" onClick={(e) => {
+                    <ModalFooter>
+                        {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-            </ModalFooter>
+                    </ModalFooter>
                 </Modal>
             </Draggable >
-            {/* Scenario Modal end------------------------ */ }
+            {/* Scenario Modal end------------------------ */}
 
         </div >
     }
