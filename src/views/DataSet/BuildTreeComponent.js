@@ -190,6 +190,8 @@ export default class BuildTree extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            manualChange: true,
+            seasonality: true,
             programId: this.props.match.params.programId,
             showMomDataPercent: false,
             currentTargetChangePercentage: '',
@@ -1607,7 +1609,7 @@ export default class BuildTree extends Component {
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
                     // console.log("dataSetObj>>>", dataSetObj);
-                    calculateModelingData(dataSetObj, '');
+                    // calculateModelingData(dataSetObj, '');
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("datasetList--->", myResult[i])
