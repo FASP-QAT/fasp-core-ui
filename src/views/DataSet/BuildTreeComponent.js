@@ -190,6 +190,13 @@ export default class BuildTree extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            scenario: {
+                id: '',
+                label: {
+                    label_en: ''
+                },
+                notes: ''
+            },
             manualChange: true,
             seasonality: true,
             programId: this.props.match.params.programId,
@@ -369,6 +376,7 @@ export default class BuildTree extends Component {
         this.resetTree = this.resetTree.bind(this);
 
         this.dataChange = this.dataChange.bind(this);
+        this.scenarioChange = this.scenarioChange.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.nodeTypeChange = this.nodeTypeChange.bind(this);
         this.addScenario = this.addScenario.bind(this);
@@ -424,8 +432,13 @@ export default class BuildTree extends Component {
         this.showMomData = this.showMomData.bind(this);
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
+        this.openScenarioModal = this.openScenarioModal.bind(this);
     }
-
+    openScenarioModal() {
+        this.setState({
+            openAddScenarioModal: !this.state.openAddScenarioModal
+        })
+    }
     buildMomJexcelPercent() {
         var momList = this.state.momListPer;
         var dataArray = [];
@@ -3340,23 +3353,25 @@ export default class BuildTree extends Component {
         }
     }
     addScenario() {
-        const { tabList } = this.state;
         const { scenario } = this.state;
+        var scenarioList = this.state.scenarioList;
+        var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+        var scenarioId = parseInt(maxScenarioId) + 1;
         var newTabObject = {
-            scenarioId: parseInt(tabList.length) + 1,
-            scenarioName: scenario.scenarioName,
-            scenarioDesc: scenario.scenarioDesc,
-            active: true
+            id: scenarioId,
+            label: {
+                label_en: scenario.label.label_en
+            }
         };
         // console.log("tab data---", newTabObject);
-        var tabList1 = [...tabList, newTabObject];
+        scenarioList = [...scenarioList, newTabObject];
         // console.log("tabList---", tabList1)
         this.setState({
-            tabList: [...tabList, newTabObject],
-            activeTab: parseInt(tabList.length),
+            selectedScenario : scenarioId,
+            scenarioList,
             openAddScenarioModal: false
         }, () => {
-            console.log("final tab list---", this.state);
+            console.log("final tab list---", this.state.scenarioList);
         });
     }
     nodeTypeChange(value) {
@@ -3439,6 +3454,19 @@ export default class BuildTree extends Component {
     resetTree() {
         this.componentDidMount();
         // this.setState({ items: TreeData.demographic_scenario_two });
+    }
+    scenarioChange(event) {
+        console.log("event---", event);
+        const { scenario } = this.state;
+        if (event.target.name === "scenarioName") {
+            scenario.label.label_en = event.target.value;
+        }
+        if (event.target.name === "scenarioDesc") {
+            scenario.notes = event.target.value;
+        }
+        this.setState({
+            scenario
+        });
     }
     dataChange(event) {
         // alert("hi");
@@ -5998,17 +6026,13 @@ export default class BuildTree extends Component {
                                                                             onChange={(e) => { this.dataChange(e) }}
                                                                             // onBlur={handleBlur}
                                                                             required
-                                                                        // value={this.state.user.language.languageId}
+                                                                            value={this.state.selectedScenario}
                                                                         >
                                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                                             {scenarios}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={() => {
-                                                                                this.setState({
-                                                                                    openAddScenarioModal: true
-                                                                                })
-                                                                            }} title=""></i></InputGroupText>
+                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
@@ -6216,7 +6240,7 @@ export default class BuildTree extends Component {
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Scenario</strong>
-                        <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
                         <FormGroup>
@@ -6240,8 +6264,8 @@ export default class BuildTree extends Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
             </Draggable>
