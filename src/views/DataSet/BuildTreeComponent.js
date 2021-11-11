@@ -51,6 +51,7 @@ import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
+import AuthenticationService from '../Common/AuthenticationService';
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -661,6 +662,28 @@ export default class BuildTree extends Component {
                 this.buildMomJexcelPercent();
             });
         } else {
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var program = transaction.objectStore('datasetData');
+                var getRequest = program.get(programId.toString());
+                getRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext')
+                    });
+                };
+                getRequest.onsuccess = function (event) {
+                    // console.log("hi",getRequest.result);
+                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    console.log("hi bro", programJson)
+                }
+            }.bind(this)
             this.setState({ showMomData: true }, () => {
                 this.buildMomJexcel();
             });
@@ -1607,7 +1630,7 @@ export default class BuildTree extends Component {
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
                     // console.log("dataSetObj>>>", dataSetObj);
-                    calculateModelingData(dataSetObj, '');
+                    // calculateModelingData(dataSetObj, '');
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("datasetList--->", myResult[i])
