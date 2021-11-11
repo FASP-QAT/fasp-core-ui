@@ -2741,6 +2741,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 1,
                         level: 0,
                         parent: null,
+                        sortOrder: "00",
                         payload: {
                             label: {
                                 label_en: ''
@@ -2786,6 +2787,7 @@ export default class CreateTreeTemplate extends Component {
                     id: 1,
                     level: 0,
                     parent: null,
+                    sortOrder: "00",
                     payload: {
                         label: {
                             label_en: ''
@@ -3120,9 +3122,9 @@ export default class CreateTreeTemplate extends Component {
         newItem.parent = itemConfig.context.parent;
         newItem.id = parseInt(items.length + 1);
         newItem.level = parseInt(itemConfig.context.level + 1);
-        var parentSortOrder=items.filter(c=>c.id==itemConfig.context.parent)[0].sortOrder;
-        var childList=items.filter(c=>c.parent==itemConfig.context.parent);
-        newItem.sortOrder=parentSortOrder.concat(".").concat(("0" + (Number(childList.length)+1)).slice(-2));
+        var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.context.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
         }
