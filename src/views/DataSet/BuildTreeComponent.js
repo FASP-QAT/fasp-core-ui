@@ -422,7 +422,9 @@ export default class BuildTree extends Component {
             usageTemplateList: [],
             forecastingUnitByTracerCategory: [],
             planningUnitByTracerCategory: [],
-            datasetList: []
+            datasetList: [],
+            forecastStartDate:'',
+            forecastStopDate:''
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -475,8 +477,24 @@ export default class BuildTree extends Component {
         this.toggle = this.toggle.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.buildModelingJexcel = this.buildModelingJexcel.bind(this);
+        this.setStartAndStopDateOfProgram = this.setStartAndStopDateOfProgram.bind(this);
     }
 
+    setStartAndStopDateOfProgram(dataSetId) {
+        // console.log("programId>>>", dataSetId);
+        // console.log("dataSetList>>>", this.state.datasetList);
+        var dataSetObj = this.state.datasetList.filter(c => c.programId == dataSetId)[0];
+        // console.log("dataSetObj>>>", dataSetObj);
+        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        // console.log("programData>>>", programData.currentVersion.forecastStartDate);
+        // console.log("programData>>>", programData.currentVersion.forecastStopDate);
+        this.setState({
+            forecastStartDate: programData.currentVersion.forecastStartDate,
+            forecastStopDate: programData.currentVersion.forecastStopDate,
+        });
+
+    }
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
         console.log("scalingList---", scalingList);
@@ -5214,197 +5232,197 @@ export default class BuildTree extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
-                        <InputGroup>
+                            <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
+                            <InputGroup>
+                                <Input
+                                    type="select"
+                                    name="datasetId"
+                                    id="datasetId"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                >
+                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    {datasets}
+                                </Input>
+                            </InputGroup>
+
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
-                                name="datasetId"
-                                id="datasetId"
+                                name="forecastMethodId"
+                                id="forecastMethodId"
                                 bsSize="sm"
-                            // onChange={(e) => { this.getTreeList(e.target.value) }}
+                                onChange={(e) => { this.dataChange(e) }}
+                                required
+                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
                             >
-                                <option value="0">{i18n.t('static.common.all')}</option>
-                                {datasets}
+                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                {forecastMethods}
                             </Input>
-                        </InputGroup>
-                            
                         </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
-                        <Input
-                            type="select"
-                            name="forecastMethodId"
-                            id="forecastMethodId"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            required
-                            value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
-                        >
-                            <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
-                            {forecastMethods}
-                        </Input>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            id="treeName"
-                            name="treeName"
-                            bsSize="sm"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.curTreeObj != "" ? this.state.curTreeObj.label.label_en : ''}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
-                        <div className="controls ">
-                            {/* <InMultiputGroup> */}
-                            <MultiSelect
-                                // type="select"
-                                name="regionId"
-                                id="regionId"
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="treeName"
+                                name="treeName"
                                 bsSize="sm"
-                                value={regionMultiList}
-                                onChange={(e) => { this.handleRegionChange(e) }}
-                                options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                labelledBy={i18n.t('static.common.regiontext')}
-                            />
-                        </div>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label htmlFor="currencyId">Notes</Label>
-                        <Input type="textarea"
-                            id="treeNotes"
-                            name="treeNotes"
-                            onChange={(e) => { this.dataChange(e) }}
-                            value={this.state.curTreeObj != "" ? this.state.curTreeObj.notes : ''}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup className="col-md-12">
-                        <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                        <FormGroup check inline>
-                            <Input
-                                className="form-check-input"
-                                type="radio"
-                                id="active10"
-                                name="active"
-                                value={true}
-                                checked={this.state.curTreeObj.active === true}
                                 onChange={(e) => { this.dataChange(e) }}
-                            />
-                            <Label
-                                className="form-check-label"
-                                check htmlFor="inline-radio1">
-                                {i18n.t('static.common.active')}
-                            </Label>
+                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.label.label_en : ''}
+                            ></Input>
                         </FormGroup>
-                        <FormGroup check inline>
-                            <Input
-                                className="form-check-input"
-                                type="radio"
-                                id="active11"
-                                name="active"
-                                value={false}
-                                checked={this.state.curTreeObj.active === false}
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                            <div className="controls ">
+                                {/* <InMultiputGroup> */}
+                                <MultiSelect
+                                    // type="select"
+                                    name="regionId"
+                                    id="regionId"
+                                    bsSize="sm"
+                                    value={regionMultiList}
+                                    onChange={(e) => { this.handleRegionChange(e) }}
+                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                    labelledBy={i18n.t('static.common.regiontext')}
+                                />
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Notes</Label>
+                            <Input type="textarea"
+                                id="treeNotes"
+                                name="treeNotes"
                                 onChange={(e) => { this.dataChange(e) }}
-                            />
-                            <Label
-                                className="form-check-label"
-                                check htmlFor="inline-radio2">
-                                {i18n.t('static.common.disabled')}
-                            </Label>
+                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.notes : ''}
+                            ></Input>
                         </FormGroup>
-                    </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active10"
+                                    name="active"
+                                    value={true}
+                                    checked={this.state.curTreeObj.active === true}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio1">
+                                    {i18n.t('static.common.active')}
+                                </Label>
+                            </FormGroup>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active11"
+                                    name="active"
+                                    value={false}
+                                    checked={this.state.curTreeObj.active === false}
+                                    onChange={(e) => { this.dataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2">
+                                    {i18n.t('static.common.disabled')}
+                                </Label>
+                            </FormGroup>
+                        </FormGroup>
 
                     </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
+                    <ModalFooter>
+                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
                 </Modal>
             </Draggable>
-        {/* Scenario Modal start------------------- */ }
-        <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openAddScenarioModal}
-                className={'modal-md '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Scenario</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            id="scenarioName"
-                            name="scenarioName"
-                            onChange={(e) => { this.scenarioChange(e) }}
-                        // value={this.state.scenario.scenarioName}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">Notes</Label>
-                        <Input type="text"
-                            id="scenarioDesc"
-                            name="scenarioDesc"
-                            onChange={(e) => { this.scenarioChange(e) }}
-                        // value={this.state.scenario.scenarioDesc}
-                        ></Input>
-                    </FormGroup>
+            {/* Scenario Modal start------------------- */}
+            <Draggable handle=".modal-title">
+                <Modal isOpen={this.state.openAddScenarioModal}
+                    className={'modal-md '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Scenario</strong>
+                        <Button size="md" onClick={() => this.setState({ openAddScenarioModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="scenarioName"
+                                name="scenarioName"
+                                onChange={(e) => { this.scenarioChange(e) }}
+                            // value={this.state.scenario.scenarioName}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label htmlFor="currencyId">Notes</Label>
+                            <Input type="text"
+                                id="scenarioDesc"
+                                name="scenarioDesc"
+                                onChange={(e) => { this.scenarioChange(e) }}
+                            // value={this.state.scenario.scenarioDesc}
+                            ></Input>
+                        </FormGroup>
 
-                </ModalBody>
-                <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
-            </Modal>
-        </Draggable>
-        {/* Modal end------------------------ */ }
-        {/* Modal start------------------- */ }
-        <Draggable handle=".modal-title">
-            <Modal isOpen={this.state.openAddNodeModal}
-                className={'modal-lg '} >
-                <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Node</strong>
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                </ModalHeader>
-                <ModalBody>
-                    <Row>
-                        <Col xs="12" md="12" className="mb-4">
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddScenarioModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+            </Draggable>
+            {/* Modal end------------------------ */}
+            {/* Modal start------------------- */}
+            <Draggable handle=".modal-title">
+                <Modal isOpen={this.state.openAddNodeModal}
+                    className={'modal-lg '} >
+                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                        <strong>Add/Edit Node</strong>
+                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    </ModalHeader>
+                    <ModalBody>
+                        <Row>
+                            <Col xs="12" md="12" className="mb-4">
 
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '1'}
-                                        onClick={() => { this.toggleModal(0, '1'); }}
-                                    >
-                                        Node Data
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink
-                                        active={this.state.activeTab1[0] === '2'}
-                                        onClick={() => { this.toggleModal(0, '2'); }}
-                                    >
-                                        Scaling/Transfer
-                                    </NavLink>
-                                </NavItem>
+                                <Nav tabs>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '1'}
+                                            onClick={() => { this.toggleModal(0, '1'); }}
+                                        >
+                                            Node Data
+                                        </NavLink>
+                                    </NavItem>
+                                    <NavItem>
+                                        <NavLink
+                                            active={this.state.activeTab1[0] === '2'}
+                                            onClick={() => { this.toggleModal(0, '2'); }}
+                                        >
+                                            Scaling/Transfer
+                                        </NavLink>
+                                    </NavItem>
 
-                            </Nav>
-                            <TabContent activeTab={this.state.activeTab1[0]}>
-                                {this.tabPane1()}
-                            </TabContent>
-                        </Col>
-                    </Row>
+                                </Nav>
+                                <TabContent activeTab={this.state.activeTab1[0]}>
+                                    {this.tabPane1()}
+                                </TabContent>
+                            </Col>
+                        </Row>
 
-                </ModalBody>
-                <ModalFooter>
-                    {/* <Button size="md" onClick={(e) => {
+                    </ModalBody>
+                    <ModalFooter>
+                        {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                </ModalFooter>
-            </Modal>
-        </Draggable>
-        {/* Scenario Modal end------------------------ */ }
+                    </ModalFooter>
+                </Modal>
+            </Draggable>
+            {/* Scenario Modal end------------------------ */}
 
         </div >
     }
