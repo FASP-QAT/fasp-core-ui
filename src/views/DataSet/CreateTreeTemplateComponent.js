@@ -430,18 +430,18 @@ export default class CreateTreeTemplate extends Component {
             ],
 
             momListPer: [
-                { month: '2021-01-01', sexuallyActiveMenMonthStartPer: '50%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 424594, sexuallyActiveMenMonthEndPer: '51%', monthEnd: 216543 },
-                { month: '2021-02-01', sexuallyActiveMenMonthStartPer: '51%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 429188, sexuallyActiveMenMonthEndPer: '52%', monthEnd: 223178 },
-                { month: '2021-03-01', sexuallyActiveMenMonthStartPer: '52%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 433781, sexuallyActiveMenMonthEndPer: '53%', monthEnd: 229904 },
-                { month: '2021-04-01', sexuallyActiveMenMonthStartPer: '53%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 626250, sexuallyActiveMenMonthEndPer: '54%', monthEnd: 338175 },
-                { month: '2021-05-01', sexuallyActiveMenMonthStartPer: '54%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 632813, sexuallyActiveMenMonthEndPer: '55%', monthEnd: 348047 },
-                { month: '2021-06-01', sexuallyActiveMenMonthStartPer: '55%', calculatedChange: '1.00%', manualChange: '4.00%', sexuallyActiveMenMonthEnd: 639375, sexuallyActiveMenMonthEndPer: '60%', monthEnd: 383625 },
-                { month: '2021-07-01', sexuallyActiveMenMonthStartPer: '60%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 839719, sexuallyActiveMenMonthEndPer: '61%', monthEnd: 512228 },
-                { month: '2021-08-01', sexuallyActiveMenMonthStartPer: '61%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 848250, sexuallyActiveMenMonthEndPer: '62%', monthEnd: 525915 },
-                { month: '2021-09-01', sexuallyActiveMenMonthStartPer: '62%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 856781, sexuallyActiveMenMonthEndPer: '63%', monthEnd: 539772 },
-                { month: '2021-10-01', sexuallyActiveMenMonthStartPer: '63%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 665625, sexuallyActiveMenMonthEndPer: '64%', monthEnd: 426000 },
-                { month: '2021-11-01', sexuallyActiveMenMonthStartPer: '64%', calculatedChange: '1.00%', manualChange: '', sexuallyActiveMenMonthEnd: 672188, sexuallyActiveMenMonthEndPer: '65%', monthEnd: 436922 },
-                { month: '2021-12-01', sexuallyActiveMenMonthStartPer: '65%', calculatedChange: '0.50%', manualChange: '', sexuallyActiveMenMonthEnd: 678750, sexuallyActiveMenMonthEndPer: '66%', monthEnd: 447975 },
+                { month: '2021-01-01', sexuallyActiveMenMonthStartPer: '50', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 424594, sexuallyActiveMenMonthEndPer: '51', monthEnd: 216543 },
+                { month: '2021-02-01', sexuallyActiveMenMonthStartPer: '51', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 429188, sexuallyActiveMenMonthEndPer: '52', monthEnd: 223178 },
+                { month: '2021-03-01', sexuallyActiveMenMonthStartPer: '52', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 433781, sexuallyActiveMenMonthEndPer: '53', monthEnd: 229904 },
+                { month: '2021-04-01', sexuallyActiveMenMonthStartPer: '53', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 626250, sexuallyActiveMenMonthEndPer: '54', monthEnd: 338175 },
+                { month: '2021-05-01', sexuallyActiveMenMonthStartPer: '54', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 632813, sexuallyActiveMenMonthEndPer: '55', monthEnd: 348047 },
+                { month: '2021-06-01', sexuallyActiveMenMonthStartPer: '55', calculatedChange: '1.00', manualChange: '4.00', sexuallyActiveMenMonthEnd: 639375, sexuallyActiveMenMonthEndPer: '60', monthEnd: 383625 },
+                { month: '2021-07-01', sexuallyActiveMenMonthStartPer: '60', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 839719, sexuallyActiveMenMonthEndPer: '61', monthEnd: 512228 },
+                { month: '2021-08-01', sexuallyActiveMenMonthStartPer: '61', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 848250, sexuallyActiveMenMonthEndPer: '62', monthEnd: 525915 },
+                { month: '2021-09-01', sexuallyActiveMenMonthStartPer: '62', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 856781, sexuallyActiveMenMonthEndPer: '63', monthEnd: 539772 },
+                { month: '2021-10-01', sexuallyActiveMenMonthStartPer: '63', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 665625, sexuallyActiveMenMonthEndPer: '64', monthEnd: 426000 },
+                { month: '2021-11-01', sexuallyActiveMenMonthStartPer: '64', calculatedChange: '1.00', manualChange: '', sexuallyActiveMenMonthEnd: 672188, sexuallyActiveMenMonthEndPer: '65', monthEnd: 436922 },
+                { month: '2021-12-01', sexuallyActiveMenMonthStartPer: '65', calculatedChange: '0.50', manualChange: '', sexuallyActiveMenMonthEnd: 678750, sexuallyActiveMenMonthEndPer: '66', monthEnd: 447975 },
 
             ],
             currentModelingType: '',
@@ -750,7 +750,7 @@ export default class CreateTreeTemplate extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
-        var monthDifference = moment(endDate).endOf('month').diff(startDate, 'months', true);
+        var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
         var getValue = e.target.value;
@@ -833,7 +833,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
         this.setState({
-            currentEndValue: e.target.value != '' ? targetEndValue : '',
+            currentEndValue: (e.target.value != '' && this.state.currentModelingType != 3) ? targetEndValue : '',
             currentCalculatedMomChange: e.target.value != '' ? momValue : ''
         });
     }
@@ -890,14 +890,18 @@ export default class CreateTreeTemplate extends Component {
     }
 
     showMomData() {
-        this.setState({ showMomData: true }, () => {
-            this.buildMomJexcel();
-        });
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            this.setState({ showMomDataPercent: true }, () => {
+                this.buildMomJexcelPercent();
+            });
+        } else {
+            this.setState({ showMomData: true }, () => {
+                this.buildMomJexcel();
+            });
+        }
     }
     showMomDataPercent() {
-        this.setState({ showMomDataPercent: true }, () => {
-            this.buildMomJexcelPercent();
-        });
+
     }
     buildMomJexcelPercent() {
         var momList = this.state.momListPer;
@@ -906,12 +910,16 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = momList[j].sexuallyActiveMenMonthStartPer
+            if (j == 0) {
+                data[1] = momList[j].sexuallyActiveMenMonthStartPer
+            } else {
+                data[1] = `=E${parseInt(j)}`
+            }
             data[2] = momList[j].calculatedChange
             data[3] = momList[j].manualChange
-            data[4] = momList[j].sexuallyActiveMenMonthEndPer
+            data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             data[5] = momList[j].sexuallyActiveMenMonthEnd
-            data[6] = momList[j].monthEnd
+            data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
         }
@@ -1347,25 +1355,35 @@ export default class CreateTreeTemplate extends Component {
     }
     selected = function (instance, cell, x, y, value) {
         if (y == 7) {
-            console.log("x row data===>", this.el.getRowData(x));
-            var elInstance = this.state.modelingEl;
-            var rowData = elInstance.getRowData(x);
             this.setState({
-                currentRowIndex: x,
-                showCalculatorFields: true,
-                currentModelingType: rowData[2],
-                currentCalculatorStartDate: rowData[3],
-                currentCalculatorStopDate: rowData[4],
-                currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
+                currentRowIndex: '',
+                showCalculatorFields: '',
+                currentModelingType: '',
+                currentCalculatorStartDate: '',
+                currentCalculatorStopDate: '',
+                currentCalculatorStartValue: '',
+            }, () => {
+                console.log("x row data===>", this.el.getRowData(x));
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(x);
+                this.setState({
+                    currentRowIndex: x,
+                    showCalculatorFields: true,
+                    currentModelingType: rowData[2],
+                    currentCalculatorStartDate: rowData[3],
+                    currentCalculatorStopDate: rowData[4],
+                    currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
 
-                currentCalculatedMomChange: '',
-                currentTargetChangeNumber: '',
-                currentTargetChangeNumberEdit: false,
-                currentTargetChangePercentage: '',
-                currentTargetChangePercentageEdit: false,
-                currentEndValue: '',
-                currentEndValueEdit: false
-            });
+                    currentCalculatedMomChange: '',
+                    currentTargetChangeNumber: '',
+                    currentTargetChangeNumberEdit: false,
+                    currentTargetChangePercentage: '',
+                    currentTargetChangePercentageEdit: false,
+                    currentEndValue: '',
+                    currentEndValueEdit: false
+                });
+            })
+
         }
     }.bind(this)
     changed = function (instance, cell, x, y, value) {
@@ -3383,6 +3401,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("cursor changed item---", item);
         if (item != null) {
             this.setState({
+                showCalculatorFields:false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
                 currentItemConfig: data,
@@ -3635,7 +3654,7 @@ export default class CreateTreeTemplate extends Component {
 
 
         let bar1 = {}
-        if (this.state.momListPer.length > 0) {
+        if (this.state.momListPer.length > 0 && this.state.momElPer != '') {
             var datasetsArr = [];
             datasetsArr.push({
                 label: 'Men who use condoms (Month End)',
@@ -3647,7 +3666,7 @@ export default class CreateTreeTemplate extends Component {
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
                 pointHoverBorderColor: grey,
-                data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEnd)),
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[5])),
             }
             )
             datasetsArr.push(
@@ -3668,7 +3687,7 @@ export default class CreateTreeTemplate extends Component {
                     pointRadius: 0,
                     showInLegend: false,
                     yAxisID: 'B',
-                    data: this.state.momListPer.map((item, index) => (item.sexuallyActiveMenMonthEndPer.replaceAll("%", '') > 0 ? item.sexuallyActiveMenMonthEndPer.replaceAll("%", '') : null))
+                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
                 }
             )
 
@@ -4546,10 +4565,11 @@ export default class CreateTreeTemplate extends Component {
                             }
 
                         </div>
-                        <div className="row">
 
-                            {this.state.showCalculatorFields &&
-                                <>
+
+                        {this.state.showCalculatorFields &&
+                            <>
+                                <div className="row">
                                     {/* <div className="row"> */}
                                     <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
@@ -4558,7 +4578,7 @@ export default class CreateTreeTemplate extends Component {
                                         <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                         <Picker
                                             ref={this.pickAMonth2}
-                                            years={{ min: { year: 2016, month: 2 }, max: { year: 2050, month: 9 } }}
+                                            years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                             // value={this.state.singleValue2}
                                             value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
                                             lang={pickerLang.months}
@@ -4602,7 +4622,7 @@ export default class CreateTreeTemplate extends Component {
                                         <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
                                         <Picker
                                             ref={this.pickAMonth2}
-                                            years={{ min: { year: 2016, month: 2 }, max: { year: 2050, month: 9 } }}
+                                            years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                             // value={this.state.singleValue2}
                                             value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
                                             lang={pickerLang.months}
@@ -4613,7 +4633,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Picker>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
+                                    <FormGroup className="col-md-5">
                                         <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentEndValue"
@@ -4627,7 +4647,10 @@ export default class CreateTreeTemplate extends Component {
 
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
+                                    <FormGroup className="col-md-1 mt-lg-4">
+                                        <Label htmlFor="currencyId">or</Label>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-5">
                                         <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentTargetChangePercentage"
@@ -4641,7 +4664,12 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
-                                    {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <FormGroup className="col-md-6">
+                                    {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-1 mt-lg-4">
+                                        <Label htmlFor="currencyId">or</Label>
+                                    </FormGroup>
+                                    }
+                                    {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
+                                    {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="currentTargetChangeNumber"
@@ -4655,6 +4683,8 @@ export default class CreateTreeTemplate extends Component {
                                         {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                     </FormGroup>
                                     }
+                                </div>
+                                <div className="row col-md-12 pl-lg-0">
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
@@ -4718,15 +4748,16 @@ export default class CreateTreeTemplate extends Component {
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
                                     </FormGroup>
-                                    <FormGroup className="col-md-12">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                </div>
+                                <FormGroup className="col-md-12">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
-                                    </FormGroup>
-                                    {/* </div> */}
-                                </>
-                            }
-                        </div>
+                                </FormGroup>
+                                {/* </div> */}
+                            </>
+                        }
+
                     </div>
                     {this.state.showMomData &&
                         <div>
