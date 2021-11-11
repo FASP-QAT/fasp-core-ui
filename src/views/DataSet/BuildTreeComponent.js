@@ -47,6 +47,9 @@ import Draggable from 'react-draggable';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
+import docicon from '../../assets/img/doc.png'
+import { saveAs } from "file-saver";
+import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -164,31 +167,6 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
-    const opacity = isDragging ? 0.4 : 1
-    let itemTitleColor = Colors.RoyalBlue;
-    if (isOver) {
-        if (canDrop) {
-            itemTitleColor = "green";
-        } else {
-            itemTitleColor = "#BA0C2F";
-        }
-    }
-
-    return connectDropTarget(connectDragSource(
-        // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-        <div className="ContactTemplate boxContactTemplate">
-            <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
-            >
-                <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
-            </div>
-            <div className="ContactPhone ContactPhoneValue">
-                <span style={{ textAlign: 'center', fontWeight: '500' }}>{getPayloadData(itemConfig, 1)}</span>
-                <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{getPayloadData(itemConfig, 2)}</p></div>
-            </div>
-        </div>
-    ))
-}
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -206,66 +184,6 @@ function addCommas(cell1, row) {
         return "";
     }
 }
-
-function getPayloadData(itemConfig, type) {
-    console.log("inside get payload");
-    var data = [];
-    data = itemConfig.payload.nodeDataMap;
-    console.log("itemConfig---", data);
-    console.log("data---", data);
-    var scenarioId = document.getElementById('scenarioId').value;
-    // this.state.selectedScenario;
-    if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
-        if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-            if (type == 1) {
-                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue);
-            } else {
-                return "";
-            }
-        } else {
-            if (type == 1) {
-                return (itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue + "% of parent";
-            } else {
-                return ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
-            }
-        }
-    } else {
-        return "";
-    }
-}
-const NodeDragSource = DragSource(
-    ItemTypes.NODE,
-    {
-        beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
-        endDrag(props, monitor) {
-            const { onMoveItem } = props;
-            const item = monitor.getItem()
-            const dropResult = monitor.getDropResult()
-            if (dropResult) {
-                onMoveItem(dropResult.id, item.id);
-            }
-        },
-    },
-    (connect, monitor) => ({
-        connectDragSource: connect.dragSource(),
-        isDragging: monitor.isDragging(),
-    }),
-)(Node);
-const NodeDragDropSource = DropTarget(
-    ItemTypes.NODE,
-    {
-        drop: ({ itemConfig }) => ({ id: itemConfig.id }),
-        canDrop: ({ canDropItem, itemConfig }, monitor) => {
-            const { id } = monitor.getItem();
-            return canDropItem(itemConfig.id, id);
-        },
-    },
-    (connect, monitor) => ({
-        connectDropTarget: connect.dropTarget(),
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-    }),
-)(NodeDragSource);
 
 export default class BuildTree extends Component {
     constructor() {
@@ -419,7 +337,7 @@ export default class BuildTree extends Component {
                     }
                 }
             },
-            momList:[],
+            momList: [],
             activeTab1: new Array(2).fill('1'),
             tracerCategoryList: [],
             tracerCategoryList: [],
@@ -434,7 +352,7 @@ export default class BuildTree extends Component {
             datasetList: [],
             forecastStartDate: '',
             forecastStopDate: '',
-            momListPer:[]
+            momListPer: []
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -1144,6 +1062,7 @@ export default class BuildTree extends Component {
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
+        console.log("sameLevelNodeList---", sameLevelNodeList);
         this.setState({
             sameLevelNodeList
         });
@@ -1523,6 +1442,142 @@ export default class BuildTree extends Component {
             data, 0, 1
         );
     };
+
+    getPayloadData(itemConfig, type) {
+        console.log("inside get payload");
+        var data = [];
+        data = itemConfig.payload.nodeDataMap;
+        console.log("itemConfig---", data);
+        console.log("data---", data);
+        var scenarioId = document.getElementById('scenarioId').value;
+        // this.state.selectedScenario;
+        if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
+            if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
+                if (type == 1) {
+                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue);
+                } else if (type == 3) {
+                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                    console.log("Child List+++", childList);
+                    if (childList.length > 0) {
+                        var sum = 0;
+                        childList.map(c => {
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].dataValue)
+                        })
+                        return sum;
+                    } else {
+                        return "";
+                    }
+                } else {
+                    return "";
+                }
+            } else {
+                if (type == 1) {
+                    return (itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue + "% of parent";
+                } else if (type == 3) {
+                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                    console.log("Child List+++", childList);
+                    if (childList.length > 0) {
+                        var sum = 0;
+                        childList.map(c => {
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].dataValue)
+                        })
+                        return sum;
+                    } else {
+                        return "";
+                    }
+                } else {
+                    return ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
+                }
+            }
+        } else {
+            return "";
+        }
+    }
+
+    exportDoc() {
+        console.log("This.state.items +++", this.state.items);
+        var items = this.state.items.sort(function (a, b) { return a.sortOrder - b.sortOrder });
+        console.log("Items+++", items);
+        var dataArray = [];
+        for (var i = 0; i < items.length; i++) {
+            var row = "";
+            var row1 = "";
+            var level = items[i].level;
+            for (var j = 1; j <= level; j++) {
+                row = row.concat("    ");
+            }
+            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                row = row.concat(addCommas((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue))
+                row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
+            } else {
+                row = row.concat((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue).concat("% ")
+                row1 = row1.concat(items[i].payload.label.label_en)
+            }
+            dataArray.push(new Paragraph({
+                children: [new TextRun({ "text": row, bold: true }), new TextRun({ "text": row1 })],
+                spacing: {
+                    after: 150,
+                },
+            }));
+            if (i != 0) {
+                var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
+                if (filteredList.length == 0) {
+                    var dataFilter = this.state.items.filter(c => c.level == items[i].level);
+                    var total = 0;
+                    dataFilter.filter(c => c.parent == items[i].parent).map(item => {
+                        total += Number((item.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue)
+                    })
+                    var parentName = this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en;
+                    var row = "";
+                    var row1 = "";
+                    var row3 = "";
+                    var row4 = parentName;
+                    for (var j = 1; j <= items[i].level; j++) {
+                        row3 = row3.concat("    ");
+                    }
+                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                    } else {
+                        row = row.concat(total).concat("% ")
+                        row1 = row1.concat(" Subtotal")
+                    }
+                    dataArray.push(new Paragraph({
+                        children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
+                        spacing: {
+                            after: 150,
+                        },
+                        shading: {
+                            type: ShadingType.CLEAR,
+                            fill: "697069"
+                        },
+                        style: total != 100 ? "aside" : "",
+                    }))
+                }
+            }
+        }
+        const doc = new Document({
+            sections: [
+                {
+                    children: dataArray
+                }
+            ],
+            styles: {
+                paragraphStyles: [
+                    {
+                        id: "aside",
+                        name: "aside",
+                        run: {
+                            color: "BA0C2F",
+                        },
+                    },
+                ]
+            }
+        });
+
+        Packer.toBlob(doc).then(blob => {
+            saveAs(blob, "TreeValidation.docx");
+        });
+    }
+
     toggle() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
@@ -3629,6 +3684,9 @@ export default class BuildTree extends Component {
         newItem.parent = itemConfig.context.parent;
         newItem.id = parseInt(items.length + 1);
         newItem.level = parseInt(itemConfig.context.level + 1);
+        var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.context.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
         }
@@ -3844,6 +3902,8 @@ export default class BuildTree extends Component {
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     // this.getUsageText();
                     // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
+                } else if (data.context.payload.nodeType.id != 1) {
+                    this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
 
             })
@@ -5256,6 +5316,66 @@ export default class BuildTree extends Component {
                     </option>
                 )
             }, this);
+        const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
+            const opacity = isDragging ? 0.4 : 1
+            let itemTitleColor = Colors.RoyalBlue;
+            if (isOver) {
+                if (canDrop) {
+                    itemTitleColor = "green";
+                } else {
+                    itemTitleColor = "#BA0C2F";
+                }
+            }
+
+            return connectDropTarget(connectDragSource(
+                // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+                <div className="ContactTemplate boxContactTemplate">
+                    <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                    >
+                        <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
+                    </div>
+                    <div className="ContactPhone ContactPhoneValue">
+                        <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
+                        <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
+                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                    </div>
+                </div>
+            ))
+        }
+
+        const NodeDragSource = DragSource(
+            ItemTypes.NODE,
+            {
+                beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
+                endDrag(props, monitor) {
+                    const { onMoveItem } = props;
+                    const item = monitor.getItem()
+                    const dropResult = monitor.getDropResult()
+                    if (dropResult) {
+                        onMoveItem(dropResult.id, item.id);
+                    }
+                },
+            },
+            (connect, monitor) => ({
+                connectDragSource: connect.dragSource(),
+                isDragging: monitor.isDragging(),
+            }),
+        )(Node);
+        const NodeDragDropSource = DropTarget(
+            ItemTypes.NODE,
+            {
+                drop: ({ itemConfig }) => ({ id: itemConfig.id }),
+                canDrop: ({ canDropItem, itemConfig }, monitor) => {
+                    const { id } = monitor.getItem();
+                    return canDropItem(itemConfig.id, id);
+                },
+            },
+            (connect, monitor) => ({
+                connectDropTarget: connect.dropTarget(),
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop(),
+            }),
+        )(NodeDragSource);
 
         const { singleValue2 } = this.state
         const { forecastMethodList } = this.state;
@@ -5475,7 +5595,7 @@ export default class BuildTree extends Component {
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
                 name: "contactTemplate",
-                itemSize: { width: 200, height: 75 },
+                itemSize: { width: 200, height: 80 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 highlightBorderWidth: 1,
@@ -5526,6 +5646,7 @@ export default class BuildTree extends Component {
                                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                     onClick={() => this.exportPDF()}
                                                 />
+                                                {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
                                             </FormGroup>
 
                                         </div>
