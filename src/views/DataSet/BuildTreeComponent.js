@@ -3,6 +3,7 @@ import { OrgDiagram } from 'basicprimitivesreact';
 // import { PDFDocument } from 'pdfkit';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import cleanUp from '../../assets/img/calculator.png';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
@@ -31,14 +32,21 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY,JEXCEL_MONTH_PICKER_FORMAT,JEXCEL_PAGINATION_OPTION,JEXCEL_PRO_KEY,JEXCEL_DECIMAL_NO_REGEX_LONG,DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
 import MultiSelect from 'react-multi-select-component';
 import Draggable from 'react-draggable';
+import { Bar } from 'react-chartjs-2';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { grey } from '@material-ui/core/colors';
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -263,6 +271,8 @@ export default class BuildTree extends Component {
     constructor() {
         super();
         this.state = {
+            momList : [],
+            momListPer : [],
             modelingTypeList: [],
             showModelingJexcelNumber: false,
             filteredModelingType: [],
@@ -3074,6 +3084,231 @@ export default class BuildTree extends Component {
     }
 
     tabPane1() {
+        var chartOptions = {
+            title: {
+                display: false,
+            },
+            scales: {
+                yAxes: [
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            stepSize: 1000000
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 1
+                        },
+                        position: 'left',
+                        // scaleSteps : 100000
+                    }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: false,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+
+        let bar = {}
+        if (this.state.momList.length > 0) {
+            var datasetsArr = [];
+            datasetsArr.push(
+                {
+                    label: '',
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: grey,
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: false,
+                    data: this.state.momList.map((item, index) => (item.monthEnd > 0 ? item.monthEnd : null))
+                }
+            )
+
+            bar = {
+                labels: [...new Set(this.state.momList.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
+                datasets: datasetsArr
+
+            };
+        }
+
+        var chartOptions1 = {
+            title: {
+                display: false,
+            },
+            scales: {
+                yAxes: [
+                    {
+                        id: 'A',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black',
+                            stepSize: 100000
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 1
+                        },
+                        position: 'left',
+                        // scaleSteps : 100000
+                    },
+                    {
+                        id: 'B',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "",
+                            fontColor: 'black'
+                        },
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'black'
+                        },
+                        gridLines: {
+                            drawBorder: true, lineWidth: 0
+                        },
+                        position: 'right',
+                    }
+                ],
+                xAxes: [{
+                    ticks: {
+                        fontColor: 'black'
+                    },
+                    gridLines: {
+                        drawBorder: true, lineWidth: 0
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        if (tooltipItems.datasetIndex == 0) {
+                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            var infoToShow = [];
+                            details.map(c => {
+                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            });
+                            return (infoToShow.join(' | '));
+                        } else {
+                            return (tooltipItems.yLabel.toLocaleString());
+                        }
+                    }.bind(this)
+                },
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+
+        let bar1 = {}
+        if (this.state.momListPer.length > 0 && this.state.momElPer != '') {
+            var datasetsArr = [];
+            datasetsArr.push({
+                label: 'Men who use condoms (Month End)',
+                stack: 1,
+                yAxisID: 'A',
+                backgroundColor: '#D3D3D3',
+                borderColor: grey,
+                pointBackgroundColor: grey,
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: grey,
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[5])),
+            }
+            )
+            datasetsArr.push(
+                {
+                    label: '% of sexually active men (Month End)',
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: '#006789',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: false,
+                    yAxisID: 'B',
+                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
+                }
+            )
+
+
+            bar1 = {
+                labels: [...new Set(this.state.momListPer.map(ele => (moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
+                datasets: datasetsArr
+
+            };
+        }
         return (
             <>
                 <TabPane tabId="1">
