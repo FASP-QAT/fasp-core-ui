@@ -191,6 +191,8 @@ export default class BuildTree extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            manualChange: true,
+            seasonality: true,
             programId: this.props.match.params.programId,
             showMomDataPercent: false,
             currentTargetChangePercentage: '',
@@ -1151,8 +1153,8 @@ export default class BuildTree extends Component {
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].modelingType.id != 2 ? scalingList[j].dataValue : ''
-            data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
+            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
+            data[6] = scalingList[j].modelingType.id == 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
             data[7] = cleanUp
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -1208,7 +1210,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Monthly Change (%)",
                     type: 'numeric',
-                    mask: '#,##.####', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
@@ -1222,7 +1224,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.##', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -5207,7 +5209,11 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                 </div>
                                 <FormGroup className="col-md-12">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({
+                                            showCalculatorFields: false
+                                        });
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
                                 </FormGroup>
@@ -5265,7 +5271,9 @@ export default class BuildTree extends Component {
                                 <div id="momJexcel">
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({ showMomData: false })
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                 </div>
