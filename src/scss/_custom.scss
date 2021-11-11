@@ -5268,3 +5268,21 @@ height: 0px;
 .SelectGoVesionSetting{
   width: 202px;
 }
+.HeaderNodeText{
+  display: inline;
+  margin-left: 2%;
+  border: 1px solid #ccc;
+  padding: 4px 5px 4px 0px;
+  border-radius: 4px;
+}
+// .ReadonlyPicker.month-picker{
+//   background-color: #e5edf5!important;
+//   opacity: 1!important;
+//   pointer-events: none!important;
+// }
+.ReadonlyPicker {
+  opacity: 1!important;
+  position: relative!important;
+  pointer-events: none!important;
+  background-color: #e5edf5!important;
+}
