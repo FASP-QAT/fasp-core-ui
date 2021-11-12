@@ -42,7 +42,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
-import { MultiSelect } from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import Draggable from 'react-draggable';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
@@ -3401,12 +3401,26 @@ export default class BuildTree extends Component {
         // console.log("tab data---", newTabObject);
         scenarioList = [...scenarioList, newTabObject];
         // console.log("tabList---", tabList1)
+        if (this.state.treeId != "") {
+            var items = this.state.items;
+            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+            var obj = {
+                nodeDataId: scenarioId,
+                label: {
+                    label_en: scenario.label.label_en
+                },
+                notes: scenario.notes
+            }
+                (item.payload.nodeDataMap[scenarioId])[0] = obj;
+            items[itemIndex1] = item;
+        }
         this.setState({
             selectedScenario: scenarioId,
             scenarioList,
             openAddScenarioModal: false
         }, () => {
-            console.log("final tab list---", this.state.scenarioList);
+            console.log("final tab list---", this.state.items);
         });
     }
     nodeTypeChange(value) {
@@ -3565,9 +3579,7 @@ export default class BuildTree extends Component {
                     console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
-                        currentScenario = (items[i].payload.nodeDataMap[scenarioId])[0];
                     } else {
-
                         var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                         var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
                         console.log("api parent value---", parentValue);
@@ -3582,10 +3594,9 @@ export default class BuildTree extends Component {
                 this.setState({
                     items,
                     selectedScenario: scenarioId,
-                    selectedScenarioLabel: selectedText,
-                    currentScenario
+                    selectedScenarioLabel: selectedText
                 }, () => {
-                    console.log("currentScenario---", this.state.currentScenario);
+                    // console.log("currentScenario---", this.state.currentScenario);
                 });
             } else {
                 this.setState({
@@ -3935,6 +3946,7 @@ export default class BuildTree extends Component {
     };
     onCursoChanged(event, data) {
         // this.setState({ openAddNodeModal: true });
+        console.log("this.state.selectedScenario---",this.state.selectedScenario);
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
@@ -3948,18 +3960,13 @@ export default class BuildTree extends Component {
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
-                //         title: item.title,
-                //         config: {
-                //             ...config,
-                //             // highlightItem: item.id,
-                //             // cursorItem: item.id
-                //         },
+                currentScenario : (data.context.payload.nodeDataMap[this.state.selectedScenario])[0],
                 highlightItem: item.id,
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 var scenarioId = this.state.selectedScenario;
-                console.log("highlighted item---", this.state.currentItemConfig.context)
+                console.log("highlighted item---", this.state.currentScenario)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
@@ -5033,6 +5040,7 @@ export default class BuildTree extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
+                                className="ReadonlyPicker"
                             >
                                 <MonthBox value={this.makeText(this.state.singleValue2)}
                                     onClick={this.handleClickMonthBox2} />
@@ -6310,14 +6318,14 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong> {this.state.activeTab1[0] === '2' && <> {
-                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
-                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
-                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
+                        <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
                                         )))}
-                            <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
+                            <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                         <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
