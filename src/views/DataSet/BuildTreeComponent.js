@@ -441,25 +441,23 @@ export default class BuildTree extends Component {
         })
     }
     buildMomJexcelPercent() {
-        var parentStartValue  = this.state.parentScenario.calculatedDataValue;
-        console.log("parentStartValue---",parentStartValue)
+
+        var parentStartValue = this.state.parentScenario.calculatedDataValue;
+        console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            // if (j == 0) {
+            // ata[1] = momList[j].startValue
             data[1] = momList[j].startValue
-            // } else {
-            //     data[1] = `=E${parseInt(j)}`
-            // }
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
             data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             data[5] = parentStartValue
             // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
-            data[6] = momList[j].calculatedValue
+            data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
         }
@@ -4223,8 +4221,8 @@ export default class BuildTree extends Component {
                     pointRadius: 0,
                     showInLegend: false,
                     yAxisID: 'B',
-                    // data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
-                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
+                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
+                    // data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
                 }
             )
 
