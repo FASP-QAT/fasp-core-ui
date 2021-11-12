@@ -281,6 +281,7 @@ const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
+const ModelingValidation=React.lazy(()=>import('../../views/Validations/ModelingValidations'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -299,6 +300,7 @@ const routes = [
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
+  {path:'/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation},
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', name: 'static.common.managetree', component: BuildTree },
@@ -1494,6 +1496,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Modeling Validations',
+                            url: '/validation/modelingValidation',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
