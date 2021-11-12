@@ -140,7 +140,7 @@ export function calculateModelingData(dataset, props) {
                                 var seasonalityNumber = (Number(endValueWMC) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                                 totalManualChange = Number(seasonalityNumber) + Number(nodeDataOverrideListFiltered[0].manualChange);
                             }
-                            endValueWMC += Number(totalManualChange);
+                            endValue += Number(totalManualChange);
                             var calculatedValue = 0;
                             var calculatedValueWMC = 0;
                             if (payload.nodeType.id == 2) {
