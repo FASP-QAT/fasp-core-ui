@@ -4529,7 +4529,7 @@ export default class CreateTreeTemplate extends Component {
                         },
                         shading: {
                             type: ShadingType.CLEAR,
-                            fill: "697069"
+                            fill: "651D32"
                         },
                         style: total != 100 ? "aside" : "",
                     }))
