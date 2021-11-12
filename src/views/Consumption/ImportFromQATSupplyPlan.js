@@ -71,6 +71,21 @@ export default class ImportFromQATSupplyPlan extends Component {
             message: '',
 
             progressPer: 0,
+
+            //step1
+            programId: '',
+            forecastProgramId: '',
+            programs: [],
+            datasetList: [],
+            startDate: '',
+            stopDate: '',
+            stepOneData: [],
+            versionId: '',
+            planningUnitListJexcel: [],
+            forecastProgramVersionId: '',
+
+            // step2
+            stepTwoData: [],
         }
 
         this.finishedStepOne = this.finishedStepOne.bind(this);
@@ -81,7 +96,21 @@ export default class ImportFromQATSupplyPlan extends Component {
         this.previousToStepTwo = this.previousToStepTwo.bind(this);
 
         this.removeMessageText = this.removeMessageText.bind(this);
+        this.updateStepOneData = this.updateStepOneData.bind(this);
     }
+
+    updateStepOneData(key, value) {
+        // let { program } = this.state;
+
+        this.setState({
+            [key]: value
+        },
+            () => {
+                // console.log("program---------->1", key + ' ------ ' + value);
+                // console.log("program---------->2", this.state);
+            })
+    }
+
     componentDidMount() {
 
         document.getElementById('stepOneImport').style.display = 'block';
@@ -199,10 +228,10 @@ export default class ImportFromQATSupplyPlan extends Component {
                                 <br></br>
                                 <div>
                                     <div id="stepOneImport">
-                                        <StepOneImport finishedStepOne={this.finishedStepOne} items={this.state}></StepOneImport>
+                                        <StepOneImport finishedStepOne={this.finishedStepOne} updateStepOneData={this.updateStepOneData} items={this.state}></StepOneImport>
                                     </div>
                                     <div id="stepTwoImport">
-                                        <StepTwoImport ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} items={this.state}></StepTwoImport>
+                                        <StepTwoImport ref='countryChild' finishedStepTwo={this.finishedStepTwo} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} items={this.state}></StepTwoImport>
                                     </div>
                                     <div id="stepThreeImport">
                                         <StepThreeImport ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></StepThreeImport>

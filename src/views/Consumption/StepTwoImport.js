@@ -50,25 +50,123 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             loading: false,
-            selSource: []
+            selSource: [],
+            programRegionList: [],
+            forecastProgramRegionList: []
 
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
 
     }
 
+    formSubmit = function () {
+
+        var validation = this.checkValidation();
+        console.log("validation------->", validation)
+        if (validation == true) {
+            // this.setState({ loading: true })
+            var tableJson = this.el.getJson(null, false);
+            console.log("tableJson---", tableJson);
+            let changedpapuList = [];
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+
+                let json = {
+
+                    supplyPlanRegionId: parseInt(map1.get("0")),
+                    isRegionInForecastProgram: parseInt(map1.get("2")),
+                    importRegion: parseInt(map1.get("3")),
 
 
-    checkValidation() {
+                    // capacityCbm: map1.get("2").replace(",", ""),
+                    // capacityCbm: map1.get("2").replace(/,/g, ""),
+                    // capacityCbm: this.el.getValueFromCoords(2, i).toString().replace(/,/g, ""),
+                    // capacityCbm: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                    // gln: (map1.get("3") === '' ? null : map1.get("3")),
+                    // active: map1.get("4"),
+                    // realmCountry: {
+                    //     realmCountryId: parseInt(map1.get("5"))
+                    // },
+                    // regionId: parseInt(map1.get("6"))
+                }
+                changedpapuList.push(json);
 
+            }
+            this.setState({
+                stepTwoData: changedpapuList,
+
+            }, () => {
+                this.props.finishedStepTwo();
+            })
+            this.props.updateStepOneData("stepTwoData", changedpapuList);
+            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+
+        } else {
+            console.log("Something went wrong");
+        }
+    }
+
+
+    checkValidation = function () {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+
+            //ForecastPlanningUnit
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+
+        }
+        return valid;
     }
 
 
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+
+        if (x == 3) {
+
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -89,17 +187,37 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     }
 
     filterData() {
-        let tempList = [];
-        tempList.push({ id: 1, v1: 'North', v2: 1 });
-        tempList.push({ id: 2, v1: 'South', v2: 2 });
+        // let tempList = [];
+        // tempList.push({ id: 1, v1: 'North', v2: 1 });
+        // tempList.push({ id: 2, v1: 'South', v2: 2 });
+
+        // this.setState({
+        //     selSource: tempList,
+        //     loading: true
+        // },
+        //     () => {
+        //         this.buildJexcel();
+        //     })
+
+        let programId = this.props.items.programId
+        let forecastProgramId = this.props.items.forecastProgramId
+        let programs = this.props.items.programs
+        let datasetList = this.props.items.datasetList
+
+        let selectedProgramObj = programs.filter(c => c.programId == programId)[0];
+        let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId)[0];
 
         this.setState({
-            selSource: tempList,
-            loading: true
+            programRegionList: selectedProgramObj.regionList,
+            forecastProgramRegionList: selectedForecastProgramObj.regionList,
+            selSource: selectedProgramObj.regionList,
         },
             () => {
                 this.buildJexcel();
             })
+        console.log("region--------->1", selectedProgramObj.regionList);
+        console.log("region--------->2", selectedForecastProgramObj.regionList);
+
     }
 
     buildJexcel() {
@@ -112,10 +230,18 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 data = [];
-                data[0] = papuList[j].id
-                // data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[1] = papuList[j].v1
-                data[2] = papuList[j].v2
+                data[0] = papuList[j].regionId
+                data[1] = getLabelText(papuList[j].label, this.state.lang)
+
+                let match = this.state.forecastProgramRegionList.filter(c => c.regionId == papuList[j].regionId);
+
+                if (match.length > 0) {
+                    data[2] = 1
+                    data[3] = ''
+                } else {
+                    data[2] = 0
+                    data[3] = ''
+                }
 
                 papuDataArr[count] = data;
                 count++;
@@ -160,17 +286,25 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: 'Supply plan regions',
                     type: 'text',
-                    // readOnly: true,
+                    readOnly: true,
                     textEditor: true,
                 },
                 {
                     title: 'Is region in forecast program?',
-                    // readOnly: true,
+                    readOnly: true,
                     type: 'dropdown',
-                    // source: this.state.forecastMethodTypeList,
                     source: [
+                        { id: 0, name: 'No' },
                         { id: 1, name: 'Yes' },
-                        { id: 2, name: 'No, data will not be imported' },
+                    ]
+                },
+                {
+                    title: 'Import?',
+                    type: 'dropdown',
+                    source: [
+                        { id: 1, name: 'Import' },
+                        { id: 2, name: 'Do not import' },
+                        { id: 3, name: 'No region to import into' },
                     ]
                 },
 
@@ -181,14 +315,25 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
 
-                    var id = rowData[0];
-                    if (id == 2) {// grade out
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                    var importRegion = rowData[3];
+                    if (importRegion == 2) {// fill color
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
                     } else {
-                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        // elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
+                    }
+
+                    if (importRegion == 3) {// grade out
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                    } else {
+
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
                     }
 
                 }
@@ -205,7 +350,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
-            // onchange: this.changed,
+            onchange: this.changed,
             // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -254,7 +399,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     </div>
                 </div>
                 <FormGroup>
-                    <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.props.finishedStepTwo()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                    <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                     &nbsp;
                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                     &nbsp;

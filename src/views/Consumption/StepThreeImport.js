@@ -31,12 +31,13 @@ import {
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
 import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js';
 import moment from "moment";
 
 
@@ -47,7 +48,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             loading: false,
-            selSource: []
+            selSource: [],
+            actualConsumptionData: [],
+            stepOneData: this.props.items.stepOneData,
+            datasetList: this.props.items.datasetList,
+            forecastProgramVersionId: this.props.items.forecastProgramVersionId,
+            forecastProgramId: this.props.items.forecastProgramId,
+            startDate: this.props.items.startDate,
+            stopDate: this.props.items.stopDate,
 
         }
         this.changed = this.changed.bind(this);
@@ -113,23 +121,101 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     filterData() {
-        let tempList = [];
-        tempList.push({ id: 1, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jan-21', v5: '0.694444', v6: '4250', v7: '2951.39', v8: '2951.39', v9: true });
-        tempList.push({ id: 2, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Feb-21', v5: '0.694444', v6: '4000', v7: '2777.78', v8: '3000.00', v9: true });
-        tempList.push({ id: 3, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Mar-21', v5: '0.694444', v6: '3850', v7: '2673.61', v8: '3100.00', v9: true });
-        tempList.push({ id: 4, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Apr-21', v5: '0.694444', v6: '4200', v7: '2916.67', v8: '', v9: true });
-        tempList.push({ id: 5, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'May-21', v5: '0.694444', v6: '4530', v7: '3145.83', v8: '', v9: true });
-        tempList.push({ id: 6, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jun-21', v5: '0.694444', v6: '4250', v7: '2951.39', v8: '', v9: true });
-        tempList.push({ id: 7, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jul-21', v5: '0.694444', v6: '4100', v7: '2847.22', v8: '', v9: true });
-        tempList.push({ id: 8, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '0.694444', v6: '3900', v7: '2708.33', v8: '', v9: true });
+        // let tempList = [];
+        // tempList.push({ id: 1, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jan-21', v5: '0.694444', v6: '4250', v7: '2951.39', v8: '2951.39', v9: true });
+        // tempList.push({ id: 2, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Feb-21', v5: '0.694444', v6: '4000', v7: '2777.78', v8: '3000.00', v9: true });
+        // tempList.push({ id: 3, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Mar-21', v5: '0.694444', v6: '3850', v7: '2673.61', v8: '3100.00', v9: true });
+        // tempList.push({ id: 4, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Apr-21', v5: '0.694444', v6: '4200', v7: '2916.67', v8: '', v9: true });
+        // tempList.push({ id: 5, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'May-21', v5: '0.694444', v6: '4530', v7: '3145.83', v8: '', v9: true });
+        // tempList.push({ id: 6, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jun-21', v5: '0.694444', v6: '4250', v7: '2951.39', v8: '', v9: true });
+        // tempList.push({ id: 7, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jul-21', v5: '0.694444', v6: '4100', v7: '2847.22', v8: '', v9: true });
+        // tempList.push({ id: 8, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '0.694444', v6: '3900', v7: '2708.33', v8: '', v9: true });
 
-        this.setState({
-            selSource: tempList,
-            loading: true
-        },
-            () => {
-                this.buildJexcel();
-            })
+        // this.setState({
+        //     selSource: tempList,
+        //     loading: true
+        // },
+        //     () => {
+        //         this.buildJexcel();
+        //     })
+
+        let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
+        let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
+
+        let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
+        let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
+
+        let ActualConsumptionDataInput = { "programId": 2442, "versionId": 1, "planningUnitIds": ["1074", "1082", "2802"], "startDate": "2018-01-01", "stopDate": "2021-12-01", "regionIds": ["70", "73", "74"] }
+
+        // let ActualConsumptionDataInput = {
+        //     programId: this.props.items.programId,
+        //     versionId: this.props.items.versionId,
+        //     planningUnitIds: supplyPlanPlanningUnitId,
+        //     startDate: this.props.items.startDate,
+        //     stopDate: this.props.items.stopDate,
+        //     regionIds: regionIds
+        // }
+
+        console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
+
+
+        ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("getActualConsumptionData------>", response.data);
+                    this.setState({
+                        actualConsumptionData: response.data,
+                        selSource: response.data
+                    }, () => {
+                        this.buildJexcel();
+                    })
+                } else {
+                    this.setState({
+                        actualConsumptionData: []
+                    });
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false, color: 'red'
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false, color: 'red'
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false, color: 'red'
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false, color: 'red'
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+
     }
 
     buildJexcel() {
@@ -141,18 +227,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
+                let stepOneSelectedObject = this.state.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
+                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
+
+                let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
+
                 data = [];
-                data[0] = papuList[j].id
-                // data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[1] = papuList[j].v1
-                data[2] = papuList[j].v2
-                data[3] = papuList[j].v3
-                data[4] = papuList[j].v4
-                data[5] = papuList[j].v5
-                data[6] = papuList[j].v6
-                data[7] = papuList[j].v7
-                data[8] = papuList[j].v8
-                data[9] = papuList[j].v9
+                data[0] = papuList[j].planningUnit.id
+                data[1] = stepOneSelectedObject.forecastPlanningUnitId
+                data[2] = getLabelText(papuList[j].region.label, this.state.lang)
+                data[3] = papuList[j].month
+                data[4] = stepOneSelectedObject.multiplier
+                data[5] = papuList[j].actualConsumption
+                data[6] = stepOneSelectedObject.multiplier * papuList[j].actualConsumption
+                data[7] = ''
+                data[8] = true
+                data[9] = (match.length > 0 ? 1 : 0)
 
                 papuDataArr[count] = data;
                 count++;
@@ -190,19 +280,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             columns: [
 
                 {
-                    title: 'id',
-                    type: 'hidden',
-                    readOnly: true
-                },
-                {
                     title: 'Supply plan planning unit',
-                    type: 'text',
-                    textEditor: true,
+                    type: 'dropdown',
+                    source: this.props.items.planningUnitListJexcel,
                 },
                 {
                     title: 'Forecasting planning Unit',
-                    type: 'text',
-                    textEditor: true,
+                    type: 'dropdown',
+                    source: this.props.items.planningUnitListJexcel,
                 },
                 {
                     title: 'Region',
@@ -211,8 +296,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: 'Month',
-                    type: 'text',
-                    textEditor: true,
+                    type: 'calendar',
+                    options: {
+                        format: JEXCEL_MONTH_PICKER_FORMAT,
+                        type: 'year-month-picker'
+                    }
                 },
                 {
                     title: 'Multiplier',
@@ -238,6 +326,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     title: 'Import?',
                     type: 'checkbox'
                 },
+                {
+                    title: 'duplicate',
+                    type: 'hidden'
+                },
 
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
@@ -246,9 +338,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
                 var rowData = elInstance.getRowData(y);
                 // console.log("elInstance---->", elInstance);
-                var id = rowData[0];
+                var id = rowData[9];
 
-                if (id == 1 || id == 2 || id == 3) {
+                if (id == 1) {
                     for (var i = 0; i < colArr.length; i++) {
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');

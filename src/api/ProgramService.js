@@ -211,5 +211,10 @@ class ProgramService {
         );
     }
 
+    getActualConsumptionData(json) {
+        return axios.post(`${API_URL}/api/program/actualConsumptionReport`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()
