@@ -41,6 +41,7 @@ import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
 import Draggable from 'react-draggable';
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import ModelingTypeService from "../../api/ModelingTypeService";
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
@@ -1215,7 +1216,7 @@ export default class CreateTreeTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [90, 80, 80, 80, 90, 90, 90, 90, 90],
+            colWidths: [90, 150, 80, 80, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -4494,8 +4495,9 @@ export default class CreateTreeTemplate extends Component {
                 <TabPane tabId="2">
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
-                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
                             </a>
                         </div>
@@ -4522,7 +4524,7 @@ export default class CreateTreeTemplate extends Component {
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Start Month<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
-                        <FormGroup className="col-md-4 pl-lg-0">
+                        <FormGroup className="col-md-4 pl-lg-0 ">
                             <Picker
                                 ref={this.pickAMonth2}
                                 years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
@@ -4530,6 +4532,8 @@ export default class CreateTreeTemplate extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
+                                className="ReadonlyPicker"
+    
                             >
                                 <MonthBox value={this.makeText(this.state.singleValue2)}
                                     onClick={this.handleClickMonthBox2} />
@@ -5840,14 +5844,14 @@ export default class CreateTreeTemplate extends Component {
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <> {
-                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
-                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
-                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
+                        <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
                                         )))}
-                            <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
+                            <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                         <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
