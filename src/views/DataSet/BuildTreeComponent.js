@@ -441,6 +441,8 @@ export default class BuildTree extends Component {
         })
     }
     buildMomJexcelPercent() {
+        var parentStartValue  = this.state.parentScenario.calculatedDataValue;
+        console.log("parentStartValue---",parentStartValue)
         var momList = this.state.momListPer;
         var dataArray = [];
         let count = 0;
@@ -455,7 +457,7 @@ export default class BuildTree extends Component {
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
             data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = momList[j].sexuallyActiveMenMonthEnd
+            data[5] = parentStartValue
             // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             data[6] = momList[j].calculatedValue
             dataArray[count] = data;
