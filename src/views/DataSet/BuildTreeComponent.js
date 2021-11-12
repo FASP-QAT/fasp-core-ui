@@ -554,12 +554,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = momList[j].monthStartNoSeasonality
-            data[2] = momList[j].calculatedChange
-            data[3] = momList[j].monthEndNoSeasonality
+            data[1] = momList[j].startValue
+            data[2] = momList[j].difference
+            data[3] = momList[j].calculatedValue
             data[4] = momList[j].seasonalityIndex
             data[5] = momList[j].manualChange
-            data[6] = momList[j].monthEnd
+            data[6] = momList[j].endValue
             dataArray[count] = data;
             count++;
         }
@@ -696,12 +696,16 @@ export default class BuildTree extends Component {
                     var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    console.log("hi bro", programJson)
-                }
-            }.bind(this)
-            this.setState({ showMomData: true }, () => {
-                this.buildMomJexcel();
-            });
+                    // console.log("hi bro", programJson.nodeDataModelingList)
+                    var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
+                    console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode}, () => {
+                        this.buildMomJexcel();
+                    });
+                }.bind(this)
+        }.bind(this)
+
         }
     }
     setStartAndStopDateOfProgram(dataSetId) {
@@ -4040,11 +4044,11 @@ export default class BuildTree extends Component {
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
-                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            // var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
-                            details.map(c => {
-                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            });
+                            // details.map(c => {
+                            //     infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            // });
                             return (infoToShow.join(' | '));
                         } else {
                             return (tooltipItems.yLabel.toLocaleString());
@@ -4087,7 +4091,7 @@ export default class BuildTree extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: false,
-                    data: this.state.momList.map((item, index) => (item.monthEnd > 0 ? item.monthEnd : null))
+                    data: this.state.momList.map((item, index) => (item.endValue > 0 ? item.endValue : null))
                 }
             )
 
