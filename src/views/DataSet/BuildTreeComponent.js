@@ -42,7 +42,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import Draggable from 'react-draggable';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
@@ -554,12 +554,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = momList[j].monthStartNoSeasonality
-            data[2] = momList[j].calculatedChange
-            data[3] = momList[j].monthEndNoSeasonality
+            data[1] = momList[j].startValue
+            data[2] = momList[j].difference
+            data[3] = momList[j].calculatedValue
             data[4] = momList[j].seasonalityIndex
             data[5] = momList[j].manualChange
-            data[6] = momList[j].monthEnd
+            data[6] = momList[j].endValue
             dataArray[count] = data;
             count++;
         }
@@ -3393,7 +3393,7 @@ export default class BuildTree extends Component {
         scenarioList = [...scenarioList, newTabObject];
         // console.log("tabList---", tabList1)
         this.setState({
-            selectedScenario : scenarioId,
+            selectedScenario: scenarioId,
             scenarioList,
             openAddScenarioModal: false
         }, () => {
