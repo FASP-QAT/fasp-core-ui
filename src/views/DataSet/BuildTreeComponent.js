@@ -3571,9 +3571,7 @@ export default class BuildTree extends Component {
                     console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
-                        currentScenario = (items[i].payload.nodeDataMap[scenarioId])[0];
                     } else {
-
                         var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                         var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
                         console.log("api parent value---", parentValue);
@@ -3588,10 +3586,9 @@ export default class BuildTree extends Component {
                 this.setState({
                     items,
                     selectedScenario: scenarioId,
-                    selectedScenarioLabel: selectedText,
-                    currentScenario
+                    selectedScenarioLabel: selectedText
                 }, () => {
-                    console.log("currentScenario---", this.state.currentScenario);
+                    // console.log("currentScenario---", this.state.currentScenario);
                 });
             } else {
                 this.setState({
@@ -3941,6 +3938,7 @@ export default class BuildTree extends Component {
     };
     onCursoChanged(event, data) {
         // this.setState({ openAddNodeModal: true });
+        console.log("this.state.selectedScenario---",this.state.selectedScenario);
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
@@ -3954,18 +3952,13 @@ export default class BuildTree extends Component {
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
-                //         title: item.title,
-                //         config: {
-                //             ...config,
-                //             // highlightItem: item.id,
-                //             // cursorItem: item.id
-                //         },
+                currentScenario : (data.context.payload.nodeDataMap[this.state.selectedScenario])[0],
                 highlightItem: item.id,
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 var scenarioId = this.state.selectedScenario;
-                console.log("highlighted item---", this.state.currentItemConfig.context)
+                console.log("highlighted item---", this.state.currentScenario)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
