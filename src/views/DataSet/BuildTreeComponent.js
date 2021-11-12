@@ -4074,7 +4074,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: grey,
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4185,7 +4185,7 @@ export default class BuildTree extends Component {
                 label: 'Men who use condoms (Month End)',
                 stack: 1,
                 yAxisID: 'A',
-                backgroundColor: '#D3D3D3',
+                backgroundColor: '#A7C6ED',
                 borderColor: grey,
                 pointBackgroundColor: grey,
                 pointBorderColor: '#fff',
@@ -4201,7 +4201,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#006789',
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -5068,11 +5068,13 @@ export default class BuildTree extends Component {
 
                         {this.state.showCalculatorFields &&
                             <>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                 <div className="row">
                                     {/* <div className="row"> */}
-                                    <FormGroup className="col-md-12 pt-lg-1">
+                                    {/* <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                         <Picker
@@ -5258,12 +5260,15 @@ export default class BuildTree extends Component {
 
                                 </FormGroup>
                                 {/* </div> */}
+                                </fieldset>
                             </>
                         }
 
                     </div>
                     {this.state.showMomData &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-5">
@@ -5327,10 +5332,13 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                     }
                     {this.state.showMomDataPercent &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row">
                                 <div id="momJexcelPer" className={"RowClickable"}>
                                 </div>
@@ -5349,6 +5357,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                     }
                 </TabPane>
