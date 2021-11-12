@@ -398,6 +398,7 @@ export default class ListTreeComponent extends Component {
                                                             name="templateId"
                                                             id="templateId"
                                                             bsSize="sm"
+                                                            className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
                                                             <option value="">{'+ Add Tree'}</option>
