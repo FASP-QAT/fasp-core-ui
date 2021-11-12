@@ -672,11 +672,11 @@ export default class BuildTree extends Component {
     }
 
     showMomData() {
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            this.setState({ showMomDataPercent: true }, () => {
-                this.buildMomJexcelPercent();
-            });
-        } else {
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     this.setState({ showMomDataPercent: true }, () => {
+        //         this.buildMomJexcelPercent();
+        //     });
+        // } else {
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -700,13 +700,21 @@ export default class BuildTree extends Component {
                     var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
                     console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
                     // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode}, () => {
-                        this.buildMomJexcel();
-                    });
+                    if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                        console.log("in if>>>>");
+                        this.setState({ showMomDataPercent: true ,showMomData: false ,momListPer: getMomDataForCurrentNode }, () => {
+                            this.buildMomJexcelPercent();
+                        });
+                    } else {
+                        console.log("in else>>>>");
+                        this.setState({ showMomDataPercent: false,showMomData: true, momList: getMomDataForCurrentNode }, () => {
+                            this.buildMomJexcel();
+                        });
+                    }
                 }.bind(this)
-        }.bind(this)
+            }.bind(this)
 
-        }
+        // }
     }
     setStartAndStopDateOfProgram(dataSetId) {
         // console.log("programId>>>", dataSetId);
