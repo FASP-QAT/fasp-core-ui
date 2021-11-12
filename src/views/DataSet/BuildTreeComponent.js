@@ -5039,6 +5039,7 @@ export default class BuildTree extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
+                                className="ReadonlyPicker"
                             >
                                 <MonthBox value={this.makeText(this.state.singleValue2)}
                                     onClick={this.handleClickMonthBox2} />
@@ -6316,14 +6317,14 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-lg '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong> {this.state.activeTab1[0] === '2' && <> {
-                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
-                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
-                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : "")
+                        <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
                                         )))}
-                            <b className="supplyplanformulas">{this.state.currentItemConfig.context.payload.label.label_en}</b></>}
+                            <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                         <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
