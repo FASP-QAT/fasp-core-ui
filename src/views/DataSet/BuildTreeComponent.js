@@ -42,7 +42,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import Draggable from 'react-draggable';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
@@ -441,21 +441,22 @@ export default class BuildTree extends Component {
         })
     }
     buildMomJexcelPercent() {
+
+        var parentStartValue = this.state.parentScenario.calculatedDataValue;
+        console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            if (j == 0) {
-                data[1] = momList[j].sexuallyActiveMenMonthStartPer
-            } else {
-                data[1] = `=E${parseInt(j)}`
-            }
-            data[2] = momList[j].calculatedChange
+            // ata[1] = momList[j].startValue
+            data[1] = momList[j].startValue
+            data[2] = momList[j].difference
             data[3] = momList[j].manualChange
             data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = momList[j].sexuallyActiveMenMonthEnd
+            data[5] = parentStartValue
+            // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -672,41 +673,49 @@ export default class BuildTree extends Component {
     }
 
     showMomData() {
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            this.setState({ showMomDataPercent: true }, () => {
-                this.buildMomJexcelPercent();
-            });
-        } else {
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
-                db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var program = transaction.objectStore('datasetData');
-                var getRequest = program.get(programId.toString());
-                getRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        //     this.setState({ showMomDataPercent: true }, () => {
+        //         this.buildMomJexcelPercent();
+        //     });
+        // } else {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.get(programId.toString());
+            getRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext')
+                });
+            };
+            getRequest.onsuccess = function (event) {
+                // console.log("hi",getRequest.result);
+                var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                // console.log("hi bro", programJson.nodeDataModelingList)
+                var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
+                console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+                // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                    console.log("in if>>>>");
+                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode }, () => {
+                        this.buildMomJexcelPercent();
                     });
-                };
-                getRequest.onsuccess = function (event) {
-                    // console.log("hi",getRequest.result);
-                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    // console.log("hi bro", programJson.nodeDataModelingList)
-                    var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
-                    console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
-                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode}, () => {
+                } else {
+                    console.log("in else>>>>");
+                    this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
                         this.buildMomJexcel();
                     });
-                }.bind(this)
+                }
+            }.bind(this)
         }.bind(this)
 
-        }
+        // }
     }
     setStartAndStopDateOfProgram(dataSetId) {
         // console.log("programId>>>", dataSetId);
@@ -3938,7 +3947,7 @@ export default class BuildTree extends Component {
     };
     onCursoChanged(event, data) {
         // this.setState({ openAddNodeModal: true });
-        console.log("this.state.selectedScenario---",this.state.selectedScenario);
+        console.log("this.state.selectedScenario---", this.state.selectedScenario);
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
@@ -3952,7 +3961,7 @@ export default class BuildTree extends Component {
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
-                currentScenario : (data.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+                currentScenario: (data.context.payload.nodeDataMap[this.state.selectedScenario])[0],
                 highlightItem: item.id,
                 cursorItem: item.id,
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0]
@@ -4213,6 +4222,7 @@ export default class BuildTree extends Component {
                     showInLegend: false,
                     yAxisID: 'B',
                     data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
+                    // data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
                 }
             )
 
