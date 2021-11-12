@@ -449,17 +449,14 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            // if (j == 0) {
+            // ata[1] = momList[j].startValue
             data[1] = momList[j].startValue
-            // } else {
-            //     data[1] = `=E${parseInt(j)}`
-            // }
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
             data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             data[5] = parentStartValue
             // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
-            data[6] = momList[j].calculatedValue
+            data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
         }
@@ -4120,7 +4117,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: grey,
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4231,7 +4228,7 @@ export default class BuildTree extends Component {
                 label: 'Men who use condoms (Month End)',
                 stack: 1,
                 yAxisID: 'A',
-                backgroundColor: '#D3D3D3',
+                backgroundColor: '#A7C6ED',
                 borderColor: grey,
                 pointBackgroundColor: grey,
                 pointBorderColor: '#fff',
@@ -4247,7 +4244,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#006789',
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4258,8 +4255,8 @@ export default class BuildTree extends Component {
                     pointRadius: 0,
                     showInLegend: false,
                     yAxisID: 'B',
-                    // data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
-                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
+                    data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
+                    // data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
                 }
             )
 
@@ -5116,11 +5113,13 @@ export default class BuildTree extends Component {
 
                         {this.state.showCalculatorFields &&
                             <>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                 <div className="row">
                                     {/* <div className="row"> */}
-                                    <FormGroup className="col-md-12 pt-lg-1">
+                                    {/* <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                         <Picker
@@ -5306,12 +5305,15 @@ export default class BuildTree extends Component {
 
                                 </FormGroup>
                                 {/* </div> */}
+                                </fieldset>
                             </>
                         }
 
                     </div>
                     {this.state.showMomData &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-5">
@@ -5375,10 +5377,13 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                     }
                     {this.state.showMomDataPercent &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row">
                                 <div id="momJexcelPer" className={"RowClickable"}>
                                 </div>
@@ -5397,6 +5402,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                     }
                 </TabPane>
