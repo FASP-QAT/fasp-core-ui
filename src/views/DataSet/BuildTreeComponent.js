@@ -699,11 +699,12 @@ export default class BuildTree extends Component {
                     // console.log("hi bro", programJson.nodeDataModelingList)
                     var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
                     console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
-                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode }, () => {
+                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+                    this.setState({ showMomData: true, momList: getMomDataForCurrentNode}, () => {
                         this.buildMomJexcel();
                     });
                 }.bind(this)
-            }.bind(this)
+        }.bind(this)
 
         }
     }
@@ -4029,11 +4030,11 @@ export default class BuildTree extends Component {
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
-                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            // var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
-                            details.map(c => {
-                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            });
+                            // details.map(c => {
+                            //     infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            // });
                             return (infoToShow.join(' | '));
                         } else {
                             return (tooltipItems.yLabel.toLocaleString());
@@ -4076,7 +4077,7 @@ export default class BuildTree extends Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: false,
-                    data: this.state.momList.map((item, index) => (item.monthEnd > 0 ? item.monthEnd : null))
+                    data: this.state.momList.map((item, index) => (item.endValue > 0 ? item.endValue : null))
                 }
             )
 
