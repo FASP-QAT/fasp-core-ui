@@ -16,7 +16,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, Popover, PopoverHeader, PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, Popover, PopoverHeader, PopoverBody, ModalBody, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input,Fieldset, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -3550,7 +3550,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: grey,
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -3661,7 +3661,7 @@ export default class CreateTreeTemplate extends Component {
                 label: 'Men who use condoms (Month End)',
                 stack: 1,
                 yAxisID: 'A',
-                backgroundColor: '#D3D3D3',
+                backgroundColor: '#A7C6ED',
                 borderColor: grey,
                 pointBackgroundColor: grey,
                 pointBorderColor: '#fff',
@@ -3677,7 +3677,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#006789',
+                    borderColor: '#002F6C',
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -4573,12 +4573,13 @@ export default class CreateTreeTemplate extends Component {
 
 
                         {this.state.showCalculatorFields &&
-                            <>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                 <div className="row">
                                     {/* <div className="row"> */}
-                                    <FormGroup className="col-md-12 pt-lg-1">
+                                    {/* <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                         <Picker
@@ -4778,14 +4779,17 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
                                 </FormGroup>
-                                {/* </div> */}
-                            </>
+                                
+                            </fieldset>
                         }
 
                     </div>
                     {this.state.showMomData &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
+                            
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-5">
                                         <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
@@ -4836,6 +4840,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                 </div>
+                               
                             </div>
 
                             <div className="row pl-lg-0 pt-lg-3">
@@ -4846,10 +4851,13 @@ export default class CreateTreeTemplate extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                     }
                     {this.state.showMomDataPercent &&
                         <div>
+                            <fieldset className="scheduler-border">
+                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-5">
@@ -4895,6 +4903,8 @@ export default class CreateTreeTemplate extends Component {
                                     </div>
                                 </div>
                             </div>
+                            </fieldset>
+                            
                         </div>
                     }
                 </TabPane>
