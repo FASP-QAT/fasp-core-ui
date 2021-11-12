@@ -2088,63 +2088,63 @@ export default class BuildTree extends Component {
             console.log("parent unit id===", this.state.usageTypeParent);
         });
     }
-    getUsageTemplateList() {
-        var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
-        console.log("tracerCategoryId---", tracerCategoryId);
-        UsageTemplateService.getUsageTemplateListForTree(tracerCategoryId).then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-                usageTemplateList: listArray
-            }, () => {
-                console.log(" get uasge template--------------", response.data);
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+    // getUsageTemplateList() {
+    //     var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
+    //     console.log("tracerCategoryId---", tracerCategoryId);
+    //     UsageTemplateService.getUsageTemplateListForTree(tracerCategoryId).then(response => {
+    //         var listArray = response.data;
+    //         listArray.sort((a, b) => {
+    //             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+    //             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+    //             return itemLabelA > itemLabelB ? 1 : -1;
+    //         });
+    //         this.setState({
+    //             usageTemplateList: listArray
+    //         }, () => {
+    //             console.log(" get uasge template--------------", response.data);
+    //         })
+    //     })
+    //         .catch(
+    //             error => {
+    //                 if (error.message === "Network Error") {
+    //                     this.setState({
+    //                         message: 'static.unkownError',
+    //                         loading: false
+    //                     });
+    //                 } else {
+    //                     switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
+    //                         case 401:
+    //                             this.props.history.push(`/login/static.message.sessionExpired`)
+    //                             break;
+    //                         case 403:
+    //                             this.props.history.push(`/accessDenied`)
+    //                             break;
+    //                         case 500:
+    //                         case 404:
+    //                         case 406:
+    //                             this.setState({
+    //                                 message: error.response.data.messageCode,
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                         case 412:
+    //                             this.setState({
+    //                                 message: error.response.data.messageCode,
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                         default:
+    //                             this.setState({
+    //                                 message: 'static.unkownError',
+    //                                 loading: false
+    //                             });
+    //                             break;
+    //                     }
+    //                 }
+    //             }
+    //         );
+    // }
 
     copyDataFromUsageTemplate(event) {
         var usageTemplate = (this.state.usageTemplateList.filter(c => c.usageTemplateId == event.target.value))[0];
@@ -2336,7 +2336,7 @@ export default class BuildTree extends Component {
                         var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
                         var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
                     } else {
-                        var selectedText3 = this.state.currentScenario.fuNode.repeatUsagePeriod.label.label_en;
+                        var selectedText3 = this.state.currentScenario.fuNode.repeatUsagePeriod != null ? this.state.currentScenario.fuNode.repeatUsagePeriod.label.label_en : '';
                     }
 
 
@@ -2755,34 +2755,35 @@ export default class BuildTree extends Component {
         }.bind(this)
     }
 
-    getUsageTemplateList() {
-        // const lan = 'en';
-        // var db1;
-        // var storeOS;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var planningunitTransaction = db1.transaction(['usageTemplate'], 'readwrite');
-        //     var planningunitOs = planningunitTransaction.objectStore('usageTemplate');
-        //     var planningunitRequest = planningunitOs.getAll();
-        //     var planningList = []
-        //     planningunitRequest.onerror = function (event) {
-        //         // Handle errors!
-        //     };
-        //     planningunitRequest.onsuccess = function (e) {
-        //         var myResult = [];
-        //         myResult = planningunitRequest.result;
-        //         var proList = []
-        //         console.log("myResult===============6", myResult)
+    getUsageTemplateList(tracerCategoryId) {
+        console.log("tracerCategoryId---",tracerCategoryId);
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('usageTemplate');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                var proList = []
+                console.log("myResult===============6", myResult)
 
-        //         this.setState({
-        //             usageTemplateList: myResult
-        //         }, () => {
+                this.setState({
+                    usageTemplateList: tracerCategoryId != "" ? myResult.filter(c => c.tracerCategory.id == tracerCategoryId) : myResult
+                }, () => {
 
-        //         })
-        //     }.bind(this);
-        // }.bind(this)
+                })
+            }.bind(this);
+        }.bind(this)
     }
 
     getForecastingUnitListByTracerCategory(tracerCategoryId) {
@@ -3721,7 +3722,7 @@ export default class BuildTree extends Component {
         if (event.target.name === "tracerCategoryId") {
             console.log("currentItemConfig---", currentItemConfig);
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
-            this.getUsageTemplateList();
+            this.getUsageTemplateList(event.target.value);
         }
 
         if (event.target.name === "noOfPersons") {
@@ -3747,7 +3748,26 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "repeatUsagePeriodId") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId = event.target.value;
+            var repeatUsagePeriodId = '';
+            if (event.target.value != "") {
+                var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
+                repeatUsagePeriodId = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
+            }
+            if ((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod != null) {
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId = event.target.value;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.label.label_en = repeatUsagePeriodId;
+            } else {
+                var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
+                var repeatUsagePeriod = {
+                    usagePeriodId: event.target.value,
+                    label: {
+                        label_en: repeatUsagePeriodId
+                    }
+                }
+                fuNode.repeatUsagePeriod = repeatUsagePeriod;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
+            }
+
             this.getNoFURequired();
             this.getUsageText();
         }
@@ -5113,198 +5133,198 @@ export default class BuildTree extends Component {
 
                         {this.state.showCalculatorFields &&
                             <>
-                            <fieldset className="scheduler-border">
-                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                                <div className="row">
-                                    {/* <div className="row"> */}
-                                    {/* <FormGroup className="col-md-12 pt-lg-1">
+                                <fieldset className="scheduler-border">
+                                    <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                    <div className="row">
+                                        {/* <div className="row"> */}
+                                        {/* <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
                                     </FormGroup> */}
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
-                                        <Picker
-                                            ref={this.pickAMonth2}
-                                            years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
-                                            // value={this.state.singleValue2}
-                                            value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
-                                            lang={pickerLang.months}
-                                            onChange={this.handleAMonthChange2}
-                                            onDismiss={this.handleAMonthDissmis2}
-                                        >
-                                            <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
-                                        </Picker>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="startValue"
-                                            name="startValue"
-                                            bsSize="sm"
-                                            readOnly={true}
-                                            value={this.state.currentScenario.calculatedDataValue}
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
+                                            <Picker
+                                                ref={this.pickAMonth2}
+                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                // value={this.state.singleValue2}
+                                                value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
+                                                lang={pickerLang.months}
+                                                onChange={this.handleAMonthChange2}
+                                                onDismiss={this.handleAMonthDissmis2}
+                                            >
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                            </Picker>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="startValue"
+                                                name="startValue"
+                                                bsSize="sm"
+                                                readOnly={true}
+                                                value={this.state.currentScenario.calculatedDataValue}
 
-                                        >
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="startPercentage"
-                                            name="startPercentage"
-                                            bsSize="sm"
-                                            readOnly={true}
-                                            value={this.state.currentScenario.dataValue}
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="startPercentage"
+                                                name="startPercentage"
+                                                bsSize="sm"
+                                                readOnly={true}
+                                                value={this.state.currentScenario.dataValue}
 
-                                        >
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    }
-                                    {/* </div> */}
-                                    {/* <div className="row"> */}
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
-                                        <Picker
-                                            ref={this.pickAMonth2}
-                                            years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
-                                            // value={this.state.singleValue2}
-                                            value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
-                                            lang={pickerLang.months}
-                                            onChange={this.handleAMonthChange2}
-                                            onDismiss={this.handleAMonthDissmis2}
-                                        >
-                                            <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
-                                        </Picker>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    <FormGroup className="col-md-5">
-                                        <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="currentEndValue"
-                                            name="currentEndValue"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
-                                            value={this.state.currentEndValue}
-                                            readOnly={this.state.currentEndValueEdit}
-                                        >
-                                        </Input>
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        }
+                                        {/* </div> */}
+                                        {/* <div className="row"> */}
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                            <Picker
+                                                ref={this.pickAMonth2}
+                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                // value={this.state.singleValue2}
+                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
+                                                lang={pickerLang.months}
+                                                onChange={this.handleAMonthChange2}
+                                                onDismiss={this.handleAMonthDissmis2}
+                                            >
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                            </Picker>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-5">
+                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="currentEndValue"
+                                                name="currentEndValue"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
+                                                value={this.state.currentEndValue}
+                                                readOnly={this.state.currentEndValueEdit}
+                                            >
+                                            </Input>
 
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    <FormGroup className="col-md-1 mt-lg-4">
-                                        <Label htmlFor="currencyId">or</Label>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-5">
-                                        <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="currentTargetChangePercentage"
-                                            name="currentTargetChangePercentage"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInPercent(e) }}
-                                            value={this.state.currentTargetChangePercentage}
-                                            readOnly={this.state.currentTargetChangePercentageEdit}
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-1 mt-lg-4">
+                                            <Label htmlFor="currencyId">or</Label>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-5">
+                                            <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="currentTargetChangePercentage"
+                                                name="currentTargetChangePercentage"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInPercent(e) }}
+                                                value={this.state.currentTargetChangePercentage}
+                                                readOnly={this.state.currentTargetChangePercentageEdit}
 
-                                        >
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-1 mt-lg-4">
-                                        <Label htmlFor="currencyId">or</Label>
-                                    </FormGroup>
-                                    }
-                                    {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                    {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="currentTargetChangeNumber"
-                                            name="currentTargetChangeNumber"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
-                                            value={this.state.currentTargetChangeNumber}
-                                            readOnly={this.state.currentTargetChangeNumberEdit}
-                                        >
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    }
-                                </div>
-                                <div className="row col-md-12 pl-lg-0">
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="calculatedMomChange"
-                                            name="calculatedMomChange"
-                                            bsSize="sm"
-                                            readOnly={true}
-                                            value={this.state.currentCalculatedMomChange}>
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6"></FormGroup>
-                                    <FormGroup className="col-md-6" >
-                                        <div className="check inline  pl-lg-1 pt-lg-2">
-                                            {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
-                                                <Input
-                                                    className="form-check-input checkboxMargin"
-                                                    type="radio"
-                                                    id="active1"
-                                                    name="modelingType"
-                                                    checked={this.state.currentModelingType == 4 ? true : false}
-                                                // onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{'Exponential (%)'}</b>
-                                                </Label>
-                                            </div>}
-                                            <div className="col-md-12 form-group">
-                                                <Input
-                                                    className="form-check-input Radioactive checkboxMargin"
-                                                    type="radio"
-                                                    id="active2"
-                                                    name="modelingType"
-                                                    checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
-                                                // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{'Linear (%)'}</b>
-                                                </Label>
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-1 mt-lg-4">
+                                            <Label htmlFor="currencyId">or</Label>
+                                        </FormGroup>
+                                        }
+                                        {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="currentTargetChangeNumber"
+                                                name="currentTargetChangeNumber"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
+                                                value={this.state.currentTargetChangeNumber}
+                                                readOnly={this.state.currentTargetChangeNumberEdit}
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        }
+                                    </div>
+                                    <div className="row col-md-12 pl-lg-0">
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="calculatedMomChange"
+                                                name="calculatedMomChange"
+                                                bsSize="sm"
+                                                readOnly={true}
+                                                value={this.state.currentCalculatedMomChange}>
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6"></FormGroup>
+                                        <FormGroup className="col-md-6" >
+                                            <div className="check inline  pl-lg-1 pt-lg-2">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="radio"
+                                                        id="active1"
+                                                        name="modelingType"
+                                                        checked={this.state.currentModelingType == 4 ? true : false}
+                                                    // onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Exponential (%)'}</b>
+                                                    </Label>
+                                                </div>}
+                                                <div className="col-md-12 form-group">
+                                                    <Input
+                                                        className="form-check-input Radioactive checkboxMargin"
+                                                        type="radio"
+                                                        id="active2"
+                                                        name="modelingType"
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
+                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Linear (%)'}</b>
+                                                    </Label>
+                                                </div>
+                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="radio"
+                                                        id="active3"
+                                                        name="modelingType"
+                                                        checked={this.state.currentModelingType == 2 ? true : false}
+                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Linear (#)'}</b>
+                                                    </Label>
+                                                </div>}
                                             </div>
-                                            {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
-                                                <Input
-                                                    className="form-check-input checkboxMargin"
-                                                    type="radio"
-                                                    id="active3"
-                                                    name="modelingType"
-                                                    checked={this.state.currentModelingType == 2 ? true : false}
-                                                // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{'Linear (#)'}</b>
-                                                </Label>
-                                            </div>}
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                    </FormGroup>
-                                </div>
-                                <FormGroup className="col-md-12">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({
-                                            showCalculatorFields: false
-                                        });
-                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                        </FormGroup>
+                                    </div>
+                                    <FormGroup className="col-md-12">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                            this.setState({
+                                                showCalculatorFields: false
+                                            });
+                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
 
-                                </FormGroup>
-                                {/* </div> */}
+                                    </FormGroup>
+                                    {/* </div> */}
                                 </fieldset>
                             </>
                         }
@@ -5313,95 +5333,95 @@ export default class BuildTree extends Component {
                     {this.state.showMomData &&
                         <div>
                             <fieldset className="scheduler-border">
-                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                            <div className="row pl-lg-2 pr-lg-2">
-                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                    <div className="col-md-5">
-                                        <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
-                                    </div>
-                                    <div className="col-md-5 float-right pl-lg-5">
-                                        <FormGroup className="" >
-                                            <div className="check inline  pl-lg-1 pt-lg-0">
-                                                <div>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="manualChange"
-                                                        name="manualChange"
-                                                        // checked={true}
-                                                        checked={this.state.manualChange}
-                                                        onClick={(e) => { this.momCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Manual Change affects future month'}</b>
-                                                    </Label>
+                                <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                <div className="row pl-lg-2 pr-lg-2">
+                                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                        <div className="col-md-5">
+                                            <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                        </div>
+                                        <div className="col-md-5 float-right pl-lg-5">
+                                            <FormGroup className="" >
+                                                <div className="check inline  pl-lg-1 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="manualChange"
+                                                            name="manualChange"
+                                                            // checked={true}
+                                                            checked={this.state.manualChange}
+                                                            onClick={(e) => { this.momCheckbox(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Manual Change affects future month'}</b>
+                                                        </Label>
+                                                    </div>
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="seasonality"
+                                                            name="seasonality"
+                                                            // checked={true}
+                                                            checked={this.state.seasonality}
+                                                            onClick={(e) => { this.momCheckbox(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Show Seasonality & manual change'}</b>
+                                                        </Label>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="seasonality"
-                                                        name="seasonality"
-                                                        // checked={true}
-                                                        checked={this.state.seasonality}
-                                                        onClick={(e) => { this.momCheckbox(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Show Seasonality & manual change'}</b>
-                                                    </Label>
-                                                </div>
-                                            </div>
-                                        </FormGroup>
+                                            </FormGroup>
+                                        </div>
                                     </div>
-                                </div>
-                                <div id="momJexcel">
-                                </div>
-                                <div className="col-md-12 pr-lg-0">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({ showMomData: false })
-                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
-
-                                </div>
-                            </div>
-
-                            <div className="row pl-lg-0 pt-lg-3">
-                                <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                    <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                    <div>
+                                    <div id="momJexcel">
+                                    </div>
+                                    <div className="col-md-12 pr-lg-0">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                            this.setState({ showMomData: false })
+                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
                                 </div>
-                            </div>
+
+                                <div className="row pl-lg-0 pt-lg-3">
+                                    <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                        <div>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </fieldset>
                         </div>
                     }
                     {this.state.showMomDataPercent &&
                         <div>
                             <fieldset className="scheduler-border">
-                            <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                            <div className="row">
-                                <div id="momJexcelPer" className={"RowClickable"}>
-                                </div>
-                                <div className="col-md-12 pr-lg-0">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
-
-                                </div>
-                            </div>
-
-                            <div className="row pl-lg-0 pt-lg-3">
-                                <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                    <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
-                                    <div>
+                                <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                <div className="row">
+                                    <div id="momJexcelPer" className={"RowClickable"}>
+                                    </div>
+                                    <div className="col-md-12 pr-lg-0">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
                                 </div>
-                            </div>
+
+                                <div className="row pl-lg-0 pt-lg-3">
+                                    <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                        <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
+                                        <div>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </fieldset>
                         </div>
                     }
