@@ -2040,8 +2040,9 @@ export default class CreateTreeTemplate extends Component {
                 selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
             } else {
                 // take everything from object
-                console.log(">>>>", this.state.currentItemConfig);
-                selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
+                // console.log(">>>>", this.state.currentItemConfig);
+                // console.log("node unit List>>>", this.state.nodeUnitList);
+                selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
             }
 
             if (this.state.addNodeFlag) {
@@ -2091,8 +2092,8 @@ export default class CreateTreeTemplate extends Component {
             }
         } else {
             //PU
-            console.log("pu>>>", this.state.currentItemConfig);
-            console.log("puList>>>", this.state.planningUnitList);
+            // console.log("pu>>>", this.state.currentItemConfig);
+            // console.log("puList>>>", this.state.planningUnitList);
             if (this.state.addNodeFlag) {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
@@ -3070,13 +3071,16 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
             var calculatedDataValue;
             var parentValue;
+            var parentValue1;
             if (this.state.addNodeFlag !== "true") {
-                parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue
+                parentValue1 = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue;
             } else {
-                parentValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue
+                parentValue1 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             }
+
             console.log("parentValue---", parentValue);
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = (event.target.value * parentValue) / 100
+            parentValue = (parentValue1).toString().replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * event.target.value) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue
@@ -3823,7 +3827,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                         </FormGroup>}
-                                    <FormGroup>
+                                    {this.state.currentItemConfig.context.payload.nodeType.id != 1 && <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -3842,8 +3846,9 @@ export default class CreateTreeTemplate extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
+                                    }
 
-                                    {this.state.numberNode &&
+                                    {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
                                         <>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
@@ -3867,10 +3872,10 @@ export default class CreateTreeTemplate extends Component {
                                                     bsSize="sm"
                                                     readOnly={true}
                                                     onChange={(e) => { this.dataChange(e) }}
-                                                    value={this.state.addNodeFlag != "true" ? addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas(this.state.parentValue)}
+                                                    value={this.state.addNodeFlag != "true" ? addCommas(this.state.currentItemConfig.parentItem != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : '') : addCommas(this.state.parentValue)}
                                                 ></Input>
                                             </FormGroup></>}
-                                    {this.state.aggregationNode &&
+                                    {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
                                         <FormGroup>
                                             <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
@@ -4495,7 +4500,7 @@ export default class CreateTreeTemplate extends Component {
                 <TabPane tabId="2">
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
-                        <SupplyPlanFormulas ref="formulaeChild" />
+                            <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
@@ -4533,7 +4538,7 @@ export default class CreateTreeTemplate extends Component {
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                                 className="ReadonlyPicker"
-    
+
                             >
                                 <MonthBox value={this.makeText(this.state.singleValue2)}
                                     onClick={this.handleClickMonthBox2} />
