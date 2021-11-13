@@ -446,6 +446,7 @@ export default class BuildTree extends Component {
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
         this.openScenarioModal = this.openScenarioModal.bind(this);
         this.getStartValueForMonth = this.getStartValueForMonth.bind(this);
+        this.getRegionList = this.getRegionList.bind(this);
     }
 
     getStartValueForMonth(dateValue) {
@@ -1135,6 +1136,33 @@ export default class BuildTree extends Component {
         this.setState({
             sameLevelNodeList
         });
+    }
+    getRegionList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['region'], 'readwrite');
+            var program = transaction.objectStore('region');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                this.setState({
+                    regionList: myResult
+                });
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("myResult--->", myResult[i])
+
+                }
+
+            }.bind(this);
+        }.bind(this);
     }
 
     getModelingTypeList() {
@@ -2897,6 +2925,7 @@ export default class BuildTree extends Component {
             this.getNodeTyeList();
             this.getDatasetList();
             this.getModelingTypeList();
+            this.getRegionList();
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -4452,14 +4481,16 @@ export default class BuildTree extends Component {
                                                 name="month"
                                                 ref={this.pickAMonth1}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                value={{ year: 
-                                                    new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) }}
+                                                value={{
+                                                    year:
+                                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                }}
                                                 lang={pickerLang.months}
                                                 // theme="dark"
                                                 onChange={this.handleAMonthChange1}
                                                 onDismiss={this.handleAMonthDissmis1}
                                             >
-                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
                                                     onClick={this.handleClickMonthBox1} />
                                             </Picker>
                                         </div>
