@@ -2434,80 +2434,132 @@ export default class BuildTree extends Component {
         var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
         var scenarioId = this.state.selectedScenario;
         console.log("tracerCategoryId---", tracerCategoryId)
-        ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
-            console.log("fu list---", response.data)
+        // ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
+        //     console.log("fu list---", response.data)
 
-            var autocompleteData = [];
-            for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
-            }
-            this.setState({
-                autocompleteData,
-                forecastingUnitList: response.data
-            }, () => {
-                if (response.data.length == 1) {
-                    const currentItemConfig = this.state.currentItemConfig;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + " | " + response.data[0].label.label_en;
-                    this.setState({
-                        currentItemConfig: currentItemConfig
-                    }, () => {
-                        this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
-                    })
-                } else {
-                    const currentItemConfig = this.state.currentItemConfig;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
-                    this.setState({
-                        currentItemConfig: currentItemConfig
+        //     var autocompleteData = [];
+        //     for (var i = 0; i < response.data.length; i++) {
+        //         autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
+        //     }
+        //     this.setState({
+        //         autocompleteData,
+        //         forecastingUnitList: response.data
+        //     }, () => {
+        //         if (response.data.length == 1) {
+        //             const currentItemConfig = this.state.currentItemConfig;
+        //             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
+        //             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + " | " + response.data[0].label.label_en;
+        //             this.setState({
+        //                 currentItemConfig: currentItemConfig
+        //             }, () => {
+        //                 this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
+        //             })
+        //         } else {
+        //             const currentItemConfig = this.state.currentItemConfig;
+        //             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
+        //             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
+        //             this.setState({
+        //                 currentItemConfig: currentItemConfig
 
-                    }, () => {
+        //             }, () => {
 
-                    })
+        //             })
+        //         }
+        //     })
+        // })
+        //     .catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({
+        //                     message: 'static.unkownError',
+        //                     loading: false
+        //                 });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+
+        //                     case 401:
+        //                         this.props.history.push(`/login/static.message.sessionExpired`)
+        //                         break;
+        //                     case 403:
+        //                         this.props.history.push(`/accessDenied`)
+        //                         break;
+        //                     case 500:
+        //                     case 404:
+        //                     case 406:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     case 412:
+        //                         this.setState({
+        //                             message: error.response.data.messageCode,
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                     default:
+        //                         this.setState({
+        //                             message: 'static.unkownError',
+        //                             loading: false
+        //                         });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['forecastingUnit'], 'readwrite');
+            var program = transaction.objectStore('forecastingUnit');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var newResult = myResult.filter(x => x.tracerCategory.id == tracerCategoryId);
+                var autocompleteData = [];
+                for (var i = 0; i < newResult.length; i++) {
+                    autocompleteData[i] = { value: newResult[i].forecastingUnitId, label: newResult[i].label.label_en + " [" + newResult[i].forecastingUnitId + "]" }
                 }
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
+                this.setState({
+                    autocompleteData,
+                    forecastingUnitList: newResult
+                }, () => {
+
+                    if (newResult.length == 1) {
+                        const currentItemConfig = this.state.currentItemConfig;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = newResult[0].forecastingUnitId;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = newResult[0].forecastingUnitId + " | " + newResult[0].label.label_en;
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
+                            currentItemConfig: currentItemConfig
+                        }, () => {
+                            this.getForecastingUnitUnitByFUId(newResult[0].forecastingUnitId);
+                        })
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        const currentItemConfig = this.state.currentItemConfig;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
+                        this.setState({
+                            currentItemConfig: currentItemConfig
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
+                        }, () => {
+
+                        })
                     }
-                }
-            );
+                });
+                for (var i = 0; i < newResult.length; i++) {
+                    console.log("newResult--->", newResult[i])
 
+                }
+
+            }.bind(this);
+        }.bind(this);
     }
 
 
