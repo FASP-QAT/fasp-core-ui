@@ -375,6 +375,7 @@ export default class BuildTree extends Component {
             forecastStartDate: '',
             forecastStopDate: '',
             momListPer: [],
+            momListPerParent:[],
             parentNodeDataMap: [],
             dataSetObj: {
                 programData: ''
@@ -558,6 +559,7 @@ export default class BuildTree extends Component {
         var parentStartValue = this.state.parentScenario.calculatedDataValue;
         console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
+        var momListParent=this.state.momListPerParent;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -568,7 +570,7 @@ export default class BuildTree extends Component {
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
             data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = parentStartValue
+            data[5] = momListParent[j].endValue
             // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
@@ -591,7 +593,7 @@ export default class BuildTree extends Component {
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
                 {
-                    title: "% of Sexually active men (Month Start)",
+                    title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month Start)",
                     type: 'text',
                     readOnly: true
 
@@ -607,18 +609,18 @@ export default class BuildTree extends Component {
 
                 },
                 {
-                    title: "% of Sexually active men (Month End)",
+                    title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
                     type: 'text',
                     readOnly: true
                 },
                 {
-                    title: "Sexually active men (Month End)",
+                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
                     type: 'text',
                     readOnly: true
 
                 },
                 {
-                    title: "Men who use condoms (Month End)",
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " (Month End)",
                     type: 'text',
                     readOnly: true
                 }
@@ -670,7 +672,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
-            data[3] = this.state.manualChange && (momList[j].seasonalityPerc>0 || momList[j].manualChange>0)?momList[j].calculatedValueWMC:momList[j].calculatedValue
+            data[3] = this.state.manualChange && (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].calculatedValueWMC : momList[j].calculatedValue
             data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
             data[6] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWMC
@@ -821,8 +823,10 @@ export default class BuildTree extends Component {
                 console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
                 // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                    console.log("in if>>>>");
-                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode }, () => {
+                    var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
+                    console.log("in if>>>>",getMomDataForCurrentNodeParent);
+
+                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode ,momListPerParent:getMomDataForCurrentNodeParent }, () => {
                         this.buildMomJexcelPercent();
                     });
                 } else {
