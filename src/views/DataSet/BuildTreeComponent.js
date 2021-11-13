@@ -673,7 +673,7 @@ export default class BuildTree extends Component {
             data[3] = this.state.manualChange ? momList[j].calculatedValue : momList[j].calculatedValueWMC
             data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
-            data[6] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWMC
+            data[6] = this.state.manualChange ? momList[j].endValue : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].endValue : endValueWMC
             data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
