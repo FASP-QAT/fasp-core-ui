@@ -374,7 +374,8 @@ export default class BuildTree extends Component {
             datasetList: [],
             forecastStartDate: '',
             forecastStopDate: '',
-            momListPer: []
+            momListPer: [],
+            parentNodeDataMap: []
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -444,6 +445,11 @@ export default class BuildTree extends Component {
         this.buildMomJexcelPercent = this.buildMomJexcelPercent.bind(this);
         this.buildMomJexcel = this.buildMomJexcel.bind(this);
         this.openScenarioModal = this.openScenarioModal.bind(this);
+        this.getStartValueForMonth = this.getStartValueForMonth.bind(this);
+    }
+
+    getStartValueForMonth(dateValue) {
+        console.log("***", this.state.parentNodeDataMap);
     }
     openScenarioModal() {
         this.setState({
@@ -451,6 +457,7 @@ export default class BuildTree extends Component {
         })
     }
     buildMomJexcelPercent() {
+        this.getStartValueForMonth('');
         var parentStartValue = this.state.parentScenario.calculatedDataValue;
         console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
@@ -4016,6 +4023,9 @@ export default class BuildTree extends Component {
         if (item != null) {
 
             this.setState({
+                // parentNodeDataMap: data.parentItem.payload.nodeDataMap,
+                showMomData: false,
+                showMomDataPercent: false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
                 currentItemConfig: data,
@@ -4224,11 +4234,11 @@ export default class BuildTree extends Component {
                 callbacks: {
                     label: function (tooltipItems, data) {
                         if (tooltipItems.datasetIndex == 0) {
-                            var details = this.state.expiredStockArr[tooltipItems.index].details;
+                            // var details = this.state.expiredStockArr[tooltipItems.index].details;
                             var infoToShow = [];
-                            details.map(c => {
-                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            });
+                            // details.map(c => {
+                            //     infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                            // });
                             return (infoToShow.join(' | '));
                         } else {
                             return (tooltipItems.yLabel.toLocaleString());
