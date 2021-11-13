@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js'
 import moment from 'moment';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, FIRST_DATA_ENTRY_DATE, TBD_PROCUREMENT_AGENT_ID, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, BATCH_PREFIX } from '../../Constants.js'
-export function calculateModelingData(dataset, props) {
+export function calculateModelingData(dataset, props, page) {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -136,11 +136,11 @@ export function calculateModelingData(dataset, props) {
                             }
 
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
-                            
+
                             var totalManualChange = 0;
                             if (nodeDataOverrideListFiltered.length > 0) {
                                 console.log("nodeDataOverrideListFiltered>>>", nodeDataOverrideListFiltered);
-                                console.log("seasonalityNumber>>>",nodeDataOverrideListFiltered[0].seasonalityPerc,">>>",endValueWMC)
+                                console.log("seasonalityNumber>>>", nodeDataOverrideListFiltered[0].seasonalityPerc, ">>>", endValueWMC)
                                 var seasonalityNumber = (Number(endValueWMC) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                                 totalManualChange = Number(seasonalityNumber) + Number(nodeDataOverrideListFiltered[0].manualChange);
                             }
@@ -186,7 +186,7 @@ export function calculateModelingData(dataset, props) {
                                     manualChange: nodeDataOverrideListFiltered.length > 0 ? Number(nodeDataOverrideListFiltered[0].manualChange) : 0
                                 }
                             );
-                            console.log("nodeDataList@@@",nodeDataList);
+                            console.log("nodeDataList@@@", nodeDataList);
                         }
                     }
                 }
@@ -239,7 +239,12 @@ export function calculateModelingData(dataset, props) {
         putRequest.onerror = function (event) {
         }.bind(this);
         putRequest.onsuccess = function (event) {
-            props.fetchData(1, dataset.id);
+            if (page == "syncPage") {
+                props.fetchData(1, dataset.id);
+            } else {
+                // props.upadteState("loading", false);
+                console.log("Data saved")
+            }
         }.bind(this)
     }.bind(this)
 }
