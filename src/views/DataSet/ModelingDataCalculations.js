@@ -70,19 +70,24 @@ export function calculateModelingData(dataset, props) {
                             var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
+                            var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                             var startValue = 0;
+                            var startValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 if (nodeDataMapForScenario.calculatedDataValue == null) {
                                     startValue = nodeDataMapForScenario.dataValue;
+                                    startValueWMC = nodeDataMapForScenario.dataValue;
                                 } else {
                                     startValue = nodeDataMapForScenario.calculatedDataValue;
+                                    startValueWMC = nodeDataMapForScenario.calculatedDataValue;
                                 }
                             } else if (moment(curDate).format("YYYY-MM-DD") < moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 startValue = 0;
+                                startValueWMC = 0;
                             } else if (moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 startValue = nodeDataList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId && moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0].endValue;
+                                startValueWMC = nodeDataList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId && moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0].endValueWMC;
                             }
-                            var endValue = 0;
                             var difference = 0;
                             var transferNodeValue = 0;
                             for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
@@ -119,27 +124,45 @@ export function calculateModelingData(dataset, props) {
                                 }
                             }
                             var endValue = 0;
+                            var endValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                                endValue = startValue
-                                difference=0;
+                                endValue = Number(startValue)
+                                endValueWMC = Number(startValueWMC)
+                                difference = 0;
                             } else {
-                                endValue = startValue + difference;
+                                endValue = Number(startValue) + Number(difference);
+                                endValueWMC = Number(startValueWMC) + Number(difference);
                             }
+
+                            var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
+                            var totalManualChange = 0;
+                            if (nodeDataOverrideListFiltered.length > 0) {
+                                var seasonalityNumber = (Number(endValueWMC) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
+                                totalManualChange = Number(seasonalityNumber) + Number(nodeDataOverrideListFiltered[0].manualChange);
+                            }
+                            endValue += Number(totalManualChange);
                             var calculatedValue = 0;
+                            var calculatedValueWMC = 0;
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
+                                calculatedValueWMC = endValueWMC;
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
                                 // Jo uske parent ki calculated value hai Uska endValue %
                                 var parent = flatList[fl].parent;
                                 var parentNodeDataId = (flatList.filter(c => c.id == parent)[0].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
                                 var parentValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValue;
                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+
+                                var parentValueWMC = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValueWMC;
+                                calculatedValueWMC = (Number(Number(parentValueWMC) * Number(endValueWMC)) / 100);
                             }
                             // calculatedValue = Number(calculatedValue)
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 calculatedValue = Number(calculatedValue);
+                                calculatedValueWMC = Number(calculatedValueWMC);
                             } else {
                                 calculatedValue = Number(calculatedValue) + Number(transferNodeValue);
+                                calculatedValueWMC = Number(calculatedValueWMC) + Number(transferNodeValue);
                             }
                             nodeDataList.push(
                                 {
@@ -149,28 +172,33 @@ export function calculateModelingData(dataset, props) {
                                     endValue: endValue,
                                     calculatedValue: calculatedValue,
                                     difference: difference,
-                                    scenarioId:scenarioList[ndm].id,
-                                    id:flatList[fl].id,
-                                    treeId:treeList[tl].treeId
+                                    scenarioId: scenarioList[ndm].id,
+                                    id: flatList[fl].id,
+                                    treeId: treeList[tl].treeId,
+                                    startValueWMC: startValueWMC,
+                                    endValueWMC: endValueWMC,
+                                    calculatedValueWMC: calculatedValueWMC,
+                                    seasonalityPerc: nodeDataOverrideListFiltered.length > 0 ? Number(nodeDataOverrideListFiltered[0].seasonalityPerc) : 0,
+                                    manualChange: nodeDataOverrideListFiltered.length > 0 ? Number(nodeDataOverrideListFiltered[0].manualChange) : 0
                                 }
                             );
                         }
                     }
                 }
-                var aggregateNodeList=flatList.filter(c=>c.payload.nodeType.id==1);
+                var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
                 for (var fl = aggregateNodeList.length; fl < 0; fl--) {
                     var payload = flatList[fl].payload;
                     if (payload.nodeType.id == 1) {
-                        var nodeDataMap = payload.nodeDataMap;                        
+                        var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                            var childNodeFlatList=flatList.filter(c=>c.parent == aggregateNodeList[fl].id);
-                            var aggregatedNodeValue=0;
-                            for(var cnfl=0;cnfl<childNodeFlatList.length;cnfl++){
-                                var childNodeDataId=(childNodeFlatList[cnfl].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
-                                var nodeDataListFiltered=(nodeDataList.filter(c=>moment(c.month).format("YYYY-MM-DD")==moment(curDate).format("YYYY-MM-DD") && c.nodeDataId==childNodeDataId)[0]).calculatedValue;
-                                aggregatedNodeValue+=Number(nodeDataListFiltered);
+                            var childNodeFlatList = flatList.filter(c => c.parent == aggregateNodeList[fl].id);
+                            var aggregatedNodeValue = 0;
+                            for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
+                                var childNodeDataId = (childNodeFlatList[cnfl].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
+                                var nodeDataListFiltered = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == childNodeDataId)[0]).calculatedValue;
+                                aggregatedNodeValue += Number(nodeDataListFiltered);
                             }
                             nodeDataList.push(
                                 {
@@ -180,17 +208,23 @@ export function calculateModelingData(dataset, props) {
                                     endValue: aggregatedNodeValue,
                                     calculatedValue: aggregatedNodeValue,
                                     difference: 0,
-                                    scenarioId:scenarioList[ndm].id,
-                                    id:flatList[fl].id,
-                                    treeId:treeList[tl].treeId
+                                    scenarioId: scenarioList[ndm].id,
+                                    id: flatList[fl].id,
+                                    treeId: treeList[tl].treeId,
+                                    startValueWMC: aggregatedNodeValue,
+                                    endValueWMC: aggregatedNodeValue,
+                                    calculatedValueWMC: aggregatedNodeValue,
+                                    seasonalityPerc: 0,
+                                    manualChange: 0
                                 }
                             );
 
                         }
                     }
-                }	
+                }
             }
         }
+        console.log("NodeDataModelingList###", nodeDataList.filter(c => c.nodeDataId == 9));
         datasetJson.nodeDataModelingList = nodeDataList;
         var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
         dataset.programData = encryptedDatasetJson;
