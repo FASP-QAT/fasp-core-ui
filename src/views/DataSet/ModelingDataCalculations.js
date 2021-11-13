@@ -179,12 +179,15 @@ export function calculateModelingData(dataset, props, page) {
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
                                 // Jo uske parent ki calculated value hai Uska endValue %
                                 var parent = flatList[fl].parent;
-                                var parentNodeDataId = (flatList.filter(c => c.id == parent)[0].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
+                                var parentFiltered = (flatList.filter(c => c.id == parent))[0];
+                                var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                var parentNodeDataId = singleNodeData.nodeDataId;
                                 var parentValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValue;
                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
-
-                                var parentValueWMC = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValueWMC;
-                                calculatedValueWMC = (Number(Number(parentValueWMC) * Number(endValueWMC)) / 100);
+                                var parentValueWMC = 0;
+                                var parentNodeValueForWMC = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0];
+                                var parentValueWMC = parentFiltered.payload.nodeType.id == 2 ? parentNodeValueForWMC.endValueWithManualChangeWMC : parentNodeValueForWMC.calculatedValueWMC;
+                                calculatedValueWMC = (Number(Number(parentValueWMC) * Number(endValueWithManualChangeWMC)) / 100);
                             }
                             // calculatedValue = Number(calculatedValue)
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
