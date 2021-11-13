@@ -71,6 +71,7 @@ export function calculateModelingData(dataset, props) {
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
+                            // console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
                             var startValue = 0;
                             var startValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
@@ -135,8 +136,11 @@ export function calculateModelingData(dataset, props) {
                             }
 
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
+                            
                             var totalManualChange = 0;
                             if (nodeDataOverrideListFiltered.length > 0) {
+                                console.log("nodeDataOverrideListFiltered>>>", nodeDataOverrideListFiltered);
+                                console.log("seasonalityNumber>>>",nodeDataOverrideListFiltered[0].seasonalityPerc,">>>",endValueWMC)
                                 var seasonalityNumber = (Number(endValueWMC) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                                 totalManualChange = Number(seasonalityNumber) + Number(nodeDataOverrideListFiltered[0].manualChange);
                             }
@@ -182,6 +186,7 @@ export function calculateModelingData(dataset, props) {
                                     manualChange: nodeDataOverrideListFiltered.length > 0 ? Number(nodeDataOverrideListFiltered[0].manualChange) : 0
                                 }
                             );
+                            console.log("nodeDataList@@@",nodeDataList);
                         }
                     }
                 }

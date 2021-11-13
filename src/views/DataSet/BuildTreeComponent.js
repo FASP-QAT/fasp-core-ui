@@ -375,7 +375,10 @@ export default class BuildTree extends Component {
             forecastStartDate: '',
             forecastStopDate: '',
             momListPer: [],
-            parentNodeDataMap: []
+            parentNodeDataMap: [],
+            dataSetObj: {
+                programData: ''
+            }
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -447,8 +450,101 @@ export default class BuildTree extends Component {
         this.openScenarioModal = this.openScenarioModal.bind(this);
         this.getStartValueForMonth = this.getStartValueForMonth.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
+        this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
     }
+    updateMomDataInDataSet() {
+        var json = this.state.momEl.getJson(null, false);
+        console.log("momData>>>", json);
+        var overrideListArray = [];
+        for (var i = 0; i < json.length; i++) {
+            var map1 = new Map(Object.entries(json[i]));
+            if (map1.get("4") != '' || map1.get("5") != '') {
+                var overrideData = {
+                    month: map1.get("0"),
+                    seasonalityPerc: map1.get("4"),
+                    manualChange: map1.get("5"),
+                    nodeDataId: map1.get("7"),
+                    active: true
+                }
+                console.log("overrideData>>>", overrideData);
+                overrideListArray.push(overrideData);
+            }
+        }
+        console.log("overRide data list>>>", overrideListArray);
+        let { currentItemConfig } = this.state;
+        let { curTreeObj } = this.state;
+        let { treeData } = this.state;
+        let { dataSetObj } = this.state;
+        var items = this.state.items;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
+        this.setState({ currentItemConfig }, () => {
+            // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+            items[findNodeIndex] = currentItemConfig.context;
+            // console.log("items>>>", items);
+            curTreeObj.tree.flatList = items;
 
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+
+            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            programData.treeList = treeData;
+            console.log("dataSetDecrypt>>>", programData);
+
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            dataSetObj.programData = programData;
+
+            console.log("encpyDataSet>>>", dataSetObj)
+            // store update object in indexdb
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                // programs.forEach(program => {
+                var programRequest = programTransaction.put(dataSetObj);
+                console.log("---hurrey---");
+                // })
+                transaction.oncomplete = function (event) {
+                    // calculateModelingData(dataSetObj,'');
+                    console.log("all good >>>>");
+
+                    // this.setState({
+                    //     loading: false,
+                    //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                    //     color: "green",
+                    //     isChanged: false
+                    // }, () => {
+                    //     this.hideSecondComponent();
+                    //     this.buildJExcel();
+                    // });
+                    console.log("Data update success");
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
+        });
+        // nodeDataId,month,manualChangeValue,seconalityPer
+    }
     getStartValueForMonth(dateValue) {
         console.log("***", this.state.parentNodeDataMap);
     }
@@ -572,12 +668,13 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = momList[j].startValue
+            data[1] = this.state.manualChange ? momList[j].startValueWMC : momList[j].startValue
             data[2] = momList[j].difference
-            data[3] = momList[j].calculatedValue
-            data[4] = momList[j].seasonalityIndex
+            data[3] = this.state.manualChange ? momList[j].calculatedValueWMC : momList[j].calculatedValue
+            data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
-            data[6] = momList[j].endValue
+            data[6] = this.state.manualChange ? momList[j].endValueWMC : momList[j].endValue
+            data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
         }
@@ -626,7 +723,12 @@ export default class BuildTree extends Component {
                     title: "Month End",
                     type: 'text',
                     readOnly: true
+                },
+                {
+                    title: "Node data id",
+                    type: 'hidden',
                 }
+
 
             ],
             text: {
@@ -754,7 +856,7 @@ export default class BuildTree extends Component {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
-
+                this.buildMomJexcel();
                 console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
@@ -1701,8 +1803,16 @@ export default class BuildTree extends Component {
                     datasetList: myResult
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-                    // console.log("dataSetObj>>>", dataSetObj);
-                    // calculateModelingData(dataSetObj, '');
+                    this.setState({ dataSetObj: dataSetObj });
+
+                    calculateModelingData(dataSetObj, '');
+                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    console.log("dataSetObj.programData***>>>", programData); 
+                    
+                    
+                   
+
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("datasetList--->", myResult[i])
@@ -5487,7 +5597,7 @@ export default class BuildTree extends Component {
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                             this.setState({ showMomData: false })
                                         }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
                                 </div>
