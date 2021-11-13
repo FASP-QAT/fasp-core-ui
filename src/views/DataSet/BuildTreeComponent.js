@@ -670,10 +670,10 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
-            data[3] = this.state.manualChange ? momList[j].calculatedValue : momList[j].calculatedValueWMC
+            data[3] = this.state.manualChange && (momList[j].seasonalityPerc>0 || momList[j].manualChange>0)?momList[j].calculatedValueWMC:momList[j].calculatedValue
             data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
-            data[6] = this.state.manualChange ? momList[j].endValue : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].endValue : endValueWMC
+            data[6] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWMC
             data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
