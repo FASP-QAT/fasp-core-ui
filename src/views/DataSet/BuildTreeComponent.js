@@ -452,6 +452,100 @@ export default class BuildTree extends Component {
         this.getStartValueForMonth = this.getStartValueForMonth.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
+        this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
+    }
+    updateMomDataPerInDataSet() {
+        var json = this.state.momElPer.getJson(null, false);
+        console.log("momData>>>", json);
+        var overrideListArray = [];
+        for (var i = 0; i < json.length; i++) {
+            var map1 = new Map(Object.entries(json[i]));
+            if (map1.get("3") != '') {
+                var overrideData = {
+                    month: map1.get("0"),
+                    seasonalityPerc: 0,
+                    manualChange: map1.get("3"),
+                    nodeDataId: map1.get("7"),
+                    active: true
+                }
+                console.log("overrideData>>>", overrideData);
+                overrideListArray.push(overrideData);
+            }
+        }
+        console.log("overRide data list>>>", overrideListArray);
+        let { currentItemConfig } = this.state;
+        let { curTreeObj } = this.state;
+        let { treeData } = this.state;
+        let { dataSetObj } = this.state;
+        var items = this.state.items;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
+        this.setState({ currentItemConfig }, () => {
+            // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+            items[findNodeIndex] = currentItemConfig.context;
+            // console.log("items>>>", items);
+            curTreeObj.tree.flatList = items;
+
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+
+            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            programData.treeList = treeData;
+            console.log("dataSetDecrypt>>>", programData);
+
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            dataSetObj.programData = programData;
+
+            console.log("encpyDataSet>>>", dataSetObj)
+            // store update object in indexdb
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                // programs.forEach(program => {
+                var programRequest = programTransaction.put(dataSetObj);
+                console.log("---hurrey---");
+                // })
+                transaction.oncomplete = function (event) {
+                    // calculateModelingData(dataSetObj,'');
+                    console.log("all good >>>>");
+
+                    // this.setState({
+                    //     loading: false,
+                    //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                    //     color: "green",
+                    //     isChanged: false
+                    // }, () => {
+                    //     this.hideSecondComponent();
+                    //     this.buildJExcel();
+                    // });
+                    console.log("Data update success");
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
+        });
+        // nodeDataId,month,manualChangeValue,seconalityPer
     }
     updateMomDataInDataSet() {
         var json = this.state.momEl.getJson(null, false);
@@ -568,10 +662,12 @@ export default class BuildTree extends Component {
             data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
-            data[4] = this.state.manualChange ? momList[j].endValueWithoutAddingManualChange : momList[j].endValueWithoutAddingManualChangeWMC
+            data[4] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWithManualChangeWMC
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             data[5] = this.state.manualChange ? momListParent[j].calculatedValue : (momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC
-            data[6] = this.state.manualChange ? momList[j].calculatedValue : (momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].calculatedValueWMC
+            // data[6] = this.state.manualChange ? momList[j].calculatedValue : (momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].calculatedValueWMC
+            data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
+            data[7] = momList[j].nodeDataId
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -623,6 +719,11 @@ export default class BuildTree extends Component {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " (Month End)",
                     type: 'text',
                     readOnly: true
+                },
+                {
+                    title: 'Node data id',
+                    type: 'hidden',
+
                 }
 
             ],
@@ -860,7 +961,11 @@ export default class BuildTree extends Component {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
-                this.buildMomJexcel();
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                    this.buildMomJexcelPercent()
+                } else {
+                    this.buildMomJexcel();
+                }
                 console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
@@ -4351,7 +4456,7 @@ export default class BuildTree extends Component {
             var datasetsArr = [];
             datasetsArr.push(
                 {
-                    label: getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang)+ " (Month end forecast)",
+                    label: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " (Month end forecast)",
                     type: 'line',
                     stack: 3,
                     yAxisID: 'A',
@@ -5629,13 +5734,40 @@ export default class BuildTree extends Component {
                         <div>
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                                <div className="row">
+                                <div className="row pl-lg-2 pr-lg-2">
+                                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                        <div className="col-md-5">
+                                            <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                        </div>
+                                        <div className="col-md-5 float-right pl-lg-5">
+                                            <FormGroup className="" >
+                                                <div className="check inline  pl-lg-1 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="manualChange"
+                                                            name="manualChange"
+                                                            // checked={true}
+                                                            checked={this.state.manualChange}
+                                                            onClick={(e) => { this.momCheckbox(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Manual Change affects future month'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                        </div>
+                                    </div>
                                     <div id="momJexcelPer" className={"RowClickable"}>
                                     </div>
                                     <div className="col-md-12 pr-lg-0">
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
                                         {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
                                 </div>
