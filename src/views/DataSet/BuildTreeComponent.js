@@ -190,6 +190,8 @@ function addCommas(cell1, row) {
 export default class BuildTree extends Component {
     constructor(props) {
         super(props);
+        this.pickAMonth2 = React.createRef()
+        this.pickAMonth1 = React.createRef()
         this.state = {
             scenario: {
                 id: '',
@@ -225,7 +227,15 @@ export default class BuildTree extends Component {
             momElPer: '',
             momEl: '',
             modelingEl: '',
-            currentScenario: [],
+            currentScenario: {
+                fuNode: {
+                    forecastingUnit: {
+                        label: {
+                            label_en: ''
+                        }
+                    }
+                }
+            },
             parentScenario: [],
             popoverOpen: false,
             regionValues: [],
@@ -2048,7 +2058,7 @@ export default class BuildTree extends Component {
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId))[0];
         console.log("forecastingUnit---", forecastingUnit);
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = forecastingUnit.unit.id;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.unit.id = forecastingUnit.unit.id;
         console.log("currentItemConfig---", currentItemConfig);
         this.setState({
             currentItemConfig
@@ -2756,7 +2766,7 @@ export default class BuildTree extends Component {
     }
 
     getUsageTemplateList(tracerCategoryId) {
-        console.log("tracerCategoryId---",tracerCategoryId);
+        console.log("tracerCategoryId---", tracerCategoryId);
         const lan = 'en';
         var db1;
         var storeOS;
@@ -4427,21 +4437,20 @@ export default class BuildTree extends Component {
                                         <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                         <div className="controls edit">
                                             <Picker
+
                                                 id="month"
                                                 name="month"
-                                                ref="pickAMonth2"
+                                                ref={this.pickAMonth1}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                value={{
-                                                    year: new Date(this.state.addNodeFlag ? this.state.parentScenario.month : this.state.currentScenario.month).getFullYear(),
-                                                    month: ("0" + (new Date(this.state.addNodeFlag ? this.state.parentScenario.month : this.state.currentScenario.month).getMonth() + 1)).slice(-2)
-                                                }}
+                                                value={{ year: 
+                                                    new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                theme="dark"
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                // theme="dark"
+                                                onChange={this.handleAMonthChange1}
+                                                onDismiss={this.handleAMonthDissmis1}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.addNodeFlag ? this.state.parentScenario.month : this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.addNodeFlag ? this.state.parentScenario.month : this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
-                                                    onClick={this.handleClickMonthBox2} />
+                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                    onClick={this.handleClickMonthBox1} />
                                             </Picker>
                                         </div>
                                     </FormGroup>
@@ -4768,13 +4777,14 @@ export default class BuildTree extends Component {
                                                     <Autocomplete
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
-                                                        value={{ value: (!this.state.addNodeFlag ? this.state.currentScenario.fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? this.state.currentScenario.fuNode.forecastingUnit.label.label_en : '') }}
-                                                        defaultValue={{ value: (!this.state.addNodeFlag ? this.state.currentScenario.fuNode.forecastingUnit.id : ''), label: (!this.state.addNodeFlag ? this.state.currentScenario.fuNode.forecastingUnit.label.label_en : '') }}
+                                                        // value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        defaultValue={{ value: this.state.currentScenario.fuNode.forecastingUnit.id, label: this.state.currentScenario.fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
                                                         style={{ width: 730 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
+                                                            // if(){
                                                             this.state.currentScenario.fuNode.forecastingUnit.id = value.value;
                                                             if (value != null) {
                                                                 this.state.currentScenario.fuNode.forecastingUnit.label.label_en = value.label;
@@ -5433,6 +5443,33 @@ export default class BuildTree extends Component {
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
+    }
+
+    handleAMonthChange1 = (year, month) => {
+        // console.log("value>>>", year);
+        console.log("text>>>", (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0])
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        var updatedMonth = date;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = updatedMonth;
+        this.setState({ currentItemConfig }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
+        //
+        //
+    }
+
+    handleAMonthDissmis1 = (value) => {
+        // console.log("dismiss>>", value);
+        this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        })
+
+    }
+
+    handleClickMonthBox1 = (e) => {
+        this.pickAMonth1.current.show()
     }
 
     handleClickMonthBox2 = (e) => {
