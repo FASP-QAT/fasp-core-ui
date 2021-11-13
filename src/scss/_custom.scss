@@ -5278,3 +5278,7 @@ height: 0px;
   font-size: 10px;
 
 }
+
+.leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
+	text-align:left !important;
+}
