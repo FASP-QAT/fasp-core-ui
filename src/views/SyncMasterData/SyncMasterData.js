@@ -175,7 +175,7 @@ export default class SyncMasterData extends Component {
     syncDatasetData(datasetList) {
         console.log("datasetListFiltered+++", datasetList);
         for (var i = 0; i < datasetList.length; i++) {
-            calculateModelingData(datasetList[i], this);
+            calculateModelingData(datasetList[i], this,"syncPage");
         }
     }
 

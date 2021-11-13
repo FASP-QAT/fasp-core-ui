@@ -668,12 +668,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = this.state.manualChange ? momList[j].startValueWMC : momList[j].startValue
+            data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
-            data[3] = this.state.manualChange ? momList[j].calculatedValueWMC : momList[j].calculatedValue
+            data[3] = this.state.manualChange ? momList[j].calculatedValue : momList[j].calculatedValueWMC
             data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
-            data[6] = this.state.manualChange ? momList[j].endValueWMC : momList[j].endValue
+            data[6] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWMC
             data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
@@ -1805,13 +1805,13 @@ export default class BuildTree extends Component {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
                     this.setState({ dataSetObj: dataSetObj });
 
-                    calculateModelingData(dataSetObj, '');
+                    calculateModelingData(dataSetObj, this, "BuildTree");
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    console.log("dataSetObj.programData***>>>", programData); 
-                    
-                    
-                   
+                    console.log("dataSetObj.programData***>>>", programData);
+
+
+
 
                 });
                 // for (var i = 0; i < myResult.length; i++) {
