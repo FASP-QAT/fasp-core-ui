@@ -375,7 +375,7 @@ export default class BuildTree extends Component {
             forecastStartDate: '',
             forecastStopDate: '',
             momListPer: [],
-            momListPerParent:[],
+            momListPerParent: [],
             parentNodeDataMap: [],
             dataSetObj: {
                 programData: ''
@@ -559,7 +559,7 @@ export default class BuildTree extends Component {
         var parentStartValue = this.state.parentScenario.calculatedDataValue;
         console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
-        var momListParent=this.state.momListPerParent;
+        var momListParent = this.state.momListPerParent;
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -672,10 +672,10 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
-            data[3] = this.state.manualChange && (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].calculatedValueWMC : momList[j].calculatedValue
+            data[3] = this.state.manualChange ? momList[j].endValueWithoutAddingManualChange : momList[j].endValueWithoutAddingManualChangeWMC
             data[4] = momList[j].seasonalityPerc
             data[5] = momList[j].manualChange
-            data[6] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWMC
+            data[6] = this.state.manualChange ? momList[j].endValue : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].endValueWMC
             data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
@@ -824,9 +824,9 @@ export default class BuildTree extends Component {
                 // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                     var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
-                    console.log("in if>>>>",getMomDataForCurrentNodeParent);
+                    console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
-                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode ,momListPerParent:getMomDataForCurrentNodeParent }, () => {
+                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
                         this.buildMomJexcelPercent();
                     });
                 } else {
@@ -4426,22 +4426,26 @@ export default class BuildTree extends Component {
                 }]
             },
             tooltips: {
-                callbacks: {
-                    label: function (tooltipItems, data) {
-                        if (tooltipItems.datasetIndex == 0) {
-                            // var details = this.state.expiredStockArr[tooltipItems.index].details;
-                            var infoToShow = [];
-                            // details.map(c => {
-                            //     infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            // });
-                            return (infoToShow.join(' | '));
-                        } else {
-                            return (tooltipItems.yLabel.toLocaleString());
-                        }
-                    }.bind(this)
-                },
                 enabled: false,
-                custom: CustomTooltips
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
             },
             maintainAspectRatio: false
             ,
