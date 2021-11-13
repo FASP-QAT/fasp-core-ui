@@ -565,14 +565,14 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            // ata[1] = momList[j].startValue
-            data[1] = momList[j].startValue
+            data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
             data[2] = momList[j].difference
             data[3] = momList[j].manualChange
-            data[4] = `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = momListParent[j].endValue
-            // data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
-            data[6] = `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
+            data[4] = this.state.manualChange ? momList[j].endValueWithoutAddingManualChange : momList[j].endValueWithoutAddingManualChangeWMC
+            // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
+            data[5] = this.state.manualChange ? momListParent[j].calculatedValue : (momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC
+            data[6] = this.state.manualChange ? momList[j].calculatedValue : (momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].calculatedValueWMC
+            // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
         }
@@ -4293,7 +4293,7 @@ export default class BuildTree extends Component {
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black',
-                            stepSize: 1000000
+                            // stepSize: 1000000
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -4312,27 +4312,31 @@ export default class BuildTree extends Component {
                 }]
             },
             tooltips: {
-                callbacks: {
-                    label: function (tooltipItems, data) {
-                        if (tooltipItems.datasetIndex == 0) {
-                            // var details = this.state.expiredStockArr[tooltipItems.index].details;
-                            var infoToShow = [];
-                            // details.map(c => {
-                            //     infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            // });
-                            return (infoToShow.join(' | '));
-                        } else {
-                            return (tooltipItems.yLabel.toLocaleString());
-                        }
-                    }.bind(this)
-                },
                 enabled: false,
-                custom: CustomTooltips
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
             },
             maintainAspectRatio: false
             ,
             legend: {
-                display: false,
+                display: true,
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
@@ -4347,7 +4351,7 @@ export default class BuildTree extends Component {
             var datasetsArr = [];
             datasetsArr.push(
                 {
-                    label: '',
+                    label: getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang)+ " (Month end forecast)",
                     type: 'line',
                     stack: 3,
                     yAxisID: 'A',
@@ -5630,7 +5634,8 @@ export default class BuildTree extends Component {
                                     </div>
                                     <div className="col-md-12 pr-lg-0">
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
+                                        {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
                                 </div>

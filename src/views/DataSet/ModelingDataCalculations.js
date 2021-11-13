@@ -75,7 +75,7 @@ export function calculateModelingData(dataset, props, page) {
                             var startValue = 0;
                             var startValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                                if (nodeDataMapForScenario.calculatedDataValue == null) {
+                                if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
                                     startValue = nodeDataMapForScenario.dataValue;
                                     startValueWMC = nodeDataMapForScenario.dataValue;
                                 } else {
@@ -104,7 +104,7 @@ export function calculateModelingData(dataset, props, page) {
                                     var dv = 0;
                                     var dvWMC = 0;
                                     if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
-                                        if (nodeDataMapForScenario.calculatedDataValue == null) {
+                                        if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
                                             dv = nodeDataMapForScenario.dataValue;
                                             dvWMC = nodeDataMapForScenario.dataValue;
                                         } else {
