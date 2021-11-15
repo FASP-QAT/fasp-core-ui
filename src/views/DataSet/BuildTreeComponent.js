@@ -1092,7 +1092,7 @@ export default class BuildTree extends Component {
                 console.log("---hurrey---");
                 // })
                 transaction.oncomplete = function (event) {
-                    calculateModelingData(dataSetObj, '');
+                    // calculateModelingData(dataSetObj, '');
                     console.log("all good >>>>");
                     this.setState({
                         items,
