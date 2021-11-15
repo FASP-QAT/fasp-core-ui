@@ -69,6 +69,7 @@ export default class ImportFromQATSupplyPlan extends Component {
             loading: true,
             lang: localStorage.getItem('lang'),
             message: '',
+            color: '',
 
             progressPer: 0,
 
@@ -77,12 +78,14 @@ export default class ImportFromQATSupplyPlan extends Component {
             forecastProgramId: '',
             programs: [],
             datasetList: [],
+            datasetList1: [],
             startDate: '',
             stopDate: '',
             stepOneData: [],
             versionId: '',
             planningUnitListJexcel: [],
             forecastProgramVersionId: '',
+            planningUnitList: [],
 
             // step2
             stepTwoData: [],
@@ -97,6 +100,13 @@ export default class ImportFromQATSupplyPlan extends Component {
 
         this.removeMessageText = this.removeMessageText.bind(this);
         this.updateStepOneData = this.updateStepOneData.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateStepOneData(key, value) {
@@ -113,9 +123,14 @@ export default class ImportFromQATSupplyPlan extends Component {
 
     componentDidMount() {
 
+        this.hideSecondComponent();
+        console.log("state-----------------", this.state.color, "---------", this.state.message);
+        this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan`)
+
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
+
 
     }
     finishedStepOne() {
@@ -137,7 +152,10 @@ export default class ImportFromQATSupplyPlan extends Component {
         this.refs.child.filterData();
     }
     finishedStepThree() {
-
+        this.setState({ progressPer: 0 });
+        document.getElementById('stepOneImport').style.display = 'block';
+        document.getElementById('stepTwoImport').style.display = 'none';
+        document.getElementById('stepThreeImport').style.display = 'none';
 
     }
 
@@ -151,6 +169,8 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
+
+        this.refs.stepOneChild.filterData();
     }
 
     previousToStepTwo() {
@@ -158,6 +178,8 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepOneImport').style.display = 'none';
         document.getElementById('stepTwoImport').style.display = 'block';
         document.getElementById('stepThreeImport').style.display = 'none';
+
+        this.refs.countryChild.filterData();
     }
 
 
@@ -167,7 +189,8 @@ export default class ImportFromQATSupplyPlan extends Component {
 
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5></h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
+                {/* <h5 className={this.props.match.params.color} id="div2">{i18n.t(this.props.match.params.message)}</h5> */}
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -219,7 +242,7 @@ export default class ImportFromQATSupplyPlan extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressbartext1Import">{i18n.t('static.dashboard.programheader')}</li>
+                                        <li className="progressbartext1Import">Program and Planning Units</li>
                                         <li className="progressbartext2Import">{i18n.t('static.program.region')}</li>
                                         <li className="progressbartext3Import">{i18n.t('static.quantimed.quantimedImportScreenFourth')}</li>
                                     </ul>
@@ -228,19 +251,19 @@ export default class ImportFromQATSupplyPlan extends Component {
                                 <br></br>
                                 <div>
                                     <div id="stepOneImport">
-                                        <StepOneImport finishedStepOne={this.finishedStepOne} updateStepOneData={this.updateStepOneData} items={this.state}></StepOneImport>
+                                        <StepOneImport ref='stepOneChild' finishedStepOne={this.finishedStepOne} updateStepOneData={this.updateStepOneData} items={this.state}></StepOneImport>
                                     </div>
                                     <div id="stepTwoImport">
                                         <StepTwoImport ref='countryChild' finishedStepTwo={this.finishedStepTwo} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} items={this.state}></StepTwoImport>
                                     </div>
                                     <div id="stepThreeImport">
-                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></StepThreeImport>
-                                        <FormGroup className="mt-2">
+                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} updateStepOneData={this.updateStepOneData} previousToStepTwo={this.previousToStepTwo} finishedStepThree={this.finishedStepThree} removeMessageText={this.removeMessageText} hideSecondComponent={this.hideSecondComponent} items={this.state} {...this.props}></StepThreeImport>
+                                        {/* <FormGroup className="mt-2">
                                             <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.finishedStepThree}> <i className="fa fa-check"></i>Import</Button>
                                             &nbsp;
                                             <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             &nbsp;
-                                        </FormGroup>
+                                        </FormGroup> */}
                                     </div>
                                 </div>
                                 {/* <div style={{ display: this.state.loading ? "block" : "none" }}>

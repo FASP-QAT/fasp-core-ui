@@ -5,6 +5,8 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import csvicon from '../../assets/img/csv.png';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import {
     Badge,
     Button,
@@ -37,8 +39,11 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from "moment";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import CryptoJS from 'crypto-js';
+
 
 
 export default class StepThreeImportMapPlanningUnits extends Component {
@@ -50,35 +55,227 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             loading: false,
             selSource: [],
             actualConsumptionData: [],
-            stepOneData: this.props.items.stepOneData,
-            datasetList: this.props.items.datasetList,
-            forecastProgramVersionId: this.props.items.forecastProgramVersionId,
-            forecastProgramId: this.props.items.forecastProgramId,
-            startDate: this.props.items.startDate,
-            stopDate: this.props.items.stopDate,
+            stepOneData: [],
+            datasetList: [],
+            forecastProgramVersionId: '',
+            forecastProgramId: '',
+            startDate: '',
+            stopDate: '',
 
         }
-        this.changed = this.changed.bind(this);
+
         this.buildJexcel = this.buildJexcel.bind(this);
-        this.checkValidation = this.checkValidation.bind(this);
-        this.oneditionend = this.oneditionend.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
 
     }
 
+    formSubmit() {
+        confirmAlert({
+            title: i18n.t('static.program.confirmsubmit'),
+            message: "Selected rows will be imported. Note that imported data will override any existing consumption for those months, region & planning units.",
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        var tableJson = this.el.getJson(null, false);
+                        var programs = [];
+                        var ImportListNotPink = [];
+                        var ImportListPink = [];
+
+                        let datasetList = this.props.items.datasetList
+                        let forecastProgramVersionId = this.props.items.forecastProgramVersionId
+                        let forecastProgramId = this.props.items.forecastProgramId
+                        let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
+
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                        let username = decryptedUser.username;
+
+                        for (var i = 0; i < tableJson.length; i++) {
+                            var map1 = new Map(Object.entries(tableJson[i]));
+
+                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("0"))[0];
+
+                            if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
+                                let tempJson = {
+                                    "forecastConsumptionId": '',
+                                    "program": {
+                                        "id": selectedForecastProgramObj.programId,
+                                        "label": selectedForecastProgramObj.label,
+                                        "code": selectedForecastProgramObj.programCode,
+                                        "idString": "" + selectedForecastProgramObj.programId
+                                    },
+                                    "consumptionUnit": {
+                                        "forecastConsumptionUnitId": '',
+                                        "dataType": 1,
+                                        "forecastingUnit": selectedPlanningUnitObj.forecastingUnit,
+                                        "planningUnit": {
+                                            "id": selectedPlanningUnitObj.planningUnitId,
+                                            "label": selectedPlanningUnitObj.label,
+                                            "multiplier": selectedPlanningUnitObj.multiplier,
+                                            "idString": '' + selectedPlanningUnitObj.planningUnitId,
+                                        },
+                                        "otherUnit": null
+                                    },
+                                    "region": {
+                                        "id": map1.get("10"),
+                                        "label": null,
+                                        "idString": '' + map1.get("10")
+                                    },
+                                    "month": map1.get("3"),
+                                    // "actualConsumption": map1.get("4"),
+                                    "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "reportingRate": null,
+                                    "daysOfStockOut": null,
+                                    "exclude": false,
+                                    "versionId": selectedForecastProgramObj.versionId,
+                                    "createdBy": {
+                                        "userId": userId,
+                                        "username": username
+                                    },
+                                    "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
+                                }
 
 
-    checkValidation() {
+                                ImportListNotPink.push(tempJson);
+                            }
 
-    }
+                            if (map1.get("9") == 1 && map1.get("8") == true) {
+                                let tempJsonPink = {
+                                    regionId: map1.get("10"),
+                                    planningUnitId: map1.get("0"),
+                                    month: map1.get("3"),
+                                    // actualConsumption: map1.get("4"),
+                                    actualConsumption: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                }
+                                ImportListPink.push(tempJsonPink);
+                            }
+
+                            // console.log("map1.get(3)---", map1.get("3"));
+                            // console.log("map1.get(12)---", map1.get("12"));
+                            // console.log("map1.get(7)---", map1.get("7"));
+                            // console.log("map1.get(8)---", map1.get("8"));
+                            // var notes = map1.get("4");
+                            // var startDate = map1.get("7");
+                            // var stopDate = map1.get("8");
+                            // var id = map1.get("10");
+                            // var noOfDaysInMonth = map1.get("12");
+                            // console.log("start date ---", startDate);
+                            // console.log("stop date ---", stopDate);
+                            // console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+
+                        }
+
+                        var program = (this.props.items.datasetList1.filter(x => x.programId == this.props.items.forecastProgramId && x.version == this.props.items.forecastProgramVersionId)[0]);
+                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+
+                        // programData.currentVersion.forecastStartDate = startDate;
+                        // programData.actionList = [1, 2]
+
+                        console.log("Final-------------->", programData.consumptionList);
+                        let originalConsumptionList = programData.consumptionList;
+                        for (var i = 0; i < ImportListPink.length; i++) {
+                            // let match = originalConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
+                            let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.consumptionUnit.planningUnit.id == ImportListPink[i].planningUnitId)
+
+                            if (index != -1) {
+                                let indexObj = originalConsumptionList[index];
+                                indexObj.actualConsumption = ImportListPink[i].actualConsumption;
+                                originalConsumptionList[index] = indexObj;
+                            }
+                        }
+
+                        console.log("Final-------------->11", ImportListNotPink);
+                        console.log("Final-------------->12", ImportListPink);
+                        console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
+                        programData.consumptionList = originalConsumptionList.concat(ImportListNotPink);
 
 
-    changed = function (instance, cell, x, y, value) {
-        this.props.removeMessageText && this.props.removeMessageText();
-    }
+                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        program.programData = programData;
+                        // var db1;
+                        // getDatabase();
+                        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        // openRequest.onerror = function (event) {
+                        //     this.setState({
+                        //         message: i18n.t('static.program.errortext'),
+                        //         color: 'red'
+                        //     })
+                        //     this.hideFirstComponent()
+                        // }.bind(this);
+                        // openRequest.onsuccess = function (e) {
+                        //     db1 = e.target.result;
+                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        //     var programTransaction = transaction.objectStore('datasetData');
+                        //     var programRequest = programTransaction.put(program);
+                        //     programRequest.onerror = function (e) {
 
-    oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
-        var rowData = elInstance.getRowData(y);
+                        //     }.bind(this);
+                        //     programRequest.onsuccess = function (e) {
+
+                        //     }.bind(this);
+                        // }.bind(this);
+                        programs.push(program);
+
+
+                        console.log("programs to update---", programs);
+
+                        var db1;
+                        getDatabase();
+                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        openRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        openRequest.onsuccess = function (e) {
+                            db1 = e.target.result;
+                            var transaction = db1.transaction(['datasetData'], 'readwrite');
+                            var programTransaction = transaction.objectStore('datasetData');
+                            programs.forEach(program => {
+                                var programRequest = programTransaction.put(program);
+                                console.log("---hurrey---");
+                            })
+                            transaction.oncomplete = function (event) {
+                                // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
+                                // this.props.updateStepOneData("color", "green");
+                                // this.setState({
+                                //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                                //     color: "green",
+                                // }, () => {
+                                //     this.props.hideSecondComponent();
+                                //     this.props.finishedStepThree();
+                                //     // this.buildJExcel();
+                                // });
+                                console.log("Data update success");
+                                // this.props.history.push(`/dataSource/listDataSource/` + 'red/' + i18n.t('static.message.cancelled'))
+                                this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
+                                // this.props.history.push('/importFromQATSupplyPlan/listImportFromQATSupplyPlan/' + 'green/' + i18n.t('static.mt.dataUpdateSuccess'));
+                            }.bind(this);
+                            transaction.onerror = function (event) {
+                                this.setState({
+                                    loading: false,
+                                    // message: 'Error occured.',
+                                    color: "red",
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                console.log("Data update errr");
+                            }.bind(this);
+                        }.bind(this);
+
+                    }
+                },
+                {
+                    label: i18n.t('static.program.no')
+                }
+            ]
+        });
 
     }
 
@@ -91,6 +288,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         // var elInstance = instance.jexcel;
         // var json = elInstance.getJson();
+        // // console.log("elInstance---->", elInstance);
 
         // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
         // for (var j = 0; j < json.length; j++) {
@@ -99,9 +297,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         //     var rowData = elInstance.getRowData(j);
         //     // console.log("elInstance---->", elInstance);
 
-        //     var id = rowData[0];
+        //     var id = rowData[9];
+        //     console.log("elInstance---->", id);
 
-        //     if (id == 1 || id == 2 || id == 3) {
+        //     if (id == 1) {
         //         for (var i = 0; i < colArr.length; i++) {
         //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
         //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
@@ -145,16 +344,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
         let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
 
-        let ActualConsumptionDataInput = { "programId": 2442, "versionId": 1, "planningUnitIds": ["1074", "1082", "2802"], "startDate": "2018-01-01", "stopDate": "2021-12-01", "regionIds": ["70", "73", "74"] }
+        // let ActualConsumptionDataInput = { "programId": 2442, "versionId": 1, "planningUnitIds": ["1074", "1082", "2802"], "startDate": "2018-01-01", "stopDate": "2021-12-01", "regionIds": ["70", "73", "74"] }
 
-        // let ActualConsumptionDataInput = {
-        //     programId: this.props.items.programId,
-        //     versionId: this.props.items.versionId,
-        //     planningUnitIds: supplyPlanPlanningUnitId,
-        //     startDate: this.props.items.startDate,
-        //     stopDate: this.props.items.stopDate,
-        //     regionIds: regionIds
-        // }
+        let ActualConsumptionDataInput = {
+            programId: this.props.items.programId,
+            versionId: this.props.items.versionId,
+            planningUnitIds: supplyPlanPlanningUnitId,
+            startDate: this.props.items.startDate,
+            stopDate: this.props.items.stopDate,
+            regionIds: regionIds
+        }
 
         console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
 
@@ -227,22 +426,31 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
-                let stepOneSelectedObject = this.state.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
-                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
+                let stepOneSelectedObject = this.props.items.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
+                // console.log("stepOneSelectedObject-------->1", this.props.items.stepOneData);
+                // console.log("stepOneSelectedObject-------->2", papuList[j].planningUnit.id);
+                // console.log("stepOneSelectedObject-------->3", stepOneSelectedObject);
+
+                let selectedForecastProgram = this.props.items.datasetList.filter(c => c.programId == this.props.items.forecastProgramId && c.versionId == this.props.items.forecastProgramVersionId)[0];
+
+                // console.log("selectedForecastProgram-------->4", selectedForecastProgram);
 
                 let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
+                // let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id)
 
                 data = [];
                 data[0] = papuList[j].planningUnit.id
                 data[1] = stepOneSelectedObject.forecastPlanningUnitId
                 data[2] = getLabelText(papuList[j].region.label, this.state.lang)
                 data[3] = papuList[j].month
-                data[4] = stepOneSelectedObject.multiplier
-                data[5] = papuList[j].actualConsumption
-                data[6] = stepOneSelectedObject.multiplier * papuList[j].actualConsumption
-                data[7] = ''
+
+                data[4] = papuList[j].actualConsumption
+                data[5] = stepOneSelectedObject.multiplier
+                data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(6)
+                data[7] = (match.length > 0 ? match[0].actualConsumption : '')
                 data[8] = true
                 data[9] = (match.length > 0 ? 1 : 0)
+                data[10] = papuList[j].region.id
 
                 papuDataArr[count] = data;
                 count++;
@@ -272,6 +480,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var json = [];
         var data = papuDataArr;
+        console.log("data.length---------->", data.length);
+
+        let planningUnitListJexcel = this.props.items.planningUnitListJexcel
+        planningUnitListJexcel.splice(0, 1);
 
         var options = {
             data: data,
@@ -280,19 +492,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             columns: [
 
                 {
-                    title: 'Supply plan planning unit',
+                    title: 'Supply Plan Planning Unit',
                     type: 'dropdown',
-                    source: this.props.items.planningUnitListJexcel,
+                    source: planningUnitListJexcel,//A0
+                    // readOnly: true
                 },
                 {
                     title: 'Forecasting planning Unit',
                     type: 'dropdown',
-                    source: this.props.items.planningUnitListJexcel,
+                    source: planningUnitListJexcel,//B1
+                    // readOnly: true
                 },
                 {
                     title: 'Region',
                     type: 'text',
                     textEditor: true,
+                    // readOnly: true//C2
                 },
                 {
                     title: 'Month',
@@ -300,60 +515,75 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT,
                         type: 'year-month-picker'
-                    }
+                    },
+                    // readOnly: true//D3
                 },
                 {
-                    title: 'Multiplier',
-                    type: 'text',
+                    title: 'Actual Consumption(Supply Plan Module)',
+                    type: 'numeric',
+                    mask: '#,##',
                     textEditor: true,
+                    // readOnly: true//E4
                 },
                 {
-                    title: 'Supply plan consumption',
+                    title: 'Conversion Factor(Supply Plan to Forecast)',
                     type: 'text',
                     textEditor: true,
+                    // readOnly: true//F5
                 },
                 {
-                    title: 'Converted Consumption',
-                    type: 'text',
+                    title: 'Converted Actual Consumption(Supply Plan Module)',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
+                    // readOnly: true//G6
                 },
                 {
-                    title: 'Current QAT consumption',
-                    type: 'text',
+                    title: 'Current Actual Consumption(Forecast Module)',
+                    type: 'numeric',
+                    mask: '#,##',
                     textEditor: true,
+                    // readOnly: true//H7
                 },
                 {
                     title: 'Import?',
-                    type: 'checkbox'
+                    type: 'checkbox'//I8
                 },
                 {
                     title: 'duplicate',
-                    type: 'hidden'
+                    type: 'hidden'//J9
+                },
+                {
+                    title: 'regionId',
+                    type: 'hidden'//K10
                 },
 
+
             ],
-            updateTable: function (el, cell, x, y, source, value, id) {
-                console.log("INSIDE UPDATE TABLE");
-                var elInstance = el.jexcel;
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-                var rowData = elInstance.getRowData(y);
-                // console.log("elInstance---->", elInstance);
-                var id = rowData[9];
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            //     console.log("INSIDE UPDATE TABLE");
+            //     var elInstance = el.jexcel;
+            //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+            //     var rowData = elInstance.getRowData(y);
+            //     // console.log("elInstance---->", elInstance);
+            //     var id = rowData[9];
 
-                if (id == 1) {
-                    for (var i = 0; i < colArr.length; i++) {
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-                        let textColor = contrast('#f48282');
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-                    }
-                } else {
-                    for (var i = 0; i < colArr.length; i++) {
-                        elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-                    }
-                }
+            //     if (id == 1) {
+            //         for (var i = 0; i < colArr.length; i++) {
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            //             let textColor = contrast('#f48282');
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+            //         }
+            //     } else {
+            //         for (var i = 0; i < colArr.length; i++) {
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            //         }
+            //     }
 
-            }.bind(this),
+            // }.bind(this),
+            // editable: false,
             pagination: false,
             filters: true,
             search: true,
@@ -384,9 +614,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             contextMenu: false
         };
 
-        this.el = jexcel(document.getElementById("mapImport"), options);
+        var languageEl = jexcel(document.getElementById("mapImport"), options);
+        this.el = languageEl;
         this.setState({
-            loading: false
+            languageEl: languageEl, loading: false
         })
     }
 
@@ -403,11 +634,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     </div>}
                 </div>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h4 className="red">{this.props.message}</h4>
-
+                {/* <h4 className="red">{this.props.message}</h4> */}
+                <ul className="legendcommitversion list-group">
+                    <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
+                </ul>
+                <h5 className="red">All values below are in supply planning units.</h5>
+                {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
-                    <div id="mapImport" className="RowheightForjexceladdRow">
+                    <div id="mapImport" className="jexcelremoveReadonlybackground">
                     </div>
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -421,6 +656,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </div>
                     </div>
                 </div>
+                <FormGroup>
+                    {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
+                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>Import</Button>
+                    &nbsp;
+                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
+                    <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                    &nbsp;
+                </FormGroup>
             </>
         );
     }

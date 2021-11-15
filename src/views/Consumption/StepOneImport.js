@@ -75,12 +75,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             versions: [],
             versionId: '',
             datasetList: [],
+            datasetList1: [],
             forecastProgramId: '',
             programPlanningUnitList: [],
             tracerCategoryList: [],
             planningUnitList: [],
             planningUnitListJexcel: [],
-            stepOneData: []
+            stepOneData: [],
+            forecastPlanignUnitListForNotDuplicate: [],
 
         }
         this.changed = this.changed.bind(this);
@@ -99,13 +101,26 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+
+    hideSecondComponent() {
+        // alert("HI");
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     getPlanningUnitList() {
         PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
             console.log("RESP----->", response.data);
             var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             let tempList = [];
             if (listArray.length > 0) {
                 for (var i = 0; i < listArray.length; i++) {
@@ -127,13 +142,25 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 active: true,
                 forecastingUnit: []
             });
+            // console.log("planningUnitListJexcel----->0", tempList);
+
 
             this.setState({
                 planningUnitList: response.data,
                 planningUnitListJexcel: tempList
             }, () => {
-                tempList.splice(0, 1);
+                // console.log("planningUnitListJexcel----->1", tempList);
+
+                // for (let i = 0; i < tempList.length; i++) {
+                //     if (tempList[i].id === -1) {
+                //         console.log("planningUnitListJexcel----->111", i + '---    ' + tempList[i].id);
+                //     }
+                // }
+                // tempList.splice(0, 1);
+                // tempList.splice(0, 1);
+                // console.log("planningUnitListJexcel----->3", tempList);
                 this.props.updateStepOneData("planningUnitListJexcel", tempList);
+                this.props.updateStepOneData("planningUnitList", response.data);
             });
         }).catch(
             error => {
@@ -239,6 +266,40 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.el.setValueFromCoords(7, y, selectedPlanningUnitObj.multiplier, true);
                 this.el.setValueFromCoords(8, y, (this.el.getValueFromCoords(2, y) / selectedPlanningUnitObj.multiplier).toFixed(6), true);
                 this.el.setValueFromCoords(9, y, 0, true);
+
+                // let match = this.state.forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
+                // if (match.length > 0) {
+                //     let index = originalConsumptionList.findIndex(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
+                //     let tempObj = match[0].forecastPlanningUnitId = forecastPlanningUnitId;
+                //     let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                //     forecastPlanignUnitListForNotDuplicate[index] = tempObj;
+                //     this.setState({
+                //         forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
+                //     })
+                // } else {
+                //     let forecastPlanignUnitListForNotDuplicate = [];
+                //     forecastPlanignUnitListForNotDuplicate.push({
+                //         supplyPlanPlanningUnitId: this.el.getValueFromCoords(0, y),
+                //         forecastPlanningUnitId: forecastPlanningUnitId
+                //     });
+                //     this.setState({
+                //         forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
+                //     })
+                // }
+
+                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                forecastPlanignUnitListForNotDuplicate.push({
+                    supplyPlanPlanningUnitId: this.el.getValueFromCoords(0, y),
+                    forecastPlanningUnitId: this.el.getValueFromCoords(6, y)
+                })
+
+                const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
+                const filtered = forecastPlanignUnitListForNotDuplicate.filter(({ supplyPlanPlanningUnitId }, index) => !ids.includes(supplyPlanPlanningUnitId, index + 1))
+                this.setState({
+                    forecastPlanignUnitListForNotDuplicate: filtered
+                })
+
+
             } else {
                 this.el.setValueFromCoords(5, y, '', true);
                 this.el.setValueFromCoords(7, y, '', true);
@@ -338,28 +399,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         //     console.log("IF------------>2");
         // }
 
-        let arrList = [];
-        let Json1 = {
-            id: 1,
-            cList: [
-                { cid: 1, cName: 'abc' },
-                { cid: 2, cName: 'pqr' },
-                { cid: 3, cName: 'xyz' }
-            ]
-        }
-        let Json2 = {
-            id: 2,
-            cList: [
-                { cid: 11, cName: 'abc11' },
-                { cid: 22, cName: 'pqr22' },
-                { cid: 33, cName: 'xyz33' }
-            ]
-        }
-        arrList.push(Json1);
-        arrList.push(Json2);
 
-        let tempList = arrList.filter(c => c.cList.cid == 3);
-        console.log("tempList---->", tempList);
 
     }
 
@@ -373,6 +413,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var datasetList = [];
+            var datasetList1 = [];
 
             getRequest.onerror = function (event) {
                 // Handle errors!
@@ -420,17 +461,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         consumptionList: programJson1.consumptionList,
                         filteredForecastingUnit: filtered,
                         filteredPlanningUnit: filteredPU,
-                        regionList: programJson1.regionList
+                        regionList: programJson1.regionList,
+                        label: programJson1.label,
+                        realmCountry: programJson1.realmCountry,
                     });
+                    datasetList1.push(filteredGetRequestList[i])
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
                 this.setState({
-                    datasetList: datasetList
+                    datasetList: datasetList,
+                    datasetList1: datasetList1
                 }, () => {
                     this.getTracerCategoryList();
                 })
                 this.props.updateStepOneData("datasetList", datasetList);
+                this.props.updateStepOneData("datasetList1", datasetList1);
 
             }.bind(this);
         }.bind(this);
@@ -532,84 +578,107 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         // console.log("startDate---->1", startDate);
         // console.log("startDate---->2", stopDate);
+
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
-            this.props.updateStepOneData("programId", programId);
-            this.props.updateStepOneData("versionId", versionId);
-            this.props.updateStepOneData("forecastProgramId", forecastProgramId);
-            this.props.updateStepOneData("startDate", startDate);
-            this.props.updateStepOneData("stopDate", stopDate);
 
-
-            document.getElementById("stepOneBtn").disabled = false;
-
+            let selectedSupplyPlanProgram = this.state.programs.filter(c => c.programId == programId)[0];
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
-            let healthAreaList = selectedForecastProgram.healthAreaList;
-            let tracerCategory = [];
 
-            for (var i = 0; i < healthAreaList.length; i++) {
-                let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
-                a = a.map(ele => ele.tracerCategoryId);
-                tracerCategory = tracerCategory.concat(a);
-            }
-            console.log("tracerCategory--------->", tracerCategory);
+            if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
 
-            ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracerCategory)
-                .then(response => {
-                    if (response.status == 200) {
-                        console.log("planningUnit------>", response.data);
-                        this.setState({
-                            programPlanningUnitList: response.data,
-                            selSource: response.data,
-                        }, () => {
-                            this.buildJexcel();
-                        })
-                    } else {
-                        this.setState({
-                            programPlanningUnitList: []
-                        });
-                    }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
+                this.props.updateStepOneData("programId", programId);
+                this.props.updateStepOneData("versionId", versionId);
+                this.props.updateStepOneData("forecastProgramId", forecastProgramId);
+                this.props.updateStepOneData("startDate", startDate);
+                this.props.updateStepOneData("stopDate", stopDate);
+
+
+                document.getElementById("stepOneBtn").disabled = false;
+
+
+                let healthAreaList = selectedForecastProgram.healthAreaList;
+                let tracerCategory = [];
+
+                for (var i = 0; i < healthAreaList.length; i++) {
+                    let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
+                    a = a.map(ele => ele.tracerCategoryId);
+                    tracerCategory = tracerCategory.concat(a);
+                }
+                console.log("tracerCategory--------->1", healthAreaList);
+                console.log("tracerCategory--------->2", tracerCategory);
+
+                ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracerCategory)
+                    .then(response => {
+                        if (response.status == 200) {
+                            console.log("planningUnit------>", response.data);
                             this.setState({
-                                message: 'static.unkownError',
-                                loading: false, color: 'red'
-                            });
+                                programPlanningUnitList: response.data,
+                                selSource: response.data,
+                            }, () => {
+                                if (response.data.length == 0) {
+                                    document.getElementById("stepOneBtn").disabled = true;
+                                }
+                                this.buildJexcel();
+                            })
                         } else {
-                            switch (error.response ? error.response.status : "") {
+                            this.setState({
+                                programPlanningUnitList: []
+                            });
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false, color: 'red'
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false, color: 'red'
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false, color: 'red'
-                                    });
-                                    break;
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false, color: 'red'
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false, color: 'red'
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false, color: 'red'
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+
+
+            } else {
+                this.setState({
+                    message: 'Supply plan program and forecast program should belong to same country',
+                    color: 'red'
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
         } else {
-            document.getElementById("stepOneBtn").disabled = false;
+            document.getElementById("stepOneBtn").disabled = true;
         }
 
     }
@@ -673,6 +742,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
+        let forecastPlanignUnitListForNotDuplicate = [];
 
         var count = 0;
         if (papuList.length != 0) {
@@ -701,6 +771,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[7] = papuList[j].multiplier
                     data[8] = 1
                     data[9] = 1
+
+                    forecastPlanignUnitListForNotDuplicate.push({
+                        supplyPlanPlanningUnitId: papuList[j].planningUnit.id,
+                        forecastPlanningUnitId: papuList[j].planningUnit.id
+                    });
                 } else {
                     data[5] = ''
                     data[6] = ''
@@ -752,8 +827,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: 'Supply Plan Planning Unit',
                     type: 'text',
-                    readOnly: true,
-                    textEditor: true,//1 B
+                    readOnly: true,//1 B
                 },
                 {
                     title: 'multiplier',
@@ -798,7 +872,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//7 H
                 },
                 {
-                    title: 'Multiplier',
+                    title: 'Conversion Factor (Supply Plan to Forecast Planning Unit)',
                     type: 'numeric',
                     decimal: '.',
                     // readOnly: true,
@@ -830,16 +904,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                     var doNotImport = rowData[6];
                     if (doNotImport == -1) {// grade out
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                     } else {
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        // cell1.classList.remove('readonly');
                         var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                         // var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
@@ -859,6 +933,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
 
             }.bind(this),
+            selectionCopy: false,
             pagination: false,
             filters: true,
             search: true,
@@ -891,7 +966,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), options);
         this.setState({
-            loading: false
+            loading: false,
+            forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
     }
 
@@ -905,7 +981,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
             mylist = mylist.filter(c => (c.id == -1 ? c : c.forecastingUnit.tracerCategory.id == value && c.active.toString() == "true"));
         }
 
-        console.log("mylist--------->3", mylist);
+        console.log("mylist--------->31", mylist);
+
+        let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+        for (var i = 0; i < forecastPlanignUnitListForNotDuplicate.length; i++) {
+
+            const index = mylist.findIndex(c => c.id == forecastPlanignUnitListForNotDuplicate[i].forecastPlanningUnitId);
+            const result = mylist.splice(index, 1);
+
+        }
+
+
+        console.log("mylist--------->32", mylist);
 
         return mylist;
 
@@ -1131,7 +1218,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h4 className="red">{this.props.message}</h4>
+                <h5 className="red" id="div2">{this.state.message}</h5>
 
                 <div className="row ">
                     <FormGroup className="col-md-3">
@@ -1224,7 +1311,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit" className="table-responsive">
+                    <div id="mapPlanningUnit">
                     </div>
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>

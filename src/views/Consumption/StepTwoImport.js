@@ -29,13 +29,15 @@ import {
     CardColumns,
     Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
-import Picker from 'react-month-picker'
+import Picker from 'react-month-picker';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from "moment";
+import CryptoJS from 'crypto-js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 
 const pickerLang = {
@@ -203,9 +205,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         let forecastProgramId = this.props.items.forecastProgramId
         let programs = this.props.items.programs
         let datasetList = this.props.items.datasetList
+        let forecastProgramVersionId = this.props.items.forecastProgramVersionId
 
         let selectedProgramObj = programs.filter(c => c.programId == programId)[0];
-        let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId)[0];
+        let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
 
         this.setState({
             programRegionList: selectedProgramObj.regionList,
@@ -240,7 +243,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     data[3] = ''
                 } else {
                     data[2] = 0
-                    data[3] = ''
+                    data[3] = 3
                 }
 
                 papuDataArr[count] = data;
@@ -284,7 +287,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Supply plan regions',
+                    title: 'Supply Plan Region',
                     type: 'text',
                     readOnly: true,
                     textEditor: true,
@@ -325,15 +328,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                         // elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
                     }
 
-                    if (importRegion == 3) {// grade out
+                    var isRegionInForecast = rowData[2];
+                    if (isRegionInForecast == false) {// grade out
 
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
-                    } else {
-
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
                     }
 
                 }
