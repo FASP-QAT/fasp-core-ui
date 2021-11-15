@@ -1008,6 +1008,7 @@ export default class BuildTree extends Component {
             // })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
+            var maxModelingId = Math.max(...data.map(o => o.nodeDataModelingId));
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
@@ -1031,6 +1032,7 @@ export default class BuildTree extends Component {
 
                         data[itemIndex] = obj;
                     } else {
+                        console.log("maxModelingId---",maxModelingId);
                         obj = {
                             transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
                             notes: map1.get("1"),
@@ -1040,8 +1042,9 @@ export default class BuildTree extends Component {
                             startDate: map1.get("3"),
                             stopDate: map1.get("4"),
                             dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
-                            nodeDataModelingId: ''
+                            nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
+                        maxModelingId++;
                         data.push(obj);
                     }
                     console.log("obj---", obj);
@@ -1507,7 +1510,7 @@ export default class BuildTree extends Component {
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
             data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
-            data[6] = scalingList[j].modelingType.id == 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
+            data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
             data[7] = cleanUp
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -1516,7 +1519,7 @@ export default class BuildTree extends Component {
             } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
                 calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
             }
-            data[8] = parseFloat(calculatedChangeForMonth).toFixed(4)
+            data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : parseFloat(calculatedChangeForMonth).toFixed(4)
             data[9] = scalingList[j].nodeDataModelingId
             data[10] = 0
             scalingTotal = scalingTotal + calculatedChangeForMonth;
@@ -1791,7 +1794,7 @@ export default class BuildTree extends Component {
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
+                    this.state.modelingEl.setValueFromCoords(8, y,value, true);
                 }
             }
         }
