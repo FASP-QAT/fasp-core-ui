@@ -1039,7 +1039,7 @@ export default class BuildTree extends Component {
                             },
                             startDate: map1.get("3"),
                             stopDate: map1.get("4"),
-                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                            dataValue: map1.get("2") == 2 ? (map1[0] != "" ? "-" : "") + map1.get("6") : (map1[0] != "" ? "-" : "") + map1.get("5"),
                             nodeDataModelingId: ''
                         }
                         data.push(obj);
@@ -1092,7 +1092,7 @@ export default class BuildTree extends Component {
                 console.log("---hurrey---");
                 // })
                 transaction.oncomplete = function (event) {
-                    calculateModelingData(dataSetObj, '');
+                    // calculateModelingData(dataSetObj, '');
                     console.log("all good >>>>");
                     this.setState({
                         items,
@@ -3898,7 +3898,7 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                
+
                 var minMonth = this.state.forecastStartDate;
                 var maxMonth = this.state.forecastStopDate;
                 console.log("minMonth---", minMonth);
@@ -4594,7 +4594,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-        
+
             maintainAspectRatio: false
             ,
             legend: {
@@ -5432,7 +5432,7 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
-                        <SupplyPlanFormulas ref="formulaeChild" />
+                            <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 

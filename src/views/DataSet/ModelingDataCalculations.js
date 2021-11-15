@@ -64,12 +64,14 @@ export function calculateModelingData(dataset, props, page) {
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                        for (var ndm = 0; ndm < 1; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                             var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
+                            console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
+                            
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                             // console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
                             var startValue = 0;
@@ -147,9 +149,14 @@ export function calculateModelingData(dataset, props, page) {
                             } else {
                                 endValue = Number(startValue) + Number(difference);
                                 endValueWMC = Number(startValueWMC) + Number(differenceWMC);
+                                console.log("transfer node data value>>>", transferNodeValue);
+                                
+                                endValue += Number(transferNodeValue);
+                                endValueWMC += Number(transferNodeValue);
+                                difference += Number(transferNodeValue);
+                                differenceWMC += Number(transferNodeValue);
                             }
-                            endValue+=Number(transferNodeValue);
-                            endValueWMC+=Number(transferNodeValue);
+
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
                             var endValueWithoutManualChange = endValue;
                             var endValueWithoutManualChangeWMC = endValueWMC;
