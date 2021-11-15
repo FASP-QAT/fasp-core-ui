@@ -1381,7 +1381,7 @@
     "static.dataSource.program": "Program",
     "static.dashboard.supplierheader": "Manufacturer",
     "static.shipment.rate": "Rate (USD)",
-    "static.program.programDiscription": "program Discription",
+    "static.program.programDiscription": "Program Description",
     "static.report.planningUnit/ForecastingUnit": "Planning Unit/Forecasting Unit",
     "static.organisation.organisationtext": "Enter Organization Name",
     "static.supplyPlan.notesDetailsCon": "DD-MMM-YY (Region | Data Source) Notes",

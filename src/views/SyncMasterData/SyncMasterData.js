@@ -175,7 +175,7 @@ export default class SyncMasterData extends Component {
     syncDatasetData(datasetList) {
         console.log("datasetListFiltered+++", datasetList);
         for (var i = 0; i < datasetList.length; i++) {
-            calculateModelingData(datasetList[i], this);
+            calculateModelingData(datasetList[i], this,"syncPage");
         }
     }
 
@@ -608,6 +608,9 @@ export default class SyncMasterData extends Component {
                                 if (this.props.location.state != undefined) {
                                     datasetListFiltered = datasetList.filter(c => (this.props.location.state.programIds).includes(c.id));
                                 }
+                                datasetList.filter(c => c.userId == userId).map(program => {
+                                    pIds.push(program.programId);
+                                });
                                 // var datasetListFiltered=datasetList;
                                 this.setState({
                                     totalMasters: tm + myResult.length + datasetListFiltered.length
