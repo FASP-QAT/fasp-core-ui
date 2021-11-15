@@ -1017,7 +1017,7 @@ export default class BuildTree extends Component {
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                        console.log("data[itemIndex]---",this.state.scalingList);
+                        console.log("data[itemIndex]---", this.state.scalingList);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
                         var transfer = map1[0] != "" ? map1.get("0") : '';
                         obj.transferNodeDataId = transfer;
@@ -1027,7 +1027,7 @@ export default class BuildTree extends Component {
                         obj.stopDate = map1.get("4");
                         obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
                         obj.nodeDataModelingId = map1.get("9")
-                        
+
                         data[itemIndex] = obj;
                     } else {
                         obj = {
@@ -1317,7 +1317,7 @@ export default class BuildTree extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
-            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue).toFixed(2);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
         this.setState({
