@@ -64,7 +64,7 @@ export function calculateModelingData(dataset, props, page) {
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        for (var ndm = 0; ndm < 1; ndm++) {
+                        for (var ndm = 0; ndm < scenarioList; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                             var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
