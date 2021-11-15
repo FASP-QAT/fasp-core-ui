@@ -52,6 +52,7 @@ import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
 import AuthenticationService from '../Common/AuthenticationService';
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -1317,7 +1318,7 @@ export default class BuildTree extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
-            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue).toFixed(2);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
         this.setState({
@@ -4497,28 +4498,6 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
             maintainAspectRatio: false
             ,
             legend: {
@@ -4615,28 +4594,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
+        
             maintainAspectRatio: false
             ,
             legend: {
@@ -5474,8 +5432,9 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
-                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
                             </a>
                         </div>
