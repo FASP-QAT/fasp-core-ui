@@ -1770,7 +1770,7 @@ export default class BuildTree extends Component {
                     if (rowData[2] != 5) {
                         calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(2);
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed();
+                        calculatedChangeForMonth = parseFloat(value);
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
