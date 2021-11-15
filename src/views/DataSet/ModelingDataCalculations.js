@@ -179,12 +179,15 @@ export function calculateModelingData(dataset, props, page) {
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
                                 // Jo uske parent ki calculated value hai Uska endValue %
                                 var parent = flatList[fl].parent;
-                                var parentNodeDataId = (flatList.filter(c => c.id == parent)[0].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
+                                var parentFiltered = (flatList.filter(c => c.id == parent))[0];
+                                var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                var parentNodeDataId = singleNodeData.nodeDataId;
                                 var parentValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValue;
                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
-
-                                var parentValueWMC = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0].calculatedValueWMC;
-                                calculatedValueWMC = (Number(Number(parentValueWMC) * Number(endValueWMC)) / 100);
+                                var parentValueWMC = 0;
+                                var parentNodeValueForWMC = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == parentNodeDataId)[0];
+                                var parentValueWMC = parentFiltered.payload.nodeType.id == 2 ? parentNodeValueForWMC.endValueWithManualChangeWMC : parentNodeValueForWMC.calculatedValueWMC;
+                                calculatedValueWMC = (Number(Number(parentValueWMC) * Number(endValueWithManualChangeWMC)) / 100);
                             }
                             // calculatedValue = Number(calculatedValue)
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
@@ -229,32 +232,52 @@ export function calculateModelingData(dataset, props, page) {
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var childNodeFlatList = flatList.filter(c => c.parent == aggregateNodeList[fl].id);
-                            var aggregatedNodeValue = 0;
+                            var aggregatedStartValue = 0;
+                            var aggregatedEndValue = 0;
+                            var aggregatedCalculatedValue = 0;
+                            var aggregatedDifference = 0;
+                            var aggregatedStartValueWMC = 0;
+                            var aggregatedEndValueWMC = 0;
+                            var aggregatedCalculatedValueWMC = 0;
+                            var aggregatedDifferenceWMC = 0;
+                            var aggregatedEndValueWithoutAddingManualChange = 0;
+                            var aggregatedEndValueWithoutAddingManualChangeWMC = 0;
+                            var aggregatedEndValueWithManualChangeWMC = 0;
                             for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
                                 var childNodeDataId = (childNodeFlatList[cnfl].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId;
-                                var nodeDataListFiltered = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == childNodeDataId)[0]).calculatedValue;
-                                aggregatedNodeValue += Number(nodeDataListFiltered);
+                                var nodeDataListFiltered = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD") && c.nodeDataId == childNodeDataId)[0]);
+                                aggregatedStartValue += Number(nodeDataListFiltered.startValue);
+                                aggregatedEndValue += Number(nodeDataListFiltered.endValue);
+                                aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
+                                aggregatedDifference += Number(nodeDataListFiltered.difference);
+                                aggregatedStartValueWMC += Number(nodeDataListFiltered.startValueWMC);
+                                aggregatedEndValueWMC += Number(nodeDataListFiltered.endValueWMC);
+                                aggregatedCalculatedValueWMC += Number(nodeDataListFiltered.calculatedValue);
+                                aggregatedDifferenceWMC += Number(nodeDataListFiltered.differenceWMC);
+                                aggregatedEndValueWithoutAddingManualChange += Number(nodeDataListFiltered.endValueWithoutAddingManualChange);
+                                aggregatedEndValueWithoutAddingManualChangeWMC += Number(nodeDataListFiltered.endValueWithoutAddingManualChangeWMC);
+                                aggregatedEndValueWithManualChangeWMC += Number(nodeDataListFiltered.endValueWithManualChangeWMC);
                             }
                             nodeDataList.push(
                                 {
                                     month: curDate,
                                     nodeDataId: nodeDataMapForScenario.nodeDataId,
-                                    startValue: aggregatedNodeValue,
-                                    endValue: aggregatedNodeValue,
-                                    calculatedValue: aggregatedNodeValue,
-                                    difference: 0,
+                                    startValue: aggregatedStartValue,
+                                    endValue: aggregatedEndValue,
+                                    calculatedValue: aggregatedCalculatedValue,
+                                    difference: aggregatedDifference,
                                     scenarioId: scenarioList[ndm].id,
                                     id: flatList[fl].id,
                                     treeId: treeList[tl].treeId,
-                                    startValueWMC: aggregatedNodeValue,
-                                    endValueWMC: aggregatedNodeValue,
-                                    calculatedValueWMC: aggregatedNodeValue,
+                                    startValueWMC: aggregatedStartValueWMC,
+                                    endValueWMC: aggregatedEndValueWMC,
+                                    calculatedValueWMC: aggregatedCalculatedValueWMC,
                                     seasonalityPerc: 0,
                                     manualChange: 0,
-                                    differenceWMC: 0,
-                                    endValueWithoutAddingManualChange: aggregatedNodeValue,
-                                    endValueWithoutAddingManualChangeWMC: aggregatedNodeValue,
-                                    endValueWithManualChangeWMC: aggregatedNodeValue,
+                                    differenceWMC: aggregatedDifferenceWMC,
+                                    endValueWithoutAddingManualChange: aggregatedEndValueWithoutAddingManualChange,
+                                    endValueWithoutAddingManualChangeWMC: aggregatedEndValueWithoutAddingManualChangeWMC,
+                                    endValueWithManualChangeWMC: aggregatedEndValueWithManualChangeWMC,
                                 }
                             );
 

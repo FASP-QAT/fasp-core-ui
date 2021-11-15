@@ -664,9 +664,9 @@ export default class BuildTree extends Component {
             data[3] = momList[j].manualChange
             data[4] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWithManualChangeWMC
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = this.state.manualChange ? momListParent[j].calculatedValue : (momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC
-            // data[6] = this.state.manualChange ? momList[j].calculatedValue : (momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].calculatedValueWMC
-            data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC * momList[j].endValueWithManualChangeWMC) / 100
+            data[5] = this.state.manualChange ? momListParent[j].calculatedValue : momListParent[j].calculatedValueWMC
+            data[6] = this.state.manualChange ? momList[j].calculatedValue :  momList[j].calculatedValueWMC;
+            // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = momList[j].nodeDataId
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
