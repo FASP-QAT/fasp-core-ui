@@ -5836,7 +5836,8 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                         </div>
                                     </div>
-                                    <div id="momJexcelPer" className={"RowClickable"}>
+                                    <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label,this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label,this.state.lang)}</b></i></div>
+                                    <div id="momJexcelPer" className={"RowClickable perNodeData"}>
                                     </div>
                                     <div className="col-md-12 pr-lg-0">
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
