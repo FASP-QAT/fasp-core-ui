@@ -4395,6 +4395,7 @@ export default class BuildTree extends Component {
 
             this.setState({
                 // parentNodeDataMap: data.parentItem.payload.nodeDataMap,
+                showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
                 openAddNodeModal: true,
