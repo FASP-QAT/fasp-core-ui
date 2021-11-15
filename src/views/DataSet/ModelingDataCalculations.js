@@ -64,13 +64,13 @@ export function calculateModelingData(dataset, props, page) {
                     if (payload.nodeType.id != 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        for (var ndm = 0; ndm < 1; ndm++) {
+                        for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                             var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
-                            console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
+                            // console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
                             
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                             // console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
@@ -121,20 +121,20 @@ export function calculateModelingData(dataset, props, page) {
                                     differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
                                 //Exponential %
-                                else if (nodeDataModeling.modelingType.id == 4) {
+                                else if (nodeDataModeling.modelingType.id == 4  && nodeDataModeling.transferNodeDataId == null) {
                                     difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                                     differenceWMC += Number((Number(startValueWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
                                 //Linear % point
-                                else if (nodeDataModeling.modelingType.id == 5) {
+                                else if (nodeDataModeling.modelingType.id == 5  && nodeDataModeling.transferNodeDataId == null) {
                                     difference += Number(nodeDataModeling.dataValue);
                                     differenceWMC += Number(nodeDataModeling.dataValue);
                                 }
                                 //Linear # transfer
-                                if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null) {
+                                if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                     transferNodeValue += Number(nodeDataModeling.dataValue);
                                 }
-                                if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null) {
+                                if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                     transferNodeValue += Number(nodeDataModeling.dataValue);
                                 }
                             }
@@ -147,12 +147,17 @@ export function calculateModelingData(dataset, props, page) {
                                 difference = 0;
                                 differenceWMC = 0;
                             } else {
+                                // console.log("difference+++",difference)
                                 endValue = Number(startValue) + Number(difference);
                                 endValueWMC = Number(startValueWMC) + Number(differenceWMC);
-                                console.log("transfer node data value>>>", transferNodeValue);
-                                
+                                // console.log("CurDate+++",curDate)
+                                // console.log("transfer node data value+++", transferNodeValue);
+                                // console.log("ENdValue before+++",endValue)
+                                // console.log("ENdValueWMC before+++",endValueWMC)
                                 endValue += Number(transferNodeValue);
                                 endValueWMC += Number(transferNodeValue);
+                                // console.log("ENdValue+++",endValue)
+                                // console.log("ENdValueWMC+++",endValueWMC)
                                 difference += Number(transferNodeValue);
                                 differenceWMC += Number(transferNodeValue);
                             }
