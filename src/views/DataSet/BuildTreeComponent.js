@@ -1177,7 +1177,7 @@ export default class BuildTree extends Component {
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[2])
                 if (rowData[2] != "") {
-                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    // var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
 
                     // Month change %
                     if (rowData[2] != 2) {
@@ -1189,12 +1189,12 @@ export default class BuildTree extends Component {
                             this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
-                        else if (!(reg.test(value))) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                            valid = false;
-                        }
+                        // else if (!(reg.test(value))) {
+                        //     this.el.setStyle(col, "background-color", "transparent");
+                        //     this.el.setStyle(col, "background-color", "yellow");
+                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     valid = false;
+                        // }
                         else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -1506,8 +1506,8 @@ export default class BuildTree extends Component {
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
-            data[6] = scalingList[j].modelingType.id == 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
+            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
+            data[6] = scalingList[j].modelingType.id == 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
             data[7] = cleanUp
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -1516,7 +1516,7 @@ export default class BuildTree extends Component {
             } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
                 calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
             }
-            data[8] = parseFloat(calculatedChangeForMonth).toFixed(2)
+            data[8] = parseFloat(calculatedChangeForMonth).toFixed(4)
             data[9] = scalingList[j].nodeDataModelingId
             data[10] = 0
             scalingTotal = scalingTotal + calculatedChangeForMonth;
@@ -1563,12 +1563,12 @@ export default class BuildTree extends Component {
                 {
                     title: "Monthly Change (%)",
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##.0000', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##'
+                    mask: '#,##.0000', decimal: '.',
                 },
                 {
                     title: "Modeling Calculater",
@@ -1577,7 +1577,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##.0000', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1746,7 +1746,7 @@ export default class BuildTree extends Component {
         var rowData = elInstance.getRowData(y);
         console.log("modelingTypeId-3--", rowData[2])
         if (rowData[2] != "") {
-            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            // var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -1759,18 +1759,18 @@ export default class BuildTree extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     if (rowData[2] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(2);
+                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
                     } else {
-                        calculatedChangeForMonth = parseFloat(value);
+                        calculatedChangeForMonth = parseFloat(value).toFixed(4);
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
@@ -1783,15 +1783,15 @@ export default class BuildTree extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                else if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                }
+                // else if (!(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                // }
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(2), true);
+                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
                 }
             }
         }
