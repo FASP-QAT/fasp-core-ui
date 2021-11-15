@@ -5323,3 +5323,7 @@ fieldset.scheduler-border {
       padding:0 10px;
       border-bottom:none;
   }
+  .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
+    top: unset!important;
+    left: unset!important;
+  }

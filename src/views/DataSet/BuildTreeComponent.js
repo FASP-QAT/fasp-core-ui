@@ -5052,7 +5052,7 @@ export default class BuildTree extends Component {
                         <div>
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
-                                    <div id="modelingJexcel" className={"RowClickable"}>
+                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
