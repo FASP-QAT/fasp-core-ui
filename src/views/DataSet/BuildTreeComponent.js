@@ -1006,18 +1006,18 @@ export default class BuildTree extends Component {
             //     loading: true
             // })
             var tableJson = this.el.getJson(null, false);
-            var data = this.state.scalingList;
+            var data = this.state.currentScenario.nodeDataModelingList;
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
             const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("10 map---" + map1.get("10"))
+                // console.log("10 map---" + map1.get("10"))
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                        console.log("data[itemIndex]---", this.state.scalingList);
+                        console.log("data[itemIndex]---", data[itemIndex]);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
                         var transfer = map1[0] != "" ? map1.get("0") : '';
                         obj.transferNodeDataId = transfer;
@@ -1983,12 +1983,17 @@ export default class BuildTree extends Component {
                     datasetList: myResult
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-                    this.setState({ dataSetObj: dataSetObj });
-
-                    calculateModelingData(dataSetObj, this, "BuildTree");
+                    var dataEnc = dataSetObj;
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                     console.log("dataSetObj.programData***>>>", programData);
+                    this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
+                        // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
+                        calculateModelingData(dataEnc, this, "BuildTree");
+                    });
+
+
+
 
 
 
@@ -3268,6 +3273,7 @@ export default class BuildTree extends Component {
             this.getDatasetList();
             this.getModelingTypeList();
             this.getRegionList();
+
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -3891,8 +3897,11 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                var minMonth = moment(month).subtract(this.state.forecastStartDate, 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(month).add(this.state.forecastStopDate, 'months').endOf('month').format("YYYY-MM-DD");
+                
+                var minMonth = this.state.forecastStartDate;
+                var maxMonth = this.state.forecastStopDate;
+                console.log("minMonth---", minMonth);
+                console.log("maxMonth---", maxMonth);
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
