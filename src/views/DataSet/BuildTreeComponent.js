@@ -5596,7 +5596,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangeNumber"
