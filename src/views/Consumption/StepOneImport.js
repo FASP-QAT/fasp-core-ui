@@ -35,7 +35,7 @@ import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from '../../api/ProgramService';
 import PlanningUnitService from '../../api/PlanningUnitService';
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX } from '../../Constants.js';
 import CryptoJS from 'crypto-js'
@@ -68,7 +68,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // rangeValue: { from: { year: 2020, month: 1 }, to: { year: 2024, month: 12 } },
             // minDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
             // maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
-            loading: false,
+            // loading: false,
             selSource: [],
             programs: [],
             programId: '',
@@ -108,7 +108,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     hideSecondComponent() {
         // alert("HI");
         setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
+            document.getElementById('div12').style.display = 'none';
         }, 8000);
     }
 
@@ -161,6 +161,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 // console.log("planningUnitListJexcel----->3", tempList);
                 this.props.updateStepOneData("planningUnitListJexcel", tempList);
                 this.props.updateStepOneData("planningUnitList", response.data);
+                this.props.updateStepOneData("loading", false);
             });
         }).catch(
             error => {
@@ -373,7 +374,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
+        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
@@ -586,6 +588,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
 
+                this.props.updateStepOneData("loading", true);
                 this.props.updateStepOneData("programId", programId);
                 this.props.updateStepOneData("versionId", versionId);
                 this.props.updateStepOneData("forecastProgramId", forecastProgramId);
@@ -614,6 +617,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             this.setState({
                                 programPlanningUnitList: response.data,
                                 selSource: response.data,
+                                message: ''
                             }, () => {
                                 if (response.data.length == 0) {
                                     document.getElementById("stepOneBtn").disabled = true;
@@ -673,11 +677,45 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     color: 'red'
                 },
                     () => {
-                        this.hideSecondComponent();
+                        // this.hideSecondComponent();
                     })
             }
 
+        } else if (programId == 0) {
+            this.setState({
+                programPlanningUnitList: [],
+                selSource: [],
+                message: 'Please select supply plan program'
+            })
+            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+            this.el.destroy();
+            document.getElementById("stepOneBtn").disabled = true;
+        } else if (versionId == 0) {
+            this.setState({
+                programPlanningUnitList: [],
+                selSource: [],
+                message: 'Please select supply plan version'
+            })
+            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+            this.el.destroy();
+            document.getElementById("stepOneBtn").disabled = true;
+        } else if (forecastProgramId == 0) {
+            this.setState({
+                programPlanningUnitList: [],
+                selSource: [],
+                message: 'Please select forecast program'
+            })
+            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+            this.el.destroy();
+            document.getElementById("stepOneBtn").disabled = true;
         } else {
+            this.setState({
+                programPlanningUnitList: [],
+                selSource: [],
+                message: ''
+            })
+            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+            this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
 
@@ -934,14 +972,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             }.bind(this),
             selectionCopy: false,
-            pagination: false,
+            pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
-            // position: 'top',
+            position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
@@ -953,7 +991,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // onpaste: this.onPaste,
             // oneditionend: this.oneditionend,
             text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
                 entries: '',
@@ -969,6 +1006,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             loading: false,
             forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate
         })
+        this.props.updateStepOneData("loading", false);
     }
 
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
@@ -1004,6 +1042,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             versionId: ''
         }, () => {
             this.filterVersion();
+            this.filterData();
         })
 
     }
@@ -1218,7 +1257,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className="red" id="div2">{this.state.message}</h5>
+                <h5 className="red" id="div12">{this.state.message}</h5>
 
                 <div className="row ">
                     <FormGroup className="col-md-3">
@@ -1309,12 +1348,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     </FormGroup>
                 </div>
 
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapPlanningUnit">
                     </div>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.props.items.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>

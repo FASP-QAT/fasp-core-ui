@@ -37,7 +37,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from "moment";
@@ -52,7 +52,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         this.state = {
             lang: localStorage.getItem('lang'),
-            loading: false,
+            // loading: false,
             selSource: [],
             actualConsumptionData: [],
             stepOneData: [],
@@ -61,12 +61,97 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             forecastProgramId: '',
             startDate: '',
             stopDate: '',
+            buildCSVTable: [],
+            languageEl: '',
 
         }
 
         this.buildJexcel = this.buildJexcel.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
+        this.changeColor = this.changeColor.bind(this);
 
+    }
+
+    changeColor() {
+
+        var elInstance1 = this.el;
+        var elInstance = this.state.languageEl;
+
+        var json = elInstance.getJson();
+
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        for (var j = 0; j < json.length; j++) {
+
+
+            var rowData = elInstance.getRowData(j);
+            // console.log("elInstance---->", elInstance);
+
+            var id = rowData[9];
+
+            if (id == 1) {
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
+                    // let textColor = contrast('#f48282');
+                    // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+                }
+            } else {
+                for (var i = 0; i < colArr.length; i++) {
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                }
+            }
+        }
+    }
+
+    dateFormatter = value => {
+        return moment(value).format('MMM YY')
+    }
+
+    exportCSV() {
+
+        var csvRow = [];
+
+        // this.state.countryLabels.map(ele =>
+        //     csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+
+        // csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('')
+
+        const headers = [];
+        // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        headers.push('Supply Plan Planning Unit');
+        headers.push('Forecast Planning Unit');
+        headers.push('Region');
+        headers.push('Month');
+        headers.push('Supply Plan Consumption');
+        headers.push('Multiplier');
+        headers.push('ConvertedConsumption');
+        headers.push('Current QAT Consumption');
+        headers.push('Import?');
+
+
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption, ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption, ele.import == true ? 'Yes' : 'No'])));
+        for (var i = 0; i < A.length; i++) {
+            // console.log(A[i])
+            csvRow.push(A[i].join(","))
+
+        }
+
+        var csvString = csvRow.join("%0A")
+        // console.log('csvString' + csvString)
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = 'ImportFromQATSupplyPlan' + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
     }
 
     formSubmit() {
@@ -77,6 +162,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {
                     label: i18n.t('static.program.yes'),
                     onClick: () => {
+                        this.props.updateStepOneData("loading", true);
                         var tableJson = this.el.getJson(null, false);
                         var programs = [];
                         var ImportListNotPink = [];
@@ -232,6 +318,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 color: 'red'
                             })
                             this.hideFirstComponent()
+                            this.props.updateStepOneData("loading", false);
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
                             db1 = e.target.result;
@@ -264,6 +351,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     color: "red",
                                 }, () => {
                                     this.hideSecondComponent();
+                                    this.props.updateStepOneData("loading", false);
                                 });
                                 console.log("Data update errr");
                             }.bind(this);
@@ -280,39 +368,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild;
-        // tr.children[1].classList.add('AsteriskTheadtrTd');
-        // tr.children[2].classList.add('AsteriskTheadtrTd');
 
-        // var elInstance = instance.jexcel;
-        // var json = elInstance.getJson();
-        // // console.log("elInstance---->", elInstance);
-
-        // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
-        // for (var j = 0; j < json.length; j++) {
-
-
-        //     var rowData = elInstance.getRowData(j);
-        //     // console.log("elInstance---->", elInstance);
-
-        //     var id = rowData[9];
-        //     console.log("elInstance---->", id);
-
-        //     if (id == 1) {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
-        //             let textColor = contrast('#f48282');
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-        //         }
-        //     } else {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //         }
-        //     }
-        // }
     }
 
     componentDidMount() {
@@ -421,6 +477,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
+        var buildCSVTable = [];
 
         var count = 0;
         if (papuList.length != 0) {
@@ -454,6 +511,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 papuDataArr[count] = data;
                 count++;
+
+                buildCSVTable.push({
+                    supplyPlanPlanningUnit: getLabelText(papuList[j].planningUnit.label, this.state.lang),
+                    forecastPlanningUnit: this.props.items.planningUnitListJexcel.filter(c => c.id == stepOneSelectedObject.forecastPlanningUnitId)[0].name,
+                    region: getLabelText(papuList[j].region.label, this.state.lang),
+                    month: papuList[j].month,
+                    supplyPlanConsumption: papuList[j].actualConsumption,
+                    multiplier: stepOneSelectedObject.multiplier,
+                    convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(6),
+                    currentQATConsumption: (match.length > 0 ? match[0].actualConsumption : ''),
+                    import: true
+
+                })
             }
         }
 
@@ -584,14 +654,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
             // }.bind(this),
             // editable: false,
-            pagination: false,
+            pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
-            // position: 'top',
+            position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
@@ -608,17 +678,28 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 show: '',
                 entries: '',
             },
-            onload: this.loaded,
+            onload: function (obj, x, y, e) {
+                // jExcelLoadedFunctionWithoutPagination(obj);
+                jExcelLoadedFunction(obj);
+                var asterisk = document.getElementsByClassName("resizable")[0];
+                var tr = asterisk.firstChild;
+                // tr.children[1].classList.add('AsteriskTheadtrTd');
+                // tr.children[2].classList.add('AsteriskTheadtrTd');
+            },
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: false
+            contextMenu: false,
         };
 
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable
+        }, () => {
+            this.props.updateStepOneData("loading", false);
+            this.changeColor();
         })
+
     }
 
     render() {
@@ -627,7 +708,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             <>
                 <div className="Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
-                    {this.state.selSource.length > 0 && <div className="card-header-actions">
+                    {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">
                         <a className="card-header-action">
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                         </a>
@@ -635,17 +716,24 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h4 className="red">{this.props.message}</h4> */}
-                <ul className="legendcommitversion list-group">
+                {/* <ul className="legendcommitversion list-group">
                     <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
-                </ul>
+                </ul> */}
+                <div class="col-md-12 mt-2 pl-lg-0 form-group">
+                    <ul class="legendcommitversion list-group">
+                        <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
+                            <span class="legendcommitversionText red">Data already exists in Forecast Program</span>
+                        </li>
+                    </ul>
+                </div>
                 <h5 className="red">All values below are in supply planning units.</h5>
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapImport" className="jexcelremoveReadonlybackground">
                     </div>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.props.items.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>

@@ -33,7 +33,7 @@ import Picker from 'react-month-picker';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import getLabelText from '../../CommonComponent/getLabelText';
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from "moment";
@@ -51,7 +51,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
         this.state = {
             lang: localStorage.getItem('lang'),
-            loading: false,
+            // loading: false,
             selSource: [],
             programRegionList: [],
             forecastProgramRegionList: []
@@ -178,7 +178,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
+        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         // tr.children[3].classList.add('AsteriskTheadtrTd');
@@ -339,14 +340,15 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 }
 
             }.bind(this),
-            pagination: false,
+            pagination: localStorage.getItem("sesRecordCount"),
+            // pagination: false,
             filters: true,
             search: true,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
-            // position: 'top',
+            position: 'top',
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
@@ -373,6 +375,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.setState({
             loading: false
         })
+        this.props.updateStepOneData("loading", false);
     }
 
     render() {
@@ -382,12 +385,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
 
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }} >
+                <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapRegion">
                     </div>
                 </div>
-                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div style={{ display: this.props.items.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>

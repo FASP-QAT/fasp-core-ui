@@ -134,7 +134,7 @@ export default class ImportFromQATSupplyPlan extends Component {
 
     }
     finishedStepOne() {
-        this.setState({ progressPer: 50 });
+        this.setState({ progressPer: 50, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
         document.getElementById('stepTwoImport').style.display = 'block';
         document.getElementById('stepThreeImport').style.display = 'none';
@@ -143,7 +143,7 @@ export default class ImportFromQATSupplyPlan extends Component {
         this.refs.countryChild.filterData();
     }
     finishedStepTwo() {
-        this.setState({ progressPer: 100 });
+        this.setState({ progressPer: 100, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'block';
@@ -152,7 +152,7 @@ export default class ImportFromQATSupplyPlan extends Component {
         this.refs.child.filterData();
     }
     finishedStepThree() {
-        this.setState({ progressPer: 0 });
+        this.setState({ progressPer: 0, loading: true });
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
@@ -165,7 +165,7 @@ export default class ImportFromQATSupplyPlan extends Component {
     }
 
     previousToStepOne() {
-        this.setState({ progressPer: 0 });
+        this.setState({ progressPer: 0, loading: true });
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
@@ -174,10 +174,22 @@ export default class ImportFromQATSupplyPlan extends Component {
     }
 
     previousToStepTwo() {
-        this.setState({ progressPer: 50 });
+        this.setState({ progressPer: 50, loading: true });
         document.getElementById('stepOneImport').style.display = 'none';
         document.getElementById('stepTwoImport').style.display = 'block';
         document.getElementById('stepThreeImport').style.display = 'none';
+
+        let planningUnitListJexcel = this.state.planningUnitListJexcel;
+        planningUnitListJexcel.unshift({
+            name: 'Do not import',
+            id: -1,
+            multiplier: 1,
+            active: true,
+            forecastingUnit: []
+        });
+        this.setState({
+            planningUnitListJexcel: planningUnitListJexcel
+        });
 
         this.refs.countryChild.filterData();
     }
