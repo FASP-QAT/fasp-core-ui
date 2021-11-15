@@ -1304,6 +1304,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/validation/modelingValidation":
+                    case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
