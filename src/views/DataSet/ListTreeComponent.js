@@ -230,7 +230,7 @@ export default class ListTreeComponent extends Component {
                 },
                 {
                     title: 'ProgramId',
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true
                 }
 
