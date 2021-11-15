@@ -1039,7 +1039,7 @@ export default class BuildTree extends Component {
                             },
                             startDate: map1.get("3"),
                             stopDate: map1.get("4"),
-                            dataValue: map1.get("2") == 2 ? (map1[0] != "" ? "-" : "") + map1.get("6") : (map1[0] != "" ? "-" : "") + map1.get("5"),
+                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
                             nodeDataModelingId: ''
                         }
                         data.push(obj);
@@ -1092,7 +1092,7 @@ export default class BuildTree extends Component {
                 console.log("---hurrey---");
                 // })
                 transaction.oncomplete = function (event) {
-                    // calculateModelingData(dataSetObj, '');
+                    calculateModelingData(dataSetObj, '');
                     console.log("all good >>>>");
                     this.setState({
                         items,
@@ -1177,7 +1177,7 @@ export default class BuildTree extends Component {
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[2])
                 if (rowData[2] != "") {
-                    // var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
 
                     // Month change %
                     if (rowData[2] != 2) {
@@ -1211,12 +1211,12 @@ export default class BuildTree extends Component {
                             this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
-                        else if (!(reg.test(value))) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                            valid = false;
-                        }
+                        // else if (!(reg.test(value))) {
+                        //     this.el.setStyle(col, "background-color", "transparent");
+                        //     this.el.setStyle(col, "background-color", "yellow");
+                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     valid = false;
+                        // }
                         else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -1532,7 +1532,7 @@ export default class BuildTree extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [90, 80, 80, 80, 90, 90, 90, 90, 90],
+            colWidths: [90, 160, 80, 80, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1563,12 +1563,12 @@ export default class BuildTree extends Component {
                 {
                     title: "Monthly Change (%)",
                     type: 'numeric',
-                    mask: '#,##.0000', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                 },
                 {
                     title: "Monthly Change (#)",
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##.0000', decimal: '.',
+                    mask: '#,##'
                 },
                 {
                     title: "Modeling Calculater",
@@ -1577,7 +1577,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.0000', decimal: '.',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1791,7 +1791,7 @@ export default class BuildTree extends Component {
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
+                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(2), true);
                 }
             }
         }
@@ -3898,7 +3898,7 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-
+                
                 var minMonth = this.state.forecastStartDate;
                 var maxMonth = this.state.forecastStopDate;
                 console.log("minMonth---", minMonth);
@@ -4594,7 +4594,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-
+        
             maintainAspectRatio: false
             ,
             legend: {
@@ -5432,7 +5432,7 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
-                            <SupplyPlanFormulas ref="formulaeChild" />
+                        <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
@@ -5607,7 +5607,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangeNumber"
