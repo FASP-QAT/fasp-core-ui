@@ -122,6 +122,9 @@ export function calculateModelingData(dataset, props) {
                                 if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null) {
                                     transferNodeValue += Number(nodeDataModeling.dataValue);
                                 }
+                                if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null) {
+                                    transferNodeValue += Number(nodeDataModeling.dataValue);
+                                }
                             }
                             var endValue = 0;
                             var endValueWMC = 0;
@@ -133,7 +136,8 @@ export function calculateModelingData(dataset, props) {
                                 endValue = Number(startValue) + Number(difference);
                                 endValueWMC = Number(startValueWMC) + Number(difference);
                             }
-
+                            endValue+=Number(transferNodeValue);
+                            endValueWMC+=Number(transferNodeValue);
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
                             var totalManualChange = 0;
                             if (nodeDataOverrideListFiltered.length > 0) {
@@ -161,8 +165,8 @@ export function calculateModelingData(dataset, props) {
                                 calculatedValue = Number(calculatedValue);
                                 calculatedValueWMC = Number(calculatedValueWMC);
                             } else {
-                                calculatedValue = Number(calculatedValue) + Number(transferNodeValue);
-                                calculatedValueWMC = Number(calculatedValueWMC) + Number(transferNodeValue);
+                                calculatedValue = Number(calculatedValue);
+                                calculatedValueWMC = Number(calculatedValueWMC);
                             }
                             nodeDataList.push(
                                 {

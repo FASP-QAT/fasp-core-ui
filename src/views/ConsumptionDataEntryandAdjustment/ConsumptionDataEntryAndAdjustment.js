@@ -36,6 +36,7 @@ import bsCustomFileInput from 'bs-custom-file-input'
 import JSZip from 'jszip';
 import { da } from 'date-fns/locale';
 import NumberFormat from 'react-number-format';
+import { mixed } from 'yup';
 
 const entityname = i18n.t('static.consumption.consumptionDataEntryandAdjustment');
 
@@ -57,9 +58,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       forecastingUnitList: [],
       aruList: [],
       loading: true,
+      selectedPlanningUnitId: ""
     }
     this.loaded = this.loaded.bind(this);
-    this.buildDataJexcel=this.buildDataJexcel.bind(this)
+    this.buildDataJexcel = this.buildDataJexcel.bind(this);
+    this.filterList = this.filterList.bind(this)
+  }
+
+  filterList = function (instance, cell, c, r, source) {
+    var value = (instance.jexcel.getJson(null, false)[r])[1];
+    return this.state.mixedList.filter(c => c.type == value);
   }
 
   buildDataJexcel(consumptionUnitId) {
@@ -70,7 +78,36 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       console.log("After set+++")
       var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']
       var consumptionList = this.state.consumptionList;
-      var consumptionUnit = this.state.consumptionUnitList.filter(c => c.forecastConsumptionUnitId == consumptionUnitId)[0];
+      var consumptionUnit = {};
+      if (consumptionUnitId > 0) {
+        consumptionUnit = this.state.consumptionUnitList.filter(c => c.forecastConsumptionUnitId == consumptionUnitId)[0];
+      } else {
+        consumptionUnit = {
+          forecastConsumptionUnitId: 0,
+          dataType: 0,
+          forecastingUnit: {
+            id: 0,
+            label: {
+              label_en: ""
+            },
+            multiplier: 1
+          }, planningUnit: {
+            id: 0,
+            label: {
+              label_en: ""
+            },
+            multiplier: 1
+          }, otherUnit: {
+            id: 0,
+            label: {
+              label_en: ""
+            },
+            multiplier: 1
+          }
+
+        }
+      }
+
       console.log("After set 1+++")
       var multiplier = 1;
       if (consumptionUnitId != 0) {
@@ -202,11 +239,146 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       };
       var dataEl = jexcel(document.getElementById("tableDiv"), options);
       this.el = dataEl;
+
+      // <td>{this.state.selectedConsumptionUnitId != 0 ? <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false} readOnly ></input> : <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false}></input>}</td>
+      // <td>{c.dataType == 1 ? "Forecasting Unit" : c.dataType == 2 ? "Planning Unit" : "Other"}</td>
+      // <td>{c.dataType == 1 ? getLabelText(c.forecastingUnit.label, this.state.lang) : c.dataType == 2 ? getLabelText(c.planningUnit.label, this.state.lang) : getLabelText(c.otherUnit.label, this.state.label)}</td>
+      // <td>{c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier}</td>
+
+      let dataList = this.state.consumptionUnitList;
+      // console.log("langaugeList---->", langaugeList);
+      let dataArray1 = [];
+      var mixedList = [];
+      var fuList = this.state.forecastingUnitList;
+      for (var fu = 0; fu < fuList.length; fu++) {
+        var json = {
+          id: fuList[fu].forecastingUnitId,
+          name: getLabelText(fuList[fu].label),
+          type: 1
+        }
+        mixedList.push(json)
+      }
+      var puList = this.state.planningUnitList;
+      for (var pu = 0; pu < fuList.length; pu++) {
+        var json = {
+          id: puList[pu].planningUnitId,
+          name: getLabelText(puList[pu].label),
+          type: 2
+        }
+        mixedList.push(json)
+      }
+      var aruList = this.state.aruList;
+      for (var aru = 0; aru < aruList.length; aru++) {
+        var json = {
+          id: aruList[aru].realmCountryPlanningUnitId,
+          name: getLabelText(aruList[pu].label),
+          type: 3
+        }
+        mixedList.push(json)
+      }
+      mixedList.push()
+
+      for (var j = 0; j < dataList.length; j++) {
+        if (dataList[j].dataType == 3) {
+          mixedList.push({ id: getLabelText(dataList[j].otherUnit.label, this.state.lang), name: getLabelText(dataList[j].otherUnit.label, this.state.lang) })
+        }
+        data = [];
+        var c = dataList[j]
+        data[0] = c.forecastConsumptionUnitId == consumptionUnitId ? true : false
+        data[1] = c.dataType;
+        data[2] = c.dataType == 1 ? c.forecastingUnit.id : c.dataType == 2 ? c.planningUnit.id : getLabelText(c.otherUnit.label, this.state.lang);
+        data[3] = c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier;
+        dataArray1.push(data);
+      }
+      if (consumptionUnitId == 0) {
+        data = [];
+        data[0] = true
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        dataArray1.push(data);
+      }
+      this.el = jexcel(document.getElementById("smallTableDiv"), '');
+      this.el.destroy();
+      var options1 = {
+        data: dataArray1,
+        columnDrag: true,
+        colWidths: [0, 150, 150, 150, 100, 100, 100],
+        colHeaderClasses: ["Reqasterisk"],
+        columns: [
+          {
+            title: 'Default',
+            type: 'radio',
+            readOnly: true
+          },
+          {
+            title: "Data Type",
+            type: 'dropdown',
+            source: [{ id: 1, name: "Forecasting Unit" }, { id: 2, name: "Planning Unit" }, { id: 3, name: "Other" }],
+          },
+          {
+            title: "Product",
+            type: 'dropdown',
+            source: mixedList,
+            filter: this.filterList
+          },
+          {
+            title: "Multiplier",
+            type: 'numeric'
+          }
+        ],
+        text: {
+          // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          show: '',
+          entries: '',
+        },
+        onload: function (obj, x, y, e) {
+          obj.jexcel.hideIndex(0);
+          var elInstance = obj.jexcel;
+          var json = obj.jexcel.getJson(null, true);
+          var l = consumptionUnitId == 0 ? json.length - 1 : json.length;
+          for (var j = 0; j < l; j++) {
+            var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+            var cell = elInstance.getCell(("D").concat(parseInt(j) + 1))
+            cell.classList.add('readonly');
+
+          }
+        },
+        pagination: false,
+        search: false,
+        columnSorting: false,
+        tableOverflow: true,
+        wordWrap: true,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        copyCompatibility: true,
+        allowExport: false,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+        position: 'top',
+        filters: true,
+        license: JEXCEL_PRO_KEY,
+        contextMenu: function (obj, x, y, e) {
+          return [];
+        }.bind(this),
+      };
+      var smallTableEl = jexcel(document.getElementById("smallTableDiv"), options1);
+      this.el = smallTableEl;
+
       console.log("After set 2+++")
       this.setState({
         dataEl: dataEl, loading: false,
+        smallTableEl: smallTableEl,
         selectedConsumptionUnitId: consumptionUnitId,
         selectedConsumptionUnitObject: consumptionUnit,
+        selectedPlanningUnitId: consumptionUnit.planningUnit.id,
+        mixedList: mixedList
       })
     })
   }
@@ -240,6 +412,52 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var consumptionList = [];
         var fullConsumptionList = this.state.consumptionList;
         var consumptionUnit = this.state.selectedConsumptionUnitObject;
+        if (this.state.selectedConsumptionUnitId == 0) {
+
+          var rowData = this.state.smallTableEl.getRowData(this.state.consumptionUnitList.length);
+          console.log("RowData+++", rowData);
+          var forecastingUnitObject = {
+            id: 0,
+            label: {
+              label_en: ""
+            },
+            multiplier: ""
+          }
+          if (rowData[1] == 1) {
+            var fu = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == rowData[2])[0];
+            forecastingUnitObject.id = rowData[2];
+            forecastingUnitObject.label = fu.label;
+            forecastingUnitObject.multiplier = rowData[3];
+          }
+          var planningUnitObject = {};
+          var pu = this.state.planningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
+          planningUnitObject = {
+            id: pu.planningUnitId,
+            label: pu.label,
+            multiplier: 1
+          }
+          var otherUnitObject = {
+            id: 0,
+            label: {
+              label_en: ""
+            },
+            multiplier: ""
+          }
+          if (rowData[1] == 3) {
+            var aru = this.state.aruList.filter(c => c.realmCountryPlanningUnitId == rowData[2])[0];
+            otherUnitObject.id = 0;
+            otherUnitObject.label = aru.label;
+            otherUnitObject.multiplier = rowData[3];
+          }
+          consumptionUnit = {
+            forecastConsumptionUnitId: this.state.consumptionUnitList.length+1,
+            dataType: rowData[1],
+            forecastingUnit: forecastingUnitObject,
+            planningUnit: planningUnitObject,
+            otherUnit: otherUnitObject
+          }
+        }
+        console.log("Consumption Unit+++", consumptionUnit)
         var monthArray = this.state.monthArray;
         var regionList = this.state.regionList;
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -250,8 +468,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var reportingRateCount = 3;
           var daysOfStockOutCount = 4;
           for (var r = 0; r < regionList.length; r++) {
-            var index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+            var index = 0;
+            if (consumptionUnit.dataType == 1) {
+              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.forecastingUnit.id == consumptionUnit.forecastingUnit.id);
+            } else if (consumptionUnit.dataType == 2) {
+              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.planningUnit.id == consumptionUnit.planningUnit.id);
+            } else {
+              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.otherUnit.id == consumptionUnit.otherUnit.id);
+            }
+            console.log("index+++", index);
+            console.log("columnData[actualConsumptionCount]+++", columnData[actualConsumptionCount]);
             if (columnData[actualConsumptionCount] > 0) {
+              console.log("in if+++");
               if (index != -1) {
                 fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
                 fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
@@ -273,6 +501,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   },
                   reportingRate: columnData[reportingRateCount]
                 }
+                console.log("Json+++", json);
                 fullConsumptionList.push(json);
               }
             }
@@ -282,7 +511,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         datasetJson.consumptionList = fullConsumptionList;
-        console.log("fullConsumptionList", fullConsumptionList);
+        console.log("fullConsumptionList+++", fullConsumptionList);
         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
         myResult.programData = datasetData;
         var putRequest = datasetTransaction.put(myResult);
@@ -292,6 +521,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         putRequest.onsuccess = function (event) {
           console.log("In success+++")
           this.el = jexcel(document.getElementById("tableDiv"), '');
+          this.el.destroy();
+          this.el = jexcel(document.getElementById("smallTableDiv"), '');
           this.el.destroy();
           this.setState({
             dataEl: "",
@@ -464,8 +695,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var puResult = [];
               puResult = puRequest.result;
               // var datasetData = this.state.datasetList.filter(c => c.id == )[0].dataset;
-              console.log("DatasetData+++", datasetData)
               var datasetData = dsRequest.result;
+              console.log("DatasetData+++", datasetData)
               var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
@@ -534,7 +765,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var myResult = [];
           myResult = tcRequest.result.filter(c => c.realmCountry.id == this.state.datasetJson.realmCountry.realmCountryId && c.planningUnit.id == planningUnitId && c.realmCountryPlanningUnitId != 0);
           this.setState({
-            aruList: myResult
+            aruList: myResult,
+            selectedPlanningUnitId: planningUnitId
           })
         }.bind(this)
       }.bind(this)
@@ -955,10 +1187,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 name="planningUnitId"
                                 id="planningUnitId"
                                 bsSize="sm"
-                                readOnly
+                                disabled={this.state.selectedConsumptionUnitId > 0 ? true : false}
                                 // onChange={this.filterVersion}
                                 onChange={(e) => { this.getARUList(e); }}
-                                value={this.state.selectedConsumptionUnitObject.planningUnit.id}
+                                value={this.state.selectedPlanningUnitId}
 
                               >
                                 <option value="">{i18n.t('static.common.select')}</option>
@@ -968,7 +1200,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                        <div className="table-scroll">
+                        {/* <div className="table-scroll">
                           <div className="table-wrap table-responsive">
                             <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                               <tbody>
@@ -980,11 +1212,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     <td>{c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier}</td>
                                   </tr>)
                                 })}
+                                {this.state.selectedConsumptionUnitId==0 && 
+                                <tr></tr>
+                              }
                               </tbody>
+                              
                             </Table>
-                          </div></div>
+                          </div></div> */}
                       </>
                     }
+                    <div className="row">
+                      <div className="col-md-12 pl-0 pr-0">
+                        <div id="smallTableDiv" className="jexcelremoveReadonlybackground">
+                        </div>
+                      </div>
+                    </div>
                     <br></br>
                     <br></br>
                     <div className="row">
