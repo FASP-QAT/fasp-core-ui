@@ -50,160 +50,171 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       showTable: false,
       lang: localStorage.getItem("lang"),
       consumptionUnitShowArr: [],
-      dataEl: ""
+      dataEl: "",
+      unitQtyArr: [],
+      unitQtyArrForRegion: [],
+      planningUnitList: [],
+      forecastingUnitList: [],
+      aruList: [],
+      loading: true,
     }
-    this.loaded = this.loaded.bind(this)
+    this.loaded = this.loaded.bind(this);
+    this.buildDataJexcel=this.buildDataJexcel.bind(this)
   }
 
   buildDataJexcel(consumptionUnitId) {
-
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']
-    var consumptionList = this.state.consumptionList;
-    var consumptionUnit = this.state.consumptionUnitList.filter(c => c.forecastConsumptionUnitId == consumptionUnitId)[0];
     this.setState({
-      selectedConsumptionUnitId: consumptionUnitId,
-      selectedConsumptionUnitObject: consumptionUnit
-    })
-    var multiplier = 1;
-    if (consumptionUnitId != 0) {
-      if (consumptionUnit.dataType == 1) {
-        multiplier = consumptionUnit.forecastingUnit.multiplier;
-      } else if (consumptionUnit.dataType == 2) {
-        multiplier = consumptionUnit.planningUnit.multiplier;
-      } else {
-        multiplier = consumptionUnit.otherUnit.multiplier;
+      loading: true
+    }, () => {
+      console.log("In build+++")
+      console.log("After set+++")
+      var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']
+      var consumptionList = this.state.consumptionList;
+      var consumptionUnit = this.state.consumptionUnitList.filter(c => c.forecastConsumptionUnitId == consumptionUnitId)[0];
+      console.log("After set 1+++")
+      var multiplier = 1;
+      if (consumptionUnitId != 0) {
+        if (consumptionUnit.dataType == 1) {
+          multiplier = consumptionUnit.forecastingUnit.multiplier;
+        } else if (consumptionUnit.dataType == 2) {
+          multiplier = consumptionUnit.planningUnit.multiplier;
+        } else {
+          multiplier = consumptionUnit.otherUnit.multiplier;
+        }
       }
-    }
-    consumptionList = consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnitId);
-    console.log("ConsumptionList+++", consumptionList);
-    var monthArray = this.state.monthArray;
-    var regionList = this.state.regionList;
-    let dataArray = [];
-    let data = [];
-    let columns = [];
-    columns.push({ title: '', type: 'text', width: 200 })
-    data[0] = "Days in Month";
-    for (var j = 0; j < monthArray.length - 2; j++) {
-      data[j + 1] = monthArray[j].noOfDays;
-      columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'text', width: 100 })
-    }
-    dataArray.push(data)
-    data = [];
-    for (var r = 0; r < regionList.length; r++) {
-      data = [];
-      data[0] = getLabelText(regionList[r].label);
+      consumptionList = consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnitId);
+      console.log("ConsumptionList+++", consumptionList);
+      var monthArray = this.state.monthArray;
+      var regionList = this.state.regionList;
+      let dataArray = [];
+      let data = [];
+      let columns = [];
+      columns.push({ title: '', type: 'text', width: 200 })
+      data[0] = "Days in Month";
       for (var j = 0; j < monthArray.length - 2; j++) {
-        data[j + 1] = "";
+        data[j + 1] = monthArray[j].noOfDays;
+        columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'text', width: 100 })
       }
-
-      dataArray.push(data);
+      dataArray.push(data)
       data = [];
-      data[0] = "Actual Consumption"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        console.log("+++", consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM")));
-        console.log("+++", consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId));
-        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-        console.log("consumptionData+++", consumptionData)
-        data[j + 1] = consumptionData.length > 0 ? consumptionData[0].actualConsumption : "";
-      }
-      dataArray.push(data);
-
-      data = [];
-      data[0] = "Reporting Rate"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-        data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
-      }
-      dataArray.push(data);
-
-      data = [];
-      data[0] = "Stockout Rate (days)"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-        data[j + 1] = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut : 0;
-      }
-      dataArray.push(data);
-
-      data = [];
-      data[0] = "Stockout Rate (%)"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
-      }
-      dataArray.push(data);
-
-      data = [];
-      data[0] = "Adjusted Consumption"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length)})/100))*100,0)`;
-      }
-      dataArray.push(data);
-
-      data = [];
-      data[0] = "Converted to Planning Unit"
-      for (var j = 0; j < monthArray.length - 2; j++) {
-        data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`;
-      }
-      dataArray.push(data);
-      if (r != regionList.length - 1) {
+      for (var r = 0; r < regionList.length; r++) {
         data = [];
-        dataArray.push([]);
+        data[0] = getLabelText(regionList[r].label);
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          data[j + 1] = "";
+        }
+
+        dataArray.push(data);
+        data = [];
+        data[0] = "Actual Consumption"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          data[j + 1] = consumptionData.length > 0 ? consumptionData[0].actualConsumption : "";
+        }
+        dataArray.push(data);
+
+        data = [];
+        data[0] = "Reporting Rate"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
+        }
+        dataArray.push(data);
+
+        data = [];
+        data[0] = "Stockout Rate (days)"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          data[j + 1] = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut : 0;
+        }
+        dataArray.push(data);
+
+        data = [];
+        data[0] = "Stockout Rate (%)"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
+        }
+        dataArray.push(data);
+
+        data = [];
+        data[0] = "Adjusted Consumption"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length)})/100))*100,0)`;
+        }
+        dataArray.push(data);
+
+        data = [];
+        data[0] = "Converted to Planning Unit"
+        for (var j = 0; j < monthArray.length - 2; j++) {
+          data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`;
+        }
+        dataArray.push(data);
+        if (r != regionList.length - 1) {
+          data = [];
+          dataArray.push([]);
+        }
       }
-    }
-    // for (var j = 0; j < monthArray.length; j++) {
-    //   data = [];
-    //   data[0] = langaugeList[j].languageId
-    //   data[1] = langaugeList[j].label.label_en;
-    //   data[2] = langaugeList[j].languageCode;
-    //   data[3] = langaugeList[j].countryCode;
-    //   data[4] = langaugeList[j].lastModifiedBy.username;
-    //   data[5] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-    //   data[6] = langaugeList[j].active;
+      // for (var j = 0; j < monthArray.length; j++) {
+      //   data = [];
+      //   data[0] = langaugeList[j].languageId
+      //   data[1] = langaugeList[j].label.label_en;
+      //   data[2] = langaugeList[j].languageCode;
+      //   data[3] = langaugeList[j].countryCode;
+      //   data[4] = langaugeList[j].lastModifiedBy.username;
+      //   data[5] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+      //   data[6] = langaugeList[j].active;
 
-    //   languageArray[count] = data;
-    //   count++;
-    // }
-    this.el = jexcel(document.getElementById("tableDiv"), '');
-    this.el.destroy();
-    var options = {
-      data: dataArray,
-      columnDrag: true,
-      columns: columns,
-      text: {
-        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
-      updateTable: function (el, cell, x, y, source, value, id) {
-      },
-      onload: this.loaded,
-      pagination: false,
-      search: false,
-      columnSorting: false,
-      tableOverflow: true,
-      wordWrap: true,
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      allowDeleteRow: false,
-      copyCompatibility: true,
-      allowExport: false,
-      paginationOptions: JEXCEL_PAGINATION_OPTION,
-      position: 'top',
-      filters: false,
-      license: JEXCEL_PRO_KEY,
-      contextMenu: function (obj, x, y, e) {
-        return [];
-      }.bind(this),
-    };
-    var dataEl = jexcel(document.getElementById("tableDiv"), options);
-    this.el = dataEl;
-    this.setState({
-      dataEl: dataEl, loading: false
+      //   languageArray[count] = data;
+      //   count++;
+      // }
+      this.el = jexcel(document.getElementById("tableDiv"), '');
+      this.el.destroy();
+      var options = {
+        data: dataArray,
+        columnDrag: true,
+        columns: columns,
+        text: {
+          // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          show: '',
+          entries: '',
+        },
+        updateTable: function (el, cell, x, y, source, value, id) {
+        },
+        onload: this.loaded,
+        pagination: false,
+        search: false,
+        columnSorting: false,
+        tableOverflow: true,
+        wordWrap: true,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        copyCompatibility: true,
+        allowExport: false,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+        position: 'top',
+        filters: false,
+        license: JEXCEL_PRO_KEY,
+        contextMenu: function (obj, x, y, e) {
+          return [];
+        }.bind(this),
+      };
+      var dataEl = jexcel(document.getElementById("tableDiv"), options);
+      this.el = dataEl;
+      console.log("After set 2+++")
+      this.setState({
+        dataEl: dataEl, loading: false,
+        selectedConsumptionUnitId: consumptionUnitId,
+        selectedConsumptionUnitObject: consumptionUnit,
+      })
     })
-
   }
 
   saveConsumptionList() {
+    this.setState({
+      loading: true
+    })
     var db1;
     var storeOS;
     getDatabase();
@@ -235,13 +246,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var curUser = AuthenticationService.getLoggedInUserId();
         for (var i = 0; i < monthArray.length - 2; i++) {
           var columnData = elInstance.getColumnData([i + 1]);
-          console.log("Column Data+++", columnData)
           var actualConsumptionCount = 2;
           var reportingRateCount = 3;
           var daysOfStockOutCount = 4;
           for (var r = 0; r < regionList.length; r++) {
             var index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-            console.log("Index+++", index)
             if (columnData[actualConsumptionCount] > 0) {
               if (index != -1) {
                 fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
@@ -272,9 +281,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             daysOfStockOutCount += 8
           }
         }
-        console.log("New ConsumptionList+++", fullConsumptionList);
         datasetJson.consumptionList = fullConsumptionList;
-        console.log("DatasetJson+++", datasetJson);
+        console.log("fullConsumptionList", fullConsumptionList);
         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
         myResult.programData = datasetData;
         var putRequest = datasetTransaction.put(myResult);
@@ -282,7 +290,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         putRequest.onerror = function (event) {
         }.bind(this);
         putRequest.onsuccess = function (event) {
-          console.log("Complete success+++")
+          console.log("In success+++")
+          this.el = jexcel(document.getElementById("tableDiv"), '');
+          this.el.destroy();
+          this.setState({
+            dataEl: "",
+            loading: false
+          }, () => {
+            this.getDatasetData();
+          })
         }.bind(this)
       }.bind(this)
     }.bind(this)
@@ -340,6 +356,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   getDatasetList() {
+    this.setState({
+      loading: true
+    })
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -370,16 +389,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         this.setState({
-          datasetList: datasetList
+          datasetList: datasetList,
+          loading: false
         })
       }.bind(this)
     }.bind(this)
   }
 
   setDatasetId(e) {
+    this.setState({
+      loading: true
+    })
     var datasetId = e.target.value;
     this.setState({
-      datasetId: datasetId
+      datasetId: datasetId,
     }, () => {
       if (datasetId != "") {
         this.getDatasetData();
@@ -389,52 +412,133 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
     if (datasetId == "") {
       this.setState({
-        showTable: false
+        showTable: false,
+        loading: false
       })
     }
   }
 
   getDatasetData() {
-    var datasetData = this.state.datasetList.filter(c => c.id == this.state.datasetId)[0].dataset;
-    console.log("DatasetData+++", datasetData)
-    var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
-    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-    var datasetJson = JSON.parse(datasetData);
-    console.log("DatasetJson+++", datasetJson);
-    var consumptionList = datasetJson.consumptionList;
-    var consumptionUnitId = [...new Set(consumptionList.map(ele => (ele.consumptionUnit.forecastConsumptionUnitId)))];
-    console.log("ConsumptionUnit+++", consumptionUnitId)
-    var consumptionUnitList = [];
-    consumptionUnitId.map(item => {
-      consumptionUnitList.push(consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item)[0].consumptionUnit)
-    })
-    console.log("ConsumptionUnitList+++", consumptionUnitList)
-    var regionList = datasetJson.regionList;
-    var startDate = moment(datasetJson.currentVersion.forecastStartDate).add(-36, 'months').format("YYYY-MM-DD");
-    var stopDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-    var daysInMonth = datasetJson.currentVersion.daysInMonth;
-    console.log("regionList+++", regionList);
-    console.log("StartDate+++", startDate);
-    console.log("StopDate+++", stopDate);
-    var monthArray = [];
-    var curDate = startDate;
-    for (var m = 0; curDate < stopDate; m++) {
-      curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
-      var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
-      monthArray.push({ date: curDate, noOfDays: daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate })
-    }
-    monthArray.push({});
-    console.log("MonthArray+++", monthArray)
     this.setState({
-      consumptionList: consumptionList,
-      regionList: regionList,
-      startDate: startDate,
-      stopDate: stopDate,
-      consumptionUnitList: consumptionUnitList,
-      monthArray: monthArray,
-      datasetJson: datasetJson,
-      showTable: true
+      loading: true
     })
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+
+      var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+      var datasetOs = datasetTransaction.objectStore('datasetData');
+      var dsRequest = datasetOs.get(this.state.datasetId);
+      dsRequest.onerror = function (event) {
+      }.bind(this);
+      dsRequest.onsuccess = function (event) {
+
+        var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+        var tcOs = tcTransaction.objectStore('tracerCategory');
+        var tcRequest = tcOs.getAll();
+        tcRequest.onerror = function (event) {
+        }.bind(this);
+        tcRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = tcRequest.result;
+
+          var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+          var fuOs = fuTransaction.objectStore('forecastingUnit');
+          var fuRequest = fuOs.getAll();
+          fuRequest.onerror = function (event) {
+          }.bind(this);
+          fuRequest.onsuccess = function (event) {
+            var fuResult = [];
+            fuResult = fuRequest.result;
+
+            var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+            var puOs = puTransaction.objectStore('planningUnit');
+            var puRequest = puOs.getAll();
+            puRequest.onerror = function (event) {
+            }.bind(this);
+            puRequest.onsuccess = function (event) {
+              var puResult = [];
+              puResult = puRequest.result;
+              // var datasetData = this.state.datasetList.filter(c => c.id == )[0].dataset;
+              console.log("DatasetData+++", datasetData)
+              var datasetData = dsRequest.result;
+              var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
+              var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+              var datasetJson = JSON.parse(datasetData);
+              var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
+              var tracerCategoryListFilter = myResult.filter(c => healthAreaList.includes(c.healthArea.id));
+              var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
+              var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
+              var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
+              var planningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
+              console.log("DatasetJson+++", datasetJson);
+              var consumptionList = datasetJson.consumptionList;
+              var consumptionUnitId = [...new Set(consumptionList.map(ele => (ele.consumptionUnit.forecastConsumptionUnitId)))];
+              console.log("ConsumptionUnit+++", consumptionUnitId)
+              var consumptionUnitList = [];
+              consumptionUnitId.map(item => {
+                consumptionUnitList.push(consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item)[0].consumptionUnit)
+              })
+              var regionList = datasetJson.regionList;
+              var startDate = moment(datasetJson.currentVersion.forecastStartDate).add(-36, 'months').format("YYYY-MM-DD");
+              var stopDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+              var daysInMonth = datasetJson.currentVersion.daysInMonth;
+              var monthArray = [];
+              var curDate = startDate;
+              for (var m = 0; curDate < stopDate; m++) {
+                curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
+                monthArray.push({ date: curDate, noOfDays: daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate })
+              }
+              monthArray.push({});
+              this.setState({
+                consumptionList: consumptionList,
+                regionList: regionList,
+                startDate: startDate,
+                stopDate: stopDate,
+                consumptionUnitList: consumptionUnitList,
+                monthArray: monthArray,
+                datasetJson: datasetJson,
+                planningUnitList: planningUnitList,
+                forecastingUnitList: forecastingUnitList,
+                showTable: true,
+                loading: false
+              })
+            }.bind(this)
+          }.bind(this)
+        }.bind(this)
+      }.bind(this)
+    }.bind(this)
+  }
+
+  getARUList(e) {
+    var planningUnitId = e.target.value;
+    if (planningUnitId > 0) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var tcTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+        var tcOs = tcTransaction.objectStore('realmCountryPlanningUnit');
+        var tcRequest = tcOs.getAll();
+        tcRequest.onerror = function (event) {
+        }.bind(this);
+        tcRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = tcRequest.result.filter(c => c.realmCountry.id == this.state.datasetJson.realmCountry.realmCountryId && c.planningUnit.id == planningUnitId && c.realmCountryPlanningUnitId != 0);
+          this.setState({
+            aruList: myResult
+          })
+        }.bind(this)
+      }.bind(this)
+    }
   }
 
   setShowInPlanningUnits(e) {
@@ -454,6 +558,139 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </option>
         )
       }, this);
+
+    const { planningUnitList } = this.state;
+    let planningUnits = planningUnitList.length > 0
+      && planningUnitList.map((item, i) => {
+        return (
+          <option key={i} value={item.planningUnitId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
+
+    var chartOptions = {
+      title: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: "",
+            fontColor: 'black'
+          },
+          stacked: true,
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              return value.toLocaleString();
+            }
+          },
+          gridLines: {
+            drawBorder: true, lineWidth: 0
+          },
+          position: 'left',
+        }],
+        xAxes: [{
+          ticks: {
+            fontColor: 'black'
+          },
+          gridLines: {
+            drawBorder: true, lineWidth: 0
+          },
+          stacked: true
+        }]
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: 'black'
+        }
+      }
+    }
+
+    let bar = {}
+    var datasetListForGraph = [];
+    var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#49A4A1", "#EDB944", "#F48521"]
+    if (this.state.dataEl != "" && this.state.dataEl != undefined) {
+      var elInstance = this.state.dataEl;
+      if (elInstance != undefined) {
+        var colourCount = 0;
+        var monthData = []
+        var monthArray = []
+        this.state.monthArray.map((ele, count) => {
+          var actualConsumptionCount = 6;
+          if (count < this.state.monthArray.length - 3) {
+            monthArray.push(ele.date);
+            var qty = 0;
+            this.state.regionList.map((item, count1) => {
+              var columnData = elInstance.getRowData(actualConsumptionCount, true);
+              columnData.shift()
+              qty += Number(columnData[count])
+              actualConsumptionCount += 8;
+            })
+            monthData.push(qty);
+          }
+        });
+        datasetListForGraph.push({
+          label: getLabelText(this.state.selectedConsumptionUnitObject.dataType == 1 ? this.state.selectedConsumptionUnitObject.forecastingUnit.label : this.state.selectedConsumptionUnitObject.dataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+          data: monthData.map(item => (item > 0 ? item : 0)),
+          type: 'line',
+          backgroundColor: 'transparent',
+          borderColor: "#6C6463",
+          borderStyle: 'dotted',
+          ticks: {
+            fontSize: 2,
+            fontColor: 'transparent',
+          },
+          lineTension: 0,
+          pointStyle: 'line',
+          pointRadius: 0,
+          showInLegend: true,
+        })
+
+        var actualConsumptionCount = 6;
+        this.state.regionList.map((item, count) => {
+          if (colourCount > 10) {
+            colourCount = 0;
+          }
+
+          var columnData = elInstance.getRowData(actualConsumptionCount, true);
+          columnData.shift()
+          datasetListForGraph.push({
+            label: getLabelText(item.label, this.state.lang),
+            data: columnData.map(item => (item > 0 ? item : 0)),
+            type: 'line',
+            backgroundColor: 'transparent',
+            borderColor: colourArray[colourCount],
+            borderStyle: 'dotted',
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            lineTension: 0,
+            pointStyle: 'line',
+            pointRadius: 0,
+            showInLegend: true,
+          })
+          colourCount++;
+          actualConsumptionCount += 8;
+        })
+      }
+    }
+    if (this.state.dataEl != "" && this.state.dataEl != undefined) {
+      bar = {
+
+        labels: monthArray.map((item, index) => (moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
+        datasets: datasetListForGraph
+
+      };
+    }
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
@@ -515,212 +752,276 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   </div>
                 </div>
               </Form>
-              {this.state.showTable &&
-                <>
-                  <div className="table-scroll">
-                    <div className="table-wrap table-responsive">
-                      <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
-                        <thead>
-                          <tr>
-                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                            <th>Product</th>
-                            {this.state.monthArray.map((item, count) => {
-                              return (<th>{count == this.state.monthArray.length - 1 ? "Regional%" : count == this.state.monthArray.length - 2 ? "Total" : moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
-                            })}
-                            {/* <th>Regional%</th> */}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {this.state.consumptionUnitList.map(item => (
-                            <>
-                              <tr className="hoverTd" onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}>
-                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.forecastConsumptionUnitId)}>
-                                  {this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                </td>
-                                <td align="left">{item.dataType == 1 ? item.forecastingUnit.id : item.dataType == 2 ? item.planningUnit.id : item.otherUnit.id}</td>
-                                {this.state.monthArray.map((item1, count) => {
-                                  if (count == this.state.monthArray.length - 1) {
-                                    return (<td>100%</td>)
-                                  } else if (count == this.state.monthArray.length - 2) {
-                                    var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                    var qty = 0;
-                                    if (consumptionDataForMonth.length > 0) {
-                                      consumptionDataForMonth.map(c => {
-                                        var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                        qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(moment(c.month, "YYYY-MM").daysInMonth())))) * 100;
-                                      })
-                                      qty = qty.toFixed(2)
-                                    } else {
-                                      qty = ""
-                                    }
-                                    var multiplier = 1;
-                                    if (this.state.showInPlanningUnit) {
-                                      if (item.dataType == 1) {
-                                        multiplier = item.forecastingUnit.multiplier
-                                      } else if (item.dataType == 2) {
-                                        multiplier = item.planningUnit.multiplier
-                                      } else {
-                                        multiplier = item.otherUnit.multiplier
-                                      }
-                                    }
-                                    if (qty != "") {
-                                      qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                    }
-                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                  }
-                                  else {
-                                    var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                    var qty = 0;
-                                    if (consumptionDataForMonth.length > 0) {
-                                      consumptionDataForMonth.map(c => {
-                                        var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                        qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(item1.noOfDays)))) * 100;
-                                      })
-                                      qty = qty.toFixed(2)
-                                    } else {
-                                      qty = ""
-                                    }
-                                    var multiplier = 1;
-                                    if (this.state.showInPlanningUnit) {
-                                      if (item.dataType == 1) {
-                                        multiplier = item.forecastingUnit.multiplier
-                                      } else if (item.dataType == 2) {
-                                        multiplier = item.planningUnit.multiplier
-                                      } else {
-                                        multiplier = item.otherUnit.multiplier
-                                      }
-                                    }
-                                    if (qty != "") {
-                                      qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                    }
-                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                  }
-                                })}
-                              </tr>
-                              {this.state.regionList.map(r => (
-                                <tr style={{ display: this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? "" : "none" }}>
-                                  <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                  <td align="left">{"       " + getLabelText(r.label, this.state.lang)}</td>
-                                  {
-                                    this.state.monthArray.map((item1, count) => {
-                                      if (count == this.state.monthArray.length - 1) {
-                                        var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                        var qty = 0;
-                                        if (consumptionDataForMonth.length > 0) {
-                                          consumptionDataForMonth.map(c => {
-                                            var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                            qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(moment(c.month, "YYYY-MM").daysInMonth())))) * 100;
-                                            qty = qty
-                                          })
-                                        } else {
-                                          qty = 0
-                                        }
-
-
-                                        var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                        var qty1 = 0;
-                                        if (consumptionDataForMonth.length > 0) {
-                                          consumptionDataForMonth.map(c => {
-                                            var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                            qty1 += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(moment(c.month, "YYYY-MM").daysInMonth())))) * 100;
-                                          })
-                                          qty1 = qty1.toFixed(2)
-                                        } else {
-                                          qty1 = 0
-                                        }
-                                        var per = (Number(qty) / Number(qty1)) * 100;
-                                        return (<td>{Math.round(per)}%</td>)
-                                      } else if (count == this.state.monthArray.length - 2) {
-                                        var multiplier = 1;
-                                        if (this.state.showInPlanningUnit) {
-                                          if (item.dataType == 1) {
-                                            multiplier = item.forecastingUnit.multiplier
-                                          } else if (item.dataType == 2) {
-                                            multiplier = item.planningUnit.multiplier
-                                          } else {
-                                            multiplier = item.otherUnit.multiplier
-                                          }
-                                        }
-                                        var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                        var qty = 0;
-                                        if (consumptionDataForMonth.length > 0) {
-                                          consumptionDataForMonth.map(c => {
-                                            var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                            qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(moment(c.month, "YYYY-MM").daysInMonth())))) * 100;
-                                            qty = qty
-                                          })
-                                        } else {
-                                          qty = ""
-                                        }
-                                        if (qty != "") {
-                                          qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                        }
-                                        return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                      } else {
-                                        var multiplier = 1;
-                                        if (this.state.showInPlanningUnit) {
-                                          if (item.dataType == 1) {
-                                            multiplier = item.forecastingUnit.multiplier
-                                          } else if (item.dataType == 2) {
-                                            multiplier = item.planningUnit.multiplier
-                                          } else {
-                                            multiplier = item.otherUnit.multiplier
-                                          }
-                                        }
-                                        var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                        var qty = 0;
-                                        if (consumptionDataForMonth.length > 0) {
-                                          var reportingRate = consumptionDataForMonth[0].reportingRate > 0 ? consumptionDataForMonth[0].reportingRate : 100;
-                                          qty = (Number(consumptionDataForMonth[0].actualConsumption) / Number(reportingRate) / Number(1 - (Number(consumptionDataForMonth[0].daysOfStockOut) / Number(item1.noOfDays)))) * 100;
-                                          qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                        } else {
-                                          qty = ""
-                                        }
-                                        return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                      }
-
-                                    })}
-                                </tr>
-                              ))}
-                            </>
-                          )
-                          )}
-
-                        </tbody>
-                      </Table>
-                    </div>
-                  </div>
-                  <br></br>
-                  <br></br>
-
-                  {this.state.dataEl != "" &&
+              <div style={{ display: this.state.loading ? "none" : "block" }}>
+                {this.state.showTable &&
+                  <>
                     <div className="table-scroll">
                       <div className="table-wrap table-responsive">
                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                          <thead>
+                            <tr>
+                              <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                              <th>Product</th>
+                              {this.state.monthArray.map((item, count) => {
+                                return (<th>{count == this.state.monthArray.length - 1 ? "Regional%" : count == this.state.monthArray.length - 2 ? "Total" : moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+                              })}
+                              {/* <th>Regional%</th> */}
+                            </tr>
+                          </thead>
                           <tbody>
-                            {this.state.consumptionUnitList.map(c => {
-                              return (<tr>
-                                <td>{this.state.selectedConsumptionUnitId != 0 ? <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false} readOnly ></input> : <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false}></input>}</td>
-                                <td>{c.dataType == 1 ? "Forecasting Unit" : c.dataType == 2 ? "Planning Unit" : "Other"}</td>
-                                <td>{c.dataType == 1 ? c.forecastingUnit.id : c.dataType == 2 ? c.planningUnit.id : c.otherUnit.id}</td>
-                                <td>{c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier}</td>
-                              </tr>)
-                            })}
+                            {this.state.consumptionUnitList.map(item => (
+                              <>
+                                <tr className="hoverTd">
+                                  <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.forecastConsumptionUnitId)}>
+                                    {this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                  </td>
+                                  <td align="left" onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}>{item.dataType == 1 ? getLabelText(item.forecastingUnit.label, this.state.lang) : item.dataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
+                                  {this.state.monthArray.map((item1, count) => {
+                                    if (count == this.state.monthArray.length - 1) {
+                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}>100%</td>)
+                                    } else if (count == this.state.monthArray.length - 2) {
+                                      var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
+                                      var qty = 0;
+                                      if (consumptionDataForMonth.length > 0) {
+                                        consumptionDataForMonth.map(c => {
+                                          var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                          var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
+                                          qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
+                                        })
+                                        qty = qty.toFixed(2)
+                                      } else {
+                                        qty = ""
+                                      }
+                                      var multiplier = 1;
+                                      if (this.state.showInPlanningUnit) {
+                                        if (item.dataType == 1) {
+                                          multiplier = item.forecastingUnit.multiplier
+                                        } else if (item.dataType == 2) {
+                                          multiplier = item.planningUnit.multiplier
+                                        } else {
+                                          multiplier = item.otherUnit.multiplier
+                                        }
+                                      }
+                                      if (qty != "") {
+                                        qty = (Number(qty) / Number(multiplier)).toFixed(2)
+                                      } else {
+                                        qty = 0;
+                                      }
+                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
+                                    }
+                                    else {
+                                      var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
+                                      var qty = 0;
+                                      if (consumptionDataForMonth.length > 0) {
+                                        consumptionDataForMonth.map(c => {
+                                          var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                          qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(item1.noOfDays)))) * 100;
+                                        })
+                                        qty = qty.toFixed(2)
+                                      } else {
+                                        qty = ""
+                                      }
+                                      var multiplier = 1;
+                                      if (this.state.showInPlanningUnit) {
+                                        if (item.dataType == 1) {
+                                          multiplier = item.forecastingUnit.multiplier
+                                        } else if (item.dataType == 2) {
+                                          multiplier = item.planningUnit.multiplier
+                                        } else {
+                                          multiplier = item.otherUnit.multiplier
+                                        }
+                                      }
+                                      if (qty != "") {
+                                        qty = (Number(qty) / Number(multiplier)).toFixed(2)
+                                      } else {
+                                      }
+                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
+                                    }
+                                  })}
+                                </tr>
+                                {this.state.regionList.map(r => (
+                                  <tr style={{ display: this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? "" : "none" }}>
+                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                    <td align="left">{"       " + getLabelText(r.label, this.state.lang)}</td>
+                                    {
+                                      this.state.monthArray.map((item1, count) => {
+                                        if (count == this.state.monthArray.length - 1) {
+                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
+                                          var qty = 0;
+                                          if (consumptionDataForMonth.length > 0) {
+                                            consumptionDataForMonth.map(c => {
+                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
+                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
+                                            })
+                                          } else {
+                                            qty = 0
+                                          }
+
+
+                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
+                                          var qty1 = 0;
+                                          if (consumptionDataForMonth.length > 0) {
+                                            consumptionDataForMonth.map(c => {
+                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
+                                              qty1 += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
+                                            })
+                                            qty1 = qty1.toFixed(2)
+                                          } else {
+                                            qty1 = 0
+                                          }
+                                          var per = (Number(qty) / Number(qty1)) * 100;
+                                          return (<td>{Math.round(per)}%</td>)
+                                        } else if (count == this.state.monthArray.length - 2) {
+                                          var multiplier = 1;
+                                          if (this.state.showInPlanningUnit) {
+                                            if (item.dataType == 1) {
+                                              multiplier = item.forecastingUnit.multiplier
+                                            } else if (item.dataType == 2) {
+                                              multiplier = item.planningUnit.multiplier
+                                            } else {
+                                              multiplier = item.otherUnit.multiplier
+                                            }
+                                          }
+                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
+                                          var qty = 0;
+                                          if (consumptionDataForMonth.length > 0) {
+                                            consumptionDataForMonth.map(c => {
+                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
+                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
+                                              qty = qty
+                                            })
+                                          } else {
+                                            qty = ""
+                                          }
+                                          if (qty != "") {
+                                            qty = (Number(qty) / Number(multiplier)).toFixed(2)
+                                          } else {
+                                            qty = 0;
+                                          }
+                                          return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
+                                        } else {
+                                          var multiplier = 1;
+                                          if (this.state.showInPlanningUnit) {
+                                            if (item.dataType == 1) {
+                                              multiplier = item.forecastingUnit.multiplier
+                                            } else if (item.dataType == 2) {
+                                              multiplier = item.planningUnit.multiplier
+                                            } else {
+                                              multiplier = item.otherUnit.multiplier
+                                            }
+                                          }
+                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
+                                          var qty = 0;
+                                          if (consumptionDataForMonth.length > 0) {
+                                            consumptionDataForMonth.map(c => {
+                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(item1.noOfDays)))) * 100;
+                                              qty = qty
+                                            })
+                                          } else {
+                                            qty = ""
+                                          }
+                                          if (qty != "") {
+                                            qty = (Number(qty) / Number(multiplier)).toFixed(2)
+                                          }
+                                          return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
+                                        }
+
+                                      })}
+                                  </tr>
+                                ))}
+                              </>
+                            )
+                            )}
+
                           </tbody>
                         </Table>
-                      </div></div>
-                  }
-                  <br></br>
-                  <br></br>
-                  <div className="row">
-                    <div className="col-md-12 pl-0 pr-0">
-                      <div id="tableDiv" className="leftAlignTable">
                       </div>
                     </div>
-                  </div>
-                </>
+                    <br></br>
+                    <br></br>
 
-              }
+                    {this.state.dataEl != "" &&
+                      <>
+                        <FormGroup className="col-md-6">
+                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunitheader')}</Label>
+                          <div className="controls ">
+                            <InputGroup>
+                              <Input
+                                type="select"
+                                name="planningUnitId"
+                                id="planningUnitId"
+                                bsSize="sm"
+                                readOnly
+                                // onChange={this.filterVersion}
+                                onChange={(e) => { this.getARUList(e); }}
+                                value={this.state.selectedConsumptionUnitObject.planningUnit.id}
+
+                              >
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {planningUnits}
+                              </Input>
+
+                            </InputGroup>
+                          </div>
+                        </FormGroup>
+                        <div className="table-scroll">
+                          <div className="table-wrap table-responsive">
+                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                              <tbody>
+                                {this.state.consumptionUnitList.map(c => {
+                                  return (<tr>
+                                    <td>{this.state.selectedConsumptionUnitId != 0 ? <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false} readOnly ></input> : <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false}></input>}</td>
+                                    <td>{c.dataType == 1 ? "Forecasting Unit" : c.dataType == 2 ? "Planning Unit" : "Other"}</td>
+                                    <td>{c.dataType == 1 ? getLabelText(c.forecastingUnit.label, this.state.lang) : c.dataType == 2 ? getLabelText(c.planningUnit.label, this.state.lang) : getLabelText(c.otherUnit.label, this.state.label)}</td>
+                                    <td>{c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier}</td>
+                                  </tr>)
+                                })}
+                              </tbody>
+                            </Table>
+                          </div></div>
+                      </>
+                    }
+                    <br></br>
+                    <br></br>
+                    <div className="row">
+                      <div className="col-md-12 pl-0 pr-0">
+                        <div id="tableDiv" className="leftAlignTable">
+                        </div>
+                      </div>
+                    </div>
+                    <br></br>
+                    <br></br>
+                    {this.state.dataEl != "" &&
+                      <div className="col-md-12 p-0">
+                        <div className="col-md-12">
+                          <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                            <div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </>
+
+                }
+              </div>
+              <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                  <div class="align-items-center">
+                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                    <div class="spinner-border blue ml-4" role="status">
+
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardBody>
           <CardFooter>
