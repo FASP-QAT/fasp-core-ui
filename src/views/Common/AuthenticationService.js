@@ -1305,10 +1305,12 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/validation/modelingValidation":
+                    case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
-                    case "/dataSet/buildTree/tree/:treeId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId":
                     case "/dataSet/buildTree/":
                     case "/dataset/createTreeTemplate/:templateId":
                     case "/dataset/listTreeTemplate/":

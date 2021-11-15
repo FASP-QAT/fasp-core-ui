@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -11,8 +11,9 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
+import moment from 'moment';
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
 class VersionSettingsComponent extends Component {
@@ -63,16 +64,25 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
+                var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 //End date
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
+                var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                } else {
+                }
+                else if (diff <= 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter valid date');
+                    valid = false;
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
@@ -116,20 +126,30 @@ class VersionSettingsComponent extends Component {
             }
         }
 
+
+        var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         //End date
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
+            var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
+            }
+            else if (diff <= 0) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, 'Please enter valid date');
+            }
+            else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
 
-        //End date
+        //No of days
         if (x == 12) {
             var col = ("M").concat(parseInt(y) + 1);
             var reg = JEXCEL_INTEGER_REGEX;
