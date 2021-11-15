@@ -124,8 +124,8 @@ export default class ImportFromQATSupplyPlan extends Component {
     componentDidMount() {
 
         this.hideSecondComponent();
-        console.log("state-----------------", this.state.color, "---------", this.state.message);
-        this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan`)
+        // console.log("state-----------------", this.state.color, "---------", this.state.message);
+        // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan`)
 
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';

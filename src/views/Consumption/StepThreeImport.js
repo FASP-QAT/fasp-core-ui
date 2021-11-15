@@ -340,9 +340,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 //     // this.buildJExcel();
                                 // });
                                 console.log("Data update success");
-                                // this.props.history.push(`/dataSource/listDataSource/` + 'red/' + i18n.t('static.message.cancelled'))
-                                this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
-                                // this.props.history.push('/importFromQATSupplyPlan/listImportFromQATSupplyPlan/' + 'green/' + i18n.t('static.mt.dataUpdateSuccess'));
+
+                                // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
+                                this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
+
+
                             }.bind(this);
                             transaction.onerror = function (event) {
                                 this.setState({
