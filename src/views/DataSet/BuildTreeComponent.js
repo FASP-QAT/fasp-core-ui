@@ -52,6 +52,7 @@ import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
 import AuthenticationService from '../Common/AuthenticationService';
+import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 
 // const ref = React.createRef();
 const entityname = 'Tree Template';
@@ -1006,18 +1007,18 @@ export default class BuildTree extends Component {
             //     loading: true
             // })
             var tableJson = this.el.getJson(null, false);
-            var data = this.state.scalingList;
+            var data = this.state.currentScenario.nodeDataModelingList;
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
             const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("10 map---" + map1.get("10"))
+                // console.log("10 map---" + map1.get("10"))
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                        console.log("data[itemIndex]---",this.state.scalingList);
+                        console.log("data[itemIndex]---", data[itemIndex]);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
                         var transfer = map1[0] != "" ? map1.get("0") : '';
                         obj.transferNodeDataId = transfer;
@@ -1027,7 +1028,7 @@ export default class BuildTree extends Component {
                         obj.stopDate = map1.get("4");
                         obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
                         obj.nodeDataModelingId = map1.get("9")
-                        
+
                         data[itemIndex] = obj;
                     } else {
                         obj = {
@@ -1317,7 +1318,7 @@ export default class BuildTree extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
-            targetChangeNumber = parseFloat(getValue - this.state.currentCalculatorStartValue).toFixed(2);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
         this.setState({
@@ -1769,7 +1770,7 @@ export default class BuildTree extends Component {
                     if (rowData[2] != 5) {
                         calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(2);
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed();
+                        calculatedChangeForMonth = parseFloat(value);
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
@@ -1983,12 +1984,17 @@ export default class BuildTree extends Component {
                     datasetList: myResult
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-                    this.setState({ dataSetObj: dataSetObj });
-
-                    calculateModelingData(dataSetObj, this, "BuildTree");
+                    var dataEnc = dataSetObj;
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                     console.log("dataSetObj.programData***>>>", programData);
+                    this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
+                        // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
+                        calculateModelingData(dataEnc, this, "BuildTree");
+                    });
+
+
+
 
 
 
@@ -3268,6 +3274,7 @@ export default class BuildTree extends Component {
             this.getDatasetList();
             this.getModelingTypeList();
             this.getRegionList();
+
         })
 
         // ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -3891,8 +3898,11 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                var minMonth = moment(month).subtract(this.state.forecastStartDate, 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(month).add(this.state.forecastStopDate, 'months').endOf('month').format("YYYY-MM-DD");
+                
+                var minMonth = this.state.forecastStartDate;
+                var maxMonth = this.state.forecastStopDate;
+                console.log("minMonth---", minMonth);
+                console.log("maxMonth---", maxMonth);
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -4488,28 +4498,6 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
             maintainAspectRatio: false
             ,
             legend: {
@@ -4606,28 +4594,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
+        
             maintainAspectRatio: false
             ,
             legend: {
@@ -4647,7 +4614,7 @@ export default class BuildTree extends Component {
 
             datasetsArr.push(
                 {
-                    label: '% ' + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + ' (Month End)',
+                    label: '% ' + (this.state.currentItemConfig.parentItem != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : '') + ' (Month End)',
                     type: 'line',
                     stack: 3,
                     yAxisID: 'A',
@@ -5465,8 +5432,9 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
-                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
                             </a>
                         </div>
@@ -5511,7 +5479,7 @@ export default class BuildTree extends Component {
                         <div>
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
-                                    <div id="modelingJexcel" className={"RowClickable"}>
+                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
@@ -5741,8 +5709,17 @@ export default class BuildTree extends Component {
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
-                                            <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                         </div>
+                                        <div className="row pl-lg-0 pt-lg-3">
+                                            <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                <div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div className="col-md-5 float-right pl-lg-5">
                                             <FormGroup className="" >
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
@@ -5793,14 +5770,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
 
-                                <div className="row pl-lg-0 pt-lg-3">
-                                    <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                        <div>
 
-                                        </div>
-                                    </div>
-                                </div>
                             </fieldset>
                         </div>
                     }
@@ -5811,7 +5781,15 @@ export default class BuildTree extends Component {
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
-                                            <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
+                                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
+                                        </div>
+                                        <div className="row pl-lg-0 pt-lg-3">
+                                            <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                                <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
+                                                <div>
+
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="col-md-5 float-right pl-lg-5">
                                             <FormGroup className="" >
@@ -5836,7 +5814,8 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                         </div>
                                     </div>
-                                    <div id="momJexcelPer" className={"RowClickable"}>
+                                    <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang)}</b></i></div>
+                                    <div id="momJexcelPer" className={"RowClickable perNodeData"}>
                                     </div>
                                     <div className="col-md-12 pr-lg-0">
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
@@ -5850,14 +5829,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
 
-                                <div className="row pl-lg-0 pt-lg-3">
-                                    <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                        <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
-                                        <div>
 
-                                        </div>
-                                    </div>
-                                </div>
                             </fieldset>
                         </div>
                     }

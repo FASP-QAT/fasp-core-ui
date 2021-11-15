@@ -132,6 +132,9 @@ export function calculateModelingData(dataset, props, page) {
                                 if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null) {
                                     transferNodeValue += Number(nodeDataModeling.dataValue);
                                 }
+                                if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null) {
+                                    transferNodeValue += Number(nodeDataModeling.dataValue);
+                                }
                             }
                             // console.log("Difference+++", difference)
                             var endValue = 0;
@@ -145,8 +148,8 @@ export function calculateModelingData(dataset, props, page) {
                                 endValue = Number(startValue) + Number(difference);
                                 endValueWMC = Number(startValueWMC) + Number(differenceWMC);
                             }
-                            // console.log("Start Value+++", startValue)
-                            // console.log("Start Value WMC+++", startValueWMC)
+                            endValue+=Number(transferNodeValue);
+                            endValueWMC+=Number(transferNodeValue);
                             var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
                             var endValueWithoutManualChange = endValue;
                             var endValueWithoutManualChangeWMC = endValueWMC;
@@ -194,8 +197,8 @@ export function calculateModelingData(dataset, props, page) {
                                 calculatedValue = Number(calculatedValue);
                                 calculatedValueWMC = Number(calculatedValueWMC);
                             } else {
-                                calculatedValue = Number(calculatedValue) + Number(transferNodeValue);
-                                calculatedValueWMC = Number(calculatedValueWMC) + Number(transferNodeValue);
+                                calculatedValue = Number(calculatedValue);
+                                calculatedValueWMC = Number(calculatedValueWMC);
                             }
                             nodeDataList.push(
                                 {
