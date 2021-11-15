@@ -419,7 +419,13 @@ export default class BuildTree extends Component {
 
     exportDoc() {
         console.log("This.state.items +++", this.state.items);
-        var items = this.state.items.sort(function (a, b) { return a.sortOrder - b.sortOrder });
+        var item1 = this.state.items;
+        var sortOrderArray=[...new Set(item1.map(ele => (ele.sortOrder)))];
+        var sortedArray=sortOrderArray.sort();
+        var items=[];
+        for(var i=0;i<sortedArray.length;i++){
+            items.push(item1.filter(c=>c.sortOrder==sortedArray[i])[0]);
+        }
         console.log("Items+++", items);
         var dataArray = [];
         for (var i = 0; i < items.length; i++) {
@@ -427,7 +433,7 @@ export default class BuildTree extends Component {
             var row1 = "";
             var level = items[i].level;
             for (var j = 1; j <= level; j++) {
-                row = row.concat("    ");
+                row = row.concat("\t");
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue))
@@ -456,7 +462,7 @@ export default class BuildTree extends Component {
                     var row3 = "";
                     var row4 = parentName;
                     for (var j = 1; j <= items[i].level; j++) {
-                        row3 = row3.concat("    ");
+                        row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                     } else {
@@ -470,7 +476,7 @@ export default class BuildTree extends Component {
                         },
                         shading: {
                             type: ShadingType.CLEAR,
-                            fill: "651D32"
+                            fill: "cfcdc9"
                         },
                         style: total != 100 ? "aside" : "",
                     }))
