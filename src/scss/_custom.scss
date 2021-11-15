@@ -5326,3 +5326,7 @@ fieldset.scheduler-border {
   .perNodeData {
     margin-top: -34px;
   }
+  .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
+    top: unset!important;
+    left: unset!important;
+  }
