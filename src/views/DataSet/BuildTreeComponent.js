@@ -4092,10 +4092,10 @@ export default class BuildTree extends Component {
                 parentValue = this.state.currentScenario.calculatedDataValue
             }
             console.log("parentValue---", parentValue);
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue) / 100
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",","")) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
-                parentValue
+                parentValue:parentValue.toString().replaceAll(",","")
             })
         }
         if (event.target.name === "nodeValue") {
