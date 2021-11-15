@@ -4488,28 +4488,6 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
             maintainAspectRatio: false
             ,
             legend: {
@@ -4606,28 +4584,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
+        
             maintainAspectRatio: false
             ,
             legend: {
