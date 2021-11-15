@@ -1008,6 +1008,7 @@ export default class BuildTree extends Component {
             // })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
+            var maxModelingId = Math.max(...data.map(o => o.nodeDataModelingId));
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
@@ -1031,6 +1032,7 @@ export default class BuildTree extends Component {
 
                         data[itemIndex] = obj;
                     } else {
+                        console.log("maxModelingId---",maxModelingId);
                         obj = {
                             transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
                             notes: map1.get("1"),
@@ -1040,8 +1042,9 @@ export default class BuildTree extends Component {
                             startDate: map1.get("3"),
                             stopDate: map1.get("4"),
                             dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
-                            nodeDataModelingId: ''
+                            nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
+                        maxModelingId++;
                         data.push(obj);
                     }
                     console.log("obj---", obj);
