@@ -1568,7 +1568,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Monthly Change (#)",
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
-                    mask: '#,##'
+                    mask: '#,##.00', decimal: '.',
                 },
                 {
                     title: "Modeling Calculater",
@@ -1791,7 +1791,7 @@ export default class BuildTree extends Component {
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(2), true);
+                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
                 }
             }
         }
