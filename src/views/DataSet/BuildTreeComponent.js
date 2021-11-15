@@ -659,13 +659,13 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
-            data[2] = momList[j].difference
-            data[3] = momList[j].manualChange
-            data[4] = this.state.manualChange ? momList[j].endValue : momList[j].endValueWithManualChangeWMC
+            data[1] = this.state.manualChange ? parseFloat(momList[j].startValue).toFixed(2) : parseFloat(momList[j].startValueWMC).toFixed(2)
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[4] = this.state.manualChange ? parseFloat(momList[j].endValue).toFixed(2) : parseFloat(momList[j].endValueWithManualChangeWMC).toFixed(2)
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            data[5] = this.state.manualChange ? momListParent[j].calculatedValue : momListParent[j].calculatedValueWMC
-            data[6] = this.state.manualChange ? momList[j].calculatedValue :  momList[j].calculatedValueWMC;
+            data[5] = this.state.manualChange ? parseFloat(momListParent[j].calculatedValue).toFixed(2) : parseFloat(momListParent[j].calculatedValueWMC).toFixed(2)
+            data[6] = this.state.manualChange ? parseFloat(momList[j].calculatedValue).toFixed(2) : parseFloat(momList[j].calculatedValueWMC).toFixed(2);
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = momList[j].nodeDataId
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
@@ -690,34 +690,40 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month Start)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: "Calculated Change (+/- %)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: "Manual Change (+/- %)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.'
 
                 },
                 {
                     title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " (Month End)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -771,12 +777,12 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = this.state.manualChange ? momList[j].startValue : momList[j].startValueWMC
-            data[2] = momList[j].difference
-            data[3] = this.state.manualChange ? momList[j].endValueWithoutAddingManualChange : momList[j].endValueWithoutAddingManualChangeWMC
-            data[4] = momList[j].seasonalityPerc
-            data[5] = momList[j].manualChange
-            data[6] = this.state.manualChange ? momList[j].endValue : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? momList[j].endValueWithManualChangeWMC : momList[j].endValueWMC
+            data[1] = this.state.manualChange ? parseFloat(momList[j].startValue).toFixed(2) : parseFloat(momList[j].startValueWMC).toFixed(2)
+            data[2] = parseFloat(momList[j].difference).toFixed(2)
+            data[3] = this.state.manualChange ? parseFloat(momList[j].endValueWithoutAddingManualChange).toFixed(2) : parseFloat(momList[j].endValueWithoutAddingManualChangeWMC).toFixed(2)
+            data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
+            data[5] = parseFloat(momList[j].manualChange).toFixed(2)
+            data[6] = this.state.manualChange ? parseFloat(momList[j].endValue).toFixed(2) : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? parseFloat(momList[j].endValueWithManualChangeWMC).toFixed(2) : parseFloat(momList[j].endValueWMC).toFixed(2)
             data[7] = momList[j].nodeDataId
             dataArray[count] = data;
             count++;
@@ -799,32 +805,38 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: "Month Start (no seasonality)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
                     title: "Calculated change (+/-)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: "Monthly End (no seasonality)",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: "Seasonality index",
-                    type: this.state.seasonality == true ? 'text' : 'hidden',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.',
                 },
                 {
                     title: "Manual Change (+/-)",
-                    type: this.state.seasonality == true ? 'text' : 'hidden',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.',
 
                 },
                 {
                     title: "Month End",
-                    type: 'text',
+                    type: 'numeric',
+                    mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
@@ -1004,19 +1016,22 @@ export default class BuildTree extends Component {
                 console.log("10 map---" + map1.get("10"))
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
+                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                        console.log("data[itemIndex]---",this.state.scalingList);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                        obj.transferNodeDataId = map1.get("0");
+                        var transfer = map1[0] != "" ? map1.get("0") : '';
+                        obj.transferNodeDataId = transfer;
                         obj.notes = map1.get("1");
                         obj.modelingType.id = map1.get("2");
                         obj.startDate = map1.get("3");
                         obj.stopDate = map1.get("4");
                         obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
                         obj.nodeDataModelingId = map1.get("9")
-                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                        
                         data[itemIndex] = obj;
                     } else {
                         obj = {
-                            transferNodeDataId: map1.get("0"),
+                            transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
                             notes: map1.get("1"),
                             modelingType: {
                                 id: map1.get("2")
@@ -1030,19 +1045,75 @@ export default class BuildTree extends Component {
                     }
                     console.log("obj---", obj);
                     console.log("data--->>>", data);
-                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = data;
+                    (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = data;
                     console.log("item---", item);
                     items[itemIndex1] = item;
                     console.log("items---", items);
                     // Call function by dolly
+
+                }
+            }
+
+            let { curTreeObj } = this.state;
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            curTreeObj.tree.flatList = items;
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+
+            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            programData.treeList = treeData;
+            console.log("dataSetDecrypt>>>", programData);
+
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            dataSetObj.programData = programData;
+
+            console.log("encpyDataSet>>>", dataSetObj)
+            // store update object in indexdb
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                // programs.forEach(program => {
+                var programRequest = programTransaction.put(dataSetObj);
+                console.log("---hurrey---");
+                // })
+                transaction.oncomplete = function (event) {
+                    calculateModelingData(dataSetObj, '');
+                    console.log("all good >>>>");
                     this.setState({
                         items,
                         scalingList: data,
                         openAddNodeModal: false,
                         activeTab1: new Array(2).fill('1')
                     });
-                }
-            }
+                    console.log("Data update success");
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
+
+
         }
     }
     checkValidation() {
@@ -4572,22 +4643,10 @@ export default class BuildTree extends Component {
         let bar1 = {}
         if (this.state.momListPer.length > 0 && this.state.momElPer != '') {
             var datasetsArr = [];
-            datasetsArr.push({
-                label: 'Men who use condoms (Month End)',
-                stack: 1,
-                yAxisID: 'A',
-                backgroundColor: '#A7C6ED',
-                borderColor: grey,
-                pointBackgroundColor: grey,
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: grey,
-                data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[5])),
-            }
-            )
+
             datasetsArr.push(
                 {
-                    label: '% of sexually active men (Month End)',
+                    label: '% ' + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + ' (Month End)',
                     type: 'line',
                     stack: 3,
                     yAxisID: 'A',
@@ -4606,6 +4665,20 @@ export default class BuildTree extends Component {
                     data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`E${parseInt(index) + 1}`, true))),
                     // data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[4], true)),
                 }
+            )
+
+            datasetsArr.push({
+                label: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang),
+                stack: 1,
+                yAxisID: 'A',
+                backgroundColor: '#A7C6ED',
+                borderColor: grey,
+                pointBackgroundColor: grey,
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: grey,
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[6])),
+            }
             )
 
 
@@ -5663,7 +5736,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomData &&
                         <div>
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                <legend className="scheduler-border">MOM Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
@@ -5733,7 +5806,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomDataPercent &&
                         <div>
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                <legend className="scheduler-border">MOM Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
@@ -5765,7 +5838,11 @@ export default class BuildTree extends Component {
                                     <div id="momJexcelPer" className={"RowClickable"}>
                                     </div>
                                     <div className="col-md-12 pr-lg-0">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                            this.setState({
+                                                showMomDataPercent: false
+                                            });
+                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
                                         {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
