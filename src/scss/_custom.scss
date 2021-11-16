@@ -2772,6 +2772,13 @@ input::placeholder {
     z-index: 1;
   }
 
+  .dataentryTdWidth{
+    overflow: hidden!important;
+    min-width: 280px!important;
+    word-wrap: break-word!important;
+    z-index: 1;
+  }
+
   .regionTdWidthAdjustments{
     overflow: hidden!important;
     min-width: 120px!important;
