@@ -146,7 +146,7 @@ loading:false
     render() {
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div1">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div1">{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card className="mt-2">
