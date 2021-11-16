@@ -183,7 +183,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var map1 = new Map(Object.entries(tableJson[i]));
 
                             let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("0"))[0];
-
+                            var forecastingUnitObj=selectedPlanningUnitObj.forecastingUnit;
+                            forecastingUnitObj.multiplier=map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
                                 let tempJson = {
                                     "forecastConsumptionId": '',
@@ -194,9 +195,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         "idString": "" + selectedForecastProgramObj.programId
                                     },
                                     "consumptionUnit": {
-                                        "forecastConsumptionUnitId": '',
+                                        "forecastConsumptionUnitId": selectedPlanningUnitObj.planningUnitId,
                                         "dataType": 1,
-                                        "forecastingUnit": selectedPlanningUnitObj.forecastingUnit,
+                                        "forecastingUnit": forecastingUnitObj,
                                         "planningUnit": {
                                             "id": selectedPlanningUnitObj.planningUnitId,
                                             "label": selectedPlanningUnitObj.label,

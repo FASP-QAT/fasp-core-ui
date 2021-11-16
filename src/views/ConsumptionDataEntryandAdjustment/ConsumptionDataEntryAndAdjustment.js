@@ -71,6 +71,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   buildDataJexcel(consumptionUnitId) {
+    console.log("ConsumptionUnitId+++",consumptionUnitId);
     this.setState({
       loading: true
     }, () => {
@@ -276,11 +277,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // if(consumptionUnit.dataType==3){
         //   mixedList.push({ id: getLabelText(dataList[j].otherUnit.label, this.state.lang), name: getLabelText(dataList[j].otherUnit.label, this.state.lang) })
         // }
+        console.log("consumptionUnit++++",consumptionUnit);
         data = [];
         data[0] = consumptionUnit.dataType == 1 ? true : false;
         data[1] = 1;
         data[2] = getLabelText(consumptionUnit.forecastingUnit.label, this.state.lang);
-        data[3] = parseInt(consumptionUnit.forecastingUnit.multiplier);
+        data[3] = consumptionUnit.forecastingUnit.multiplier;
         data[4] = consumptionUnit.forecastingUnit.id;
         dataArray1.push(data);
         data = [];
