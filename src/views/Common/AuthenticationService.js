@@ -1296,8 +1296,6 @@ class AuthenticationService {
                         }
                         break;
 
-                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
-                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
@@ -1305,6 +1303,8 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
                     case "/validation/modelingValidation":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
