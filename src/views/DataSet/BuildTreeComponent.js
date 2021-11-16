@@ -1695,7 +1695,7 @@ export default class BuildTree extends Component {
                                 data[8] = "";
                                 data[9] = "";
                                 data[10] = 1;
-                                obj.insertRow(data, 0,1);
+                                obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
                     }
@@ -1716,7 +1716,7 @@ export default class BuildTree extends Component {
                 // Line
                 // items.push({ type: 'line' });
 
-                
+
 
                 return items;
             }.bind(this)
@@ -4159,6 +4159,8 @@ export default class BuildTree extends Component {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
         }
         if (event.target.name === "percentageOfParent") {
+            console.log("currentItemConfig.context.payload$$$",currentItemConfig.context.payload);
+
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
             var calculatedDataValue;
             var parentValue;
@@ -6174,6 +6176,47 @@ export default class BuildTree extends Component {
                                 console.log("add button called---------");
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
+                                var nodeDataMap = {};
+                                var tempArray=[];
+                                var tempJson = {
+                                    dataValue: "",
+                                    calculatedDataValue: '',
+                                    fuNode: {
+                                        noOfForecastingUnitsPerPerson: '',
+                                        usageFrequency: '',
+                                        forecastingUnit: {
+                                            label: {
+                                                label_en: ''
+                                            },
+                                            tracerCategory: {
+
+                                            },
+                                            unit: {
+                                                id: ''
+                                            }
+                                        },
+                                        usageType: {
+                                            id: ''
+                                        },
+                                        usagePeriod: {
+                                            usagePeriodId: ''
+                                        },
+                                        repeatUsagePeriod: {
+
+                                        },
+                                        noOfPersons: ''
+                                    },
+                                    puNode: {
+                                        planningUnit: {
+                                            unit: {
+
+                                            }
+                                        },
+                                        refillMonths: ''
+                                    }
+                                };
+                                nodeDataMap[this.state.selectedScenario] = tempJson;
+                                tempArray.push(nodeDataMap);
                                 this.setState({
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
@@ -6195,9 +6238,7 @@ export default class BuildTree extends Component {
                                                 nodeUnit: {
 
                                                 },
-                                                nodeDataMap: [
-
-                                                ]
+                                                nodeDataMap: nodeDataMap
                                             }
                                         },
                                         parentItem: {
