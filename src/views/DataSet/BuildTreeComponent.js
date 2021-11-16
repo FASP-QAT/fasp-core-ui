@@ -1023,9 +1023,9 @@ export default class BuildTree extends Component {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
                         console.log("data[itemIndex]---", data[itemIndex]);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                        console.log("obj--->>>>>",obj);
+                        console.log("obj--->>>>>", obj);
                         var transfer = map1[0] != "" ? map1.get("0") : '';
-                        console.log("transfer---",transfer);
+                        console.log("transfer---", transfer);
                         obj.transferNodeDataId = transfer;
                         obj.notes = map1.get("1");
                         obj.modelingType.id = map1.get("2");
@@ -1049,7 +1049,7 @@ export default class BuildTree extends Component {
                             nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
                         maxModelingId++;
-                        console.log("obj to push---",obj);
+                        console.log("obj to push---", obj);
                         data.push(obj);
                     }
                     console.log("obj---", obj);
@@ -1656,6 +1656,70 @@ export default class BuildTree extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y == null) {
+                    // Sorting
+                    if (obj.options.columnSorting == true) {
+                        // Line
+                        items.push({ type: 'line' });
+
+                        items.push({
+                            title: obj.options.text.orderAscending,
+                            onclick: function () {
+                                obj.orderBy(x, 0);
+                            }
+                        });
+                        items.push({
+                            title: obj.options.text.orderDescending,
+                            onclick: function () {
+                                obj.orderBy(x, 1);
+                            }
+                        });
+                    }
+                } else {
+                    // at start
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: "Insert Row",
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = cleanUp;
+                                data[8] = "";
+                                data[9] = "";
+                                data[10] = 1;
+                                obj.insertRow(data, 0,1);
+                            }.bind(this)
+                        });
+                    }
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // Line
+                // items.push({ type: 'line' });
+
+                
+
+                return items;
+            }.bind(this)
 
         };
         var modelingEl = jexcel(document.getElementById("modelingJexcel"), options);
