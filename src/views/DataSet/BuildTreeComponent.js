@@ -194,6 +194,7 @@ export default class BuildTree extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            showModelingValidation: true,
             scenario: {
                 id: '',
                 label: {
@@ -400,6 +401,7 @@ export default class BuildTree extends Component {
         this.getNodeValue = this.getNodeValue.bind(this);
         this.getNotes = this.getNotes.bind(this);
         this.calculateNodeValue = this.calculateNodeValue.bind(this);
+        this.hideTreeValidation = this.hideTreeValidation.bind(this);
         this.filterPlanningUnitNode = this.filterPlanningUnitNode.bind(this);
         this.filterPlanningUnitAndForecastingUnitNodes = this.filterPlanningUnitAndForecastingUnitNodes.bind(this);
         this.getForecastingUnitListByTracerCategoryId = this.getForecastingUnitListByTracerCategoryId.bind(this);
@@ -1032,7 +1034,7 @@ export default class BuildTree extends Component {
 
                         data[itemIndex] = obj;
                     } else {
-                        console.log("maxModelingId---",maxModelingId);
+                        console.log("maxModelingId---", maxModelingId);
                         obj = {
                             transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
                             notes: map1.get("1"),
@@ -1794,7 +1796,7 @@ export default class BuildTree extends Component {
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y,value, true);
+                    this.state.modelingEl.setValueFromCoords(8, y, value, true);
                 }
             }
         }
@@ -1869,7 +1871,7 @@ export default class BuildTree extends Component {
                         return "";
                     }
                 } else {
-                    return ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
+                    return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
                 }
             }
         } else {
@@ -2866,7 +2868,11 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
-
+    hideTreeValidation(e) {
+        this.setState({
+            showModelingValidation: e.target.checked == true ? false : true
+        })
+    }
 
     filterPlanningUnitNode(e) {
         console.log(">>>", e.target.checked);
@@ -3907,7 +3913,7 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                
+
                 var minMonth = this.state.forecastStartDate;
                 var maxMonth = this.state.forecastStopDate;
                 console.log("minMonth---", minMonth);
@@ -4101,14 +4107,14 @@ export default class BuildTree extends Component {
                 parentValue = this.state.currentScenario.calculatedDataValue
             }
             console.log("parentValue---", parentValue);
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",","")) / 100
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",", "")) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
-                parentValue:parentValue.toString().replaceAll(",","")
+                parentValue: parentValue.toString().replaceAll(",", "")
             })
         }
         if (event.target.name === "nodeValue") {
-            console.log("$$$$",(currentItemConfig.context.payload.nodeDataMap));
+            console.log("$$$$", (currentItemConfig.context.payload.nodeDataMap));
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = event.target.value;
         }
@@ -4604,7 +4610,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-        
+
             maintainAspectRatio: false
             ,
             legend: {
@@ -5442,7 +5448,7 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-9 col-md-6 pr-lg-3">
-                        <SupplyPlanFormulas ref="formulaeChild" />
+                            <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
@@ -5715,7 +5721,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomData &&
                         <div>
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">MOM Data:</legend>
+                                <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
@@ -5787,7 +5793,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomDataPercent &&
                         <div>
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">MOM Data:</legend>
+                                <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-5">
@@ -5935,7 +5941,7 @@ export default class BuildTree extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
-                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
                 </div>
             ))
@@ -6640,6 +6646,21 @@ export default class BuildTree extends Component {
                                                                                 className="form-check-label"
                                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                                 <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="active7"
+                                                                                name="active7"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.hideTreeValidation(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Hide Tree Validation'}</b>
                                                                             </Label>
                                                                         </div>
                                                                     </div>
