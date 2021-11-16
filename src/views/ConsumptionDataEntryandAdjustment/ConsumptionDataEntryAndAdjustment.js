@@ -176,7 +176,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         data = [];
         data[0] = "Adjusted Consumption"
         for (var j = 0; j < monthArray.length - 2; j++) {
-          data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length)})/100))*100,0)`;
+          data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length-1)}/${colArr[j + 1] + "1"})))*100,0)`;
         }
         dataArray.push(data);
 
@@ -812,7 +812,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             labelString: "",
             fontColor: 'black'
           },
-          stacked: true,
+          // stacked: true,
           ticks: {
             beginAtZero: true,
             fontColor: 'black',
@@ -832,7 +832,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           gridLines: {
             drawBorder: true, lineWidth: 0
           },
-          stacked: true
+          // stacked: true
         }]
       },
       maintainAspectRatio: false,
@@ -857,7 +857,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var monthArray = []
         this.state.monthArray.map((ele, count) => {
           var actualConsumptionCount = 6;
-          if (count < this.state.monthArray.length - 3) {
+          if (count < this.state.monthArray.length - 2) {
             monthArray.push(ele.date);
             var qty = 0;
             this.state.regionList.map((item, count1) => {
@@ -896,7 +896,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           columnData.shift()
           datasetListForGraph.push({
             label: getLabelText(item.label, this.state.lang),
-            data: columnData.map(item => (item > 0 ? item : 0)),
+            data: columnData.map(item => (item > 0 ? Number(item) : 0)),
             type: 'line',
             backgroundColor: 'transparent',
             borderColor: colourArray[colourCount],
@@ -922,6 +922,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         datasets: datasetListForGraph
 
       };
+      console.log("dataset+++",datasetListForGraph);
     }
     return (
       <div className="animated fadeIn">

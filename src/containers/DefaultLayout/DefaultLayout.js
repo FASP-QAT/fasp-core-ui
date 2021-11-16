@@ -281,8 +281,8 @@ const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
-const ModelingValidation=React.lazy(()=>import('../../views/Validations/ModelingValidations'))
-const ConsumptionDataEntryAndAdjustment=React.lazy(()=>import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
+const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
+const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -294,6 +294,8 @@ const AddDataSet = React.lazy(() => import('../../views/DataSet/AddDataSet'));
 const DataSetList = React.lazy(() => import('../../views/DataSet/DataSetList'));
 const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
+const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
@@ -301,8 +303,8 @@ const routes = [
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
-  {path:'/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation},
-  {path:'/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment},
+  { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', name: 'static.common.managetree', component: BuildTree },
@@ -691,6 +693,9 @@ const routes = [
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
+
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
 
 ];
 
@@ -1485,13 +1490,18 @@ class DefaultLayout extends Component {
                         ]
                       },
                       {
-                        name:"Consumption-Based Forecast",
-                        icon:'fa fa-list',
+                        name: "Consumption-Based Forecast",
+                        icon: 'fa fa-list',
                         attributes: {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          
+                          {
+                            name: "Import From QAT Supply Plan",
+                            url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
+                            icon: 'fa fa-dot-circle-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: "Data Entry & Adjustment",
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
@@ -1510,7 +1520,7 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          
+
                           {
                             name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
@@ -1523,7 +1533,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
-                          
+
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
