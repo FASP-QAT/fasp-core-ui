@@ -21,6 +21,24 @@ class VersionSettingsComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            noOfDays: [{ id: 0, name: 'Default' }, { id: 15, name: '15' },
+            { id: 16, name: '16' },
+            { id: 17, name: '17' },
+            { id: 18, name: '18' },
+            { id: 19, name: '19' },
+            { id: 20, name: '20' },
+            { id: 21, name: '21' },
+            { id: 22, name: '22' },
+            { id: 23, name: '23' },
+            { id: 24, name: '24' },
+            { id: 25, name: '25' },
+            { id: 26, name: '26' },
+            { id: 27, name: '27' },
+            { id: 28, name: '28' },
+            { id: 29, name: '29' },
+            { id: 30, name: '30' },
+            { id: 31, name: '31' }
+            ],
             isChanged: false,
             uniquePrograms: [],
             programValues: [],
@@ -150,24 +168,24 @@ class VersionSettingsComponent extends Component {
         }
 
         //No of days
-        if (x == 12) {
-            var col = ("M").concat(parseInt(y) + 1);
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-            else if (!(reg.test(value))) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-            }
-            else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        // if (x == 12) {
+        //     var col = ("M").concat(parseInt(y) + 1);
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     }
+        //     else if (!(reg.test(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //     }
+        //     else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
 
 
         if (x != 11) {
@@ -417,7 +435,7 @@ class VersionSettingsComponent extends Component {
             data[9] = 1
             data[10] = downloadedDataset[j].id
             data[11] = 0
-            data[12] = pd.currentVersion.daysInMonth
+            data[12] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
             versionSettingsArray[count] = data;
             count++;
 
@@ -531,7 +549,8 @@ class VersionSettingsComponent extends Component {
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
-                    type: 'numeric'
+                    type: 'dropdown',
+                    source: this.state.noOfDays
                 },
 
             ],
