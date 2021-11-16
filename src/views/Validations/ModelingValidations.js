@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
@@ -113,7 +113,7 @@ class ModelingValidation extends Component {
 
     setVersionId(e) {
         var versionId = e.target.value;
-        if (versionId > 0) {
+        if (versionId != "") {
             this.setState({
                 versionId: versionId
             }, () => {
@@ -271,7 +271,7 @@ class ModelingValidation extends Component {
     }
 
     getData() {
-        if (this.state.scenarioId > 0 && this.state.levelId > 0 && this.state.nodeVal.length > 0) {
+        if (this.state.scenarioId > 0 && this.state.levelId >= 0 && this.state.nodeVal.length > 0) {
             this.setState({
                 loading: true,
                 show: true
@@ -382,9 +382,11 @@ class ModelingValidation extends Component {
 
     setLevelId(e) {
         var levelId = e.target.value;
+        console.log("Level Id+++", levelId);
         var levelUnit = "";
         if (levelId != "") {
             var treeListFiltered = this.state.treeListFiltered;
+            console.log("TreeListFiltered+++", treeListFiltered)
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
             console.log("FlatData+++", flatData)
