@@ -694,8 +694,8 @@ const routes = [
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
 
-  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
-  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
 
 ];
 
