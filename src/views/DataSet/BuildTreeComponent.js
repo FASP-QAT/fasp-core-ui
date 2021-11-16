@@ -1695,7 +1695,7 @@ export default class BuildTree extends Component {
                                 data[8] = "";
                                 data[9] = "";
                                 data[10] = 1;
-                                obj.insertRow(data, 0,1);
+                                obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
                     }
@@ -1716,7 +1716,7 @@ export default class BuildTree extends Component {
                 // Line
                 // items.push({ type: 'line' });
 
-                
+
 
                 return items;
             }.bind(this)
@@ -6175,6 +6175,9 @@ export default class BuildTree extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    currentScenario: {
+                                        dataValue: ''
+                                    },
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
                                     aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
