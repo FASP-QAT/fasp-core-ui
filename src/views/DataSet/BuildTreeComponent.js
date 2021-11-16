@@ -1612,7 +1612,7 @@ export default class BuildTree extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -5477,14 +5477,18 @@ export default class BuildTree extends Component {
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
-                                value={this.state.singleValue2}
+                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                // value={this.state.singleValue2}
+                                value={{
+                                    year:
+                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                }}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                                 className="ReadonlyPicker"
                             >
-                                <MonthBox value={this.makeText(this.state.singleValue2)}
+                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
@@ -5541,6 +5545,21 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                            <Picker
+                                                ref={this.pickAMonth2}
+                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                // value={this.state.singleValue2}
+                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
+                                                lang={pickerLang.months}
+                                                onChange={this.handleAMonthChange2}
+                                                onDismiss={this.handleAMonthDissmis2}
+                                            >
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                            </Picker>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
@@ -5569,21 +5588,7 @@ export default class BuildTree extends Component {
                                         }
                                         {/* </div> */}
                                         {/* <div className="row"> */}
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
-                                            <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
-                                                // value={this.state.singleValue2}
-                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
-                                                lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
-                                            >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
-                                            </Picker>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                        </FormGroup>
+
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
@@ -5615,12 +5620,12 @@ export default class BuildTree extends Component {
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-1 mt-lg-4">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-1 mt-lg-4">
                                             <Label htmlFor="currencyId">or</Label>
                                         </FormGroup>
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangeNumber"
@@ -5665,7 +5670,7 @@ export default class BuildTree extends Component {
                                                         <b>{'Exponential (%)'}</b>
                                                     </Label>
                                                 </div>}
-                                                <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input Radioactive checkboxMargin"
                                                         type="radio"
@@ -5680,6 +5685,7 @@ export default class BuildTree extends Component {
                                                         <b>{'Linear (%)'}</b>
                                                     </Label>
                                                 </div>
+                                                }
                                                 {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -5693,6 +5699,21 @@ export default class BuildTree extends Component {
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                         <b>{'Linear (#)'}</b>
+                                                    </Label>
+                                                </div>}
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <div className="col-md-12 form-group">
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="radio"
+                                                        id="active4"
+                                                        name="modelingType"
+                                                        checked={this.state.currentModelingType == 5 ? true : false}
+                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Linear (% point)'}</b>
                                                     </Label>
                                                 </div>}
                                             </div>
