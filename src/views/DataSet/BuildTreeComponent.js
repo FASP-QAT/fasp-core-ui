@@ -1010,20 +1010,22 @@ export default class BuildTree extends Component {
             // })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
-            var maxModelingId = Math.max(...data.map(o => o.nodeDataModelingId));
+            var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
             const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                // console.log("10 map---" + map1.get("10"))
+                console.log("9 map---" + map1.get("9"))
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
                         console.log("data[itemIndex]---", data[itemIndex]);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                        console.log("obj--->>>>>",obj);
                         var transfer = map1[0] != "" ? map1.get("0") : '';
+                        console.log("transfer---",transfer);
                         obj.transferNodeDataId = transfer;
                         obj.notes = map1.get("1");
                         obj.modelingType.id = map1.get("2");
@@ -1047,6 +1049,7 @@ export default class BuildTree extends Component {
                             nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
                         maxModelingId++;
+                        console.log("obj to push---",obj);
                         data.push(obj);
                     }
                     console.log("obj---", obj);
