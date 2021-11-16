@@ -194,6 +194,7 @@ export default class BuildTree extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            showModelingValidation: true,
             scenario: {
                 id: '',
                 label: {
@@ -400,6 +401,7 @@ export default class BuildTree extends Component {
         this.getNodeValue = this.getNodeValue.bind(this);
         this.getNotes = this.getNotes.bind(this);
         this.calculateNodeValue = this.calculateNodeValue.bind(this);
+        this.hideTreeValidation = this.hideTreeValidation.bind(this);
         this.filterPlanningUnitNode = this.filterPlanningUnitNode.bind(this);
         this.filterPlanningUnitAndForecastingUnitNodes = this.filterPlanningUnitAndForecastingUnitNodes.bind(this);
         this.getForecastingUnitListByTracerCategoryId = this.getForecastingUnitListByTracerCategoryId.bind(this);
@@ -1008,20 +1010,22 @@ export default class BuildTree extends Component {
             // })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
-            var maxModelingId = Math.max(...data.map(o => o.nodeDataModelingId));
+            var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
             var obj;
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
             const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                // console.log("10 map---" + map1.get("10"))
+                console.log("9 map---" + map1.get("9"))
                 if (parseInt(map1.get("10")) === 1) {
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
                         console.log("data[itemIndex]---", data[itemIndex]);
                         obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                        console.log("obj--->>>>>", obj);
                         var transfer = map1[0] != "" ? map1.get("0") : '';
+                        console.log("transfer---", transfer);
                         obj.transferNodeDataId = transfer;
                         obj.notes = map1.get("1");
                         obj.modelingType.id = map1.get("2");
@@ -1032,7 +1036,7 @@ export default class BuildTree extends Component {
 
                         data[itemIndex] = obj;
                     } else {
-                        console.log("maxModelingId---",maxModelingId);
+                        console.log("maxModelingId---", maxModelingId);
                         obj = {
                             transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
                             notes: map1.get("1"),
@@ -1045,6 +1049,7 @@ export default class BuildTree extends Component {
                             nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
                         maxModelingId++;
+                        console.log("obj to push---", obj);
                         data.push(obj);
                     }
                     console.log("obj---", obj);
@@ -1607,7 +1612,7 @@ export default class BuildTree extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1651,6 +1656,70 @@ export default class BuildTree extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y == null) {
+                    // Sorting
+                    if (obj.options.columnSorting == true) {
+                        // Line
+                        items.push({ type: 'line' });
+
+                        items.push({
+                            title: obj.options.text.orderAscending,
+                            onclick: function () {
+                                obj.orderBy(x, 0);
+                            }
+                        });
+                        items.push({
+                            title: obj.options.text.orderDescending,
+                            onclick: function () {
+                                obj.orderBy(x, 1);
+                            }
+                        });
+                    }
+                } else {
+                    // at start
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: "Insert Row",
+                            onclick: function () {
+                                var data = [];
+                                data[0] = 0;
+                                data[1] = "";
+                                data[2] = "";
+                                data[3] = "";
+                                data[4] = "";
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = cleanUp;
+                                data[8] = "";
+                                data[9] = "";
+                                data[10] = 1;
+                                obj.insertRow(data, 0,1);
+                            }.bind(this)
+                        });
+                    }
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // region id
+                        if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // Line
+                // items.push({ type: 'line' });
+
+                
+
+                return items;
+            }.bind(this)
 
         };
         var modelingEl = jexcel(document.getElementById("modelingJexcel"), options);
@@ -1794,7 +1863,7 @@ export default class BuildTree extends Component {
                 else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y,value, true);
+                    this.state.modelingEl.setValueFromCoords(8, y, value, true);
                 }
             }
         }
@@ -1869,7 +1938,7 @@ export default class BuildTree extends Component {
                         return "";
                     }
                 } else {
-                    return ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
+                    return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
                 }
             }
         } else {
@@ -2860,7 +2929,11 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this);
     }
-
+    hideTreeValidation(e) {
+        this.setState({
+            showModelingValidation: e.target.checked == true ? false : true
+        })
+    }
 
     filterPlanningUnitNode(e) {
         console.log(">>>", e.target.checked);
@@ -3901,7 +3974,7 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
-                
+
                 var minMonth = this.state.forecastStartDate;
                 var maxMonth = this.state.forecastStopDate;
                 console.log("minMonth---", minMonth);
@@ -4095,14 +4168,14 @@ export default class BuildTree extends Component {
                 parentValue = this.state.currentScenario.calculatedDataValue
             }
             console.log("parentValue---", parentValue);
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",","")) / 100
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",", "")) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
-                parentValue:parentValue.toString().replaceAll(",","")
+                parentValue: parentValue.toString().replaceAll(",", "")
             })
         }
         if (event.target.name === "nodeValue") {
-            console.log("$$$$",(currentItemConfig.context.payload.nodeDataMap));
+            console.log("$$$$", (currentItemConfig.context.payload.nodeDataMap));
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = event.target.value;
         }
@@ -4598,7 +4671,7 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
-        
+
             maintainAspectRatio: false
             ,
             legend: {
@@ -5436,7 +5509,7 @@ export default class BuildTree extends Component {
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
-                        <SupplyPlanFormulas ref="formulaeChild" />
+                            <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
 
@@ -5468,14 +5541,18 @@ export default class BuildTree extends Component {
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                years={{ min: { year: 2016, month: 2 }, max: { year: 2016, month: 9 } }}
-                                value={this.state.singleValue2}
+                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                // value={this.state.singleValue2}
+                                value={{
+                                    year:
+                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                }}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                                 className="ReadonlyPicker"
                             >
-                                <MonthBox value={this.makeText(this.state.singleValue2)}
+                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
@@ -5532,6 +5609,21 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                            <Picker
+                                                ref={this.pickAMonth2}
+                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                // value={this.state.singleValue2}
+                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
+                                                lang={pickerLang.months}
+                                                onChange={this.handleAMonthChange2}
+                                                onDismiss={this.handleAMonthDissmis2}
+                                            >
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                            </Picker>
+                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
@@ -5560,21 +5652,7 @@ export default class BuildTree extends Component {
                                         }
                                         {/* </div> */}
                                         {/* <div className="row"> */}
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
-                                            <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
-                                                // value={this.state.singleValue2}
-                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
-                                                lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
-                                            >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
-                                            </Picker>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                        </FormGroup>
+
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
@@ -5606,12 +5684,12 @@ export default class BuildTree extends Component {
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-1 mt-lg-4">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-1 mt-lg-4">
                                             <Label htmlFor="currencyId">or</Label>
                                         </FormGroup>
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
-                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && <FormGroup className="col-md-6">
+                                        {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangeNumber"
@@ -5656,7 +5734,7 @@ export default class BuildTree extends Component {
                                                         <b>{'Exponential (%)'}</b>
                                                     </Label>
                                                 </div>}
-                                                <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input Radioactive checkboxMargin"
                                                         type="radio"
@@ -5671,6 +5749,7 @@ export default class BuildTree extends Component {
                                                         <b>{'Linear (%)'}</b>
                                                     </Label>
                                                 </div>
+                                                }
                                                 {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -5684,6 +5763,21 @@ export default class BuildTree extends Component {
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                         <b>{'Linear (#)'}</b>
+                                                    </Label>
+                                                </div>}
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <div className="col-md-12 form-group">
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="radio"
+                                                        id="active4"
+                                                        name="modelingType"
+                                                        checked={this.state.currentModelingType == 5 ? true : false}
+                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Linear (% point)'}</b>
                                                     </Label>
                                                 </div>}
                                             </div>
@@ -5709,7 +5803,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">MOM Data:</legend>
+                                <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
@@ -5781,7 +5875,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">MOM Data:</legend>
+                                <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
@@ -5929,7 +6023,7 @@ export default class BuildTree extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
-                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
                 </div>
             ))
@@ -6634,6 +6728,21 @@ export default class BuildTree extends Component {
                                                                                 className="form-check-label"
                                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                                 <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="active7"
+                                                                                name="active7"
+                                                                                // checked={false}
+                                                                                onClick={(e) => { this.hideTreeValidation(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{'Hide Tree Validation'}</b>
                                                                             </Label>
                                                                         </div>
                                                                     </div>
