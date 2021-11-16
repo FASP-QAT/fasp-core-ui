@@ -193,7 +193,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-            this.props.updateState("color", "red");
+            this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -203,7 +203,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentStatusRequest = shipmentStatusOs.getAll();
             shipmentStatusRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             shipmentStatusRequest.onsuccess = function (event) {
@@ -223,7 +223,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var paRequest = paOs.getAll();
                 paRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 paRequest.onsuccess = function (event) {
@@ -245,7 +245,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var papuRequest = papuOs.getAll();
                     papuRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
@@ -260,7 +260,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var fsRequest = fsOs.getAll();
                         fsRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "red");
+                            this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
                         fsRequest.onsuccess = function (event) {
@@ -284,7 +284,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var budgetListAll = []
                             bRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                this.props.updateState("color", "red");
+                                this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
                             bRequest.onsuccess = function (event) {
@@ -324,7 +324,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var dataSourceRequest = dataSourceOs.getAll();
                                 dataSourceRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                    this.props.updateState("color", "red");
+                                    this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
                                 dataSourceRequest.onsuccess = function (event) {
@@ -350,7 +350,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var currencyRequest = currencyOs.getAll();
                                     currencyRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                        this.props.updateState("color", "red");
+                                        this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
                                     currencyRequest.onsuccess = function (event) {
@@ -837,7 +837,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                                                                 openRequest.onerror = function (event) {
                                                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                                                    this.props.updateState("color", "red");
+                                                                    this.props.updateState("color", "#BA0C2F");
                                                                     this.props.hideFirstComponent();
                                                                 }.bind(this);
                                                                 openRequest.onsuccess = function (e) {
@@ -849,7 +849,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                     var papuRequest = papuOs.get(parseInt(procurementAgent));
                                                                     papuRequest.onerror = function (event) {
                                                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                                                        this.props.updateState("color", "red");
+                                                                        this.props.updateState("color", "#BA0C2F");
                                                                         this.props.hideFirstComponent();
                                                                     }.bind(this);
                                                                     papuRequest.onsuccess = function (event) {
@@ -2842,7 +2842,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
@@ -2854,7 +2854,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var papuRequest = papuOs.get(parseInt(procurementAgent));
                         papuRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "red");
+                            this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
                         papuRequest.onsuccess = function (event) {
@@ -3402,7 +3402,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
@@ -3420,7 +3420,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
@@ -3854,7 +3854,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {

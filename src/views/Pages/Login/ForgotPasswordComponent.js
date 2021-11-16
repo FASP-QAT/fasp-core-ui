@@ -111,7 +111,7 @@ class ForgotPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
-                                <h5 style={{ color: "red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
+                                <h5 style={{ color: "#BA0C2F" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 " style={{ display: this.state.loading ? "none" : "block" }}>
 
                                     <CardHeader>
