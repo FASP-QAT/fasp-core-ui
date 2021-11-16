@@ -400,6 +400,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // } else {
         //     console.log("IF------------>2");
         // }
+        // console.log("IF------------>2", localStorage.getItem("sesRecordCount"));
 
 
 
@@ -673,7 +674,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             } else {
                 this.setState({
-                    message: 'Supply plan program and forecast program should belong to same country',
+                    message: 'Supply Plan Program and Forecast Program should belong to same Country',
                     color: 'red'
                 },
                     () => {
@@ -972,7 +973,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             }.bind(this),
             selectionCopy: false,
-            pagination: localStorage.getItem("sesRecordCount"),
+            // pagination: localStorage.getItem("sesRecordCount"),
+            pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,

@@ -309,7 +309,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                         { id: 1, name: 'Import' },
                         { id: 2, name: 'Do not import' },
                         { id: 3, name: 'No region to import into' },
-                    ]
+                    ],
+                    filter: this.filterImport
                 },
 
 
@@ -340,7 +341,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 }
 
             }.bind(this),
-            pagination: localStorage.getItem("sesRecordCount"),
+            // pagination: localStorage.getItem("sesRecordCount"),
+            pagination: 5000000,
             // pagination: false,
             filters: true,
             search: true,
@@ -377,6 +379,15 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         })
         this.props.updateStepOneData("loading", false);
     }
+
+    filterImport = function (instance, cell, c, r, source) {
+        var mylist = [
+            { id: 1, name: 'Import' },
+            { id: 2, name: 'Do not import' },
+        ];
+
+        return mylist;
+    }.bind(this)
 
     render() {
         const { rangeValue } = this.state

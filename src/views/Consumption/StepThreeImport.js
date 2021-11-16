@@ -656,7 +656,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
             // }.bind(this),
             // editable: false,
-            pagination: localStorage.getItem("sesRecordCount"),
+            // pagination: localStorage.getItem("sesRecordCount"),
+            pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,
