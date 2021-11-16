@@ -96,7 +96,7 @@ class Login extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -109,7 +109,7 @@ class Login extends Component {
       getRequest1.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
@@ -131,7 +131,7 @@ class Login extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
 
@@ -284,7 +284,7 @@ class Login extends Component {
     // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
     var incorrectPassword = document.getElementById('div2');
-    incorrectPassword.style.color = 'red';
+    incorrectPassword.style.color = '#BA0C2F';
     this.setState({
       message: ''
     },
@@ -305,10 +305,10 @@ class Login extends Component {
     var htmlContent = logoutMessage.innerHTML;
     // console.log("htnl content....... ", htmlContent);
     if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
-      logoutMessage.style.color = 'red';
+      logoutMessage.style.color = '#BA0C2F';
     }
     else if (htmlContent.includes('Access Denied')) {
-      logoutMessage.style.color = 'red';
+      logoutMessage.style.color = '#BA0C2F';
     }
     else {
       logoutMessage.style.color = 'green';

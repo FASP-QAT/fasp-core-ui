@@ -141,7 +141,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6 " className="ForgotmarginTop">
-                                <h5 style={{ color: "red" }} id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
+                                <h5 className="red" id="div1" className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
