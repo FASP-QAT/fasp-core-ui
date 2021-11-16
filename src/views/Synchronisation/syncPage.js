@@ -3458,10 +3458,11 @@ export default class syncPage extends Component {
             programJson.versionType = { id: document.getElementById("versionType").value };
             programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
             programJson.notes = document.getElementById("notes").value;
-            ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
-              if (response.status == 200) {
-                if (response.data == this.state.comparedLatestVersion) {
-                  ProgramService.saveProgramData(programJson).then(response => {
+            // ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+              // if (response.status == 200) {
+                // if (response.data == this.state.comparedLatestVersion) {
+                  AuthenticationService.setupAxiosInterceptors();
+                  ProgramService.saveProgramData(programJson,this.state.comparedLatestVersion).then(response => {
                     if (response.status == 200) {
                       var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                       var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -3601,12 +3602,14 @@ export default class syncPage extends Component {
                             case 500:
                             case 404:
                             case 406:
+                              alert(i18n.t("static.commitVersion.versionIsOutDated"));         
                               this.setState({
                                 message: error.response.data.messageCode,
                                 color: "#BA0C2F",
                                 loading: false
                               }, () => {
                                 this.hideFirstComponent()
+                                this.checkLastModifiedDateForProgram(this.state.programId);
                               });
                               break;
                             case 412:
@@ -3632,84 +3635,84 @@ export default class syncPage extends Component {
                         }
                       }
                     );
-                } else {
-                  alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                  this.setState({
-                    message: i18n.t("static.commitVersion.versionIsOutDated"),
-                    loading: false,
-                    color: "#BA0C2F"
-                  }, () => {
-                    this.hideFirstComponent()
-                    this.checkLastModifiedDateForProgram(this.state.programId);
-                  });
+                // } else {
+                //   alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                //   this.setState({
+                //     message: i18n.t("static.commitVersion.versionIsOutDated"),
+                //     loading: false,
+                //     color: "red"
+                //   }, () => {
+                //     this.hideFirstComponent()
+                //     this.checkLastModifiedDateForProgram(this.state.programId);
+                //   });
 
-                }
-              } else {
-                this.setState({
-                  message: response.data.messageCode,
-                  color: "#BA0C2F",
-                  loading: false
-                })
-                this.hideFirstComponent();
-              }
-            })
-              .catch(
-                error => {
-                  console.log("@@@Error5", error);
-                  console.log("@@@Error5", error.message);
-                  console.log("@@@Error5", error.response ? error.response.status : "")
-                  if (error.message === "Network Error") {
-                    console.log("+++in catch 9")
-                    this.setState({
-                      message: 'static.common.networkError',
-                      color: "#BA0C2F",
-                      loading: false
-                    }, () => {
-                      this.hideFirstComponent();
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
+                // }
+            //   } else {
+            //     this.setState({
+            //       message: response.data.messageCode,
+            //       color: "red",
+            //       loading: false
+            //     })
+            //     this.hideFirstComponent();
+            //   }
+            // })
+            //   .catch(
+            //     error => {
+            //       console.log("@@@Error5", error);
+            //       console.log("@@@Error5", error.message);
+            //       console.log("@@@Error5", error.response ? error.response.status : "")
+            //       if (error.message === "Network Error") {
+            //         console.log("+++in catch 9")
+            //         this.setState({
+            //           message: 'static.common.networkError',
+            //           color: "red",
+            //           loading: false
+            //         }, () => {
+            //           this.hideFirstComponent();
+            //         });
+            //       } else {
+            //         switch (error.response ? error.response.status : "") {
 
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          color: "#BA0C2F",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false,
-                          color: "#BA0C2F"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      default:
-                        console.log("+++in catch 10")
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false,
-                          color: "#BA0C2F"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                    }
-                  }
-                }
-              );
+            //           case 401:
+            //             this.props.history.push(`/login/static.message.sessionExpired`)
+            //             break;
+            //           case 403:
+            //             this.props.history.push(`/accessDenied`)
+            //             break;
+            //           case 500:
+            //           case 404:
+            //           case 406:
+            //             this.setState({
+            //               message: error.response.data.messageCode,
+            //               color: "red",
+            //               loading: false
+            //             }, () => {
+            //               this.hideFirstComponent()
+            //             });
+            //             break;
+            //           case 412:
+            //             this.setState({
+            //               message: error.response.data.messageCode,
+            //               loading: false,
+            //               color: "red"
+            //             }, () => {
+            //               this.hideFirstComponent()
+            //             });
+            //             break;
+            //           default:
+            //             console.log("+++in catch 10")
+            //             this.setState({
+            //               message: 'static.unkownError',
+            //               loading: false,
+            //               color: "red"
+            //             }, () => {
+            //               this.hideFirstComponent()
+            //             });
+            //             break;
+            //         }
+            //       }
+            //     }
+            //   );
           }.bind(this)
         }.bind(this)
       }

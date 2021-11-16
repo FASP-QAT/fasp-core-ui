@@ -595,12 +595,12 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 60, 100, 60, 60, 60, 100, 60],
+            colWidths: [60, 150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.forecastingUnit.forecastingUnitId'),
+                    type: 'text',
                     readOnly: true
                 },
                 {

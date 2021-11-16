@@ -1602,6 +1602,7 @@ class ForecastMetrics extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1624,6 +1625,7 @@ class ForecastMetrics extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1643,6 +1645,7 @@ class ForecastMetrics extends Component {
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
@@ -1667,6 +1670,7 @@ class ForecastMetrics extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          disabled={this.state.loading}
                         />
 
                       </div>

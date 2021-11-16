@@ -224,7 +224,9 @@ class ApplicationDashboard extends Component {
       users: [],
       lang: localStorage.getItem('lang'),
       openIssues: '',
-      addressedIssues: ''
+      addressedIssues: '',
+      supplyPlanReviewCount: '',
+      roleArray: []
     };
     // this.state = {
 
@@ -414,6 +416,32 @@ class ApplicationDashboard extends Component {
             })
           })
       }
+
+      let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+      let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+      // console.log("decryptedUser=====>", decryptedUser);
+
+      var roleList = decryptedUser.roleList;
+      var roleArray = []
+      for (var r = 0; r < roleList.length; r++) {
+        roleArray.push(roleList[r].roleId)
+      }
+
+      this.setState({
+        roleArray: roleArray
+      })
+
+      if (roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') && this.state.id != 2) {
+        DashboardService.supplyPlanReviewerLevelDashboard()
+          .then(response => {
+            console.log("supplyPlanReviewerLevelDashboard===", response.data);
+            this.setState({
+              supplyPlanReviewCount: response.data
+            })
+          })
+      }
+
+
     }
     this.getPrograms();
     DashboardService.openIssues()
@@ -1281,6 +1309,44 @@ class ApplicationDashboard extends Component {
             </>
             // </Row>
           }
+
+
+          {checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
+            <>
+              <Col xs="12" sm="6" lg="3">
+                <Card className=" CardHeight">
+                  <CardBody className="box-p">
+                    <div class="h1 text-muted text-left mb-2  ">
+                      <i class="fa fa-calculator  icon-color"></i>
+                      <ButtonGroup className="float-right">
+                        <Dropdown id='card7' isOpen={this.state.card7} toggle={() => { this.setState({ card7: !this.state.card7 }); }}>
+                          <DropdownToggle caret className="p-0" color="transparent">
+                          </DropdownToggle>
+                          <DropdownMenu right>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </ButtonGroup>
+                    </div>
+
+                    <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
+                    <div className="text-count">{this.state.supplyPlanReviewCount.SUPPLY_PLAN_COUNT}</div>
+                    <div className="chart-wrapper mt-4 pb-2" >
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+            </>
+          }
+
+
+
+
+
+
+
+
+
           {/* <Row className="mt-2"> */}
           {
             this.state.programList.length > 0 &&
