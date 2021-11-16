@@ -1353,7 +1353,8 @@ a:hover {
 
 @media (min-width: 992px) {
   .sidebar .nav {
-    font-size: 12px !important;
+    // font-size: 12px !important;
+    font-size: 13px !important;
   }
   .sidebar .nav-link {
     padding: 0.75rem 0.2rem !important;
@@ -4145,6 +4146,7 @@ display: none;
 }
 .sidebar .nav-link .nav-icon {
   color: #fff;
+  margin: 2px 0.5rem 0 0!important;
 }
 .sidebar .sidebar-minimizer {
   background-color: #23282c!important;
