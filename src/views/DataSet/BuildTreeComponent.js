@@ -5510,7 +5510,7 @@ export default class BuildTree extends Component {
                 <TabPane tabId="2">
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
-                        <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <div className="offset-md-10 col-md-6 pl-lg-4">
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
@@ -5803,12 +5803,12 @@ export default class BuildTree extends Component {
 
                     </div>
                     {this.state.showMomData &&
-                        <div>
+                        <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                        <div className="col-md-5">
+                                        <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                         </div>
                                         <div className="row pl-lg-0 pt-lg-3">
@@ -5820,8 +5820,8 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
 
-                                        <div className="col-md-5 float-right pl-lg-5">
-                                            <FormGroup className="" >
+                                        <div className="col-md-6 float-right">
+                                            <FormGroup className="float-right" >
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -5875,12 +5875,12 @@ export default class BuildTree extends Component {
                         </div>
                     }
                     {this.state.showMomDataPercent &&
-                        <div>
+                        <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
                                 <div className="row pl-lg-2 pr-lg-2">
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                        <div className="col-md-5">
+                                        <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                         </div>
                                         <div className="row pl-lg-0 pt-lg-3">
@@ -5891,8 +5891,8 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-5 float-right pl-lg-5">
-                                            <FormGroup className="" >
+                                        <div className="col-md-6 float-right">
+                                            <FormGroup className="float-right" >
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -6971,7 +6971,7 @@ export default class BuildTree extends Component {
             {/* Modal start------------------- */}
             <Draggable handle=".modal-title">
                 <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-lg '} >
+                    className={'modal-xl '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                             this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
