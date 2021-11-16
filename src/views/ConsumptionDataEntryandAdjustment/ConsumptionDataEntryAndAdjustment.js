@@ -944,6 +944,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         datasets: datasetListForGraph
 
       };
+      console.log("dataset+++",datasetListForGraph);
     }
     return (
       <div className="animated fadeIn">

@@ -129,10 +129,12 @@ class ModelingValidation extends Component {
     }
 
     getDatasetData() {
+        console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
         var versionId = this.state.versionId.toString();
+        console.log("In get dataset data+++",versionId);
         if (versionId != "") {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
