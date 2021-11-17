@@ -230,6 +230,7 @@ export default class BuildTree extends Component {
             momEl: '',
             modelingEl: '',
             currentScenario: {
+                dataValue:'',
                 fuNode: {
                     forecastingUnit: {
                         label: {
@@ -4159,21 +4160,25 @@ export default class BuildTree extends Component {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
         }
         if (event.target.name === "percentageOfParent") {
-            console.log("currentItemConfig.context.payload$$$",currentItemConfig.context.payload);
 
+            console.log("event.target.value---", event.target.value);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
+            this.state.currentScenario.dataValue = event.target.value;
+            console.log("currentItemConfig.context.payload after$$$", currentItemConfig.context.payload);
+            console.log("current scenario$$$", this.state.currentScenario);
             var calculatedDataValue;
             var parentValue;
             if (this.state.addNodeFlag !== "true") {
                 parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue
             } else {
-                parentValue = this.state.currentScenario.calculatedDataValue
+                // parentValue = this.state.currentScenario.calculatedDataValue
+                parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue
             }
             console.log("parentValue---", parentValue);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",", "")) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
-                parentValue: parentValue.toString().replaceAll(",", "")
+                parentValue: parentValue
             })
         }
         if (event.target.name === "nodeValue") {
@@ -4907,8 +4912,8 @@ export default class BuildTree extends Component {
                                                     // invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                     // onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    step={.01}
-                                                    value={!this.state.addNodeFlag ? this.state.currentScenario.dataValue : ''}></Input>
+                                                    // step={.01}
+                                                    value={this.state.currentScenario.dataValue}></Input>
                                                 <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                             </FormGroup>
                                             <FormGroup>
@@ -6177,7 +6182,7 @@ export default class BuildTree extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 var nodeDataMap = {};
-                                var tempArray=[];
+                                var tempArray = [];
                                 var tempJson = {
                                     dataValue: "",
                                     calculatedDataValue: '',
@@ -6215,8 +6220,9 @@ export default class BuildTree extends Component {
                                         refillMonths: ''
                                     }
                                 };
-                                nodeDataMap[this.state.selectedScenario] = tempJson;
-                                tempArray.push(nodeDataMap);
+                                tempArray.push(tempJson);
+                                nodeDataMap[this.state.selectedScenario] = tempArray;
+                                // tempArray.push(nodeDataMap);
                                 this.setState({
                                     currentScenario: {
                                         dataValue: ''
