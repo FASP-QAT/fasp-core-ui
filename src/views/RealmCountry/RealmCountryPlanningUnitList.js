@@ -753,7 +753,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
 import ProgramService from '../../api/ProgramService';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER } from '../../Constants';
@@ -1809,6 +1809,12 @@ export default class RealmCountryPlanningUnitList extends Component {
                     }
                 }
             }
+            realmCountryList.sort((a, b) => {
+                var itemLabelA = (a.country).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = (b.country).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+
             console.log("REALM-COUNTRY--->1", realmCountryList);
             const realmCountrys = [...new Map(realmCountryList.map(item => [item.realmCountryId, item])).values()]
             console.log("REALM-COUNTRY--->2", realmCountrys);
@@ -1825,8 +1831,16 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     console.log("RESP--->3", response3.data);
                                     this.setState({
                                         rows: response1.data,
-                                        units: response2.data,
-                                        planningUnits: response3.data,
+                                        units: response2.data.sort((a, b) => {
+                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                        }),
+                                        planningUnits: response3.data.sort((a, b) => {
+                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                        }),
                                         allowAdd: true,
                                         realmCountrys
                                     }, () => {
@@ -2867,7 +2881,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             }
                         </CardFooter>
                     }
