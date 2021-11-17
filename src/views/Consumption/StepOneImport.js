@@ -855,12 +855,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100],
+            colWidths: [50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
 
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    title: 'Supply Plan Planning Unit Id',
+                    type: 'text',
                     readOnly: true//0 A
                 },
                 {
@@ -888,14 +888,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
                 {
-                    title: 'ForecastPlanningUnitId',
-                    type: 'hidden',
+                    title: 'Forecast Planning Unit Id',
+                    type: 'text',
                     readOnly: true//5 F
                 },
                 {
                     title: 'Forecast Planning Unit',
                     // readOnly: true,
-                    type: 'dropdown',
+                    type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
                     // source: [
                     //     { id: 1, name: 'Do not import' },
@@ -945,16 +945,24 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     if (doNotImport == -1) {// grade out
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
+
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'color', textColor);
+
                         var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                     } else {
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.remove('readonly');
+                        // elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+
                         // var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
                     }
@@ -1061,9 +1069,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 versions: [],
             }, () => {
                 this.setState({
-                    versions: program[0].versionList.filter(function (x, i, a) {
+                    versions: (program[0].versionList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
-                    })
+                    })).reverse()
                 }, () => { });
             });
 
