@@ -191,6 +191,7 @@ function addCommas(cell1, row) {
 export default class BuildTree extends Component {
     constructor(props) {
         super(props);
+        this.pickAMonth3 = React.createRef()
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
@@ -1695,7 +1696,7 @@ export default class BuildTree extends Component {
                                 data[8] = "";
                                 data[9] = "";
                                 data[10] = 1;
-                                obj.insertRow(data, 0,1);
+                                obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
                     }
@@ -1716,7 +1717,7 @@ export default class BuildTree extends Component {
                 // Line
                 // items.push({ type: 'line' });
 
-                
+
 
                 return items;
             }.bind(this)
@@ -2062,7 +2063,7 @@ export default class BuildTree extends Component {
                     console.log("dataSetObj.programData***>>>", programData);
                     this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
                         // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
-                        calculateModelingData(dataEnc, this, "BuildTree");
+                        // calculateModelingData(dataEnc, this, "BuildTree");
                     });
 
 
@@ -4159,6 +4160,8 @@ export default class BuildTree extends Component {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
         }
         if (event.target.name === "percentageOfParent") {
+            console.log("currentItemConfig.context.payload$$$", currentItemConfig.context.payload);
+
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
             var calculatedDataValue;
             var parentValue;
@@ -5550,7 +5553,7 @@ export default class BuildTree extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
-                                className="ReadonlyPicker"
+                                // className="ReadonlyPicker"
                             >
                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
@@ -5943,7 +5946,7 @@ export default class BuildTree extends Component {
 
     handleAMonthChange1 = (year, month) => {
         // console.log("value>>>", year);
-        console.log("text>>>", (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0])
+        console.log("text>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0])
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
@@ -5957,10 +5960,10 @@ export default class BuildTree extends Component {
     }
 
     handleAMonthDissmis1 = (value) => {
-        // console.log("dismiss>>", value);
-        this.setState({ singleValue2: value, }, () => {
+        console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
-        })
+        // })
 
     }
 
@@ -5969,7 +5972,7 @@ export default class BuildTree extends Component {
     }
 
     handleClickMonthBox2 = (e) => {
-        this.refs.pickAMonth3.show()
+        this.pickAMonth2.current.show()
     }
     handleAMonthChange2 = (year, month) => {
         console.log("value>>>", year);
@@ -5986,10 +5989,26 @@ export default class BuildTree extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
+            // this.fetchData();
+        // })
+
+    }
+
+
+    handleAMonthChange3 = (year, month) => {
+        console.log("text>>>", year, " and ", month)
+    }
+
+    handleAMonthDissmis3 = (value) => {
+        console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
         })
+    }
 
+    handleClickMonthBox3 = (e) => {
+        this.pickAMonth3.current.show()
     }
 
     render() {
@@ -6174,6 +6193,47 @@ export default class BuildTree extends Component {
                                 console.log("add button called---------");
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
+                                var nodeDataMap = {};
+                                var tempArray = [];
+                                var tempJson = {
+                                    dataValue: "",
+                                    calculatedDataValue: '',
+                                    fuNode: {
+                                        noOfForecastingUnitsPerPerson: '',
+                                        usageFrequency: '',
+                                        forecastingUnit: {
+                                            label: {
+                                                label_en: ''
+                                            },
+                                            tracerCategory: {
+
+                                            },
+                                            unit: {
+                                                id: ''
+                                            }
+                                        },
+                                        usageType: {
+                                            id: ''
+                                        },
+                                        usagePeriod: {
+                                            usagePeriodId: ''
+                                        },
+                                        repeatUsagePeriod: {
+
+                                        },
+                                        noOfPersons: ''
+                                    },
+                                    puNode: {
+                                        planningUnit: {
+                                            unit: {
+
+                                            }
+                                        },
+                                        refillMonths: ''
+                                    }
+                                };
+                                nodeDataMap[this.state.selectedScenario] = tempJson;
+                                tempArray.push(nodeDataMap);
                                 this.setState({
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
@@ -6195,9 +6255,7 @@ export default class BuildTree extends Component {
                                                 nodeUnit: {
 
                                                 },
-                                                nodeDataMap: [
-
-                                                ]
+                                                nodeDataMap: nodeDataMap
                                             }
                                         },
                                         parentItem: {
@@ -6683,17 +6741,17 @@ export default class BuildTree extends Component {
                                                                     <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
                                                                     <div className="controls edit">
                                                                         <Picker
-                                                                            ref="pickAMonth3"
+                                                                            ref={this.pickAMonth3}
                                                                             id="monthPicker"
                                                                             name="monthPicker"
                                                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                             value={singleValue2}
                                                                             lang={pickerLang.months}
                                                                             theme="dark"
-                                                                            onChange={this.handleAMonthChange2}
-                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                            onChange={this.handleAMonthChange3}
+                                                                            onDismiss={this.handleAMonthDissmis3}
                                                                         >
-                                                                            <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox2(e) }} />
+                                                                            <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
                                                                         </Picker>
                                                                     </div>
                                                                 </FormGroup>
