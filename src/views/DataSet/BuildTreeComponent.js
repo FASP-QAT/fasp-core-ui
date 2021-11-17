@@ -5572,7 +5572,7 @@ export default class BuildTree extends Component {
                             }
                             {this.state.showModelingJexcelPercent &&
                                 <><div className="calculatorimg">
-                                    <div id="modelingJexcelPercent" className={"RowClickable"}>
+                                    <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
@@ -5585,7 +5585,7 @@ export default class BuildTree extends Component {
 
 
                         {this.state.showCalculatorFields &&
-                            <>
+                            <div className="col-md-12 pl-lg-0 pr-lg-0">
                                 <fieldset className="scheduler-border">
                                     <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                     <div className="row">
@@ -5796,7 +5796,7 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                     {/* </div> */}
                                 </fieldset>
-                            </>
+                            </div>
                         }
 
                     </div>
@@ -5804,7 +5804,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
-                                <div className="row pl-lg-2 pr-lg-2">
+                                {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
@@ -5866,7 +5866,7 @@ export default class BuildTree extends Component {
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
-                                </div>
+                                {/* </div> */}
 
 
                             </fieldset>
@@ -5876,7 +5876,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
-                                <div className="row pl-lg-2 pr-lg-2">
+                                {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
@@ -5925,7 +5925,7 @@ export default class BuildTree extends Component {
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
-                                </div>
+                                {/* </div> */}
 
 
                             </fieldset>

@@ -3741,8 +3741,9 @@ export default class CreateTreeTemplate extends Component {
                                 handleReset,
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
+                                    <div className="row">
                                     {this.state.level0 &&
-                                        <FormGroup>
+                                    <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Parent</Label>
                                             <Input type="text"
                                                 name="parent"
@@ -3754,7 +3755,7 @@ export default class CreateTreeTemplate extends Component {
                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                             ></Input>
                                         </FormGroup>}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="nodeTitle"
@@ -3773,7 +3774,7 @@ export default class CreateTreeTemplate extends Component {
                                             <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
                                         </Popover>
                                     </div>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
@@ -3799,6 +3800,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                     </FormGroup>
+                                    </div>
                                     {this.state.aggregationNode &&
 
                                         <FormGroup>
@@ -4560,7 +4562,7 @@ export default class CreateTreeTemplate extends Component {
                             }
                             {this.state.showModelingJexcelPercent &&
                                 <><div className="calculatorimg">
-                                    <div id="modelingJexcelPercent" className={"RowClickable"}>
+                                    <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
@@ -4573,6 +4575,7 @@ export default class CreateTreeTemplate extends Component {
 
 
                         {this.state.showCalculatorFields &&
+                        <div className="col-md-12 pl-lg-0 pr-lg-0">
                             <fieldset className="scheduler-border">
                             <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                 <div className="row">
@@ -4781,6 +4784,7 @@ export default class CreateTreeTemplate extends Component {
                                 </FormGroup>
                                 
                             </fieldset>
+                            </div>
                         }
 
                     </div>
@@ -4788,7 +4792,7 @@ export default class CreateTreeTemplate extends Component {
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                             <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                            <div className="row pl-lg-2 pr-lg-2">
+                            {/* <div className="row pl-lg-2 pr-lg-2"> */}
                             
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-6 pl-lg-0">
@@ -4841,7 +4845,7 @@ export default class CreateTreeTemplate extends Component {
 
                                 </div>
                                
-                            </div>
+                            {/* </div> */}
 
                             <div className="row pl-lg-0 pt-lg-3">
                                 <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
@@ -4858,7 +4862,7 @@ export default class CreateTreeTemplate extends Component {
                        <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                             <legend className="scheduler-border">Modeling Calculater Tool:</legend>
-                            <div className="row pl-lg-2 pr-lg-2">
+                            {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-6 pl-lg-0">
                                         <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
@@ -4893,7 +4897,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                 </div>
-                            </div>
+                            {/* </div> */}
 
                             <div className="row pl-lg-0 pt-lg-3">
                                 <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
