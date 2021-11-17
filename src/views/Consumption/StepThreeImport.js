@@ -195,7 +195,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         "idString": "" + selectedForecastProgramObj.programId
                                     },
                                     "consumptionUnit": {
-                                        "forecastConsumptionUnitId": selectedPlanningUnitObj.planningUnitId,
+                                        "forecastConsumptionUnitId": '',
                                         "dataType": 1,
                                         "forecastingUnit": forecastingUnitObj,
                                         "planningUnit": {
