@@ -506,7 +506,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 data[4] = papuList[j].actualConsumption
                 data[5] = stepOneSelectedObject.multiplier
-                data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(6)
+                data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2)
                 data[7] = (match.length > 0 ? match[0].actualConsumption : '')
                 data[8] = true
                 data[9] = (match.length > 0 ? 1 : 0)
