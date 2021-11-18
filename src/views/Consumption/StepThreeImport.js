@@ -195,7 +195,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         "idString": "" + selectedForecastProgramObj.programId
                                     },
                                     "consumptionUnit": {
-                                        "forecastConsumptionUnitId": selectedPlanningUnitObj.planningUnitId,
+                                        "forecastConsumptionUnitId": '',
                                         "dataType": 1,
                                         "forecastingUnit": forecastingUnitObj,
                                         "planningUnit": {
@@ -522,7 +522,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     month: papuList[j].month,
                     supplyPlanConsumption: papuList[j].actualConsumption,
                     multiplier: stepOneSelectedObject.multiplier,
-                    convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(6),
+                    convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2),
                     currentQATConsumption: (match.length > 0 ? match[0].actualConsumption : ''),
                     import: true
 
@@ -568,19 +568,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     title: 'Supply Plan Planning Unit',
                     type: 'dropdown',
                     source: planningUnitListJexcel,//A0
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'Forecasting planning Unit',
                     type: 'dropdown',
                     source: planningUnitListJexcel,//B1
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'Region',
                     type: 'text',
                     textEditor: true,
-                    // readOnly: true//C2
+                    readOnly: true//C2
                 },
                 {
                     title: 'Month',
@@ -589,20 +589,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         format: JEXCEL_MONTH_PICKER_FORMAT,
                         type: 'year-month-picker'
                     },
-                    // readOnly: true//D3
+                    readOnly: true//D3
                 },
                 {
                     title: 'Actual Consumption(Supply Plan Module)',
                     type: 'numeric',
                     mask: '#,##',
                     textEditor: true,
-                    // readOnly: true//E4
+                    readOnly: true//E4
                 },
                 {
                     title: 'Conversion Factor(Supply Plan to Forecast)',
                     type: 'text',
                     textEditor: true,
-                    // readOnly: true//F5
+                    readOnly: true//F5
                 },
                 {
                     title: 'Converted Actual Consumption(Supply Plan Module)',
@@ -610,14 +610,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     decimal: '.',
                     mask: '#,##.00',
                     textEditor: true,
-                    // readOnly: true//G6
+                    readOnly: true//G6
                 },
                 {
                     title: 'Current Actual Consumption(Forecast Module)',
                     type: 'numeric',
                     mask: '#,##',
                     textEditor: true,
-                    // readOnly: true//H7
+                    readOnly: true//H7
                 },
                 {
                     title: 'Import?',
@@ -710,7 +710,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         const { rangeValue } = this.state
         return (
             <>
-                <div className="Card-header-reporticon">
+                <div className="pr-lg-0 Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">
                         <a className="card-header-action">
@@ -723,7 +723,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <ul className="legendcommitversion list-group">
                     <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
                 </ul> */}
-                <div class="col-md-12 mt-2 pl-lg-0 form-group">
+                <div class="col-md-10 mt-2 pl-lg-0 form-group">
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             <span class="legendcommitversionText red">Data already exists in Forecast Program</span>
@@ -734,7 +734,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapImport" className="jexcelremoveReadonlybackground">
+                    <div id="mapImport">
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

@@ -784,7 +784,7 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-          let textColor = 'red'//contrast('#f48282');
+          let textColor = '#BA0C2F'//contrast('#f48282');
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
         }
       } else {
@@ -1606,7 +1606,7 @@ class ForecastMetrics extends Component {
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
 
@@ -1629,7 +1629,7 @@ class ForecastMetrics extends Component {
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>

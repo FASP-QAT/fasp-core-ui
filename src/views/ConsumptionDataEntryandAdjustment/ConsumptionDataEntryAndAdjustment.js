@@ -71,7 +71,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   buildDataJexcel(consumptionUnitId) {
-    console.log("ConsumptionUnitId+++",consumptionUnitId);
+    console.log("ConsumptionUnitId+++", consumptionUnitId);
     this.setState({
       loading: true
     }, () => {
@@ -79,7 +79,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var consumptionList = this.state.consumptionList;
       var consumptionUnit = {};
       if (consumptionUnitId > 0) {
-        consumptionUnit = this.state.consumptionUnitList.filter(c => c.forecastConsumptionUnitId == consumptionUnitId)[0];
+        consumptionUnit = this.state.consumptionUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
       } else {
         consumptionUnit = {
           forecastConsumptionUnitId: 0,
@@ -117,7 +117,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           multiplier = consumptionUnit.otherUnit.multiplier;
         }
       }
-      consumptionList = consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnitId);
+      consumptionList = consumptionList.filter(c => c.consumptionUnit.planningUnit.id == consumptionUnitId);
       var monthArray = this.state.monthArray;
       var regionList = this.state.regionList;
       let dataArray = [];
@@ -125,7 +125,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       let columns = [];
       columns.push({ title: 'Month', type: 'text', width: 200 })
       data[0] = "Days in Month";
-      for (var j = 0; j < monthArray.length - 2; j++) {
+      for (var j = 0; j < monthArray.length; j++) {
         data[j + 1] = monthArray[j].noOfDays;
         columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'text', width: 100 })
       }
@@ -141,7 +141,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         dataArray.push(data);
         data = [];
         data[0] = "Actual Consumption"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
           data[j + 1] = consumptionData.length > 0 ? consumptionData[0].actualConsumption : "";
         }
@@ -149,7 +149,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         data = [];
         data[0] = "Reporting Rate"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
           data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
         }
@@ -157,7 +157,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         data = [];
         data[0] = "Stockout Rate (days)"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
           data[j + 1] = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut : 0;
         }
@@ -165,21 +165,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         data = [];
         data[0] = "Stockout Rate (%)"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
         }
         dataArray.push(data);
 
         data = [];
         data[0] = "Adjusted Consumption"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
         }
         dataArray.push(data);
 
         data = [];
         data[0] = "Converted to Planning Unit"
-        for (var j = 0; j < monthArray.length - 2; j++) {
+        for (var j = 0; j < monthArray.length; j++) {
           data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`;
         }
         dataArray.push(data);
@@ -277,7 +277,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // if(consumptionUnit.dataType==3){
         //   mixedList.push({ id: getLabelText(dataList[j].otherUnit.label, this.state.lang), name: getLabelText(dataList[j].otherUnit.label, this.state.lang) })
         // }
-        console.log("consumptionUnit++++",consumptionUnit);
+        console.log("consumptionUnit++++", consumptionUnit);
         data = [];
         data[0] = consumptionUnit.dataType == 1 ? true : false;
         data[1] = 1;
@@ -495,7 +495,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             multiplier: json[2][3]
           }
           consumptionUnit = {
-            forecastConsumptionUnitId: this.state.consumptionUnitList.length + 1,
+            forecastConsumptionUnitId: 0,
             dataType: dataType,
             forecastingUnit: forecastingUnitObject,
             planningUnit: planningUnitObject,
@@ -513,13 +513,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var daysOfStockOutCount = 4;
           for (var r = 0; r < regionList.length; r++) {
             var index = 0;
-            if (consumptionUnit.dataType == 1) {
-              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.forecastingUnit.id == consumptionUnit.forecastingUnit.id);
-            } else if (consumptionUnit.dataType == 2) {
-              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.planningUnit.id == consumptionUnit.planningUnit.id);
-            } else {
-              index = fullConsumptionList.findIndex(c => c.consumptionUnit.forecastConsumptionUnitId == consumptionUnit.forecastConsumptionUnitId && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM") && c.consumptionUnit.otherUnit.id == consumptionUnit.otherUnit.id);
-            }
+            index = fullConsumptionList.findIndex(c => c.consumptionUnit.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
             if (columnData[actualConsumptionCount] > 0) {
               if (index != -1) {
                 fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
@@ -737,29 +731,81 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
               var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
+              console.log("MyResult+++", myResult);
               var tracerCategoryListFilter = myResult.filter(c => healthAreaList.includes(c.healthArea.id));
               var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
               var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
               var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
               var planningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
               var consumptionList = datasetJson.consumptionList;
-              var consumptionUnitId = [...new Set(consumptionList.map(ele => (ele.consumptionUnit.forecastConsumptionUnitId)))];
+              var consumptionUnitId = [...new Set(consumptionList.map(ele => (ele.consumptionUnit.planningUnit.id)))];
               var consumptionUnitList = [];
               consumptionUnitId.map(item => {
-                consumptionUnitList.push(consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item)[0].consumptionUnit)
+                consumptionUnitList.push(consumptionList.filter(c => c.consumptionUnit.planningUnit.id == item)[0].consumptionUnit)
               })
               var regionList = datasetJson.regionList;
               var startDate = moment(datasetJson.currentVersion.forecastStartDate).add(-36, 'months').format("YYYY-MM-DD");
-              var stopDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+              var stopDate = moment(datasetJson.currentVersion.forecastStartDate).add(-1, 'months').format("YYYY-MM-DD");
+              console.log("STart date+++", startDate);
+              console.log("Stop Date+++", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
               var curDate = startDate;
+              var planningUnitTotalList = [];
+              var planningUnitTotalListRegion = [];
+              var totalPlanningUnitData = [];
               for (var m = 0; curDate < stopDate; m++) {
                 curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                 var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
-                monthArray.push({ date: curDate, noOfDays: daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate })
+                var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
+                monthArray.push({ date: curDate, noOfDays: noOfDays })
+                var totalPlanningUnit = 0;
+                var totalPlanningUnitPU = 0;
+                for (var cul = 0; cul < consumptionUnitList.length; cul++) {
+                  var totalQty = "";
+                  var totalQtyPU = "";
+                  for (var r = 0; r < regionList.length; r++) {
+                    var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.consumptionUnit.planningUnit.id == consumptionUnitList[cul].planningUnit.id)
+                    var qty = 0;
+                    var qtyInPU = 0;
+                    var reportingRate = "";
+                    var actualConsumption = "";
+                    var daysOfStockOut = ""
+                    if (consumptionDataForMonth.length > 0) {
+                      var c = consumptionDataForMonth[0];
+                      reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
+                      actualConsumption = c.actualConsumption;
+                      daysOfStockOut = c.daysOfStockOut;
+                      qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Number(daysOfStockOut) / Number(noOfDays)))) * 100;
+                      qty = qty.toFixed(2)
+                      var multiplier = 0;
+                      if (c.consumptionUnit.dataType == 1) {
+                        multiplier = c.consumptionUnit.forecastingUnit.multiplier
+                      } else if (c.consumptionUnit.dataType == 2) {
+                        multiplier = c.consumptionUnit.planningUnit.multiplier
+                      } else {
+                        multiplier = c.consumptionUnit.otherUnit.multiplier
+                      }
+                      qtyInPU = (Number(qty) / Number(multiplier)).toFixed(2)
+                    } else {
+                      qty = "";
+                      reportingRate = 100;
+                      daysOfStockOut = 0;
+                      qtyInPU = ""
+                    }
+                    planningUnitTotalListRegion.push({ planningUnitId: consumptionUnitList[cul].planningUnit.id, month: curDate, qty: qty, qtyInPU: qtyInPU, reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                    if (qty != "") {
+                      totalQty = Number(totalQty) + Number(qty);
+                      totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
+                    }
+                  }
+                  planningUnitTotalList.push({ planningUnitId: consumptionUnitList[cul].planningUnit.id, month: curDate, qty: totalQty, qtyInPU: totalQtyPU })
+                  totalPlanningUnit += totalQty;
+                  totalPlanningUnitPU += totalQtyPU;
+                }
               }
-              monthArray.push({});
+              console.log("PlanningUnitTotalKList+++", planningUnitTotalList);
+              console.log("PlanningUnitListForRegion+++", planningUnitTotalListRegion);
               this.setState({
                 consumptionList: consumptionList,
                 regionList: regionList,
@@ -771,7 +817,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 planningUnitList: planningUnitList,
                 forecastingUnitList: forecastingUnitList,
                 showTable: true,
-                loading: false
+                loading: false,
+                planningUnitTotalList: planningUnitTotalList,
+                planningUnitTotalListRegion: planningUnitTotalListRegion
               })
             }.bind(this)
           }.bind(this)
@@ -877,25 +925,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
         var colourCount = 0;
-        var monthData = []
-        var monthArray = []
-        this.state.monthArray.map((ele, count) => {
-          var actualConsumptionCount = 6;
-          if (count < this.state.monthArray.length - 2) {
-            monthArray.push(ele.date);
-            var qty = 0;
-            this.state.regionList.map((item, count1) => {
-              var columnData = elInstance.getRowData(actualConsumptionCount, true);
-              columnData.shift()
-              qty += Number(columnData[count])
-              actualConsumptionCount += 8;
-            })
-            monthData.push(qty);
-          }
-        });
         datasetListForGraph.push({
           label: getLabelText(this.state.selectedConsumptionUnitObject.dataType == 1 ? this.state.selectedConsumptionUnitObject.forecastingUnit.label : this.state.selectedConsumptionUnitObject.dataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
-          data: monthData.map(item => (item > 0 ? item : 0)),
+          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty > 0 ? item.qty : null)),
           type: 'line',
           backgroundColor: 'transparent',
           borderColor: "#6C6463",
@@ -916,11 +948,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             colourCount = 0;
           }
 
-          var columnData = elInstance.getRowData(actualConsumptionCount, true);
-          columnData.shift()
+          // var columnData = elInstance.getRowData(actualConsumptionCount, true);
+          // columnData.shift()
           datasetListForGraph.push({
             label: getLabelText(item.label, this.state.lang),
-            data: columnData.map(item => (item > 0 ? Number(item) : 0)),
+            data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.reagionId == item.regionId).map(item => (item.qty > 0 ? item.qty : null)),
             type: 'line',
             backgroundColor: 'transparent',
             borderColor: colourArray[colourCount],
@@ -935,18 +967,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             showInLegend: true,
           })
           colourCount++;
-          actualConsumptionCount += 8;
         })
       }
     }
     if (this.state.dataEl != "" && this.state.dataEl != undefined) {
       bar = {
 
-        labels: monthArray.map((item, index) => (moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
+        labels: this.state.monthArray.map((item, index) => (moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))),
         datasets: datasetListForGraph
 
       };
-      console.log("dataset+++",datasetListForGraph);
+      console.log("dataset+++", datasetListForGraph);
     }
     return (
       <div className="animated fadeIn">
@@ -1020,178 +1051,49 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                               <th className="dataentryTdWidth sticky-col first-col clone">Product</th>
                               {this.state.monthArray.map((item, count) => {
-                                return (<th>{count == this.state.monthArray.length - 1 ? "Regional%" : count == this.state.monthArray.length - 2 ? "Total" : moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+                                return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                               })}
-                              {/* <th>Regional%</th> */}
+                              <th>Total</th>
+                              <th>Regional%</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {this.state.consumptionUnitList.map(item => (
-                              <>
+                            {this.state.consumptionUnitList.map(item => {
+                              var total = 0;
+                              var totalPU = 0;
+                              return (<>
                                 <tr className="hoverTd">
-                                  <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.forecastConsumptionUnitId)}>
-                                    {this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                  <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
+                                    {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                   </td>
-                                  <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}>{item.dataType == 1 ? getLabelText(item.forecastingUnit.label, this.state.lang) : item.dataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
+                                  <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>{item.dataType == 1 ? getLabelText(item.forecastingUnit.label, this.state.lang) : item.dataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
                                   {this.state.monthArray.map((item1, count) => {
-                                    if (count == this.state.monthArray.length - 1) {
-                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}>100%</td>)
-                                    } else if (count == this.state.monthArray.length - 2) {
-                                      var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
-                                      var qty = 0;
-                                      if (consumptionDataForMonth.length > 0) {
-                                        consumptionDataForMonth.map(c => {
-                                          var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                          var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
-                                          qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
-                                        })
-                                        qty = qty.toFixed(2)
-                                      } else {
-                                        qty = ""
-                                      }
-                                      var multiplier = 1;
-                                      if (this.state.showInPlanningUnit) {
-                                        if (item.dataType == 1) {
-                                          multiplier = item.forecastingUnit.multiplier
-                                        } else if (item.dataType == 2) {
-                                          multiplier = item.planningUnit.multiplier
-                                        } else {
-                                          multiplier = item.otherUnit.multiplier
-                                        }
-                                      }
-                                      if (qty != "") {
-                                        qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                      } else {
-                                        qty = 0;
-                                      }
-                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                    }
-                                    else {
-                                      var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                      var qty = 0;
-                                      if (consumptionDataForMonth.length > 0) {
-                                        consumptionDataForMonth.map(c => {
-                                          var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                          qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(item1.noOfDays)))) * 100;
-                                        })
-                                        qty = qty.toFixed(2)
-                                      } else {
-                                        qty = ""
-                                      }
-                                      var multiplier = 1;
-                                      if (this.state.showInPlanningUnit) {
-                                        if (item.dataType == 1) {
-                                          multiplier = item.forecastingUnit.multiplier
-                                        } else if (item.dataType == 2) {
-                                          multiplier = item.planningUnit.multiplier
-                                        } else {
-                                          multiplier = item.otherUnit.multiplier
-                                        }
-                                      }
-                                      if (qty != "") {
-                                        qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                      } else {
-                                      }
-                                      return (<td onClick={() => { this.buildDataJexcel(item.forecastConsumptionUnitId) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                    }
+                                    var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                    total += data[0].qty;
+                                    totalPU += data[0].qtyInPU;
+                                    return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                   })}
+                                  <td>{this.state.showInPlanningUnit ? totalPU : total}</td>
+                                  <td>100%</td>
                                 </tr>
-                                {this.state.regionList.map(r => (
-                                  <tr style={{ display: this.state.consumptionUnitShowArr.includes(item.forecastConsumptionUnitId) ? "" : "none" }}>
+                                {this.state.regionList.map(r => {
+                                  var totalRegion = 0;
+                                  var totalRegionPU = 0;
+                                  return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                     <td className="sticky-col first-col clone" align="left">{"       " + getLabelText(r.label, this.state.lang)}</td>
-                                    {
-                                      this.state.monthArray.map((item1, count) => {
-                                        if (count == this.state.monthArray.length - 1) {
-                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
-                                          var qty = 0;
-                                          if (consumptionDataForMonth.length > 0) {
-                                            consumptionDataForMonth.map(c => {
-                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
-                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
-                                            })
-                                          } else {
-                                            qty = 0
-                                          }
-
-
-                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
-                                          var qty1 = 0;
-                                          if (consumptionDataForMonth.length > 0) {
-                                            consumptionDataForMonth.map(c => {
-                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
-                                              qty1 += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
-                                            })
-                                            qty1 = qty1.toFixed(2)
-                                          } else {
-                                            qty1 = 0
-                                          }
-                                          var per = (Number(qty) / Number(qty1)) * 100;
-                                          return (<td>{Math.round(per)}%</td>)
-                                        } else if (count == this.state.monthArray.length - 2) {
-                                          var multiplier = 1;
-                                          if (this.state.showInPlanningUnit) {
-                                            if (item.dataType == 1) {
-                                              multiplier = item.forecastingUnit.multiplier
-                                            } else if (item.dataType == 2) {
-                                              multiplier = item.planningUnit.multiplier
-                                            } else {
-                                              multiplier = item.otherUnit.multiplier
-                                            }
-                                          }
-                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId && moment(c.month).format("YYYY-MM") >= moment(this.state.monthArray[0].date).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.monthArray[this.state.monthArray.length - 3].date).format("YYYY-MM"))
-                                          var qty = 0;
-                                          if (consumptionDataForMonth.length > 0) {
-                                            consumptionDataForMonth.map(c => {
-                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                              var noOfDays = this.state.monthArray.filter(d => moment(d.date).format("YYYY-MM") == moment(c.month).format("YYYY-MM"))[0].noOfDays;
-                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(noOfDays)))) * 100;
-                                              qty = qty
-                                            })
-                                          } else {
-                                            qty = ""
-                                          }
-                                          if (qty != "") {
-                                            qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                          } else {
-                                            qty = 0;
-                                          }
-                                          return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                        } else {
-                                          var multiplier = 1;
-                                          if (this.state.showInPlanningUnit) {
-                                            if (item.dataType == 1) {
-                                              multiplier = item.forecastingUnit.multiplier
-                                            } else if (item.dataType == 2) {
-                                              multiplier = item.planningUnit.multiplier
-                                            } else {
-                                              multiplier = item.otherUnit.multiplier
-                                            }
-                                          }
-                                          var consumptionDataForMonth = this.state.consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.id == r.regionId && c.consumptionUnit.forecastConsumptionUnitId == item.forecastConsumptionUnitId)
-                                          var qty = 0;
-                                          if (consumptionDataForMonth.length > 0) {
-                                            consumptionDataForMonth.map(c => {
-                                              var reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                                              qty += (Number(c.actualConsumption) / Number(reportingRate) / Number(1 - (Number(c.daysOfStockOut) / Number(item1.noOfDays)))) * 100;
-                                              qty = qty
-                                            })
-                                          } else {
-                                            qty = ""
-                                          }
-                                          if (qty != "") {
-                                            qty = (Number(qty) / Number(multiplier)).toFixed(2)
-                                          }
-                                          return (<td align="left"><NumberFormat displayType={'text'} thousandSeparator={true} value={qty} /></td>)
-                                        }
-
-                                      })}
-                                  </tr>
-                                ))}
-                              </>
-                            )
+                                    {this.state.monthArray.map((item1, count) => {
+                                      var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
+                                      totalRegion += Number(data[0].qty);
+                                      totalRegionPU += Number(data[0].qtyInPU);
+                                      return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                                    })}
+                                    <td>{this.state.showInPlanningUnit ? totalRegionPU : totalRegion}</td>
+                                    <td>{this.state.showInPlanningUnit ? (totalRegionPU / totalPU) * 100 : (totalRegion / total) * 100}</td>
+                                  </tr>)
+                                })}
+                              </>)
+                            }
                             )}
 
                           </tbody>

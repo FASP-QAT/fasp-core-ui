@@ -125,7 +125,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             if (listArray.length > 0) {
                 for (var i = 0; i < listArray.length; i++) {
                     var paJson = {
-                        name: getLabelText(listArray[i].label, this.state.lang),
+                        name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
                         id: parseInt(listArray[i].planningUnitId),
                         multiplier: listArray[i].multiplier,
                         active: listArray[i].active,
@@ -791,7 +791,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 data = [];
                 data[0] = papuList[j].planningUnit.id
-                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                 data[2] = papuList[j].multiplier
                 data[3] = papuList[j].forecastingUnit.id
                 data[4] = planningUnitObj.forecastingUnit.tracerCategory.id
@@ -855,11 +855,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100],
+            colWidths: [50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
 
                 {
-                    title: 'planningUnitId',
+                    title: 'Supply Plan Planning Unit Id',
                     type: 'hidden',
                     readOnly: true//0 A
                 },
@@ -888,14 +888,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
                 {
-                    title: 'ForecastPlanningUnitId',
+                    title: 'Forecast Planning Unit Id',
                     type: 'hidden',
                     readOnly: true//5 F
                 },
                 {
                     title: 'Forecast Planning Unit',
                     // readOnly: true,
-                    type: 'dropdown',
+                    type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
                     // source: [
                     //     { id: 1, name: 'Do not import' },
@@ -945,16 +945,24 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     if (doNotImport == -1) {// grade out
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
+
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'color', textColor);
+
                         var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                     } else {
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.remove('readonly');
+                        // elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+
                         // var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
                     }
@@ -1061,9 +1069,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 versions: [],
             }, () => {
                 this.setState({
-                    versions: program[0].versionList.filter(function (x, i, a) {
+                    versions: (program[0].versionList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
-                    })
+                    })).reverse()
                 }, () => { });
             });
 
@@ -1263,7 +1271,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label> */}
                             <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
                             <div className="controls ">
@@ -1285,7 +1293,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
 
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label> */}
                             <Label htmlFor="appendedInputButton">Supply Plan Version</Label>
                             <div className="controls">
@@ -1306,7 +1314,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
 
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label> */}
                             <Label htmlFor="appendedInputButton">Forecast Program</Label>
                             <div className="controls ">
@@ -1326,11 +1334,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
-
-                    </div>
-                    <div className="row">
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label> */}
                             <Label htmlFor="appendedInputButton">Range</Label>
                             <div className="controls  Regioncalender">
@@ -1349,12 +1353,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                             </div>
                         </FormGroup>
+
                     </div>
+
                 </div>
 
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" style={{ marginTop: '-15px;' }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
