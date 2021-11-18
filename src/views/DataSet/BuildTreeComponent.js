@@ -970,9 +970,16 @@ export default class BuildTree extends Component {
         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
         // console.log("programData>>>", programData.currentVersion.forecastStartDate);
         // console.log("programData>>>", programData.currentVersion.forecastStopDate);
+        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 });
+        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 });
+        // console.log("programData>>>", { year: moment(programData.currentVersion.forecastStartDate).format("YYYY").slice(1, -1), month: moment(programData.currentVersion.forecastStartDate).format("MM").slice(1, -1) });
+        // maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+        // moment("25/04/2012","DD/MM/YYYY").year()
         this.setState({
             forecastStartDate: programData.currentVersion.forecastStartDate,
             forecastStopDate: programData.currentVersion.forecastStopDate,
+            minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+            maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
         });
     }
     momCheckbox(e) {
@@ -2579,9 +2586,11 @@ export default class BuildTree extends Component {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = usageTemplate.repeatCount;
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod.usagePeriodId;
         }
-        this.setState({ currentItemConfig,
-        currentScenario : (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] }, () => {
-            console.log("copy from template---",this.state.currentScenario);
+        this.setState({
+            currentItemConfig,
+            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
+        }, () => {
+            console.log("copy from template---", this.state.currentScenario);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -2818,9 +2827,9 @@ export default class BuildTree extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("%myResult---",myResult);
+                console.log("%myResult---", myResult);
                 var newResult = myResult.filter(x => x.tracerCategory.id == this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
-                console.log("%newResult---",newResult);
+                console.log("%newResult---", newResult);
                 console.log("");
                 var autocompleteData = [];
                 for (var i = 0; i < newResult.length; i++) {
@@ -2830,8 +2839,8 @@ export default class BuildTree extends Component {
                     autocompleteData,
                     forecastingUnitList: newResult
                 }, () => {
-                    console.log("%%%autocompleteData----",this.state.autocompleteData);
-                    console.log("%%%forecastingUnitList----",this.state.forecastingUnitList);
+                    console.log("%%%autocompleteData----", this.state.autocompleteData);
+                    console.log("%%%forecastingUnitList----", this.state.forecastingUnitList);
                     if (newResult.length == 1) {
                         const currentItemConfig = this.state.currentItemConfig;
                         (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = newResult[0].forecastingUnitId;
@@ -3273,7 +3282,6 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
-
 
         this.setState({
             treeId: this.props.match.params.treeId,
@@ -5990,7 +5998,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         modelinDataForScenario: getMomDataForNodes
                     }, () => {
-                       if(getMomDataForNodes.length > 0 ){ this.updateTreeData()}else{};
+                        if (getMomDataForNodes.length > 0) { this.updateTreeData() } else { };
                     });
                     // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
 
@@ -6796,12 +6804,31 @@ export default class BuildTree extends Component {
                                                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                             value={singleValue2}
                                                                             lang={pickerLang.months}
-                                                                            theme="dark"
+                                                                            // theme="dark"
                                                                             onChange={this.handleAMonthChange3}
                                                                             onDismiss={this.handleAMonthDissmis3}
                                                                         >
                                                                             <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
                                                                         </Picker>
+
+                                                                        {/* <Picker
+
+                                                                            id="month"
+                                                                            name="month"
+                                                                            ref={this.pickAMonth1}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                            value={{
+                                                                                year:
+                                                                                    new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                                            }}
+                                                                            lang={pickerLang.months}
+                                                                            // theme="dark"
+                                                                            onChange={this.handleAMonthChange1}
+                                                                            onDismiss={this.handleAMonthDissmis1}
+                                                                        >
+                                                                            <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                                                onClick={this.handleClickMonthBox1} />
+                                                                        </Picker> */}
                                                                     </div>
                                                                 </FormGroup>
 
