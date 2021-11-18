@@ -182,7 +182,7 @@ export default class SyncProgram extends Component {
                     } else {
                         // User ka pass latest version hai
                         // Readonly version ki list lao
-                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly);
+                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version!=latestVersion);
                         // Sare readonly versions ko delete karo
                         for (var j = 0; j < readonlyProgramList.length; j++) {
                             var index = readonlyProgramToBeDeleted.findIndex(c => c.id == readonlyProgramList[j].id);
