@@ -7038,7 +7038,7 @@ export default class BuildTree extends Component {
             </Draggable>
             {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
-            <Draggable handle=".modal-title">
+            {/* <Draggable handle=".modal-title"> */}
                 <Modal isOpen={this.state.openAddNodeModal}
                     className={'modal-xl '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
@@ -7089,7 +7089,7 @@ export default class BuildTree extends Component {
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                     </ModalFooter>
                 </Modal>
-            </Draggable >
+            {/* </Draggable > */}
             {/* Scenario Modal end------------------------ */}
 
         </div >

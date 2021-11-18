@@ -40,7 +40,7 @@ import cleanUp from '../../assets/img/calculator.png';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
-import Draggable from 'react-draggable';
+// import Draggable from 'react-draggable';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import ModelingTypeService from "../../api/ModelingTypeService";
 import docicon from '../../assets/img/doc.png'
@@ -5860,9 +5860,9 @@ export default class CreateTreeTemplate extends Component {
 
                     </Card></Col></Row>
             {/* Modal start------------------- */}
-            <Draggable handle=".modal-title">
+            {/* <Draggable handle=".modal-title"> */}
                 <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-xl '} >
+                    className={'modal-xl modaldraggble'} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                             this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
@@ -5911,7 +5911,7 @@ export default class CreateTreeTemplate extends Component {
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                     </ModalFooter>
                 </Modal>
-            </Draggable>
+            {/* </Draggable> */}
             {/* Scenario Modal end------------------------ */}
 
         </div>
