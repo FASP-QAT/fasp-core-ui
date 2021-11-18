@@ -796,13 +796,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 data[3] = papuList[j].forecastingUnit.id
                 data[4] = planningUnitObj.forecastingUnit.tracerCategory.id
 
-                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
-                let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
-                let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
+                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
+                // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
+                // let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
 
-                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
-                // let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
-                // let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
+                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
+                let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
+                // console.log("filteredPlanningUnit---------->", filteredPlanningUnit);
+                let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
 
                 if (match.length > 0) {
                     data[5] = papuList[j].planningUnit.id
