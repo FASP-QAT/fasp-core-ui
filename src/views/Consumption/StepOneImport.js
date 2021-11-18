@@ -806,7 +806,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 if (match.length > 0) {
                     data[5] = papuList[j].planningUnit.id
-                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                     data[7] = papuList[j].multiplier
                     data[8] = 1
                     data[9] = 1
