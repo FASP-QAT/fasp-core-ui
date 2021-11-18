@@ -710,7 +710,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         const { rangeValue } = this.state
         return (
             <>
-                <div className="Card-header-reporticon">
+                <div className="pr-lg-0 Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">
                         <a className="card-header-action">
@@ -723,7 +723,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <ul className="legendcommitversion list-group">
                     <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
                 </ul> */}
-                <div class="col-md-12 mt-2 pl-lg-0 form-group">
+                <div class="col-md-10 mt-2 pl-lg-0 form-group">
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             <span class="legendcommitversionText red">Data already exists in Forecast Program</span>
