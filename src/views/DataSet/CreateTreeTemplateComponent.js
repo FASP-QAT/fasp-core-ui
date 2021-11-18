@@ -3741,9 +3741,9 @@ export default class CreateTreeTemplate extends Component {
                                 handleReset,
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
-                                    <div className="row">
+                        
                                     {this.state.level0 &&
-                                    <FormGroup className="col-md-6">
+                                    <FormGroup>
                                             <Label htmlFor="currencyId">Parent</Label>
                                             <Input type="text"
                                                 name="parent"
@@ -3755,7 +3755,7 @@ export default class CreateTreeTemplate extends Component {
                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                             ></Input>
                                         </FormGroup>}
-                                    <FormGroup className="col-md-6">
+                                    <FormGroup>
                                         <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="nodeTitle"
@@ -3774,7 +3774,7 @@ export default class CreateTreeTemplate extends Component {
                                             <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
                                         </Popover>
                                     </div>
-                                    <FormGroup className="col-md-6">
+                                    <FormGroup>
                                         <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
@@ -3800,7 +3800,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                     </FormGroup>
-                                    </div>
+                                    
                                     {this.state.aggregationNode &&
 
                                         <FormGroup>
@@ -4839,7 +4839,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                                 <div id="momJexcel">
                                 </div>
-                                <div className="col-md-12 pr-lg-0">
+                                <div className="col-md-12 pr-lg-0 float-right">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.setState({ showMomData: false }) }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
@@ -4892,7 +4892,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                                 <div id="momJexcelPer" className={"RowClickable"}>
                                 </div>
-                                <div className="col-md-12 pr-lg-0">
+                                <div className="col-md-12 pr-lg-0 float-right">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-check"></i> {'Update'}</Button>
 
