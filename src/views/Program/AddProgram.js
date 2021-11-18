@@ -682,7 +682,7 @@ export default class AddProgram extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>

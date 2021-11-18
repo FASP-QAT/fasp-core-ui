@@ -94,7 +94,7 @@ export default class ImportProgram extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // if (this.props.updateState != undefined) {
             //     this.props.updateState(false);
@@ -109,7 +109,7 @@ export default class ImportProgram extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 })
                 // if (this.props.updateState != undefined) {
@@ -767,7 +767,7 @@ export default class ImportProgram extends Component {
         return (
             <>
                 <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
-                <h5 style={{ color: "red" }} id="div2">
+                <h5 className="red" id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Card className="mt-2">
