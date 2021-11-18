@@ -380,6 +380,7 @@ export default class BuildTree extends Component {
             momListPer: [],
             momListPerParent: [],
             parentNodeDataMap: [],
+            modelinDataForScenario: [],
             dataSetObj: {
                 programData: ''
             }
@@ -457,6 +458,7 @@ export default class BuildTree extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
         this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
+        this.updateTreeData = this.updateTreeData.bind(this);
     }
     updateMomDataPerInDataSet() {
         var json = this.state.momElPer.getJson(null, false);
@@ -2063,7 +2065,7 @@ export default class BuildTree extends Component {
                     console.log("dataSetObj.programData***>>>", programData);
                     this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
                         // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
-                        // calculateModelingData(dataEnc, this, "BuildTree");
+                        calculateModelingData(dataEnc, this, "BuildTree");
                     });
 
 
@@ -4102,6 +4104,7 @@ export default class BuildTree extends Component {
                     selectedScenario: scenarioId,
                     selectedScenarioLabel: selectedText
                 }, () => {
+                    this.handleAMonthDissmis3(this.state.singleValue2);
                     // console.log("currentScenario---", this.state.currentScenario);
                 });
             } else {
@@ -5553,7 +5556,7 @@ export default class BuildTree extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
-                                // className="ReadonlyPicker"
+                            // className="ReadonlyPicker"
                             >
                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
@@ -5962,7 +5965,7 @@ export default class BuildTree extends Component {
     handleAMonthDissmis1 = (value) => {
         console.log("dismiss>>", value);
         // this.setState({ singleValue2: value, }, () => {
-            // this.fetchData();
+        // this.fetchData();
         // })
 
     }
@@ -5990,7 +5993,7 @@ export default class BuildTree extends Component {
     handleAMonthDissmis2 = (value) => {
         console.log("dismiss>>", value);
         // this.setState({ singleValue2: value, }, () => {
-            // this.fetchData();
+        // this.fetchData();
         // })
 
     }
@@ -5998,12 +6001,48 @@ export default class BuildTree extends Component {
 
     handleAMonthChange3 = (year, month) => {
         console.log("text>>>", year, " and ", month)
+        // alert("hi");
     }
 
     handleAMonthDissmis3 = (value) => {
         console.log("dismiss>>", value);
+        var date = value.year + "-" + value.month + "-" + "01"
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
+            // console.log("$$$", this.state.treeData);
+            // console.log("$$$", this.state.curTreeObj);
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var program = transaction.objectStore('datasetData');
+                var getRequest = program.get(programId.toString());
+                getRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext')
+                    });
+                };
+                getRequest.onsuccess = function (event) {
+                    // console.log("hi",getRequest.result);
+                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    // console.log("hi bro", programJson.nodeDataModelingList)
+                    var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
+                    console.log("$$$>>>", getMomDataForNodes);
+                    this.setState({
+                        modelinDataForScenario: getMomDataForNodes
+                    }, () => {
+                       if(getMomDataForNodes.length > 0 ){ this.updateTreeData()}else{};
+                    });
+                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+
+                }.bind(this)
+            }.bind(this)
+
         })
     }
 
@@ -6011,6 +6050,17 @@ export default class BuildTree extends Component {
         this.pickAMonth3.current.show()
     }
 
+    updateTreeData() {
+        var items = this.state.curTreeObj.tree.flatList;
+        for (let i = 0; i < items.length; i++) {
+            var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = nodeDataModelingMap[0].endValue;
+        }
+        this.setState({
+            items,
+        })
+    }
     render() {
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
