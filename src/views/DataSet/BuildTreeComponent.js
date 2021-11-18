@@ -4729,7 +4729,8 @@ export default class BuildTree extends Component {
                                 handleReset,
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
-                                    <FormGroup>
+                                    <div className="row">
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Scenario</Label>
                                         <Input type="text"
                                             name="scenarioTxt"
@@ -4739,7 +4740,7 @@ export default class BuildTree extends Component {
                                         ></Input>
                                     </FormGroup>
                                     {this.state.level0 &&
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Parent</Label>
                                             <Input type="text"
                                                 name="parent"
@@ -4751,7 +4752,7 @@ export default class BuildTree extends Component {
                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                             ></Input>
                                         </FormGroup>}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="nodeTitle"
@@ -4770,7 +4771,7 @@ export default class BuildTree extends Component {
                                             <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
                                         </Popover>
                                     </div>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
@@ -4796,9 +4797,10 @@ export default class BuildTree extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                     </FormGroup>
+                                   
                                     {this.state.aggregationNode &&
-
-                                        <FormGroup>
+                                        
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="select"
@@ -4825,7 +4827,7 @@ export default class BuildTree extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                         </FormGroup>}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -4848,10 +4850,11 @@ export default class BuildTree extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
+                                    
 
                                     {this.state.numberNode &&
                                         <>
-                                            <FormGroup>
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="percentageOfParent"
@@ -4865,7 +4868,7 @@ export default class BuildTree extends Component {
                                                     value={this.state.currentScenario.dataValue}></Input>
                                                 <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup>
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="parentValue"
@@ -4878,7 +4881,7 @@ export default class BuildTree extends Component {
                                                 ></Input>
                                             </FormGroup></>}
                                     {this.state.aggregationNode &&
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Value{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="nodeValue"
@@ -4896,7 +4899,7 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeValue}</FormFeedback> */}
                                         </FormGroup>}
 
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Notes</Label>
                                         <Input type="textarea"
                                             id="notes"
@@ -4906,7 +4909,7 @@ export default class BuildTree extends Component {
                                             value={this.state.currentScenario.notes}
                                         ></Input>
                                     </FormGroup>
-
+                                        </div>
                                     {/* Planning unit start */}
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div>
