@@ -4650,14 +4650,28 @@ export default class BuildTree extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
+                            // labelString: "",
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black',
-                            stepSize: 100000
+                            stepSize: 100000,
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -4669,13 +4683,20 @@ export default class BuildTree extends Component {
                         id: 'B',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black'
+                            fontColor: 'black',
+                            callback: function (value) {
+                                var cell1 = value + " %";
+                                return cell1;
+
+                            },
+                            min: 0,
+                            max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -4692,7 +4713,35 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
+            tooltips: {
+                enabled: true,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        // console.log("tooltipItem---", tooltipItem);
+                        // console.log("tooltipItem data---", data);
+                        if (tooltipItem.datasetIndex == 1) {
+                            let label = data.labels[tooltipItem.index];
+                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        } else {
+                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                        }
+                    }
+                }
+
+            },
             maintainAspectRatio: false
             ,
             legend: {
@@ -5562,7 +5611,7 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">Start Month<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="">Month<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
@@ -5945,7 +5994,8 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang)}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> for node <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a % of parent <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang):''}</b></i></div>
+                                {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div id="momJexcelPer" className={"RowClickable perNodeData"}>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
@@ -6319,6 +6369,7 @@ export default class BuildTree extends Component {
                                     month: '',
                                     dataValue: "",
                                     calculatedDataValue: '',
+                                    nodeDataModelingList: [],
                                     fuNode: {
                                         noOfForecastingUnitsPerPerson: '',
                                         usageFrequency: '',
@@ -6367,6 +6418,7 @@ export default class BuildTree extends Component {
                                         fuNode: {
                                             noOfForecastingUnitsPerPerson: '',
                                             usageFrequency: '',
+                                            nodeDataModelingList: [],
                                             forecastingUnit: {
                                                 label: {
                                                     label_en: ''
