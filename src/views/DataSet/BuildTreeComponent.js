@@ -387,7 +387,8 @@ export default class BuildTree extends Component {
             modelinDataForScenario: [],
             dataSetObj: {
                 programData: ''
-            }
+            },
+            loading: false
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -463,6 +464,7 @@ export default class BuildTree extends Component {
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
         this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
+        this.updateState = this.updateState.bind(this);
     }
     updateMomDataPerInDataSet() {
         var json = this.state.momElPer.getJson(null, false);
@@ -1016,12 +1018,17 @@ export default class BuildTree extends Component {
             });
         }
     }
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        })
+    }
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
-            // this.setState({
-            //     loading: true
-            // })
+            this.setState({
+                loading: true
+            })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
             var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
@@ -1114,7 +1121,8 @@ export default class BuildTree extends Component {
                 console.log("---hurrey---");
                 // })
                 transaction.oncomplete = function (event) {
-                    calculateModelingData(dataSetObj, '');
+
+                    calculateModelingData(dataSetObj, this, "BuildTree");
                     console.log("all good >>>>");
                     this.setState({
                         items,
@@ -2071,6 +2079,7 @@ export default class BuildTree extends Component {
     }
 
     getDatasetList() {
+        this.setState({ loading: true });
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -6988,13 +6997,25 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div class="sample">
+
+                                                    <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
                                                             <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
                                                         </Provider>
+                                                    </div>
+                                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                            <div class="align-items-center">
+                                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
