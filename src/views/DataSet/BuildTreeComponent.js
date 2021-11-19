@@ -194,6 +194,8 @@ export default class BuildTree extends Component {
         this.pickAMonth3 = React.createRef()
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
+        this.pickAMonth4 = React.createRef()
+        this.pickAMonth5 = React.createRef()
         this.state = {
             showModelingValidation: true,
             scenario: {
@@ -1269,25 +1271,39 @@ export default class BuildTree extends Component {
         var elInstance = this.state.modelingEl;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
             if (this.state.currentModelingType == 5) {
+
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, 5, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             } else if (this.state.currentModelingType == 3) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             } else if (this.state.currentModelingType == 4) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             }
         }
+        this.setState({ showCalculatorFields: false });
 
     }
     calculateMomByEndValue(e) {
@@ -4084,6 +4100,22 @@ export default class BuildTree extends Component {
             treeTemplate.active = event.target.id === "active11" ? false : true;
         }
 
+        if (event.target.name == "modelingType") {
+            if (event.target.id === "active1") {
+                this.state.currentModelingType = 4
+            }
+            else if (event.target.id === "active2") {
+                this.state.currentModelingType = 3
+            }
+            else if (event.target.id === "active3") {
+                this.state.currentModelingType = 2
+            }
+            else {
+                this.state.currentModelingType = 5
+            }
+
+        }
+
         if (event.target.name === "sharePlanningUnit") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.value;
         }
@@ -5506,7 +5538,8 @@ export default class BuildTree extends Component {
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 // value={this.state.singleValue2}
                                 value={{
                                     year:
@@ -5561,30 +5594,32 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                             <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                ref={this.pickAMonth4}
+                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                onChange={this.handleAMonthChange4}
+                                                onDismiss={this.handleAMonthDissmis4}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
                                             <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                ref={this.pickAMonth5}
+                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                onChange={this.handleAMonthChange5}
+                                                onDismiss={this.handleAMonthDissmis5}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
@@ -5691,6 +5726,7 @@ export default class BuildTree extends Component {
                                                         id="active1"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 4 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                     />
                                                     <Label
@@ -5706,6 +5742,7 @@ export default class BuildTree extends Component {
                                                         id="active2"
                                                         name="modelingType"
                                                         checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5722,6 +5759,7 @@ export default class BuildTree extends Component {
                                                         id="active3"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 2 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5737,6 +5775,7 @@ export default class BuildTree extends Component {
                                                         id="active4"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 5 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -6010,6 +6049,45 @@ export default class BuildTree extends Component {
 
     handleClickMonthBox3 = (e) => {
         this.pickAMonth3.current.show()
+    }
+
+    handleClickMonthBox4 = (e) => {
+        this.pickAMonth4.current.show()
+    }
+    handleAMonthChange4 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
+
+        });
+
+    }
+    handleAMonthDissmis4 = (value) => {
+        // console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
+        // this.fetchData();
+        // })
+
+    }
+
+
+    handleClickMonthBox5 = (e) => {
+        this.pickAMonth5.current.show()
+    }
+    handleAMonthChange5 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
+
+        });
+
+    }
+    handleAMonthDissmis5 = (value) => {
+        // console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
+        // this.fetchData();
+        // })
+
     }
 
     updateTreeData() {
