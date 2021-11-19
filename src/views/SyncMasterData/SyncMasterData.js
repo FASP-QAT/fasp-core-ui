@@ -246,12 +246,12 @@ export default class SyncMasterData extends Component {
 
                                 var shipmentDataList = programJson.shipmentList;
                                 var batchInfoList = programJson.batchInfoList;
-
-                                for (var j = 0; j < shipArray.length; j++) {
+                                var shipArrayForPlanningUnit = shipArray.filter(c => c.planningUnit.id == planningUnitList[pu]);
+                                for (var j = 0; j < shipArrayForPlanningUnit.length; j++) {
                                     // console.log("In planning unit list", shipArray[j].planningUnit.id);
-                                    var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
+                                    var index = shipmentDataList.findIndex(c => c.shipmentId == shipArrayForPlanningUnit[j].shipmentId)
                                     if (index == -1) {
-                                        shipmentDataList.push(shipArray[j]);
+                                        shipmentDataList.push(shipArrayForPlanningUnit[j]);
                                     } else {
                                         if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                             minDate = shipmentDataList[index].expectedDeliveryDate;
@@ -259,17 +259,17 @@ export default class SyncMasterData extends Component {
                                         if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                             minDate = shipmentDataList[index].receivedDate;
                                         }
-                                        shipmentDataList[index] = shipArray[j];
+                                        shipmentDataList[index] = shipArrayForPlanningUnit[j];
                                     }
                                 }
                                 // console.log("Shipment data updated", shipmentDataList);
-
-                                for (var j = 0; j < batchArray.length; j++) {
-                                    var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
+                                var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
+                                for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
+                                    var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
                                     if (index == -1) {
-                                        batchInfoList.push(batchArray[j]);
+                                        batchInfoList.push(batchArrayForPlanningUnit[j]);
                                     } else {
-                                        batchInfoList[index] = batchArray[j];
+                                        batchInfoList[index] = batchArrayForPlanningUnit[j];
                                     }
                                 }
                                 if (planningUnitDataIndex != -1) {
