@@ -4178,7 +4178,7 @@ export default class CreateTreeTemplate extends Component {
                                                         defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        style={{ width: 730 }}
+                                                        // style={{ width: 730 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
                                                             // if(){

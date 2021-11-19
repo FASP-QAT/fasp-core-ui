@@ -5196,7 +5196,7 @@ export default class BuildTree extends Component {
                                                         defaultValue={{ value: this.state.currentScenario.fuNode.forecastingUnit.id, label: this.state.currentScenario.fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        style={{ width: 1000 }}
+                                                        // style={{ width: 1000 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
                                                             // if(){
@@ -5439,7 +5439,7 @@ export default class BuildTree extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                 </>}
-                                            <div style={{ clear: 'both', width: '100%' }}>
+                                            <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
                                                         <tr>
