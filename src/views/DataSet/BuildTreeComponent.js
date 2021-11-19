@@ -943,7 +943,7 @@ export default class BuildTree extends Component {
                 var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
                 console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
                 // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                     var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
                     console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
@@ -981,10 +981,10 @@ export default class BuildTree extends Component {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                    this.buildMomJexcelPercent()
-                } else {
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     this.buildMomJexcel();
+                } else {
+                    this.buildMomJexcelPercent();
                 }
                 console.log('manual change---', this.state.manualChange);
             });
@@ -1260,7 +1260,7 @@ export default class BuildTree extends Component {
     acceptValue() {
         // console.log(">>>>", this.state.currentRowIndex);
         var elInstance = this.state.modelingEl;
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
@@ -1309,7 +1309,7 @@ export default class BuildTree extends Component {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                 var getChangeInPercent = (parseFloat(e.target.value - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
                 // console.log("getChangeInPercent>>>",getChangeInPercent);
@@ -1330,7 +1330,7 @@ export default class BuildTree extends Component {
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
-        if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
@@ -1364,7 +1364,7 @@ export default class BuildTree extends Component {
             var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                 var getChangeInPercent = e.target.value;
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
             } else {
@@ -3940,7 +3940,7 @@ export default class BuildTree extends Component {
         });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
 
@@ -5612,7 +5612,7 @@ export default class BuildTree extends Component {
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <FormGroup className="col-md-6">
+                                        {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startPercentage"
@@ -5630,7 +5630,7 @@ export default class BuildTree extends Component {
                                         {/* <div className="row"> */}
 
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
@@ -5695,7 +5695,7 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6"></FormGroup>
                                         <FormGroup className="col-md-6" >
                                             <div className="check inline  pl-lg-1 pt-lg-2">
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
@@ -5710,13 +5710,13 @@ export default class BuildTree extends Component {
                                                         <b>{'Exponential (%)'}</b>
                                                     </Label>
                                                 </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input Radioactive checkboxMargin"
                                                         type="radio"
                                                         id="active2"
                                                         name="modelingType"
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
+                                                        checked={this.state.currentModelingType == 3 ? true : false}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5726,7 +5726,7 @@ export default class BuildTree extends Component {
                                                     </Label>
                                                 </div>
                                                 }
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
@@ -5741,7 +5741,7 @@ export default class BuildTree extends Component {
                                                         <b>{'Linear (#)'}</b>
                                                     </Label>
                                                 </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
