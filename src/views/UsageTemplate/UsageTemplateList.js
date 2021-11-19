@@ -2535,7 +2535,7 @@ class usageTemplate extends Component {
                         <Col xs="12" sm="12">
                             <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
                             <h5 className="red">{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
-                            <span className=""><i class="fa fa-calculator" aria-hidden="true"></i><h5 className="red">{i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
+                            <span className=""><h5 className="red"><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

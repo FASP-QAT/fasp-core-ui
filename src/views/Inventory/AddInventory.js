@@ -403,7 +403,7 @@ export default class AddInventory extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -416,7 +416,7 @@ export default class AddInventory extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -509,7 +509,7 @@ export default class AddInventory extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -521,7 +521,7 @@ export default class AddInventory extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -546,7 +546,7 @@ export default class AddInventory extends Component {
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
-                                color: 'red'
+                                color: '#BA0C2F'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
@@ -645,7 +645,7 @@ export default class AddInventory extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -657,7 +657,7 @@ export default class AddInventory extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -975,7 +975,7 @@ export default class AddInventory extends Component {
         if (cont == true) {
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: "red",
+                color: "#BA0C2F",
                 inventoryBatchInfoChangedFlag: 0
             }, () => {
                 this.hideFirstComponent();

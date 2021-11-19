@@ -113,7 +113,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -125,7 +125,7 @@ class AddRoleComponent extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         })
       }.bind(this);
       getRequest.onsuccess = function (event) {
@@ -160,7 +160,7 @@ class AddRoleComponent extends Component {
         getRequestP.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red'
+            color: '#BA0C2F'
           })
         }.bind(this);
         getRequestP.onsuccess = function (event) {
@@ -186,7 +186,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -198,7 +198,7 @@ class AddRoleComponent extends Component {
       planningunitRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         })
       }.bind(this);
       planningunitRequest.onsuccess = function (e) {
@@ -212,7 +212,7 @@ class AddRoleComponent extends Component {
         planningunitRequestAll.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
-            color: 'red'
+            color: '#BA0C2F'
           })
         }.bind(this);
         planningunitRequestAll.onsuccess = function (e) {
@@ -250,7 +250,7 @@ class AddRoleComponent extends Component {
           openRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              color: 'red'
+              color: '#BA0C2F'
             })
           }.bind(this);
           openRequest.onsuccess = function (e) {
@@ -261,7 +261,7 @@ class AddRoleComponent extends Component {
             programRequest.onerror = function (event) {
               this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
               })
             }.bind(this);
             programRequest.onsuccess = function (event) {
@@ -307,7 +307,7 @@ class AddRoleComponent extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       },
         () => {
           this.hideSecondComponent();
@@ -324,7 +324,7 @@ class AddRoleComponent extends Component {
       programRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red'
+          color: '#BA0C2F'
         },
           () => {
             this.hideSecondComponent();
@@ -372,7 +372,7 @@ class AddRoleComponent extends Component {
           getRequestP.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
-              color: 'red'
+              color: '#BA0C2F'
             },
               () => {
                 this.hideSecondComponent();
@@ -496,7 +496,7 @@ class AddRoleComponent extends Component {
                 putRequest.onerror = function (event) {
                   this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                   },
                     () => {
                       this.hideSecondComponent();
@@ -563,7 +563,7 @@ class AddRoleComponent extends Component {
 
     return (
       <div className="animated fadeIn">
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>

@@ -1037,7 +1037,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <div>
 
                     <Card  >
