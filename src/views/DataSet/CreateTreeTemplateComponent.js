@@ -40,7 +40,7 @@ import cleanUp from '../../assets/img/calculator.png';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
-import Draggable from 'react-draggable';
+// import Draggable from 'react-draggable';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import ModelingTypeService from "../../api/ModelingTypeService";
 import docicon from '../../assets/img/doc.png'
@@ -3746,9 +3746,9 @@ export default class CreateTreeTemplate extends Component {
                                 handleReset,
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
-
+                                    <div className="row">
                                     {this.state.level0 &&
-                                        <FormGroup>
+                                    <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Parent</Label>
                                             <Input type="text"
                                                 name="parent"
@@ -3760,7 +3760,7 @@ export default class CreateTreeTemplate extends Component {
                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                             ></Input>
                                         </FormGroup>}
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
                                             id="nodeTitle"
@@ -3779,7 +3779,7 @@ export default class CreateTreeTemplate extends Component {
                                             <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
                                         </Popover>
                                     </div>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                         <Input
                                             type="select"
@@ -3808,7 +3808,7 @@ export default class CreateTreeTemplate extends Component {
 
                                     {this.state.aggregationNode &&
 
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
                                             <Input
                                                 type="select"
@@ -3834,7 +3834,8 @@ export default class CreateTreeTemplate extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                         </FormGroup>}
-                                    {this.state.currentItemConfig.context.payload.nodeType.id != 1 && <FormGroup>
+                                    {this.state.currentItemConfig.context.payload.nodeType.id != 1 && 
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -3857,7 +3858,7 @@ export default class CreateTreeTemplate extends Component {
 
                                     {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
                                         <>
-                                            <FormGroup>
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="percentageOfParent"
@@ -3871,7 +3872,7 @@ export default class CreateTreeTemplate extends Component {
                                                     value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
                                                 <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup>
+                                            <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="parentValue"
@@ -3883,7 +3884,7 @@ export default class CreateTreeTemplate extends Component {
                                                 ></Input>
                                             </FormGroup></>}
                                     {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="nodeValue"
@@ -3901,7 +3902,7 @@ export default class CreateTreeTemplate extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeValue}</FormFeedback> */}
                                         </FormGroup>}
 
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="currencyId">Notes</Label>
                                         <Input type="textarea"
                                             id="notes"
@@ -3911,7 +3912,7 @@ export default class CreateTreeTemplate extends Component {
                                             value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
                                         ></Input>
                                     </FormGroup>
-
+                                        </div>
                                     {/* Planning unit start */}
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div>
@@ -4182,7 +4183,7 @@ export default class CreateTreeTemplate extends Component {
                                                         defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        style={{ width: 730 }}
+                                                        // style={{ width: 730 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
                                                             // if(){
@@ -5870,9 +5871,9 @@ export default class CreateTreeTemplate extends Component {
 
                     </Card></Col></Row>
             {/* Modal start------------------- */}
-            <Draggable handle=".modal-title">
+            {/* <Draggable handle=".modal-title"> */}
                 <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-xl '} >
+                    className={'modal-xl modaldraggble'} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                             this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
@@ -5921,7 +5922,7 @@ export default class CreateTreeTemplate extends Component {
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                     </ModalFooter>
                 </Modal>
-            </Draggable>
+            {/* </Draggable> */}
             {/* Scenario Modal end------------------------ */}
 
         </div>
