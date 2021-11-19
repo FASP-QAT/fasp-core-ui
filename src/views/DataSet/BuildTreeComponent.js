@@ -514,7 +514,7 @@ export default class BuildTree extends Component {
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -545,7 +545,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         loading: false,
                         // message: 'Error occured.',
-                        color: "red",
+                        color: "#BA0C2F",
                     }, () => {
                         this.hideSecondComponent();
                     });
@@ -607,7 +607,7 @@ export default class BuildTree extends Component {
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -638,7 +638,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         loading: false,
                         // message: 'Error occured.',
-                        color: "red",
+                        color: "#BA0C2F",
                     }, () => {
                         this.hideSecondComponent();
                     });
@@ -1092,7 +1092,7 @@ export default class BuildTree extends Component {
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -1119,7 +1119,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         loading: false,
                         // message: 'Error occured.',
-                        color: "red",
+                        color: "#BA0C2F",
                     }, () => {
                         this.hideSecondComponent();
                     });
@@ -5546,7 +5546,7 @@ export default class BuildTree extends Component {
                             }
                             {this.state.showModelingJexcelPercent &&
                                 <><div className="calculatorimg">
-                                    <div id="modelingJexcelPercent" className={"RowClickable"}>
+                                    <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
@@ -5559,7 +5559,7 @@ export default class BuildTree extends Component {
 
 
                         {this.state.showCalculatorFields &&
-                            <>
+                            <div className="col-md-12 pl-lg-0 pr-lg-0">
                                 <fieldset className="scheduler-border">
                                     <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                                     <div className="row">
@@ -5770,7 +5770,7 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                     {/* </div> */}
                                 </fieldset>
-                            </>
+                            </div>
                         }
 
                     </div>
@@ -5778,7 +5778,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
-                                <div className="row pl-lg-2 pr-lg-2">
+                                {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
@@ -5840,7 +5840,7 @@ export default class BuildTree extends Component {
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
-                                </div>
+                                {/* </div> */}
 
 
                             </fieldset>
@@ -5850,7 +5850,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
-                                <div className="row pl-lg-2 pr-lg-2">
+                                {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                     <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
@@ -5899,7 +5899,7 @@ export default class BuildTree extends Component {
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
                                     </div>
-                                </div>
+                                {/* </div> */}
 
 
                             </fieldset>
@@ -6436,7 +6436,7 @@ export default class BuildTree extends Component {
         }
         return <div className="animated fadeIn">
             <AuthenticationServiceComponent history={this.props.history} />
-            <h5 style={{ color: "red" }} id="div2">
+            <h5 className="red" id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
