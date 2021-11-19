@@ -2417,6 +2417,17 @@ export default class BuildTree extends Component {
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                    var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentScenario.puNode.planningUnit.id)[0].multiplier;
+                    this.setState({
+                        conversionFactor
+                    }, () => {
+                        this.getUsageText();
+                    });
+
+                } else {
+                    console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                }
                 // const { currentItemConfig } = this.state;
                 // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.unit.id;
                 // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
@@ -4092,9 +4103,11 @@ export default class BuildTree extends Component {
 
         if (event.target.name === "sharePlanningUnit") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.value;
+            this.getUsageText();
         }
         if (event.target.name === "refillMonths") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = event.target.value;
+            this.getUsageText();
         }
         // if (event.target.name === "forecastMethodId") {
         //     treeTemplate.forecastMethod.id = event.target.value;
@@ -4246,8 +4259,8 @@ export default class BuildTree extends Component {
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
             this.setState({
                 conversionFactor: pu.multiplier
-            },()=>{
-                console.log("conversionFactor---",this.state.conversionFactor);
+            }, () => {
+
             });
         }
 
@@ -4444,16 +4457,10 @@ export default class BuildTree extends Component {
         }
     };
     onCursoChanged(event, data) {
-        // this.setState({ openAddNodeModal: true });
-        // console.log("this.state.selectedScenario---", this.state.selectedScenario);
-        // console.log("cursor changed called---", data)
         const { context: item } = data;
-        // console.log("cursor changed item---", item);
-        // const { config } = this.state;
         if (item != null) {
 
             this.setState({
-                // parentNodeDataMap: data.parentItem.payload.nodeDataMap,
                 showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
@@ -4469,25 +4476,20 @@ export default class BuildTree extends Component {
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 var scenarioId = this.state.selectedScenario;
-                // console.log("highlighted item---", this.state.currentScenario)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    // this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
-                    // console.log("on curso nofuchanged---", this.state.noOfFUPatient)
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
-                    // console.log("no -----------------");
                     this.filterUsageTemplateList(this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
-                    // console.log("no -----------------");
                     this.getUsageText();
                 } else if (data.context.payload.nodeType.id == 5) {
-                    // console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     // this.getUsageText();
                     // this.getConversionFactor((data.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id);
+                    this.getNoOfMonthsInUsagePeriod();
                 } else if (data.context.payload.nodeType.id != 1) {
                     this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
@@ -4969,7 +4971,8 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                                 <FormGroup className="col-md-2">
                                                     <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / Clients" : "# of FU / usage / Patient"}<span class="red Reqasterisk">*</span></Label>
-
+                                                    ---{this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson}
+                                                    ---{this.state.noOfMonthsInUsagePeriod}
                                                 </FormGroup>
                                                 <FormGroup className="col-md-5">
                                                     <Input type="text"
@@ -5468,9 +5471,10 @@ export default class BuildTree extends Component {
                                                         </tr>
                                                     </table>}
                                             </div>
-                                            <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+
                                         </div>
                                     </div>}
+                                    <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -5779,67 +5783,67 @@ export default class BuildTree extends Component {
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
-                                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                        <div className="col-md-6">
-                                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
-                                        </div>
-                                        <div className="row pl-lg-0 pt-lg-3">
-                                            <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                <div>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="col-md-6">
+                                        {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
+                                    </div>
+                                    <div className="row pl-lg-0 pt-lg-3">
+                                        <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                            <div>
 
-                                                </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className="col-md-6 float-right">
-                                            <FormGroup className="float-right" >
-                                                <div className="check inline  pl-lg-1 pt-lg-0">
-                                                    <div>
-                                                        <Input
-                                                            className="form-check-input checkboxMargin"
-                                                            type="checkbox"
-                                                            id="manualChange"
-                                                            name="manualChange"
-                                                            // checked={true}
-                                                            checked={this.state.manualChange}
-                                                            onClick={(e) => { this.momCheckbox(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Manual Change affects future month'}</b>
-                                                        </Label>
-                                                    </div>
-                                                    <div>
-                                                        <Input
-                                                            className="form-check-input checkboxMargin"
-                                                            type="checkbox"
-                                                            id="seasonality"
-                                                            name="seasonality"
-                                                            // checked={true}
-                                                            checked={this.state.seasonality}
-                                                            onClick={(e) => { this.momCheckbox(e) }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Show Seasonality & manual change'}</b>
-                                                        </Label>
-                                                    </div>
+                                    <div className="col-md-6 float-right">
+                                        <FormGroup className="float-right" >
+                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="manualChange"
+                                                        name="manualChange"
+                                                        // checked={true}
+                                                        checked={this.state.manualChange}
+                                                        onClick={(e) => { this.momCheckbox(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Manual Change affects future month'}</b>
+                                                    </Label>
                                                 </div>
-                                            </FormGroup>
-                                        </div>
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="seasonality"
+                                                        name="seasonality"
+                                                        // checked={true}
+                                                        checked={this.state.seasonality}
+                                                        onClick={(e) => { this.momCheckbox(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Show Seasonality & manual change'}</b>
+                                                    </Label>
+                                                </div>
+                                            </div>
+                                        </FormGroup>
                                     </div>
-                                    <div id="momJexcel">
-                                    </div>
-                                    <div className="col-md-12 pr-lg-0">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                            this.setState({ showMomData: false })
-                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
+                                </div>
+                                <div id="momJexcel">
+                                </div>
+                                <div className="col-md-12 pr-lg-0">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({ showMomData: false })
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
-                                    </div>
+                                </div>
                                 {/* </div> */}
 
 
@@ -5851,54 +5855,54 @@ export default class BuildTree extends Component {
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">Monthly Data:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
-                                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                        <div className="col-md-6">
-                                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
-                                        </div>
-                                        <div className="row pl-lg-0 pt-lg-3">
-                                            <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
-                                                <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
-                                                <div>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="col-md-6">
+                                        {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
+                                    </div>
+                                    <div className="row pl-lg-0 pt-lg-3">
+                                        <div className="col-md-12 chart-wrapper chart-graph-report pl-0 ml-0">
+                                            <Bar id="cool-canvas" data={bar1} options={chartOptions1} />
+                                            <div>
 
-                                                </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-6 float-right">
-                                            <FormGroup className="float-right" >
-                                                <div className="check inline  pl-lg-1 pt-lg-0">
-                                                    <div>
-                                                        <Input
-                                                            className="form-check-input checkboxMargin"
-                                                            type="checkbox"
-                                                            id="manualChange"
-                                                            name="manualChange"
-                                                            // checked={true}
-                                                            checked={this.state.manualChange}
-                                                            onClick={(e) => { this.momCheckbox(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Manual Change affects future month'}</b>
-                                                        </Label>
-                                                    </div>
+                                    </div>
+                                    <div className="col-md-6 float-right">
+                                        <FormGroup className="float-right" >
+                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                                <div>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="manualChange"
+                                                        name="manualChange"
+                                                        // checked={true}
+                                                        checked={this.state.manualChange}
+                                                        onClick={(e) => { this.momCheckbox(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>{'Manual Change affects future month'}</b>
+                                                    </Label>
                                                 </div>
-                                            </FormGroup>
-                                        </div>
+                                            </div>
+                                        </FormGroup>
                                     </div>
-                                    <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang)}</b></i></div>
-                                    <div id="momJexcelPer" className={"RowClickable perNodeData"}>
-                                    </div>
-                                    <div className="col-md-12 pr-lg-0">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                            this.setState({
-                                                showMomDataPercent: false
-                                            });
-                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
+                                </div>
+                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang)}</b></i></div>
+                                <div id="momJexcelPer" className={"RowClickable perNodeData"}>
+                                </div>
+                                <div className="col-md-12 pr-lg-0">
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                                        this.setState({
+                                            showMomDataPercent: false
+                                        });
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
 
-                                    </div>
+                                </div>
                                 {/* </div> */}
 
 
@@ -6259,7 +6263,7 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
-                                    conversionFactor : '',
+                                    conversionFactor: '',
                                     parentScenario: itemConfig.level != 0 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0] : {},
                                     usageText: '',
                                     currentScenario: {

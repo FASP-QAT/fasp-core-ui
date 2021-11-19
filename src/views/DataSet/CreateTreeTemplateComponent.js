@@ -3432,11 +3432,11 @@ export default class CreateTreeTemplate extends Component {
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
                     this.getUsageTemplateList((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    console.log("no -----------------");
+                    // console.log("no -----------------");
                     this.getUsageText();
                 } else if (data.context.payload.nodeType.id == 5) {
-                    console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
-                    console.log("(puNode>>>", (data.context.payload.nodeDataMap[0])[0].puNode);
+                    // console.log("fu id edit---", (data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                    // console.log("(puNode>>>", (data.context.payload.nodeDataMap[0])[0].puNode);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.idString);
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                     (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
