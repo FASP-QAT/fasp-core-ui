@@ -1809,11 +1809,15 @@ export default class RealmCountryPlanningUnitList extends Component {
                     }
                 }
             }
-            realmCountryList.sort((a, b) => {
-                var itemLabelA = (a.country).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = (b.country).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
+            
+            if (realmCountryList.length != 0) {
+                realmCountryList.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                                    
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+            }
+
 
             console.log("REALM-COUNTRY--->1", realmCountryList);
             const realmCountrys = [...new Map(realmCountryList.map(item => [item.realmCountryId, item])).values()]
