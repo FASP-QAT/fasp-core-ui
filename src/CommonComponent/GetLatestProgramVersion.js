@@ -56,7 +56,7 @@ export default class GetLatestProgramVersion extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // if (this.props.updateState != undefined) {
             //     this.props.updateState(false);
@@ -71,7 +71,7 @@ export default class GetLatestProgramVersion extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 })
                 // if (this.props.updateState != undefined) {

@@ -39,7 +39,7 @@ hideSecondComponent() {
       <div className="animated fadeIn">
         {this.props.message}
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
         
       </div>
     );

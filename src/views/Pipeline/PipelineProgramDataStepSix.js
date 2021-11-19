@@ -293,7 +293,7 @@ export default class PipelineProgramDataStepSix extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <Formik
                     enableReinitialize={true}
                     initialValues={

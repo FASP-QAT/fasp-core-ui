@@ -169,6 +169,7 @@ label.tree_label:after {
 .checkbox label {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 
   /*16px width of fake checkbox + 6px distance between fake checkbox and text*/
   padding-left: 22px;
@@ -264,6 +265,7 @@ label.arrow_label:hover {
 }
 .fa-eye {
   color: #000000a8;
+  cursor: pointer;
 }
 
 label.arrow_label:before {
@@ -2049,6 +2051,24 @@ input::placeholder {
   left: 94.79%;
 }
 
+.progressbartext1Import {
+  // left: 7px;
+  left: -3%;
+  transform: translateX(18%) scale(1);
+}
+
+.progressbartext2Import {
+  // left: 7px;
+  left: 48.6667%;
+  transform: translateX(-14%) scale(1);
+}
+
+.progressbartext3Import {
+  // left: 7px;
+  left: 97.3333%;
+  transform: translateX(-40%) scale(1);
+}
+
 
 
 @media only screen and (max-width: 1024px) {
@@ -2752,6 +2772,13 @@ input::placeholder {
     min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
+    z-index: 1;
+  }
+
+  .dataentryTdWidth{
+    overflow: hidden!important;
+    min-width: 280px!important;
+    word-wrap: break-word!important;
     z-index: 1;
   }
 
@@ -5344,4 +5371,53 @@ fieldset.scheduler-border {
   
 .leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
 	text-align:left !important;
+}
+  //button hover css//
+.btn-danger {
+    color: #fff;
+    background-color: #BA0C2F !important;
+    border-color: #BA0C2F !important;
+}
+.btn-danger:hover {
+  color: #fff;
+  background-color: #D20E35 !important;
+  border-color: #D20E35 !important;
+}
+.card-header-action a i:hover {
+  font-size: 25px;
+  color: #4AB7DE;
+}
+.jexcel_clear_btn:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: 7px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+.jexcel_pagination_dropdown:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+.btn-secondary:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+}
+.btn-primary:hover {
+  color: #fff;
+  background-color: #19437A!important;
+  border-color: #19437A!important;
 }

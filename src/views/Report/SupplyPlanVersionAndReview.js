@@ -1177,7 +1177,7 @@ class SupplyPlanVersionAndReview extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -1230,7 +1230,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
                                                     this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                        <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                     )}</InputGroup></FormGroup>
 
                                         <FormGroup className="col-md-3">
