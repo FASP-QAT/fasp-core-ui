@@ -4971,8 +4971,6 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                                 <FormGroup className="col-md-2">
                                                     <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / Clients" : "# of FU / usage / Patient"}<span class="red Reqasterisk">*</span></Label>
-                                                    ---{this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson}
-                                                    ---{this.state.noOfMonthsInUsagePeriod}
                                                 </FormGroup>
                                                 <FormGroup className="col-md-5">
                                                     <Input type="text"
