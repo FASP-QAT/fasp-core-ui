@@ -125,7 +125,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             if (listArray.length > 0) {
                 for (var i = 0; i < listArray.length; i++) {
                     var paJson = {
-                        name: getLabelText(listArray[i].label, this.state.lang),
+                        name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
                         id: parseInt(listArray[i].planningUnitId),
                         multiplier: listArray[i].multiplier,
                         active: listArray[i].active,
@@ -400,6 +400,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // } else {
         //     console.log("IF------------>2");
         // }
+        // console.log("IF------------>2", localStorage.getItem("sesRecordCount"));
 
 
 
@@ -673,7 +674,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             } else {
                 this.setState({
-                    message: 'Supply plan program and forecast program should belong to same country',
+                    message: 'Supply Plan Program and Forecast Program should belong to same Country',
                     color: 'red'
                 },
                     () => {
@@ -790,22 +791,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 data = [];
                 data[0] = papuList[j].planningUnit.id
-                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                 data[2] = papuList[j].multiplier
                 data[3] = papuList[j].forecastingUnit.id
                 data[4] = planningUnitObj.forecastingUnit.tracerCategory.id
 
-                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
-                let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
-                let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
+                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
+                // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
+                // let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
 
-                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
-                // let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
-                // let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
+                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
+                let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
+                // console.log("filteredPlanningUnit---------->", filteredPlanningUnit);
+                let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
 
                 if (match.length > 0) {
                     data[5] = papuList[j].planningUnit.id
-                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                     data[7] = papuList[j].multiplier
                     data[8] = 1
                     data[9] = 1
@@ -854,11 +856,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100],
+            colWidths: [50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
 
                 {
-                    title: 'planningUnitId',
+                    title: 'Supply Plan Planning Unit Id',
                     type: 'hidden',
                     readOnly: true//0 A
                 },
@@ -887,14 +889,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
                 {
-                    title: 'ForecastPlanningUnitId',
+                    title: 'Forecast Planning Unit Id',
                     type: 'hidden',
                     readOnly: true//5 F
                 },
                 {
                     title: 'Forecast Planning Unit',
                     // readOnly: true,
-                    type: 'dropdown',
+                    type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
                     // source: [
                     //     { id: 1, name: 'Do not import' },
@@ -944,16 +946,24 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     if (doNotImport == -1) {// grade out
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.add('readonly');
+
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'color', textColor);
+
                         var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                     } else {
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                        // cell1.classList.remove('readonly');
+                        // elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
+
                         // var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
                         // cell1.classList.remove('readonly');
                     }
@@ -972,7 +982,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             }.bind(this),
             selectionCopy: false,
-            pagination: localStorage.getItem("sesRecordCount"),
+            // pagination: localStorage.getItem("sesRecordCount"),
+            pagination: 5000000,
             filters: true,
             search: true,
             columnSorting: true,
@@ -1059,9 +1070,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 versions: [],
             }, () => {
                 this.setState({
-                    versions: program[0].versionList.filter(function (x, i, a) {
+                    versions: (program[0].versionList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
-                    })
+                    })).reverse()
                 }, () => { });
             });
 
@@ -1259,98 +1270,98 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
 
-                <div className="row ">
-                    <FormGroup className="col-md-3">
-                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label> */}
-                        <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
-                        <div className="controls ">
-                            <InputGroup>
-                                <Input
-                                    type="select"
-                                    name="programId"
-                                    id="programId"
-                                    bsSize="sm"
-                                    onChange={(e) => { this.setProgramId(e); }}
-                                    value={this.state.programId}
+                <div style={{ display: this.props.items.loading ? "none" : "block" }} >
+                    <div className="row ">
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="select"
+                                        name="programId"
+                                        id="programId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.setProgramId(e); }}
+                                        value={this.state.programId}
+                                    >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {programList}
+
+                                    </Input>
+
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Supply Plan Version</Label>
+                            <div className="controls">
+                                <InputGroup>
+                                    <Input
+                                        type="select"
+                                        name="versionId"
+                                        id="versionId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.setVersionId(e); }}
+                                        value={this.state.versionId}
+                                    >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {versionList}
+                                    </Input>
+
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Forecast Program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="select"
+                                        name="forecastProgramId"
+                                        id="forecastProgramId"
+                                        bsSize="sm"
+                                        onChange={(e) => { this.setForecastProgramId(e); }}
+                                        value={this.state.forecastProgramId}
+                                    >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {datasets}
+                                    </Input>
+
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label> */}
+                            <Label htmlFor="appendedInputButton">Range</Label>
+                            <div className="controls  Regioncalender">
+
+                                <Picker
+                                    ref="pickRange"
+                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                    value={rangeValue}
+                                    lang={pickerLang}
+                                    //theme="light"
+                                    onChange={this.handleRangeChange}
+                                    onDismiss={this.handleRangeDissmis}
                                 >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {programList}
+                                    <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                </Picker>
 
-                                </Input>
+                            </div>
+                        </FormGroup>
 
-                            </InputGroup>
-                        </div>
-                    </FormGroup>
+                    </div>
 
-                    <FormGroup className="col-md-3">
-                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label> */}
-                        <Label htmlFor="appendedInputButton">Supply Plan Version</Label>
-                        <div className="controls">
-                            <InputGroup>
-                                <Input
-                                    type="select"
-                                    name="versionId"
-                                    id="versionId"
-                                    bsSize="sm"
-                                    onChange={(e) => { this.setVersionId(e); }}
-                                    value={this.state.versionId}
-                                >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {versionList}
-                                </Input>
-
-                            </InputGroup>
-                        </div>
-                    </FormGroup>
-
-                    <FormGroup className="col-md-3">
-                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label> */}
-                        <Label htmlFor="appendedInputButton">Forecast Program</Label>
-                        <div className="controls ">
-                            <InputGroup>
-                                <Input
-                                    type="select"
-                                    name="forecastProgramId"
-                                    id="forecastProgramId"
-                                    bsSize="sm"
-                                    onChange={(e) => { this.setForecastProgramId(e); }}
-                                    value={this.state.forecastProgramId}
-                                >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {datasets}
-                                </Input>
-
-                            </InputGroup>
-                        </div>
-                    </FormGroup>
-
-
-                </div>
-                <div className="row">
-                    <FormGroup className="col-md-3">
-                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label> */}
-                        <Label htmlFor="appendedInputButton">Range</Label>
-                        <div className="controls  Regioncalender">
-
-                            <Picker
-                                ref="pickRange"
-                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                value={rangeValue}
-                                lang={pickerLang}
-                                //theme="light"
-                                onChange={this.handleRangeChange}
-                                onDismiss={this.handleRangeDissmis}
-                            >
-                                <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                            </Picker>
-
-                        </div>
-                    </FormGroup>
                 </div>
 
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" style={{ marginTop: '-15px;' }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

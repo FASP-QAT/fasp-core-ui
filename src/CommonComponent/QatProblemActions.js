@@ -96,7 +96,7 @@ export default class QatProblemActions extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -187,7 +187,7 @@ export default class QatProblemActions extends Component {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     })
                                     this.hideFirstComponent()
                                 }.bind(this);
@@ -204,7 +204,7 @@ export default class QatProblemActions extends Component {
                                         this.setState({
                                             supplyPlanError: i18n.t('static.program.errortext'),
                                             loading: false,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                         })
                                         this.hideFirstComponent()
                                     }.bind(this);
@@ -4237,7 +4237,7 @@ export default class QatProblemActions extends Component {
                                             putRequest.onerror = function (event) {
                                                 this.setState({
                                                     message: i18n.t('static.program.errortext'),
-                                                    color: 'red'
+                                                    color: '#BA0C2F'
                                                 })
                                                 // this.props.updateState(false);
                                                 if (this.props.updateState != undefined) {

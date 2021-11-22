@@ -4499,7 +4499,7 @@ export default class CreateTreeTemplate extends Component {
                 </TabPane>
                 <TabPane tabId="2">
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
-                        <div className="offset-md-9 col-md-6 pr-lg-3">
+                        <div className="offset-md-10 col-md-6 pl-lg-4 ">
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
@@ -4785,17 +4785,17 @@ export default class CreateTreeTemplate extends Component {
 
                     </div>
                     {this.state.showMomData &&
-                        <div>
+                        <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                             <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
                             
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                    <div className="col-md-5">
+                                    <div className="col-md-6 pl-lg-0">
                                         <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
                                     </div>
-                                    <div className="col-md-5 float-right pl-lg-5">
-                                        <FormGroup className="" >
+                                    <div className="col-md-6 float-right">
+                                        <FormGroup className="float-right" >
                                             <div className="check inline  pl-lg-1 pt-lg-0">
                                                 <div>
                                                     <Input
@@ -4855,16 +4855,16 @@ export default class CreateTreeTemplate extends Component {
                         </div>
                     }
                     {this.state.showMomDataPercent &&
-                        <div>
+                       <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                             <legend className="scheduler-border">Modeling Calculater Tool:</legend>
                             <div className="row pl-lg-2 pr-lg-2">
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                    <div className="col-md-5">
+                                    <div className="col-md-6 pl-lg-0">
                                         <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button>
                                     </div>
-                                    <div className="col-md-5 float-right pl-lg-5">
-                                        <FormGroup className="" >
+                                    <div className="col-md-6 float-right">
+                                        <FormGroup className="float-right" >
                                             <div className="check inline  pl-lg-1 pt-lg-0">
                                                 <div>
                                                     <Input
@@ -4968,7 +4968,13 @@ export default class CreateTreeTemplate extends Component {
 
     exportDoc() {
         console.log("This.state.items +++", this.state.items);
-        var items = this.state.items.sort(function (a, b) { return a.sortOrder - b.sortOrder });
+        var item1 = this.state.items;
+        var sortOrderArray=[...new Set(item1.map(ele => (ele.sortOrder)))];
+        var sortedArray=sortOrderArray.sort();
+        var items=[];
+        for(var i=0;i<sortedArray.length;i++){
+            items.push(item1.filter(c=>c.sortOrder==sortedArray[i])[0]);
+        }
         console.log("Items+++", items);
         var dataArray = [];
         for (var i = 0; i < items.length; i++) {
@@ -4976,7 +4982,7 @@ export default class CreateTreeTemplate extends Component {
             var row1 = "";
             var level = items[i].level;
             for (var j = 1; j <= level; j++) {
-                row = row.concat("    ");
+                row = row.concat("\t");
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas((items[i].payload.nodeDataMap[0])[0].dataValue))
@@ -5005,7 +5011,7 @@ export default class CreateTreeTemplate extends Component {
                     var row3 = "";
                     var row4 = parentName;
                     for (var j = 1; j <= items[i].level; j++) {
-                        row3 = row3.concat("    ");
+                        row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                     } else {
@@ -5019,7 +5025,7 @@ export default class CreateTreeTemplate extends Component {
                         },
                         shading: {
                             type: ShadingType.CLEAR,
-                            fill: "651D32"
+                            fill: "cfcdc9"
                         },
                         style: total != 100 ? "aside" : "",
                     }))
@@ -5857,7 +5863,7 @@ export default class CreateTreeTemplate extends Component {
             {/* Modal start------------------- */}
             <Draggable handle=".modal-title">
                 <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-lg '} >
+                    className={'modal-xl '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                             this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :

@@ -282,6 +282,7 @@ const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/Usa
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
+const ProductValidation = React.lazy(() => import('../../views/Validations/ProductValidations'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
@@ -304,6 +305,7 @@ const routes = [
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
+  { path: '/validation/productValidation', exact: true, name: 'Product Validation', component: ProductValidation },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
@@ -694,8 +696,8 @@ const routes = [
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
 
-  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
-  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'static.breadcrum.list', entityname: 'static.importFromQATSupplyPlan.importFromQATSupplyPlan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
 
 ];
 
@@ -896,7 +898,7 @@ class DefaultLayout extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -907,7 +909,7 @@ class DefaultLayout extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
@@ -1530,6 +1532,12 @@ class DefaultLayout extends Component {
                           {
                             name: 'Modeling Validations',
                             url: '/validation/modelingValidation',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Product Validations',
+                            url: '/validation/productValidation',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
