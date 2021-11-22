@@ -136,7 +136,8 @@ export default class SyncProgram extends Component {
                             programIdsToLoad.push(programList[i].programId);
                             var syncedMasters = this.state.syncedMasters;
                             this.setState({
-                                syncedMasters: syncedMasters + 1
+                                syncedMasters: syncedMasters + 1,
+                                syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                             })
                         } else {
                             if (programList[i].programModified) {
@@ -150,12 +151,14 @@ export default class SyncProgram extends Component {
                                     programIdsToLoad.push(programList[i].programId);
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 } else {
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 }
                             } else {
@@ -169,12 +172,14 @@ export default class SyncProgram extends Component {
                                     programIdsToLoad.push(programList[i].programId);
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 } else {
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 }
                             }
@@ -192,7 +197,8 @@ export default class SyncProgram extends Component {
                         }
                         var syncedMasters = this.state.syncedMasters;
                         this.setState({
-                            syncedMasters: syncedMasters + 1
+                            syncedMasters: syncedMasters + 1,
+                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                         })
                     }
                 }
