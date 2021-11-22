@@ -197,6 +197,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            scalingMonth: new Date(),
             showModelingValidation: true,
             scenario: {
                 id: '',
@@ -465,7 +466,38 @@ export default class BuildTree extends Component {
         this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
     }
+    filterScalingDataByMonth(date) {
+        // console.log("date--->>>>>>>", date);
+        var json = this.state.modelingEl.getJson(null, false);
+        // console.log("modelingElData>>>", json);
+        var scalingTotal = 0;
+        for (var i = 0; i < json.length; i++) {
+            var calculatedChangeForMonth = 0;
+            var map1 = new Map(Object.entries(json[i]));
+            var startDate = map1.get("3");
+            var stopDate = map1.get("4");
+            var modelingTypeId = map1.get("2");
+            var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
+            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            console.log("modelingTypeId---", modelingTypeId);
+            if (result) {
+                var nodeValue = this.state.currentScenario.calculatedDataValue;
+
+                if (modelingTypeId == 2 || modelingTypeId == 5) {
+                    calculatedChangeForMonth = dataValue;
+                } else if (modelingTypeId == 3 || modelingTypeId == 4) {
+                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
+                }
+            }
+            this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
+            scalingTotal = scalingTotal + calculatedChangeForMonth;
+        }
+        this.setState({ scalingTotal });
+
+    }
+
     updateMomDataPerInDataSet() {
         var json = this.state.momElPer.getJson(null, false);
         console.log("momData>>>", json);
@@ -1762,6 +1794,11 @@ export default class BuildTree extends Component {
         this.el = modelingEl;
         this.setState({
             modelingEl: modelingEl
+        },()=>{
+
+            console.log("curDate---", curDate)
+            var curDate = "2021-11-01";
+            this.filterScalingDataByMonth(curDate);
         }
         );
     }
@@ -5621,14 +5658,14 @@ export default class BuildTree extends Component {
                                 // value={this.state.singleValue2}
                                 value={{
                                     year:
-                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                        new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2)
                                 }}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                             // className="ReadonlyPicker"
                             >
-                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                <MonthBox value={this.makeText({ year: new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
@@ -6062,9 +6099,10 @@ export default class BuildTree extends Component {
         console.log("text>>>", month)
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
-        let { currentItemConfig } = this.state;
-        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
-        this.setState({ currentItemConfig }, () => {
+        this.filterScalingDataByMonth(date);
+        // let { currentItemConfig } = this.state;
+        // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
+        this.setState({ scalingMonth: date }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });
         //
