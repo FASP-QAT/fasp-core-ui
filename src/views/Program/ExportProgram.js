@@ -146,6 +146,7 @@ export default class ExportProgram extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
+                    console.log("MyResult+++",myResult);
                     var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedProgramData');
                     var dGetRequest = dProgram.getAll();
@@ -255,6 +256,37 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].programModified = programQPLResultFiltered.programModified;
                                                                                         myResult[i].openCount = programQPLResultFiltered.openCount;
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
+                                                                                        console.log("myResult[i]+++",myResult[i]);
+                                                                                        for (var ppl = 0; ppl < programPlanningUnitList.length; ppl++) {
+                                                                                            var planningUnitDataList = myResult[i].programData.planningUnitDataList;
+                                                                                            console.log("planningUnitDataList+++",planningUnitDataList);
+                                                                                            console.log("programPlanningUnitList[ppl].planningUnit.id+++",programPlanningUnitList[ppl].planningUnit.id);
+                                                                                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == programPlanningUnitList[ppl].planningUnit.id);
+                                                                                            console.log("planningUnitDataFilter+++",planningUnitDataFilter);
+                                                                                            var index = planningUnitDataList.findIndex(c => c.planningUnitId == programPlanningUnitList[ppl].planningUnit.id);
+                                                                                            var programJson = {};
+                                                                                            if (planningUnitDataFilter.length > 0) {
+                                                                                                var planningUnitData = planningUnitDataFilter[0]
+                                                                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                programJson = JSON.parse(programData);
+                                                                                                console.log("ProgramJson+++",programJson);
+                                                                                                var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == programPlanningUnitList[ppl].planningUnit.id);
+                                                                                                programJson.shipmentList = shipmentList;
+                                                                                                var batchInfoList = (programJson.batchInfoList).filter(c => c.planningUnitId == programPlanningUnitList[ppl].planningUnit.id);
+                                                                                                programJson.batchInfoList = batchInfoList;
+                                                                                            } else {
+                                                                                                programJson = {
+                                                                                                    consumptionList: [],
+                                                                                                    inventoryList: [],
+                                                                                                    shipmentList: [],
+                                                                                                    batchInfoList: [],
+                                                                                                    supplyPlan: []
+                                                                                                }
+                                                                                            }
+                                                                                            var programData1={planningUnitId:programPlanningUnitList[ppl].planningUnit.id,planningUnitData:(CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString()}
+                                                                                            myResult[i].programData.planningUnitDataList[index] = programData1;
+                                                                                        }
 
                                                                                         var txt = JSON.stringify(myResult[i]);
                                                                                         var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];

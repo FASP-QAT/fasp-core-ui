@@ -1253,7 +1253,10 @@ export default class syncPage extends Component {
               programId: localStorage.getItem("sesProgramId")
             }, () => {
               // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-              this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+              var proListFiltered=proList.filter(c => c.value == localStorage.getItem("sesProgramId"));
+              if(proListFiltered.length>0){
+              this.checkLastModifiedDateForProgram();
+              }
             })
           } else {
             this.setState({
@@ -3564,7 +3567,7 @@ export default class syncPage extends Component {
                         var putRequest = programSaveData.put(item);
                         var putRequest1 = downloadedProgramSaveData.put(item);
                         var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-
+                        localStorage.setItem("sesProgramId", "");
                         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
                         // this.redirectToDashbaord();
                       }.bind(this)

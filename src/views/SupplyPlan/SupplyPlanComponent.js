@@ -278,9 +278,9 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     updateFieldData(value) {
-        var planningUnitDataList=this.state.planningUnitDataList;
-        var planningUnitDataFilter=planningUnitDataList.filter(c=>c.planningUnitId==value.value);
-        var programJson={};
+        var planningUnitDataList = this.state.planningUnitDataList;
+        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == value.value);
+        var programJson = {};
         if (planningUnitDataFilter.length > 0) {
             var planningUnitData = planningUnitDataFilter[0]
             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -295,8 +295,8 @@ export default class SupplyPlanComponent extends React.Component {
                 supplyPlan: []
             }
         }
-        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0,programJson:programJson },()=>{
-            if(this.state.activeTab[0] === '2'){
+        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, programJson: programJson }, () => {
+            if (this.state.activeTab[0] === '2') {
                 this.refs.compareChild.formSubmit(this.state.monthCount)
             }
         });
@@ -373,8 +373,8 @@ export default class SupplyPlanComponent extends React.Component {
         });
         if (tab == 2) {
             this.refs.compareChild.formSubmit(this.state.monthCount)
-        }else{
-            this.formSubmit(this.state.planningUnit,this.state.monthCount);
+        } else {
+            this.formSubmit(this.state.planningUnit, this.state.monthCount);
         }
     }
 
@@ -2379,12 +2379,15 @@ export default class SupplyPlanComponent extends React.Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    })
-                    this.getPlanningUnitList(programSelect);
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        })
+                        this.getPlanningUnitList(programSelect);
+                    }
                 }
 
             }.bind(this);
@@ -2438,7 +2441,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -2529,46 +2532,46 @@ export default class SupplyPlanComponent extends React.Component {
                                         return a < b ? -1 : a > b ? 1 : 0;
                                     }),
                                     generalProgramJson: programJson,
-                                    planningUnitDataList:planningUnitDataList,
+                                    planningUnitDataList: planningUnitDataList,
                                     dataSourceListAll: dataSourceListAll,
                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                     loading: false
-                                },()=>{
+                                }, () => {
                                     // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
-                                var planningUnitIdProp = '';
-                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
-                                    planningUnitIdProp = this.props.match.params.planningUnitId;
-                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                    planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                } else if (proList.length == 1) {
-                                    planningUnitIdProp = proList[0].value;
-                                }
-                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                    var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? {value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label} : {value:"", label: ""};
-                                    // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                    var planningUnitDataFilter=planningUnitDataList.filter(c=>c.planningUnitId==planningUnitIdProp);
-                                    var programJson={};
-                                    if (planningUnitDataFilter.length > 0) {
-                                        var planningUnitData = planningUnitDataFilter[0]
-                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                        programJson = JSON.parse(programData);
-                                    } else {
-                                        programJson = {
-                                            consumptionList: [],
-                                            inventoryList: [],
-                                            shipmentList: [],
-                                            batchInfoList: [],
-                                            supplyPlan: []
-                                        }
+                                    var planningUnitIdProp = '';
+                                    if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
+                                        planningUnitIdProp = this.props.match.params.planningUnitId;
+                                    } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                    } else if (proList.length == 1) {
+                                        planningUnitIdProp = proList[0].value;
                                     }
-                                    this.setState({
-                                        planningUnit: planningUnit,
-                                        planningUnitId: planningUnitIdProp,
-                                        programJson:programJson
-                                    })
-                                    this.formSubmit(planningUnit, this.state.monthCount);
-                                }
+                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                        var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
+                                        // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                        var programJson = {};
+                                        if (planningUnitDataFilter.length > 0) {
+                                            var planningUnitData = planningUnitDataFilter[0]
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+                                        this.setState({
+                                            planningUnit: planningUnit,
+                                            planningUnitId: planningUnitIdProp,
+                                            programJson: programJson
+                                        })
+                                        this.formSubmit(planningUnit, this.state.monthCount);
+                                    }
                                 })
 
                             }.bind(this);
@@ -2689,7 +2692,7 @@ export default class SupplyPlanComponent extends React.Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
-            var generalProgramJson=this.state.generalProgramJson;
+            var generalProgramJson = this.state.generalProgramJson;
             // var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
             // var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active.toString() == "true")
             // var shiList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true" && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= moment(m[0].startDate) && moment(c.receivedDate) <= moment(m[17].endDate)) : (moment(c.expectedDeliveryDate) >= moment(m[0].startDate) && moment(c.expectedDeliveryDate) <= moment(m[17].endDate))))
@@ -4468,7 +4471,7 @@ export default class SupplyPlanComponent extends React.Component {
                     // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     // var programJson = JSON.parse(programData);
-                    var programResult=programRequest.result.programData;
+                    var programResult = programRequest.result.programData;
                     var planningUnitData = [];
                     var selectedPlanningUnitdata = {};
                     var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
@@ -4479,8 +4482,8 @@ export default class SupplyPlanComponent extends React.Component {
                     planningunitList.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
-                        var programJson={}
-                        var planningUnitDataFilter=programResult.planningUnitDataList.filter(c=>c.planningUnitId==planningUnit.value);
+                        var programJson = {}
+                        var planningUnitDataFilter = programResult.planningUnitDataList.filter(c => c.planningUnitId == planningUnit.value);
                         if (planningUnitDataFilter.length > 0) {
                             var planningUnitDataFromJson = planningUnitDataFilter[0]
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitDataFromJson.planningUnitData, SECRET_KEY);
