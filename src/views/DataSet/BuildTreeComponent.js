@@ -4683,7 +4683,7 @@ export default class BuildTree extends Component {
                         id: 'B',
                         scaleLabel: {
                             display: true,
-                            labelString: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
+                            labelString: "% of " + (this.state.numberNode ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                             fontColor: 'black'
                         },
                         stacked: false,
