@@ -5701,7 +5701,7 @@ export default class BuildTree extends Component {
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
@@ -5714,6 +5714,7 @@ export default class BuildTree extends Component {
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
+                                        }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
@@ -5732,7 +5733,7 @@ export default class BuildTree extends Component {
                                         {/* <div className="row"> */}
 
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">Target ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
@@ -5749,7 +5750,7 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">or</Label>
                                         </FormGroup>
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">change {this.state.currentItemConfig.context.payload.nodeType.id == 3 ? '(% points)' : '(%)'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
@@ -5994,7 +5995,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> for node <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a % of parent <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang):''}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> for node <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a % of parent <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div id="momJexcelPer" className={"RowClickable perNodeData"}>
                                 </div>
