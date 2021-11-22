@@ -1979,7 +1979,7 @@ class ShipmentGlobalView extends Component {
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
-                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                    <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                 )}
 
                                         </FormGroup>
@@ -1999,7 +1999,7 @@ class ShipmentGlobalView extends Component {
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
-                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                    <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                 )}
 
                                         </FormGroup>

@@ -928,7 +928,7 @@ class RealmCountry extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <div>
                     <Card>
                         <CardBody className="p-0">

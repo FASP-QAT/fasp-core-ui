@@ -71,7 +71,7 @@ export default class uploadUserManual extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: 'red',
+                                color: '#BA0C2F',
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent();
@@ -91,7 +91,7 @@ export default class uploadUserManual extends Component {
                                     this.setState({
                                         message: i18n.t("static.unkownError"),
                                         loading: false,
-                                        color: 'red'
+                                        color: '#BA0C2F'
                                     }, () => {
                                         this.hideSecondComponent();
                                     });
@@ -100,7 +100,7 @@ export default class uploadUserManual extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: 'red'
+                                        color: '#BA0C2F'
                                     }, () => {
                                         this.hideSecondComponent();
                                     });
@@ -109,7 +109,7 @@ export default class uploadUserManual extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                     }, () => {
                                         this.hideSecondComponent();
                                     });

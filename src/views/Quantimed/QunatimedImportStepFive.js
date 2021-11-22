@@ -177,7 +177,7 @@ export default class QunatimedImportStepFive extends Component {
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                this.props.updateState("color", "red");
+                                this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
                             openRequest.onsuccess = function (e) {
@@ -195,7 +195,7 @@ export default class QunatimedImportStepFive extends Component {
                                 var programRequest = programTransaction.get(programId);
                                 programRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                    this.props.updateState("color", "red");
+                                    this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
                                 programRequest.onsuccess = function (event) {
@@ -214,7 +214,7 @@ export default class QunatimedImportStepFive extends Component {
                                     var rcpuRequest = rcpuOs.getAll();
                                     rcpuRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                        this.props.updateState("color", "red");
+                                        this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
                                     rcpuRequest.onsuccess = function (event) {
@@ -329,7 +329,7 @@ for(var pu=0;pu<finalPuList.length;pu++){
                                         putRequest.onerror = function (event) {
 
                                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                            this.props.updateState("color", "red");
+                                            this.props.updateState("color", "#BA0C2F");
                                             this.props.hideFirstComponent();
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
@@ -385,7 +385,7 @@ for(var pu=0;pu<finalPuList.length;pu++){
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-            this.props.updateState("color", "red");
+            this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -403,7 +403,7 @@ for(var pu=0;pu<finalPuList.length;pu++){
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             programRequest.onsuccess = function (event) {

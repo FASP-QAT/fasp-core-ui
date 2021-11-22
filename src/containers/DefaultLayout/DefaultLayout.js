@@ -283,6 +283,9 @@ const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/Usa
 const ExtrapolateData = React.lazy(() => import('../../views/Extrapolation/ExtrapolateDataComponent.js'));
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
+const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
+const ProductValidation = React.lazy(() => import('../../views/Validations/ProductValidations'))
+const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -294,6 +297,8 @@ const AddDataSet = React.lazy(() => import('../../views/DataSet/AddDataSet'));
 const DataSetList = React.lazy(() => import('../../views/DataSet/DataSetList'));
 const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
+const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
@@ -301,9 +306,12 @@ const routes = [
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load or Delete Dataset', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
+  { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
+  { path: '/validation/productValidation', exact: true, name: 'Product Validation', component: ProductValidation },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/tree/:treeId', name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/tree/:treeId/:programId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
@@ -692,6 +700,9 @@ const routes = [
   { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
   { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
 
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+
 ];
 
 class DefaultLayout extends Component {
@@ -891,7 +902,7 @@ class DefaultLayout extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -902,7 +913,7 @@ class DefaultLayout extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
@@ -1494,14 +1505,25 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          
+
                           {
                             name: "Extrapolation",
                             url: '/Extrapolation/extrapolateData',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
-                          
+                          {
+                            name: "Import From QAT Supply Plan",
+                            url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
+                            icon: 'fa fa-dot-circle-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: "Data Entry & Adjustment",
+                            url: '/dataentry/consumptionDataEntryAndAdjustment',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                         ]
                       },
                       {
@@ -1514,14 +1536,26 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          
+
                           {
                             name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
-                          
+                          {
+                            name: 'Modeling Validations',
+                            url: '/validation/modelingValidation',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Product Validations',
+                            url: '/validation/productValidation',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&

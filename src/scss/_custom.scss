@@ -169,6 +169,7 @@ label.tree_label:after {
 .checkbox label {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 
   /*16px width of fake checkbox + 6px distance between fake checkbox and text*/
   padding-left: 22px;
@@ -264,6 +265,7 @@ label.arrow_label:hover {
 }
 .fa-eye {
   color: #000000a8;
+  cursor: pointer;
 }
 
 label.arrow_label:before {
@@ -1353,7 +1355,8 @@ a:hover {
 
 @media (min-width: 992px) {
   .sidebar .nav {
-    font-size: 12px !important;
+    // font-size: 12px !important;
+    font-size: 13px !important;
   }
   .sidebar .nav-link {
     padding: 0.75rem 0.2rem !important;
@@ -2046,6 +2049,24 @@ input::placeholder {
 }
 .progresdatatext6 {
   left: 94.79%;
+}
+
+.progressbartext1Import {
+  // left: 7px;
+  left: -3%;
+  transform: translateX(18%) scale(1);
+}
+
+.progressbartext2Import {
+  // left: 7px;
+  left: 48.6667%;
+  transform: translateX(-14%) scale(1);
+}
+
+.progressbartext3Import {
+  // left: 7px;
+  left: 97.3333%;
+  transform: translateX(-40%) scale(1);
 }
 
 
@@ -2751,6 +2772,13 @@ input::placeholder {
     min-width: 280px!important;
     word-wrap: break-word!important;
     border:none!important;
+    z-index: 1;
+  }
+
+  .dataentryTdWidth{
+    overflow: hidden!important;
+    min-width: 280px!important;
+    word-wrap: break-word!important;
     z-index: 1;
   }
 
@@ -4145,6 +4173,7 @@ display: none;
 }
 .sidebar .nav-link .nav-icon {
   color: #fff;
+  margin: 2px 0.5rem 0 0!important;
 }
 .sidebar .sidebar-minimizer {
   background-color: #23282c!important;
@@ -5090,10 +5119,10 @@ height: 0px;
     //     width: 78% !important;
     // }
     
-    .listtreetable .jexcel > thead > tr >td:nth-child(3) {
+    .listtreetable .jexcel > thead > tr >td:nth-child(4) {
       text-align: left!important;
   }
-  .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(3).readonly {
+  .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
     text-align: left!important;
 }
 .boxContactTemplate{
@@ -5268,6 +5297,35 @@ height: 0px;
 .SelectGoVesionSetting{
   width: 202px;
 }
+.HeaderNodeText{
+  display: inline;
+  margin-left: 1%;
+  border: 1px solid #ccc;
+  padding: 4px 3px 4px 4px;
+  border-radius: 4px;
+}
+.ScalingheadTitle{
+  padding-left: 5px;
+}
+// .ReadonlyPicker.month-picker{
+//   background-color: #e5edf5!important;
+//   opacity: 1!important;
+//   pointer-events: none!important;
+// }
+.ReadonlyPicker {
+  opacity: 1!important;
+  position: relative!important;
+  pointer-events: none!important;
+  background-color: #e5edf5!important;
+}
+.addtreebg{
+  background: #20a8d8!important;
+  color: #fff!important;
+}
+.addtreebg option { 
+  background-color: #fff!important;
+  color:#000!important; 
+}
 .treeValidation{
     margin-top: -16px;
     font-size: 10px;
@@ -5277,4 +5335,80 @@ height: 0px;
   color: #BA0C2F !important;
   font-size: 10px;
 
+}
+fieldset.scheduler-border {
+  border: 1px groove #eee !important;
+  padding: 0 1.4em 1.4em 1.4em !important;
+  margin: 0 0 1.5em 0 !important;
+  -webkit-box-shadow:  0px 0px 0px 0px #000;
+          box-shadow:  0px 0px 0px 0px #000;
+}
+
+  legend.scheduler-border {
+      font-size: 1.2em !important;
+      font-weight: bold !important;
+      text-align: left !important;
+      width:auto;
+      padding:0 10px;
+      border-bottom:none;
+  }
+  .perNodeData {
+    margin-top: -34px;
+  }
+  .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
+    top: unset!important;
+    left: unset!important;
+  }
+
+.leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
+	text-align:left !important;
+}
+  //button hover css//
+.btn-danger {
+    color: #fff;
+    background-color: #BA0C2F !important;
+    border-color: #BA0C2F !important;
+}
+.btn-danger:hover {
+  color: #fff;
+  background-color: #D20E35 !important;
+  border-color: #D20E35 !important;
+}
+.card-header-action a i:hover {
+  font-size: 25px;
+  color: #4AB7DE;
+}
+.jexcel_clear_btn:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: 7px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+.jexcel_pagination_dropdown:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+.btn-secondary:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+}
+.btn-primary:hover {
+  color: #fff;
+  background-color: #19437A!important;
+  border-color: #19437A!important;
 }

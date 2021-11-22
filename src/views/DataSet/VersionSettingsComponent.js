@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+// import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
@@ -11,8 +11,9 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from "../../Constants";
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
+import moment from 'moment';
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
 class VersionSettingsComponent extends Component {
@@ -20,6 +21,24 @@ class VersionSettingsComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            noOfDays: [{ id: 0, name: 'Default' }, { id: 15, name: '15' },
+            { id: 16, name: '16' },
+            { id: 17, name: '17' },
+            { id: 18, name: '18' },
+            { id: 19, name: '19' },
+            { id: 20, name: '20' },
+            { id: 21, name: '21' },
+            { id: 22, name: '22' },
+            { id: 23, name: '23' },
+            { id: 24, name: '24' },
+            { id: 25, name: '25' },
+            { id: 26, name: '26' },
+            { id: 27, name: '27' },
+            { id: 28, name: '28' },
+            { id: 29, name: '29' },
+            { id: 30, name: '30' },
+            { id: 31, name: '31' }
+            ],
             isChanged: false,
             uniquePrograms: [],
             programValues: [],
@@ -63,16 +82,25 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
+                var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 //End date
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(8, y);
+                var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
-                } else {
+                }
+                else if (diff <= 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter valid date');
+                    valid = false;
+                }
+                else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
@@ -116,38 +144,48 @@ class VersionSettingsComponent extends Component {
             }
         }
 
+
+        var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         //End date
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-
-        //End date
-        if (x == 12) {
-            var col = ("M").concat(parseInt(y) + 1);
-            var reg = JEXCEL_INTEGER_REGEX;
+            var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-            else if (!(reg.test(value))) {
+            else if (diff <= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                this.el.setComments(col, 'Please enter valid date');
             }
             else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
+
+        //No of days
+        // if (x == 12) {
+        //     var col = ("M").concat(parseInt(y) + 1);
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     }
+        //     else if (!(reg.test(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //     }
+        //     else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
 
 
         if (x != 11) {
@@ -397,7 +435,7 @@ class VersionSettingsComponent extends Component {
             data[9] = 1
             data[10] = downloadedDataset[j].id
             data[11] = 0
-            data[12] = pd.currentVersion.daysInMonth
+            data[12] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
             versionSettingsArray[count] = data;
             count++;
 
@@ -511,7 +549,8 @@ class VersionSettingsComponent extends Component {
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
-                    type: 'numeric'
+                    type: 'dropdown',
+                    source: this.state.noOfDays
                 },
 
             ],

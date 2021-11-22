@@ -85,7 +85,7 @@ export default class ChangeInLocalProgramVersion extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -97,7 +97,7 @@ export default class ChangeInLocalProgramVersion extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 })
             }.bind(this);
@@ -150,7 +150,7 @@ export default class ChangeInLocalProgramVersion extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -162,7 +162,7 @@ export default class ChangeInLocalProgramVersion extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 })
             }.bind(this);

@@ -270,7 +270,7 @@ export default class AddProductCategory extends React.Component {
                                                         buttons: [
                                                             <div>
                                                                 {/* <button label='Delete' onClick={(event) => this.disableNode(rowInfo)}>Disable</button> */}
-                                                                <a style={{ color: 'red' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
+                                                                <a style={{ color: '#BA0C2F' }} href="javascript:void();" title="Disable Product Category" onClick={(event) => this.disableNode(rowInfo)} ><i className="fa fa-times"></i></a>
                                                             </div>,
                                                         ],
                                                         style: {
