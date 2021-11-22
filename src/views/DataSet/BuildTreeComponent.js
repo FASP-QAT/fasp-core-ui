@@ -1359,7 +1359,7 @@ export default class BuildTree extends Component {
         var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
-        var getValue = e.target.value;
+        var getValue = e.target.value.toString().replaceAll(",","");
         // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
         //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
@@ -1369,17 +1369,17 @@ export default class BuildTree extends Component {
         //     getValue = e.target.value
         // }
         if (this.state.currentModelingType == 2) {
-            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-                var getChangeInPercent = (parseFloat(e.target.value - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
+                var getChangeInPercent = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
                 // console.log("getChangeInPercent>>>",getChangeInPercent);
                 // console.log("momValue>>>",momValue)
             } else {
                 // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
-                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
             }
         }
         if (this.state.currentModelingType == 4) {
@@ -1388,7 +1388,7 @@ export default class BuildTree extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(e.target.value - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
+            var momValue = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -5738,19 +5738,20 @@ export default class BuildTree extends Component {
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
                                                 name="startValue"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={this.state.currentScenario.calculatedDataValue}
+                                                value={addCommas(this.state.currentScenario.calculatedDataValue)}
 
                                             >
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
+                                        }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
@@ -5769,13 +5770,13 @@ export default class BuildTree extends Component {
                                         {/* <div className="row"> */}
 
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">Target ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
-                                                value={this.state.currentEndValue}
+                                                value={addCommas(this.state.currentEndValue)}
                                                 readOnly={this.state.currentEndValueEdit}
                                             >
                                             </Input>
@@ -5786,7 +5787,7 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">or</Label>
                                         </FormGroup>
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
