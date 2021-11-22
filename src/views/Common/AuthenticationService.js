@@ -1305,7 +1305,11 @@ class AuthenticationService {
                         break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
-                    case "/validation/productValidation":    
+                        if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
+                            return true;
+                        }
+                        break;
+                    case "/validation/productValidation":
                     case "/validation/modelingValidation":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
