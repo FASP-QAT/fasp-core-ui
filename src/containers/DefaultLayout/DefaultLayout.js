@@ -1033,7 +1033,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.datasync'),
                         icon: 'fa fa-refresh',
-                        url: '/masterDataSync',
+                        url: '/syncProgram',
                       },
                       {
                         name: i18n.t('static.translations.translations'),

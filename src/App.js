@@ -44,6 +44,7 @@ class App extends Component {
             <Route exact path="/masterDataSync" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />
             <Route exact path="/masterDataSync/:color/:message" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />
             <Route exact path="/syncProgram/:color/:message" exact name="Sync Program" render={props => <SyncProgram {...props} />} />
+            <Route exact path="/syncProgram" exact name="Sync Program" render={props => <SyncProgram {...props} />} />
             <Route exact path="/updateExpiredPassword" exact name="Update expired password" render={props => <UpdateExpiredPassword {...props} />} />
             <Route exact path="/resetPassword/:emailId/:token" exact name="Reset password" render={props => <ResetPassword {...props} />} />
             <Route exact path="/userAgreement" exact render={props => <UserAgreement {...props} />} />

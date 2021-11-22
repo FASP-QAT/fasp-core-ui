@@ -17,7 +17,7 @@ export default class UserAgreementComponent extends Component {
     accept() {
         // AuthenticationService.setupAxiosInterceptors();
         UserService.acceptUserAgreement().then(response => {
-            this.props.history.push(`/masterDataSync`)
+            this.props.history.push(`/syncProgram`)
         }).catch(
             error => {
                 if (error.message === "Network Error") {

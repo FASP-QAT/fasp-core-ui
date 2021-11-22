@@ -1401,7 +1401,7 @@ export default class syncPage extends Component {
               }
               if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
-                this.props.history.push(`/masterDataSync`)
+                this.props.history.push(`/syncProgram`)
               } else {
                 this.getDataForCompare(value);
               }
@@ -4331,7 +4331,7 @@ export default class syncPage extends Component {
     console.log("ProgramIds++++", programIds);
     console.log("this props++++", this)
     console.log("this props++++", this.props)
-    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
+    this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
 
   updateState(parameterName, value) {

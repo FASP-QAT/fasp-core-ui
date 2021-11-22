@@ -55,6 +55,7 @@ export default class SyncProgram extends Component {
     }
 
     componentDidMount() {
+        console.log("In sync Program+++");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -94,8 +95,7 @@ export default class SyncProgram extends Component {
                     if (programList.length > 0) {
                         this.syncPrograms(programList);
                     } else {
-                        let id = AuthenticationService.displayDashboardBasedOnRole();
-                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                        this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                     }
                 })
             }.bind(this)
@@ -390,8 +390,7 @@ export default class SyncProgram extends Component {
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
                                                     console.log(")))) Data saved successfully")
-                                                    let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                                                    this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                                                 }.bind(this)
                                             }.bind(this)
                                         }.bind(this)
@@ -469,8 +468,7 @@ export default class SyncProgram extends Component {
                                 var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             }
                             programDataTransaction2.oncomplete = function (event) {
-                                let id = AuthenticationService.displayDashboardBasedOnRole();
-                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)

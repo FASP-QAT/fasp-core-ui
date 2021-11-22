@@ -1067,7 +1067,7 @@ class Program extends Component {
                                                                 // this.refs.programListChild.checkNewerVersions();
                                                                 this.getPrograms();
                                                                 this.getLocalPrograms();
-                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                                this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                                             }.bind(this)
                                                         }.bind(this)
                                                     }.bind(this)
@@ -1174,7 +1174,7 @@ class Program extends Component {
                                                 // this.refs.programListChild.checkNewerVersions();
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
-                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                             }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
