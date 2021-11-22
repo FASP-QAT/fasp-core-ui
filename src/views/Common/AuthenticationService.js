@@ -1303,6 +1303,7 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                        case "/extrapolation/extrapolateData":
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
