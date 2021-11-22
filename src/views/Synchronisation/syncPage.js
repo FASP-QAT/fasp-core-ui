@@ -3600,19 +3600,19 @@ export default class syncPage extends Component {
                             case 403:
                               this.props.history.push(`/accessDenied`)
                               break;
+                            case 406:
+                                alert(i18n.t("static.commitVersion.versionIsOutDated"));         
+                                this.setState({
+                                  message: error.response.data.messageCode,
+                                  color: "#BA0C2F",
+                                  loading: false
+                                }, () => {
+                                  this.hideFirstComponent()
+                                  this.checkLastModifiedDateForProgram(this.state.programId);
+                                });
+                                break;  
                             case 500:
                             case 404:
-                            case 406:
-                              alert(i18n.t("static.commitVersion.versionIsOutDated"));         
-                              this.setState({
-                                message: error.response.data.messageCode,
-                                color: "#BA0C2F",
-                                loading: false
-                              }, () => {
-                                this.hideFirstComponent()
-                                this.checkLastModifiedDateForProgram(this.state.programId);
-                              });
-                              break;
                             case 412:
                               this.setState({
                                 message: error.response.data.messageCode,
