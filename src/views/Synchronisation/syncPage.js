@@ -1255,7 +1255,7 @@ export default class syncPage extends Component {
               // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
               var proListFiltered=proList.filter(c => c.value == localStorage.getItem("sesProgramId"));
               if(proListFiltered.length>0){
-              this.checkLastModifiedDateForProgram();
+              this.checkLastModifiedDateForProgram(proListFiltered[0]);
               }
             })
           } else {
