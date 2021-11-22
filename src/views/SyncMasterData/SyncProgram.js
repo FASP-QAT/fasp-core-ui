@@ -88,7 +88,7 @@ export default class SyncProgram extends Component {
                 // var readonlyProgramList = myResult.filter(c => c.readonly);
                 console.log("MyResult+++", myResult);
                 this.setState({
-                    totalMasters: myResult.length,
+                    totalMasters: myResult.length + 1,
                     loading: false,
                     programList: programList
                 }, () => {
@@ -187,7 +187,7 @@ export default class SyncProgram extends Component {
                     } else {
                         // User ka pass latest version hai
                         // Readonly version ki list lao
-                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version!=latestVersion);
+                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version != latestVersion);
                         // Sare readonly versions ko delete karo
                         for (var j = 0; j < readonlyProgramList.length; j++) {
                             var index = readonlyProgramToBeDeleted.findIndex(c => c.id == readonlyProgramList[j].id);
@@ -203,7 +203,7 @@ export default class SyncProgram extends Component {
                     }
                 }
                 console.log("outside for+++");
-                if (this.state.syncedMasters == this.state.totalMasters) {
+                if (this.state.syncedMasters == this.state.totalMasters - 1) {
                     this.loadLatestVersion(programIdsToLoad, readonlyProgramToBeDeleted)
                 }
             } else {
@@ -396,6 +396,11 @@ export default class SyncProgram extends Component {
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
                                                     console.log(")))) Data saved successfully")
+                                                    var syncedMasters = this.state.syncedMasters;
+                                                    this.setState({
+                                                        syncedMasters: syncedMasters + 1,
+                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                    })
                                                     this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                                                 }.bind(this)
                                             }.bind(this)
