@@ -1303,6 +1303,7 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/extrapolation/extrapolateData":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
                     case "/validation/productValidation":
