@@ -4843,7 +4843,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcel">
+                                <div id="momJexcel" className="ScalingTable">
                                 </div>
                                 <div className="col-md-12 pr-lg-0 float-right">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.setState({ showMomData: false }) }}><i className="fa fa-times"></i> {'Close'}</Button>
@@ -4896,7 +4896,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcelPer" className={"RowClickable"}>
+                                <div id="momJexcelPer" className={"RowClickable FiltermomjexcelPer"}>
                                 </div>
                                 <div className="col-md-12 pr-lg-0 float-right">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-times"></i> {'Close'}</Button>
@@ -5872,8 +5872,9 @@ export default class CreateTreeTemplate extends Component {
                     </Card></Col></Row>
             {/* Modal start------------------- */}
             {/* <Draggable handle=".modal-title"> */}
+            
                 <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-xl modaldraggble'} >
+                    className={'modal-xl'} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
                         <strong>Add/Edit Node</strong>     {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                             this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
