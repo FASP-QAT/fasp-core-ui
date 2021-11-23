@@ -68,7 +68,7 @@ class VersionSettingsComponent extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.el.getValueFromCoords(12, y);
             if (parseInt(value) == 1) {
                 //Start date
                 var col = ("H").concat(parseInt(y) + 1);
@@ -83,10 +83,10 @@ class VersionSettingsComponent extends Component {
                     this.el.setComments(col, "");
                 }
                 var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 //End date
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(8, y);
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
                 var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -106,9 +106,9 @@ class VersionSettingsComponent extends Component {
                 }
                 // No of days in month
 
-                var col = ("M").concat(parseInt(y) + 1);
+                var col = ("N").concat(parseInt(y) + 1);
                 var reg = JEXCEL_INTEGER_REGEX;
-                var value = this.el.getValueFromCoords(12, y);
+                var value = this.el.getValueFromCoords(13, y);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -124,6 +124,71 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
+
+
+                var col = ("O").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`O${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                var col = ("P").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
+                var col = ("Q").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
             }
         }
         return valid;
@@ -146,10 +211,10 @@ class VersionSettingsComponent extends Component {
 
 
         var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-        var stopDate = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        var stopDate = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         //End date
-        if (x == 8) {
-            var col = ("I").concat(parseInt(y) + 1);
+        if (x == 9) {
+            var col = ("J").concat(parseInt(y) + 1);
             var diff = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -188,11 +253,100 @@ class VersionSettingsComponent extends Component {
         // }
 
 
-        if (x != 11) {
-            this.el.setValueFromCoords(11, y, 1, true);
+        if (x != 12) {
+            this.el.setValueFromCoords(12, y, 1, true);
             this.setState({
                 isChanged: true
             })
+        }
+
+
+        if (x == 8 && this.el.getValueFromCoords(17, y) == 0) {//forecastPeriodInMonth
+            let startDate = this.el.getValueFromCoords(7, y);
+            let month = this.el.getValueFromCoords(8, y);
+            console.log("startDate--------->", startDate);
+            if (startDate != null && month != null) {
+                let newStartDate = new Date(startDate);
+                newStartDate.setMonth(newStartDate.getMonth() + month);
+                // console.log("startDate--------->1", new Date(newStartDate));
+                this.el.setValueFromCoords(17, y, 1, true);
+                this.el.setValueFromCoords(9, y, newStartDate.getFullYear() + '-' + (newStartDate.getMonth() + 1) + "-01 00:00:00", true);
+
+            }
+            this.el.setValueFromCoords(17, y, 0, true);
+        }
+
+
+        if (x == 9 && this.el.getValueFromCoords(17, y) == 0) {//endDate
+            console.log("startDate--------->1111111");
+            let startDate = this.el.getValueFromCoords(7, y);
+            let endDate = this.el.getValueFromCoords(9, y);
+
+            if (startDate != null & endDate != null) {
+                let d1 = new Date(startDate);
+                let d2 = new Date(endDate)
+                var months;
+                months = (d2.getFullYear() - d1.getFullYear()) * 12;
+                months += d2.getMonth() - d1.getMonth();
+                this.el.setValueFromCoords(17, y, 1, true);
+                this.el.setValueFromCoords(8, y, months, true);
+            }
+            this.el.setValueFromCoords(17, y, 0, true);
+        }
+
+
+        //unit per pallet euro1
+        if (x == 14) {
+            var col = ("O").concat(parseInt(y) + 1);
+            value = this.el.getValue(`O${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        //unit per pallet euro1
+        if (x == 15) {
+            var col = ("P").concat(parseInt(y) + 1);
+            value = this.el.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        //unit per pallet euro1
+        if (x == 16) {
+            var col = ("Q").concat(parseInt(y) + 1);
+            value = this.el.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
         }
 
 
@@ -211,17 +365,17 @@ class VersionSettingsComponent extends Component {
             var count = 0;
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("11 map---" + map1.get("11"))
-                if (parseInt(map1.get("11")) === 1) {
-                    console.log("map1.get(10)---", map1.get("10"));
-                    console.log("map1.get(12)---", map1.get("12"));
+                console.log("12 map---" + map1.get("12"))
+                if (parseInt(map1.get("12")) === 1) {
+                    console.log("map1.get(11)---", map1.get("11"));
+                    console.log("map1.get(13)---", map1.get("13"));
                     console.log("map1.get(7)---", map1.get("7"));
-                    console.log("map1.get(8)---", map1.get("8"));
+                    console.log("map1.get(9)---", map1.get("9"));
                     var notes = map1.get("4");
                     var startDate = map1.get("7");
-                    var stopDate = map1.get("8");
-                    var id = map1.get("10");
-                    var noOfDaysInMonth = map1.get("12");
+                    var stopDate = map1.get("9");
+                    var id = map1.get("11");
+                    var noOfDaysInMonth = map1.get("13");
                     console.log("start date ---", startDate);
                     console.log("stop date ---", stopDate);
                     console.log("noOfDaysInMonth ---", noOfDaysInMonth);
@@ -232,6 +386,12 @@ class VersionSettingsComponent extends Component {
                     programData.currentVersion.forecastStopDate = stopDate;
                     programData.currentVersion.daysInMonth = noOfDaysInMonth;
                     programData.currentVersion.notes = notes;
+
+
+                    programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                    programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                    programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+
                     programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                     program.programData = programData;
                     // var db1;
@@ -374,12 +534,34 @@ class VersionSettingsComponent extends Component {
                     }
                 }
                 console.log("proList---", proList);
-                this.setState({
-                    datasetList: proList,
-                    uniquePrograms: proList.filter((v, i, a) => a.findIndex(t => (t.programId === v.programId)) === i),
-                    loading: false
 
-                });
+                if (localStorage.getItem("sesForecastProgramIds") != '' && localStorage.getItem("sesForecastProgramIds") != undefined) {
+                    // console.log("program---->>>", JSON.parse(localStorage.getItem("sesForecastProgramIds")));
+                    this.setState({
+                        datasetList: proList,
+                        uniquePrograms: proList.filter((v, i, a) => a.findIndex(t => (t.programId === v.programId)) === i),
+                        loading: false,
+                        programValues: JSON.parse(localStorage.getItem("sesForecastProgramIds")),
+                        // programValues: [{ label: "TZA-CON/ARV-MOH", value: 2551 }]
+
+
+                    }, () => {
+                        var programIds = this.state.programValues.map(x => x.value).join(", ");
+                        programIds = Array.from(new Set(programIds.split(','))).toString();
+                        this.getDatasetById(programIds);
+                        // this.filterData()
+                        //   this.filterTracerCategory(programIds);
+
+                    })
+                } else {
+                    this.setState({
+                        datasetList: proList,
+                        uniquePrograms: proList.filter((v, i, a) => a.findIndex(t => (t.programId === v.programId)) === i),
+                        loading: false
+
+                    });
+                }
+
             }.bind(this);
         }.bind(this);
     }
@@ -400,7 +582,7 @@ class VersionSettingsComponent extends Component {
 
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance.jexcel;
-        elInstance.setValueFromCoords(11, y, 1, true);
+        elInstance.setValueFromCoords(12, y, 1, true);
     }
 
     buildJExcel() {
@@ -425,21 +607,43 @@ class VersionSettingsComponent extends Component {
             } else {
                 data[7] = pd.currentVersion.forecastStartDate
             }
+
+
+            if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStopDate != null) {
+                let d1 = new Date(pd.currentVersion.forecastStartDate);
+                let d2 = new Date(pd.currentVersion.forecastStopDate)
+                var months;
+                months = (d2.getFullYear() - d1.getFullYear()) * 12;
+                months += d2.getMonth() - d1.getMonth();
+                data[8] = months
+            } else {
+                data[8] = 0
+            }
+
+
+
             if (pd.currentVersion.forecastStopDate != null && pd.currentVersion.forecastStopDate != "") {
                 var parts2 = pd.currentVersion.forecastStopDate.split('-');
-                data[8] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
+                data[9] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
             } else {
-                data[8] = pd.currentVersion.forecastStopDate
+                data[9] = pd.currentVersion.forecastStopDate
             }
             // 1-Local 0-Live
-            data[9] = 1
-            data[10] = downloadedDataset[j].id
-            data[11] = 0
-            data[12] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
+            data[10] = 1
+            data[11] = downloadedDataset[j].id
+            data[12] = 0
+            data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
+
+
+            data[14] = (pd.currentVersion.freightPerc == null ? '' : pd.currentVersion.freightPerc)
+            data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
+            data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
+            data[17] = 0;
             versionSettingsArray[count] = data;
             count++;
 
         }
+        // console.log("versionSettingsArray------->", versionSettingsArray);
         var versionTypeId = document.getElementById('versionTypeId').value;
         for (var j = 0; j < versionSettingsList.length; j++) {
             var databytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
@@ -456,11 +660,19 @@ class VersionSettingsComponent extends Component {
                 data[5] = versionList[k].createdDate
                 data[6] = versionList[k].createdBy.username
                 data[7] = versionList[k].forecastStartDate
-                data[8] = versionList[k].forecastStopDate
-                data[9] = 0
-                data[10] = versionList[k].versionId
-                data[11] = 0
-                data[12] = versionList[k].daysInMonth
+                data[8] = ''
+                data[9] = versionList[k].forecastStopDate
+                data[10] = 0
+                data[11] = versionList[k].versionId
+                data[12] = 0
+                data[13] = versionList[k].daysInMonth
+
+
+                data[14] = versionList[k].freightPerc
+                data[15] = versionList[k].forecastThresholdHighPerc
+                data[16] = versionList[k].forecastThresholdLowPerc
+                data[17] = 0;
+
                 if (versionTypeId != "") {
                     if (versionList[k].versionType.id == versionTypeId) {
                         versionSettingsArray[count] = data;
@@ -477,34 +689,36 @@ class VersionSettingsComponent extends Component {
         var json = [];
         var data = versionSettingsArray;
 
+
+        // console.log("versionSettingsArray------->1", data);
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100],
+            colWidths: [100, 120, 60, 80, 150, 100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
                     title: 'programId',
-                    type: 'hidden',
+                    type: 'hidden',//0 A
                 },
                 {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true// 1 B
                 },
                 {
                     title: i18n.t('static.report.version'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true//2 C
                 },
                 {
                     title: i18n.t('static.report.versiontype'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true//3 D
                 },
                 {
                     title: i18n.t('static.program.programDiscription'),
-                    type: 'text'
+                    type: 'text'//4 E
                 },
                 {
                     title: i18n.t('static.program.dateCommitted'),
@@ -512,45 +726,74 @@ class VersionSettingsComponent extends Component {
                     type: 'calendar',
                     options: {
                         format: JEXCEL_DATE_FORMAT_SM
-                    }
+                    }// 5 F
 
 
                 },
                 {
                     title: i18n.t('static.program.commitedbyUser'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true//6 G
                 },
                 {
                     title: i18n.t('static.program.forecastStart'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
-                    }
+                    } // 7 H
+                },
+                {
+                    title: i18n.t('static.versionSettings.ForecastPeriodInMonth'),
+                    type: 'text',
+                    // readOnly: true//8 I
                 },
                 {
                     title: i18n.t('static.program.forecastEnd'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
-                    }
+                    }// 9 J
                 },
                 {
                     title: 'isLocal',
-                    type: 'hidden',
+                    type: 'hidden',//10 K
                 },
                 {
                     title: 'versionId',
-                    type: 'hidden',
+                    type: 'hidden',//11 L
                 },
                 {
                     title: 'isChanged',
-                    type: 'hidden',
+                    type: 'hidden',//12 M
                 },
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
                     source: this.state.noOfDays
+                },//13 N
+
+
+                {
+                    title: i18n.t('static.versionSettings.freight%'),
+                    type: 'numeric',
+                    textEditor: true,
+                    // readOnly: true
+                },//14 O
+                {
+                    title: i18n.t('static.versionSettings.forecastThresholdHigh'),
+                    type: 'numeric',
+                    textEditor: true,
+                    // readOnly: true
+                },//15 P
+                {
+                    title: i18n.t('static.versionSettings.ForecastThresholdLow'),
+                    type: 'numeric',
+                    textEditor: true,
+                    // readOnly: true
+                },//16 Q
+                {
+                    title: 'localCalling',
+                    type: 'hidden',//17 R
                 },
 
             ],
@@ -573,14 +816,22 @@ class VersionSettingsComponent extends Component {
                 var elInstance = el.jexcel;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
-                    if (rowData[9] == 1) {
+                    if (rowData[10] == 1) {
                         var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                         cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
+                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                     }
                     else {
@@ -588,11 +839,20 @@ class VersionSettingsComponent extends Component {
                         cell.classList.add('readonly');
                         cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
+                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
                         cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
-                        cell = elInstance.getCell(("M").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
                     }
+
                 }
             }.bind(this),
             onchange: this.changed,
@@ -639,7 +899,8 @@ class VersionSettingsComponent extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
             var programIds = this.state.programValues.map(x => x.value).join(", ");
-            console.log("program values ---", programIds);
+            // console.log("program------------->>>", this.state.programValues);
+            localStorage.setItem("sesForecastProgramIds", JSON.stringify(this.state.programValues));
             programIds = Array.from(new Set(programIds.split(','))).toString();
             this.getDatasetById(programIds);
             // this.filterData()
