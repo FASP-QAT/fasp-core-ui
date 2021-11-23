@@ -194,7 +194,10 @@ export default class BuildTree extends Component {
         this.pickAMonth3 = React.createRef()
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
+        this.pickAMonth4 = React.createRef()
+        this.pickAMonth5 = React.createRef()
         this.state = {
+            scalingMonth: new Date(),
             showModelingValidation: true,
             scenario: {
                 id: '',
@@ -385,7 +388,8 @@ export default class BuildTree extends Component {
             modelinDataForScenario: [],
             dataSetObj: {
                 programData: ''
-            }
+            },
+            loading: false
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -461,7 +465,39 @@ export default class BuildTree extends Component {
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
         this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
     }
+    filterScalingDataByMonth(date) {
+        // console.log("date--->>>>>>>", date);
+        var json = this.state.modelingEl.getJson(null, false);
+        // console.log("modelingElData>>>", json);
+        var scalingTotal = 0;
+        for (var i = 0; i < json.length; i++) {
+            var calculatedChangeForMonth = 0;
+            var map1 = new Map(Object.entries(json[i]));
+            var startDate = map1.get("3");
+            var stopDate = map1.get("4");
+            var modelingTypeId = map1.get("2");
+            var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
+            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            console.log("modelingTypeId---", modelingTypeId);
+            if (result) {
+                var nodeValue = this.state.currentScenario.calculatedDataValue;
+
+                if (modelingTypeId == 2 || modelingTypeId == 5) {
+                    calculatedChangeForMonth = dataValue;
+                } else if (modelingTypeId == 3 || modelingTypeId == 4) {
+                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
+                }
+            }
+            this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
+            scalingTotal = scalingTotal + calculatedChangeForMonth;
+        }
+        this.setState({ scalingTotal });
+
+    }
+
     updateMomDataPerInDataSet() {
         var json = this.state.momElPer.getJson(null, false);
         console.log("momData>>>", json);
@@ -943,7 +979,7 @@ export default class BuildTree extends Component {
                 var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
                 console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
                 // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                     var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
                     console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
@@ -970,9 +1006,16 @@ export default class BuildTree extends Component {
         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
         // console.log("programData>>>", programData.currentVersion.forecastStartDate);
         // console.log("programData>>>", programData.currentVersion.forecastStopDate);
+        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 });
+        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 });
+        // console.log("programData>>>", { year: moment(programData.currentVersion.forecastStartDate).format("YYYY").slice(1, -1), month: moment(programData.currentVersion.forecastStartDate).format("MM").slice(1, -1) });
+        // maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+        // moment("25/04/2012","DD/MM/YYYY").year()
         this.setState({
             forecastStartDate: programData.currentVersion.forecastStartDate,
             forecastStopDate: programData.currentVersion.forecastStopDate,
+            minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+            maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
         });
     }
     momCheckbox(e) {
@@ -981,10 +1024,10 @@ export default class BuildTree extends Component {
             this.setState({
                 manualChange: e.target.checked == true ? true : false
             }, () => {
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                    this.buildMomJexcelPercent()
-                } else {
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     this.buildMomJexcel();
+                } else {
+                    this.buildMomJexcelPercent();
                 }
                 console.log('manual change---', this.state.manualChange);
             });
@@ -1007,12 +1050,17 @@ export default class BuildTree extends Component {
             });
         }
     }
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        })
+    }
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
-            // this.setState({
-            //     loading: true
-            // })
+            this.setState({
+                loading: true
+            })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
             var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
@@ -1105,7 +1153,8 @@ export default class BuildTree extends Component {
                 console.log("---hurrey---");
                 // })
                 transaction.oncomplete = function (event) {
-                    calculateModelingData(dataSetObj, '');
+
+                    calculateModelingData(dataSetObj, this, "BuildTree");
                     console.log("all good >>>>");
                     this.setState({
                         items,
@@ -1260,27 +1309,41 @@ export default class BuildTree extends Component {
     acceptValue() {
         // console.log(">>>>", this.state.currentRowIndex);
         var elInstance = this.state.modelingEl;
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+        if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
+
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, 5, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             } else if (this.state.currentModelingType == 3) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             } else if (this.state.currentModelingType == 4) {
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
             }
         }
+        this.setState({ showCalculatorFields: false });
 
     }
     calculateMomByEndValue(e) {
@@ -1296,7 +1359,7 @@ export default class BuildTree extends Component {
         var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
-        var getValue = e.target.value;
+        var getValue = e.target.value.toString().replaceAll(",","");
         // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
         //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
@@ -1306,17 +1369,17 @@ export default class BuildTree extends Component {
         //     getValue = e.target.value
         // }
         if (this.state.currentModelingType == 2) {
-            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-                var getChangeInPercent = (parseFloat(e.target.value - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
+            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
+                var getChangeInPercent = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
                 // console.log("getChangeInPercent>>>",getChangeInPercent);
                 // console.log("momValue>>>",momValue)
             } else {
                 // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
-                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
+                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
             }
         }
         if (this.state.currentModelingType == 4) {
@@ -1325,12 +1388,12 @@ export default class BuildTree extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(e.target.value - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
+            var momValue = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(2);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
-        if (this.state.currentItemConfig.context.payload.nodeType.id != 3) {
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(2);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(2);
         }
@@ -1364,7 +1427,7 @@ export default class BuildTree extends Component {
             var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                 var getChangeInPercent = e.target.value;
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
             } else {
@@ -1731,6 +1794,11 @@ export default class BuildTree extends Component {
         this.el = modelingEl;
         this.setState({
             modelingEl: modelingEl
+        },()=>{
+
+            console.log("curDate---", curDate)
+            var curDate = "2021-11-01";
+            this.filterScalingDataByMonth(curDate);
         }
         );
     }
@@ -2048,6 +2116,7 @@ export default class BuildTree extends Component {
     }
 
     getDatasetList() {
+        this.setState({ loading: true });
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3297,7 +3366,6 @@ export default class BuildTree extends Component {
 
     componentDidMount() {
 
-
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
@@ -3940,7 +4008,7 @@ export default class BuildTree extends Component {
         });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = this.state.currentScenario.month;
 
@@ -4099,6 +4167,22 @@ export default class BuildTree extends Component {
 
         if (event.target.name == "active") {
             treeTemplate.active = event.target.id === "active11" ? false : true;
+        }
+
+        if (event.target.name == "modelingType") {
+            if (event.target.id === "active1") {
+                this.state.currentModelingType = 4
+            }
+            else if (event.target.id === "active2") {
+                this.state.currentModelingType = 3
+            }
+            else if (event.target.id === "active3") {
+                this.state.currentModelingType = 2
+            }
+            else {
+                this.state.currentModelingType = 5
+            }
+
         }
 
         if (event.target.name === "sharePlanningUnit") {
@@ -4603,14 +4687,28 @@ export default class BuildTree extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
+                            // labelString: "",
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black',
-                            stepSize: 100000
+                            stepSize: 100000,
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -4622,13 +4720,20 @@ export default class BuildTree extends Component {
                         id: 'B',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: "% of " + (this.state.numberNode ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black'
+                            fontColor: 'black',
+                            callback: function (value) {
+                                var cell1 = value + " %";
+                                return cell1;
+
+                            },
+                            min: 0,
+                            max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -4645,7 +4750,35 @@ export default class BuildTree extends Component {
                     }
                 }]
             },
+            tooltips: {
+                enabled: true,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        // console.log("tooltipItem---", tooltipItem);
+                        // console.log("tooltipItem data---", data);
+                        if (tooltipItem.datasetIndex == 1) {
+                            let label = data.labels[tooltipItem.index];
+                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
 
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        } else {
+                            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                        }
+                    }
+                }
+
+            },
             maintainAspectRatio: false
             ,
             legend: {
@@ -4748,186 +4881,186 @@ export default class BuildTree extends Component {
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Scenario</Label>
-                                        <Input type="text"
-                                            name="scenarioTxt"
-                                            bsSize="sm"
-                                            readOnly={true}
-                                            value={this.state.selectedScenarioLabel}
-                                        ></Input>
-                                    </FormGroup>
-                                    {this.state.level0 &&
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Parent</Label>
+                                            <Label htmlFor="currencyId">Scenario</Label>
                                             <Input type="text"
-                                                name="parent"
+                                                name="scenarioTxt"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={this.state.currentItemConfig.context.level != 0
-                                                    && this.state.addNodeFlag !== "true"
-                                                    ? this.state.currentItemConfig.parentItem.payload.label.label_en
-                                                    : this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                                value={this.state.selectedScenarioLabel}
                                             ></Input>
-                                        </FormGroup>}
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="nodeTitle"
-                                            name="nodeTitle"
-                                            bsSize="sm"
-                                            valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
-                                            invalid={touched.nodeTitle && !!errors.nodeTitle}
-                                            onBlur={handleBlur}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            value={this.state.currentItemConfig.context.payload.label.label_en}>
-                                        </Input>
-                                        <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
-                                    </FormGroup>
-                                    <div>
-                                        <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
-                                            <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
-                                        </Popover>
-                                    </div>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                        <Input
-                                            type="select"
-                                            id="nodeTypeId"
-                                            name="nodeTypeId"
-                                            bsSize="sm"
-                                            valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
-                                            invalid={touched.nodeTypeId && !!errors.nodeTypeId}
-                                            onBlur={handleBlur}
-                                            onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
-                                            required
-                                            value={this.state.currentItemConfig.context.payload.nodeType.id}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {this.state.nodeTypeFollowUpList.length > 0
-                                                && this.state.nodeTypeFollowUpList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.id}>
-                                                            {getLabelText(item.label, this.state.lang)}
-                                                        </option>
-                                                    )
-                                                }, this)}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
-                                    </FormGroup>
-                                   
-                                    {this.state.aggregationNode &&
-                                        
+                                        </FormGroup>
+                                        {this.state.level0 &&
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">Parent</Label>
+                                                <Input type="text"
+                                                    name="parent"
+                                                    bsSize="sm"
+                                                    readOnly={true}
+                                                    value={this.state.currentItemConfig.context.level != 0
+                                                        && this.state.addNodeFlag !== "true"
+                                                        ? this.state.currentItemConfig.parentItem.payload.label.label_en
+                                                        : this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                                ></Input>
+                                            </FormGroup>}
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                type="select"
-                                                id="nodeUnitId"
-                                                name="nodeUnitId"
+                                            <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="nodeTitle"
+                                                name="nodeTitle"
                                                 bsSize="sm"
-                                                valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
-                                                invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
+                                                invalid={touched.nodeTitle && !!errors.nodeTitle}
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                value={this.state.currentItemConfig.context.payload.label.label_en}>
+                                            </Input>
+                                            <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
+                                        </FormGroup>
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
+                                                <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                            </Popover>
+                                        </div>
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Input
+                                                type="select"
+                                                id="nodeTypeId"
+                                                name="nodeTypeId"
+                                                bsSize="sm"
+                                                valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
+                                                invalid={touched.nodeTypeId && !!errors.nodeTypeId}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.nodeTypeChange(e.target.value); this.dataChange(e) }}
                                                 required
-                                                disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
-                                                value={this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                                value={this.state.currentItemConfig.context.payload.nodeType.id}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.nodeUnitList.length > 0
-                                                    && this.state.nodeUnitList.map((item, i) => {
+                                                {this.state.nodeTypeFollowUpList.length > 0
+                                                    && this.state.nodeTypeFollowUpList.map((item, i) => {
                                                         return (
-                                                            <option key={i} value={item.unitId}>
+                                                            <option key={i} value={item.id}>
                                                                 {getLabelText(item.label, this.state.lang)}
                                                             </option>
                                                         )
                                                     }, this)}
                                             </Input>
-                                            <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
-                                        </FormGroup>}
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                                        <div className="controls edit">
-                                            <Picker
+                                            <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
+                                        </FormGroup>
 
-                                                id="month"
-                                                name="month"
-                                                ref={this.pickAMonth1}
-                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                value={{
-                                                    year:
-                                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
-                                                }}
-                                                lang={pickerLang.months}
-                                                // theme="dark"
-                                                onChange={this.handleAMonthChange1}
-                                                onDismiss={this.handleAMonthDissmis1}
-                                            >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
-                                                    onClick={this.handleClickMonthBox1} />
-                                            </Picker>
-                                        </div>
-                                    </FormGroup>
-                                    
+                                        {this.state.aggregationNode &&
 
-                                    {this.state.numberNode &&
-                                        <>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
-                                                <Input type="text"
-                                                    id="percentageOfParent"
-                                                    name="percentageOfParent"
+                                                <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                                <Input
+                                                    type="select"
+                                                    id="nodeUnitId"
+                                                    name="nodeUnitId"
                                                     bsSize="sm"
-                                                    // valid={!errors.percentageOfParent && this.state.currentScenario.dataValue != ''}
-                                                    // invalid={touched.percentageOfParent && !!errors.percentageOfParent}
-                                                    // onBlur={handleBlur}
+                                                    valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
+                                                    invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                    onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    // step={.01}
-                                                    value={this.state.currentScenario.dataValue}></Input>
-                                                <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
-                                                <Input type="text"
-                                                    id="parentValue"
-                                                    name="parentValue"
-                                                    bsSize="sm"
-                                                    readOnly={true}
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    // value={this.state.addNodeFlag != "true" ? addCommas(this.state.parentScenario.calculatedDataValue) : addCommas(this.state.parentValue)}
-                                                    value={addCommas(this.state.parentValue)}
-                                                ></Input>
-                                            </FormGroup></>}
-                                    {this.state.aggregationNode &&
+                                                    required
+                                                    disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
+                                                    value={this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {this.state.nodeUnitList.length > 0
+                                                        && this.state.nodeUnitList.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.unitId}>
+                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+                                                </Input>
+                                                <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
+                                            </FormGroup>}
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Value{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                id="nodeValue"
-                                                name="nodeValue"
-                                                bsSize="sm"
-                                                // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
-                                                // invalid={touched.nodeValue && !!errors.nodeValue}
-                                                onBlur={handleBlur}
-                                                readOnly={this.state.numberNode ? true : false}
-                                                onChange={(e) => { this.dataChange(e) }}
-                                                // step={.01}
-                                                // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                value={this.state.numberNode ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
-                                            ></Input>
-                                            {/* <FormFeedback className="red">{errors.nodeValue}</FormFeedback> */}
-                                        </FormGroup>}
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                            <div className="controls edit">
+                                                <Picker
 
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">Notes</Label>
-                                        <Input type="textarea"
-                                            id="notes"
-                                            name="notes"
-                                            onChange={(e) => { this.dataChange(e) }}
-                                            // value={this.getNotes}
-                                            value={this.state.currentScenario.notes}
-                                        ></Input>
-                                    </FormGroup>
-                                        </div>
+                                                    id="month"
+                                                    name="month"
+                                                    ref={this.pickAMonth1}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={{
+                                                        year:
+                                                            new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                    }}
+                                                    lang={pickerLang.months}
+                                                    // theme="dark"
+                                                    onChange={this.handleAMonthChange1}
+                                                    onDismiss={this.handleAMonthDissmis1}
+                                                >
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                        onClick={this.handleClickMonthBox1} />
+                                                </Picker>
+                                            </div>
+                                        </FormGroup>
+
+
+                                        {this.state.numberNode &&
+                                            <>
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        id="percentageOfParent"
+                                                        name="percentageOfParent"
+                                                        bsSize="sm"
+                                                        // valid={!errors.percentageOfParent && this.state.currentScenario.dataValue != ''}
+                                                        // invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                        // onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        // step={.01}
+                                                        value={this.state.currentScenario.dataValue}></Input>
+                                                    <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        id="parentValue"
+                                                        name="parentValue"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        // value={this.state.addNodeFlag != "true" ? addCommas(this.state.parentScenario.calculatedDataValue) : addCommas(this.state.parentValue)}
+                                                        value={addCommas(this.state.parentValue)}
+                                                    ></Input>
+                                                </FormGroup></>}
+                                        {this.state.aggregationNode &&
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">Node Value{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
+                                                <Input type="text"
+                                                    id="nodeValue"
+                                                    name="nodeValue"
+                                                    bsSize="sm"
+                                                    // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                    // invalid={touched.nodeValue && !!errors.nodeValue}
+                                                    onBlur={handleBlur}
+                                                    readOnly={this.state.numberNode ? true : false}
+                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    // step={.01}
+                                                    // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                                    value={this.state.numberNode ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
+                                                ></Input>
+                                                {/* <FormFeedback className="red">{errors.nodeValue}</FormFeedback> */}
+                                            </FormGroup>}
+
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">Notes</Label>
+                                            <Input type="textarea"
+                                                id="notes"
+                                                name="notes"
+                                                onChange={(e) => { this.dataChange(e) }}
+                                                // value={this.getNotes}
+                                                value={this.state.currentScenario.notes}
+                                            ></Input>
+                                        </FormGroup>
+                                    </div>
                                     {/* Planning unit start */}
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div>
@@ -5515,23 +5648,24 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">Start Month<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="">Month<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 // value={this.state.singleValue2}
                                 value={{
                                     year:
-                                        new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                        new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2)
                                 }}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                             // className="ReadonlyPicker"
                             >
-                                <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                <MonthBox value={this.makeText({ year: new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
@@ -5575,47 +5709,50 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
                                             <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                ref={this.pickAMonth4}
+                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                onChange={this.handleAMonthChange4}
+                                                onDismiss={this.handleAMonthDissmis4}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
                                             <Picker
-                                                ref={this.pickAMonth2}
-                                                years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                ref={this.pickAMonth5}
+                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
-                                                onChange={this.handleAMonthChange2}
-                                                onDismiss={this.handleAMonthDissmis2}
+                                                onChange={this.handleAMonthChange5}
+                                                onDismiss={this.handleAMonthDissmis5}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox2} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
                                                 name="startValue"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={this.state.currentScenario.calculatedDataValue}
+                                                value={addCommas(this.state.currentScenario.calculatedDataValue)}
 
                                             >
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <FormGroup className="col-md-6">
+                                        }
+                                        {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startPercentage"
@@ -5633,13 +5770,13 @@ export default class BuildTree extends Component {
                                         {/* <div className="row"> */}
 
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Ending {this.state.currentItemConfig.context.payload.nodeType.id != 3 ? 'Value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">Target ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
-                                                value={this.state.currentEndValue}
+                                                value={addCommas(this.state.currentEndValue)}
                                                 readOnly={this.state.currentEndValueEdit}
                                             >
                                             </Input>
@@ -5650,7 +5787,7 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">or</Label>
                                         </FormGroup>
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Target change %<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
@@ -5698,13 +5835,14 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6"></FormGroup>
                                         <FormGroup className="col-md-6" >
                                             <div className="check inline  pl-lg-1 pt-lg-2">
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
                                                         id="active1"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 4 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                     />
                                                     <Label
@@ -5713,13 +5851,14 @@ export default class BuildTree extends Component {
                                                         <b>{'Exponential (%)'}</b>
                                                     </Label>
                                                 </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input Radioactive checkboxMargin"
                                                         type="radio"
                                                         id="active2"
                                                         name="modelingType"
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentModelingType == 3) ? true : false}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id > 2 || this.state.currentModelingType == 3) ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5729,13 +5868,14 @@ export default class BuildTree extends Component {
                                                     </Label>
                                                 </div>
                                                 }
-                                                {this.state.currentItemConfig.context.payload.nodeType.id != 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
                                                         id="active3"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 2 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5744,13 +5884,14 @@ export default class BuildTree extends Component {
                                                         <b>{'Linear (#)'}</b>
                                                     </Label>
                                                 </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id == 3 && <div className="col-md-12 form-group">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <div className="col-md-12 form-group">
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="radio"
                                                         id="active4"
                                                         name="modelingType"
                                                         checked={this.state.currentModelingType == 5 ? true : false}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
                                                     />
                                                     <Label
@@ -5891,7 +6032,8 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b> for node <b>{getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang)}</b> as a % of parent <b>{getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang)}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> for node <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a % of parent <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
+                                {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"}>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
@@ -5958,9 +6100,10 @@ export default class BuildTree extends Component {
         console.log("text>>>", month)
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
-        let { currentItemConfig } = this.state;
-        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
-        this.setState({ currentItemConfig }, () => {
+        this.filterScalingDataByMonth(date);
+        // let { currentItemConfig } = this.state;
+        // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
+        this.setState({ scalingMonth: date }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });
         //
@@ -6024,6 +6167,45 @@ export default class BuildTree extends Component {
 
     handleClickMonthBox3 = (e) => {
         this.pickAMonth3.current.show()
+    }
+
+    handleClickMonthBox4 = (e) => {
+        this.pickAMonth4.current.show()
+    }
+    handleAMonthChange4 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
+
+        });
+
+    }
+    handleAMonthDissmis4 = (value) => {
+        // console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
+        // this.fetchData();
+        // })
+
+    }
+
+
+    handleClickMonthBox5 = (e) => {
+        this.pickAMonth5.current.show()
+    }
+    handleAMonthChange5 = (year, month) => {
+        // console.log("value>>>", year);
+        // console.log("text>>>", month)
+        this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
+
+        });
+
+    }
+    handleAMonthDissmis5 = (value) => {
+        // console.log("dismiss>>", value);
+        // this.setState({ singleValue2: value, }, () => {
+        // this.fetchData();
+        // })
+
     }
 
     updateTreeData() {
@@ -6226,6 +6408,7 @@ export default class BuildTree extends Component {
                                     month: '',
                                     dataValue: "",
                                     calculatedDataValue: '',
+                                    nodeDataModelingList: [],
                                     fuNode: {
                                         noOfForecastingUnitsPerPerson: '',
                                         usageFrequency: '',
@@ -6274,6 +6457,7 @@ export default class BuildTree extends Component {
                                         fuNode: {
                                             noOfForecastingUnitsPerPerson: '',
                                             usageFrequency: '',
+                                            nodeDataModelingList: [],
                                             forecastingUnit: {
                                                 label: {
                                                     label_en: ''
@@ -6822,12 +7006,31 @@ export default class BuildTree extends Component {
                                                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                             value={singleValue2}
                                                                             lang={pickerLang.months}
-                                                                            theme="dark"
+                                                                            // theme="dark"
                                                                             onChange={this.handleAMonthChange3}
                                                                             onDismiss={this.handleAMonthDissmis3}
                                                                         >
                                                                             <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
                                                                         </Picker>
+
+                                                                        {/* <Picker
+
+                                                                            id="month"
+                                                                            name="month"
+                                                                            ref={this.pickAMonth1}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                            value={{
+                                                                                year:
+                                                                                    new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                                            }}
+                                                                            lang={pickerLang.months}
+                                                                            // theme="dark"
+                                                                            onChange={this.handleAMonthChange1}
+                                                                            onDismiss={this.handleAMonthDissmis1}
+                                                                        >
+                                                                            <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                                                onClick={this.handleClickMonthBox1} />
+                                                                        </Picker> */}
                                                                     </div>
                                                                 </FormGroup>
 
@@ -6885,13 +7088,25 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div class="sample">
+
+                                                    <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
                                                             <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
                                                         </Provider>
+                                                    </div>
+                                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                            <div class="align-items-center">
+                                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
@@ -7062,56 +7277,56 @@ export default class BuildTree extends Component {
             {/* Modal end------------------------ */}
             {/* Modal start------------------- */}
             {/* <Draggable handle=".modal-title"> */}
-                <Modal isOpen={this.state.openAddNodeModal}
-                    className={'modal-xl '} >
-                    <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
-                            this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
-                                (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
-                                    (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
-                                            (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
-                                        )))}
-                            <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                        <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
-                    </ModalHeader>
-                    <ModalBody>
-                        <Row>
-                            <Col xs="12" md="12" className="mb-4">
+            <Modal isOpen={this.state.openAddNodeModal}
+                className={'modal-xl '} >
+                <ModalHeader className="modalHeaderSupplyPlan hideCross">
+                    <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                        this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
+                            (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                    (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
+                                    )))}
+                        <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                </ModalHeader>
+                <ModalBody>
+                    <Row>
+                        <Col xs="12" md="12" className="mb-4">
 
-                                <Nav tabs>
-                                    <NavItem>
-                                        <NavLink
-                                            active={this.state.activeTab1[0] === '1'}
-                                            onClick={() => { this.toggleModal(0, '1'); }}
-                                        >
-                                            Node Data
-                                        </NavLink>
-                                    </NavItem>
-                                    <NavItem>
-                                        <NavLink
-                                            active={this.state.activeTab1[0] === '2'}
-                                            onClick={() => { this.toggleModal(0, '2'); }}
-                                        >
-                                            Modeling/Transfer
-                                        </NavLink>
-                                    </NavItem>
+                            <Nav tabs>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '1'}
+                                        onClick={() => { this.toggleModal(0, '1'); }}
+                                    >
+                                        Node Data
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '2'}
+                                        onClick={() => { this.toggleModal(0, '2'); }}
+                                    >
+                                        Modeling/Transfer
+                                    </NavLink>
+                                </NavItem>
 
-                                </Nav>
-                                <TabContent activeTab={this.state.activeTab1[0]}>
-                                    {this.tabPane1()}
-                                </TabContent>
-                            </Col>
-                        </Row>
+                            </Nav>
+                            <TabContent activeTab={this.state.activeTab1[0]}>
+                                {this.tabPane1()}
+                            </TabContent>
+                        </Col>
+                    </Row>
 
-                    </ModalBody>
-                    <ModalFooter>
-                        {/* <Button size="md" onClick={(e) => {
+                </ModalBody>
+                <ModalFooter>
+                    {/* <Button size="md" onClick={(e) => {
                         this.state.addNodeFlag ? this.onAddButtonClick(this.state.currentItemConfig) : this.updateNodeInfoInJson(this.state.currentItemConfig)
                     }} color="success" className="submitBtn float-right mr-1" type="button"> <i className="fa fa-check"></i>Submit</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                    </ModalFooter>
-                </Modal>
+                </ModalFooter>
+            </Modal>
             {/* </Draggable > */}
             {/* Scenario Modal end------------------------ */}
 
