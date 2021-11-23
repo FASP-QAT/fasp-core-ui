@@ -529,7 +529,7 @@ export default class BuildTree extends Component {
             tempArray.push(tempJson);
             nodeDataMap[1] = tempArray;
             var tempTree = {
-                treeId : parseInt(maxTreeId) + 1,
+                treeId: parseInt(maxTreeId) + 1,
                 active: curTreeObj.active,
                 forecastMethod: curTreeObj.forecastMethod,
                 label: curTreeObj.label,
@@ -572,9 +572,10 @@ export default class BuildTree extends Component {
             treeData.push(tempTree);
             console.log("create update tree object--->>>", treeData);
             this.setState({
-                treeData
-            },()=>{
-                console.log("---------->>>>>>>>",this.state.regionValues);
+                treeData,
+                openTreeDataModal: false
+            }, () => {
+                console.log("---------->>>>>>>>", this.state.regionValues);
             })
 
         }
@@ -2364,6 +2365,7 @@ export default class BuildTree extends Component {
 
     }
     handleRegionChange = (regionIds) => {
+        console.log("regionIds---", regionIds);
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label)
@@ -2409,10 +2411,15 @@ export default class BuildTree extends Component {
             console.log("tree data---", this.state.treeData);
             var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
             console.log("curTreeObj---", curTreeObj)
+            var regionValues = (curTreeObj.regionList).map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+            }, this);
+            console.log("regionValues--->>>>",regionValues);
             this.setState({
                 curTreeObj,
                 scenarioList: curTreeObj.scenarioList,
-                regionList: curTreeObj.regionList
+                regionValues
             }, () => {
                 console.log("my items--->", this.state.items);
             });
@@ -6460,7 +6467,7 @@ export default class BuildTree extends Component {
         const { regionList } = this.state;
         let regionMultiList = regionList.length > 0
             && regionList.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
 
             }, this);
 
