@@ -252,7 +252,9 @@ export default class BuildTree extends Component {
             regionList: [],
             curTreeObj: {
                 forecastMethod: { id: '' },
-                label: { label_en: '' }
+                label: { label_en: '' },
+                notes: '',
+                active: true
             },
             treeData: [],
             openAddScenarioModal: false,
@@ -467,6 +469,115 @@ export default class BuildTree extends Component {
         this.updateTreeData = this.updateTreeData.bind(this);
         this.updateState = this.updateState.bind(this);
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
+        this.createOrUpdateTree = this.createOrUpdateTree.bind(this);
+        this.treeDataChange = this.treeDataChange.bind(this);
+    }
+
+
+    createOrUpdateTree() {
+        if (this.state.treeId != null) {
+            console.log("inside if hurrey------------------")
+        } else {
+
+            const { treeData } = this.state;
+            const { curTreeObj } = this.state;
+            var maxTreeId = Math.max(...treeData.map(o => o.treeId));
+            console.log("tree data----", treeData)
+            // curTreeObj.treeId = parseInt(maxTreeId) + 1;
+            var nodeDataMap = {};
+            var tempArray = [];
+            var tempJson = {
+                notes: '',
+                month: '',
+                dataValue: "",
+                calculatedDataValue: '',
+                nodeDataModelingList: [],
+                fuNode: {
+                    noOfForecastingUnitsPerPerson: '',
+                    usageFrequency: '',
+                    forecastingUnit: {
+                        label: {
+                            label_en: ''
+                        },
+                        tracerCategory: {
+
+                        },
+                        unit: {
+                            id: ''
+                        }
+                    },
+                    usageType: {
+                        id: ''
+                    },
+                    usagePeriod: {
+                        usagePeriodId: ''
+                    },
+                    repeatUsagePeriod: {
+
+                    },
+                    noOfPersons: ''
+                },
+                puNode: {
+                    planningUnit: {
+                        unit: {
+
+                        }
+                    },
+                    refillMonths: ''
+                }
+            };
+            tempArray.push(tempJson);
+            nodeDataMap[1] = tempArray;
+            var tempTree = {
+                treeId : parseInt(maxTreeId) + 1,
+                active: curTreeObj.active,
+                forecastMethod: curTreeObj.forecastMethod,
+                label: curTreeObj.label,
+                notes: curTreeObj.notes,
+                regionList: [],
+                scenarioList: [{
+                    id: 1,
+                    label: {
+                        label_en: "Default"
+                    }
+                }],
+                tree: {
+                    flatList: [{
+                        id: 1,
+                        level: 0,
+                        parent: null,
+                        sortOrder: "00",
+                        payload: {
+                            label: {
+                                label_en: ''
+                            },
+                            nodeType: {
+                                id: 2
+                            },
+                            nodeUnit: {
+                                id: ''
+                            },
+                            nodeDataMap: nodeDataMap
+                        },
+                        parentItem: {
+                            payload: {
+                                nodeUnit: {
+
+                                }
+                            }
+                        }
+                    }]
+                }
+            }
+            treeData.push(tempTree);
+            console.log("create update tree object--->>>", treeData);
+            this.setState({
+                treeData
+            },()=>{
+                console.log("---------->>>>>>>>",this.state.regionValues);
+            })
+
+        }
     }
     filterScalingDataByMonth(date) {
         // console.log("date--->>>>>>>", date);
@@ -1359,7 +1470,7 @@ export default class BuildTree extends Component {
         var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
-        var getValue = e.target.value.toString().replaceAll(",","");
+        var getValue = e.target.value.toString().replaceAll(",", "");
         // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
         //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
@@ -1369,7 +1480,7 @@ export default class BuildTree extends Component {
         //     getValue = e.target.value
         // }
         if (this.state.currentModelingType == 2) {
-            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -1379,7 +1490,7 @@ export default class BuildTree extends Component {
                 // console.log("momValue>>>",momValue)
             } else {
                 // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
-                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",",""))) / monthDifference).toFixed(2);
+                var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(2);
             }
         }
         if (this.state.currentModelingType == 4) {
@@ -1794,7 +1905,7 @@ export default class BuildTree extends Component {
         this.el = modelingEl;
         this.setState({
             modelingEl: modelingEl
-        },()=>{
+        }, () => {
 
             console.log("curDate---", curDate)
             var curDate = "2021-11-01";
@@ -2136,15 +2247,18 @@ export default class BuildTree extends Component {
                     datasetList: myResult
                 }, () => {
                     var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-                    var dataEnc = dataSetObj;
-                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    console.log("dataSetObj.programData***>>>", programData);
-                    this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-                        // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
-                        calculateModelingData(dataEnc, this, "BuildTree");
-                    });
-
+                    if (dataSetObj != null) {
+                        var dataEnc = dataSetObj;
+                        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        console.log("dataSetObj.programData***>>>", programData);
+                        this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
+                            // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
+                            calculateModelingData(dataEnc, this, "BuildTree");
+                        });
+                    } else {
+                        this.setState({ loading: false })
+                    }
 
 
 
@@ -2306,7 +2420,7 @@ export default class BuildTree extends Component {
             this.setState({
                 curTreeObj: [],
                 scenarioList: [],
-                regionList: [],
+                // regionList: [],
                 items: [],
                 selectedScenario: ''
             });
@@ -4062,6 +4176,40 @@ export default class BuildTree extends Component {
             scenario
         });
     }
+    treeDataChange(event) {
+        console.log("event---", event);
+        let { curTreeObj } = this.state;
+        if (event.target.name === "treeName") {
+            var label = {
+                label_en: event.target.value
+            }
+            curTreeObj.label = label;
+
+        }
+        if (event.target.name == "active") {
+            curTreeObj.active = event.target.id === "active11" ? false : true;
+        }
+
+        if (event.target.name === "forecastMethodId") {
+            console.log("event.target.value----", event.target.value);
+            // var forecastMethodId = event.target.value;
+            var forecastMethod = {
+                id: event.target.value
+            };
+            curTreeObj.forecastMethod = forecastMethod;
+            console.log("immidiate tree--->", curTreeObj);
+        }
+
+        if (event.target.name === "treeNotes") {
+            curTreeObj.notes = event.target.value;
+        }
+
+
+        this.setState({ curTreeObj }, () => {
+            console.log("curTreeObj---", curTreeObj);
+        });
+
+    }
     dataChange(event) {
         // alert("hi");
         console.log("event---", event);
@@ -4154,20 +4302,6 @@ export default class BuildTree extends Component {
             // this.getTreeByTreeId(event.target.value);
         }
 
-        if (event.target.name === "treeName") {
-            curTreeObj.label.label_en = event.target.value;
-        }
-        if (event.target.name === "forecastMethodId") {
-            curTreeObj.forecastMethod.id = event.target.value;
-        }
-
-        if (event.target.name === "treeNotes") {
-            curTreeObj.notes = event.target.value;
-        }
-
-        if (event.target.name == "active") {
-            treeTemplate.active = event.target.id === "active11" ? false : true;
-        }
 
         if (event.target.name == "modelingType") {
             if (event.target.id === "active1") {
@@ -4720,7 +4854,7 @@ export default class BuildTree extends Component {
                         id: 'B',
                         scaleLabel: {
                             display: true,
-                            labelString: "% of " + (this.state.numberNode ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
+                            labelString: "% of " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -6266,6 +6400,9 @@ export default class BuildTree extends Component {
                     const dropResult = monitor.getDropResult()
                     if (dropResult) {
                         onMoveItem(dropResult.id, item.id);
+                        // *****************
+                        // console.log("anchal***************************************");
+                        // this.createOrUpdateTree();
                     }
                 },
             },
@@ -6645,7 +6782,7 @@ export default class BuildTree extends Component {
                                                     this.setState({
                                                         openTreeDataModal: true
                                                     })
-                                                }}><i className="fa fa-plus-square"></i></a>
+                                                }}><i className="fa fa-cog"></i></a>
                                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                     onClick={() => this.exportPDF()}
                                                 />
@@ -6914,43 +7051,6 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                                {/* <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
-                                                                    <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="forecastMethodId"
-                                                                        id="forecastMethodId"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.forecastMethodId && this.state.treeTemplate.forecastMethod.id != ''}
-                                                                        invalid={touched.forecastMethodId && !!errors.forecastMethodId}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        value={this.state.treeTemplate.forecastMethod.id}
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {forecastMethods}
-                                                                    </Input>
-                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                                </FormGroup>
-
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="treeName"
-                                                                        id="treeName"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
-                                                                        invalid={touched.treeName && !!errors.treeName}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.treeTemplate.label.label_en}
-                                                                    >
-                                                                    </Input>
-                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
-                                                                </FormGroup> */}
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId" style={{ visibility: 'hidden' }}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
@@ -7153,9 +7253,9 @@ export default class BuildTree extends Component {
                                 name="forecastMethodId"
                                 id="forecastMethodId"
                                 bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
+                                onChange={(e) => { this.treeDataChange(e) }}
                                 required
-                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.forecastMethod.id : ''}
+                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
                             >
                                 <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
                                 {forecastMethods}
@@ -7167,8 +7267,8 @@ export default class BuildTree extends Component {
                                 id="treeName"
                                 name="treeName"
                                 bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.label.label_en : ''}
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
                             ></Input>
                         </FormGroup>
                         <FormGroup className="col-md-12">
@@ -7180,7 +7280,7 @@ export default class BuildTree extends Component {
                                     name="regionId"
                                     id="regionId"
                                     bsSize="sm"
-                                    value={regionMultiList}
+                                    value={this.state.regionValues}
                                     onChange={(e) => { this.handleRegionChange(e) }}
                                     options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
                                     labelledBy={i18n.t('static.common.regiontext')}
@@ -7192,8 +7292,8 @@ export default class BuildTree extends Component {
                             <Input type="textarea"
                                 id="treeNotes"
                                 name="treeNotes"
-                                onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.curTreeObj != "" ? this.state.curTreeObj.notes : ''}
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
                             ></Input>
                         </FormGroup>
                         <FormGroup className="col-md-12">
@@ -7206,7 +7306,7 @@ export default class BuildTree extends Component {
                                     name="active"
                                     value={true}
                                     checked={this.state.curTreeObj.active === true}
-                                    onChange={(e) => { this.dataChange(e) }}
+                                    onChange={(e) => { this.treeDataChange(e) }}
                                 />
                                 <Label
                                     className="form-check-label"
@@ -7222,7 +7322,7 @@ export default class BuildTree extends Component {
                                     name="active"
                                     value={false}
                                     checked={this.state.curTreeObj.active === false}
-                                    onChange={(e) => { this.dataChange(e) }}
+                                    onChange={(e) => { this.treeDataChange(e) }}
                                 />
                                 <Label
                                     className="form-check-label"
@@ -7234,7 +7334,7 @@ export default class BuildTree extends Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" size="md" onClick={(e) => { this.addScenario() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
