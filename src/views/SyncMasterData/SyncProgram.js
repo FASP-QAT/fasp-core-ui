@@ -55,6 +55,7 @@ export default class SyncProgram extends Component {
     }
 
     componentDidMount() {
+        console.log("In sync Program+++");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -87,15 +88,14 @@ export default class SyncProgram extends Component {
                 // var readonlyProgramList = myResult.filter(c => c.readonly);
                 console.log("MyResult+++", myResult);
                 this.setState({
-                    totalMasters: myResult.length,
+                    totalMasters: myResult.length + 1,
                     loading: false,
                     programList: programList
                 }, () => {
                     if (programList.length > 0) {
                         this.syncPrograms(programList);
                     } else {
-                        let id = AuthenticationService.displayDashboardBasedOnRole();
-                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                        this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                     }
                 })
             }.bind(this)
@@ -136,7 +136,8 @@ export default class SyncProgram extends Component {
                             programIdsToLoad.push(programList[i].programId);
                             var syncedMasters = this.state.syncedMasters;
                             this.setState({
-                                syncedMasters: syncedMasters + 1
+                                syncedMasters: syncedMasters + 1,
+                                syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                             })
                         } else {
                             if (programList[i].programModified) {
@@ -150,12 +151,14 @@ export default class SyncProgram extends Component {
                                     programIdsToLoad.push(programList[i].programId);
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 } else {
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 }
                             } else {
@@ -169,12 +172,14 @@ export default class SyncProgram extends Component {
                                     programIdsToLoad.push(programList[i].programId);
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 } else {
                                     var syncedMasters = this.state.syncedMasters;
                                     this.setState({
-                                        syncedMasters: syncedMasters + 1
+                                        syncedMasters: syncedMasters + 1,
+                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                     })
                                 }
                             }
@@ -182,7 +187,7 @@ export default class SyncProgram extends Component {
                     } else {
                         // User ka pass latest version hai
                         // Readonly version ki list lao
-                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly);
+                        var readonlyProgramList = programList.filter(c => c.programId == programList[i].programId && c.readonly && c.version != latestVersion);
                         // Sare readonly versions ko delete karo
                         for (var j = 0; j < readonlyProgramList.length; j++) {
                             var index = readonlyProgramToBeDeleted.findIndex(c => c.id == readonlyProgramList[j].id);
@@ -192,12 +197,13 @@ export default class SyncProgram extends Component {
                         }
                         var syncedMasters = this.state.syncedMasters;
                         this.setState({
-                            syncedMasters: syncedMasters + 1
+                            syncedMasters: syncedMasters + 1,
+                            syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                         })
                     }
                 }
                 console.log("outside for+++");
-                if (this.state.syncedMasters == this.state.totalMasters) {
+                if (this.state.syncedMasters == this.state.totalMasters - 1) {
                     this.loadLatestVersion(programIdsToLoad, readonlyProgramToBeDeleted)
                 }
             } else {
@@ -390,8 +396,12 @@ export default class SyncProgram extends Component {
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
                                                     console.log(")))) Data saved successfully")
-                                                    let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                                                    var syncedMasters = this.state.syncedMasters;
+                                                    this.setState({
+                                                        syncedMasters: syncedMasters + 1,
+                                                        syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
+                                                    })
+                                                    this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                                                 }.bind(this)
                                             }.bind(this)
                                         }.bind(this)
@@ -469,8 +479,7 @@ export default class SyncProgram extends Component {
                                 var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             }
                             programDataTransaction2.oncomplete = function (event) {
-                                let id = AuthenticationService.displayDashboardBasedOnRole();
-                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
+                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
