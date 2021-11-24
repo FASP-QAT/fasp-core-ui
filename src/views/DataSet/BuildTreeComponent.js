@@ -528,8 +528,9 @@ export default class BuildTree extends Component {
             };
             tempArray.push(tempJson);
             nodeDataMap[1] = tempArray;
+            var treeId = parseInt(maxTreeId) + 1;
             var tempTree = {
-                treeId: parseInt(maxTreeId) + 1,
+                treeId: treeId,
                 active: curTreeObj.active,
                 forecastMethod: curTreeObj.forecastMethod,
                 label: curTreeObj.label,
@@ -573,9 +574,11 @@ export default class BuildTree extends Component {
             console.log("create update tree object--->>>", treeData);
             this.setState({
                 treeData,
-                openTreeDataModal: false
+                openTreeDataModal: false,
+                treeId
             }, () => {
                 console.log("---------->>>>>>>>", this.state.regionValues);
+                this.getTreeByTreeId(treeId);
             })
 
         }
@@ -2391,10 +2394,52 @@ export default class BuildTree extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 console.log("tree template myresult---", myResult)
+                const { treeData } = this.state;
+                var treeTemplate = myResult.filter(x => x.treeTemplateId == treeTemplateId)[0];
+
+                // var tempArray = [];
+                // var tempJson = treeTemplate.payload.nodeDataMap[0][0];
+                // tempArray.push(tempJson);
+                // nodeDataMap[1] = tempArray;
+                var flatList = treeTemplate.flatList;
+                for (let i = 0; i < flatList.length; i++) {
+                    var nodeDataMap = {};
+                    var tempArray = [];
+                    // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
+                    console.log("flatList[i]---", flatList[i]);
+                    var tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    tempArray.push(tempJson);
+                    nodeDataMap[1] = tempArray;
+                    flatList[i].payload.nodeDataMap = nodeDataMap;
+                }
+                console.log("flat list--->", flatList);
+                var maxTreeId = Math.max(...treeData.map(o => o.treeId));
+                var treeId = parseInt(maxTreeId) + 1;
+                var tempTree = {
+                    treeId: treeId,
+                    active: treeTemplate.active,
+                    forecastMethod: treeTemplate.forecastMethod,
+                    label: treeTemplate.label,
+                    notes: treeTemplate.notes,
+                    regionList: [],
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: "Default"
+                        }
+                    }],
+                    tree: {
+                        flatList: flatList
+                    }
+                }
+                treeData.push(tempTree);
                 this.setState({
-                    treeTemplate: myResult.filter(x => x.treeTemplateId == treeTemplateId)[0]
+                    treeData,
+                    treeId
                 }, () => {
-                    console.log("tree template obj---", this.state.treeTemplate)
+                    this.getTreeByTreeId(treeId);
+                    console.log("tree template obj---", this.state.treeData)
+
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("treeTemplateList--->", myResult[i])
@@ -2415,7 +2460,7 @@ export default class BuildTree extends Component {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
-            console.log("regionValues--->>>>",regionValues);
+            console.log("regionValues--->>>>", regionValues);
             this.setState({
                 curTreeObj,
                 scenarioList: curTreeObj.scenarioList,
@@ -2480,7 +2525,7 @@ export default class BuildTree extends Component {
                     if (this.state.treeId != "" && this.state.treeId != 0) {
                         this.getTreeByTreeId(this.state.treeId);
                     }
-                    // this.buildJexcel();
+                    this.getTreeTemplateById(this.props.match.params.templateId);
                 });
 
             }.bind(this);
@@ -3492,7 +3537,6 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             this.getTreeList();
-            this.getTreeTemplateById(this.props.match.params.templateId);
             this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
@@ -7059,7 +7103,7 @@ export default class BuildTree extends Component {
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
-                                                                    <Label htmlFor="languageId" style={{ visibility: 'hidden' }}>{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Tree'}</Label>
                                                                     <Input
                                                                         type="select"
                                                                         name="treeId"
