@@ -1098,7 +1098,11 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 .then(response3 => {
                                     console.log("RESP--->3", response3.data);
                                     this.setState({
-                                        rows: response1.data,
+                                        rows: response1.data.sort((a, b) => {
+                                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                        }),
                                         units: response2.data.sort((a, b) => {
                                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
