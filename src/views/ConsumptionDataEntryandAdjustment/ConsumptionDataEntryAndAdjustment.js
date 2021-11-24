@@ -983,7 +983,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
         <Card>
-          <div className="Card-header-reporticon pb-2">
+          <div className="Card-header-reporticon pb-lg-0">
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a className="card-header-action">
@@ -996,7 +996,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             </div>
           </div>
 
-          <CardBody >
+          <CardBody className="pt-lg-0">
             <div>
               <Form >
                 <div className="pl-0">
@@ -1034,7 +1034,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <FormGroup className="tab-ml-0 mb-md-3 ml-3">
                       <Col md="12" >
                         <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
-                        <Label check className="form-check-label" htmlFor="checkbox1">Show everything in planning units</Label>
+                        <Label check className="form-check-label pt-lg-1" htmlFor="checkbox1">Show everything in planning units</Label>
                       </Col>
                     </FormGroup>
                   </div>
@@ -1100,13 +1100,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         </Table>
                       </div>
                     </div>
-                    <br></br>
-                    <br></br>
-
                     {this.state.dataEl != "" &&
                       <>
-                        <FormGroup className="col-md-6">
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunitheader')}</Label>
+                        <FormGroup className="col-md-6 pt-lg-3 pl-lg-0">
+                          <Label htmlFor="appendedInputButton" style={{fontSize:'15px'}}>{i18n.t('static.dashboard.planningunitheader')}</Label>
                           <div className="controls ">
                             <InputGroup>
                               <Input
@@ -1149,23 +1146,32 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </>
                     }
                     <div className="row">
-                      <div className="col-md-12 pl-0 pr-0">
-                        <div id="smallTableDiv" className="jexcelremoveReadonlybackground">
+                   
+                      <div className="col-md-8 pl-lg-3 pr-lg-3">
+                      <div className="col-md-12 card-header-action">
+                <a className="card-header-action">
+                  <span style={{ cursor: 'pointer',float:'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                </a>
+                </div>
+                        <div id="smallTableDiv" className="jexcelremoveReadonlybackground pt-lg-3">
                         </div>
                       </div>
                     </div>
-                    <br></br>
-                    <br></br>
-                    <div className="row">
-                      <div className="col-md-12 pl-0 pr-0">
-                        <div id="tableDiv" className="leftAlignTable">
+                    
+                    <div className="row pt-lg-3">
+                      <div className="col-md-12 pl-lg-3 pr-lg-3">
+                      <div className="col-md-12 card-header-action">
+                <a className="card-header-action">
+                  <span style={{ cursor: 'pointer',float:'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                </a>
+                </div>
+                        <div id="tableDiv" className="leftAlignTable pt-lg-3">
                         </div>
                       </div>
                     </div>
-                    <br></br>
-                    <br></br>
+                   
                     {this.state.dataEl != "" &&
-                      <div className="col-md-12 p-0">
+                      <div className="col-md-12 pt-lg-3">
                         <div className="col-md-12">
                           <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
                             <Bar id="cool-canvas" data={bar} options={chartOptions} />
