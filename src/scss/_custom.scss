@@ -3853,6 +3853,11 @@ margin-left: -45px;
   background-color: transparent !important;
   border-color: transparent !important;
   }
+  .en-btnlogin.btn-secondary:hover {
+    color: #002f6c !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
   .logo-MarginTop{
   margin-top: -2%!important;
   }
@@ -5368,6 +5373,13 @@ fieldset.scheduler-border {
   //   // top: 255px!important;
   //   // left: 600px!important;
   // }
+  // .ScalingTable .jexcel_filters{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  .FiltermomjexcelPer .jexcel_filters{
+    position: fixed!important;
+  }
   
 .leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
 	text-align:left !important;
