@@ -6569,13 +6569,10 @@ export default class BuildTree extends Component {
                     const dropResult = monitor.getDropResult()
                     if (dropResult) {
                         onMoveItem(dropResult.id, item.id);
-<<<<<<< HEAD
                         // treeCalculator(items);
-=======
                         // *****************
                         // console.log("anchal***************************************");
                         // this.createOrUpdateTree();
->>>>>>> b4d0800bb262f91fa2a20c28bd4cae23a928cad7
                     }
                 },
             },
