@@ -298,6 +298,7 @@ const DataSetList = React.lazy(() => import('../../views/DataSet/DataSetList'));
 const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 
 const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
+const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSetting/PlanningUnitSetting'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -702,6 +703,9 @@ const routes = [
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
+
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Setting', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Setting', component: PlanningUnitSetting },
 
 ];
 

@@ -1296,10 +1296,11 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/planningUnitSetting/listPlanningUnitSetting":
+                    case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
-                            // if (true) {
                             return true;
                         }
                         break;
