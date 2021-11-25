@@ -1286,6 +1286,10 @@ export default class syncPage extends Component {
                 loading: false
               })
             }
+          }else{
+            this.setState({
+              loading:false
+            })
           }
         })
           .catch(
@@ -3039,7 +3043,7 @@ export default class syncPage extends Component {
         {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" /> */}
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
         <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
-        <Row>
+        <Row style={{ display: this.state.loading ? "none" : "block" }}>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardBody>
@@ -3151,7 +3155,7 @@ export default class syncPage extends Component {
                 </div>
                 <br></br>
                 <div id="detailsDiv">
-                  <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
+                  <div className="animated fadeIn">
                     <Formik
                       initialValues={initialValues}
                       validate={validate(validationSchema)}
@@ -3218,6 +3222,7 @@ export default class syncPage extends Component {
                             </Col>
                           </Form>
                         )} />
+                        <h5  style={{ color: 'red' }}>{i18n.t('static.commitVersion.commitNote')}</h5>
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -3262,17 +3267,6 @@ export default class syncPage extends Component {
                       </Col>
                     </Row>
                   </div>
-                  <div style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                      <div class="align-items-center">
-                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                        <div class="spinner-border blue ml-4" role="status">
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
                 </div>
               </CardBody>
@@ -3286,6 +3280,15 @@ export default class syncPage extends Component {
             </Card>
           </Col>
         </Row>
+        <div style={{ display: this.state.loading ? "block" : "none" }}>
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+            <div class="align-items-center">
+              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+              <div class="spinner-border blue ml-4" role="status">
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
