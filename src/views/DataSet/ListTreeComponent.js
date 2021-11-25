@@ -312,7 +312,7 @@ export default class ListTreeComponent extends Component {
         } else {
 
             var treeId = this.el.getValueFromCoords(0, x);
-            var programId = this.el.getValueFromCoords(7, x);
+            var programId = this.el.getValueFromCoords(8, x);
             console.log("programId>>>", programId);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({

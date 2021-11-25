@@ -1210,7 +1210,7 @@ export default class BuildTree extends Component {
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
-            var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
+            var programId = this.state.programId;
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
@@ -1247,26 +1247,48 @@ export default class BuildTree extends Component {
 
         // }
     }
-    setStartAndStopDateOfProgram(dataSetId) {
-        // console.log("programId>>>", dataSetId);
-        // console.log("dataSetList>>>", this.state.datasetList);
-        var dataSetObj = this.state.datasetList.filter(c => c.programId == dataSetId)[0];
-        // console.log("dataSetObj>>>", dataSetObj);
-        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        // console.log("programData>>>", programData.currentVersion.forecastStartDate);
-        // console.log("programData>>>", programData.currentVersion.forecastStopDate);
-        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 });
-        // console.log("programData>>>", { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 });
-        // console.log("programData>>>", { year: moment(programData.currentVersion.forecastStartDate).format("YYYY").slice(1, -1), month: moment(programData.currentVersion.forecastStartDate).format("MM").slice(1, -1) });
-        // maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-        // moment("25/04/2012","DD/MM/YYYY").year()
-        this.setState({
-            forecastStartDate: programData.currentVersion.forecastStartDate,
-            forecastStopDate: programData.currentVersion.forecastStopDate,
-            minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
-            maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
-        });
+    setStartAndStopDateOfProgram(programId) {
+        console.log("programId>>>", programId);
+        var proList = [];
+        if (programId != "") {
+            var dataSetObj = this.state.datasetList.filter(c => c.id == programId)[0];
+            console.log("dataSetObj>>>", dataSetObj);
+            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var treeList = programData.treeList;
+            for (var k = 0; k < treeList.length; k++) {
+                proList.push(treeList[k])
+            }
+
+            this.setState({
+                treeData: proList,
+                items:[],
+                selectedScenario : '',
+                programId,
+                forecastStartDate: programData.currentVersion.forecastStartDate,
+                forecastStopDate: programData.currentVersion.forecastStopDate,
+                minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+                maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
+            }, () => {
+                console.log("program id after update--->", this.state.programId);
+                if (proList.length == 1) {
+                    var treeId = proList[0].treeId;
+                    this.setState({
+                        treeId: treeId
+                    }, () => {
+                        this.getTreeByTreeId(treeId);
+                    })
+                }
+                // this.getTreeList();
+            });
+        } else {
+            this.setState({
+                items:[],
+                selectedScenario : '',
+                programId,
+                treeData: proList
+            })
+        }
     }
     momCheckbox(e) {
         var checked = e.target.checked;
@@ -2385,7 +2407,9 @@ export default class BuildTree extends Component {
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
+                    console.log("my datasetList --->", this.state.datasetList);
+                    var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
+                    console.log("dataSetObj---", dataSetObj);
                     if (dataSetObj != null) {
                         var dataEnc = dataSetObj;
                         var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
@@ -2639,16 +2663,29 @@ export default class BuildTree extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 console.log("userId---", userId);
                 console.log("myResult.length---", myResult.length);
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("inside for---", myResult[i]);
-                    if (myResult[i].userId == userId) {
-                        console.log("inside if---");
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                        console.log("programData---", programData);
-                        var treeList = programData.treeList;
-                        for (var k = 0; k < treeList.length; k++) {
-                            proList.push(treeList[k])
+                if (this.state.programId != null && this.state.programId != "") {
+                    console.log("inside if condition-------------------->",this.state.programId);
+                    var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
+                    console.log("dataSetObj tree>>>", dataSetObj);
+                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var treeList = programData.treeList;
+                    for (var k = 0; k < treeList.length; k++) {
+                        proList.push(treeList[k])
+                    }
+                } else {
+                    console.log("inside else condition-------------------->");
+                    for (var i = 0; i < myResult.length; i++) {
+                        console.log("inside for---", myResult[i]);
+                        if (myResult[i].userId == userId) {
+                            console.log("inside if---");
+                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            console.log("programData--->>>>>>>>>>>>>>>>>>>>>>", programData);
+                            var treeList = programData.treeList;
+                            for (var k = 0; k < treeList.length; k++) {
+                                proList.push(treeList[k])
+                            }
                         }
                     }
                 }
@@ -3666,12 +3703,14 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
-
+        // console.log("this.props.match.params.programId---", this.props.match.params.programId);
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
         }, () => {
-            this.getTreeList();
+            // if (this.state.programId != "") {
+                this.getTreeList();
+            // }
             this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
@@ -6443,7 +6482,7 @@ export default class BuildTree extends Component {
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
-                var programId = this.state.programId + "_v1_uId_" + AuthenticationService.getLoggedInUserId();
+                var programId = this.state.programId;
                 db1 = e.target.result;
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var program = transaction.objectStore('datasetData');
@@ -6538,8 +6577,8 @@ export default class BuildTree extends Component {
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {item.programCode}
+                    <option key={i} value={item.id}>
+                        {item.programCode + "~v" + item.version}
                     </option>
                 )
             }, this);
@@ -7421,9 +7460,10 @@ export default class BuildTree extends Component {
                                     name="datasetId"
                                     id="datasetId"
                                     bsSize="sm"
+                                    value={this.state.programId}
                                     onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
                                 >
-                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    <option value="">{"Please select program"}</option>
                                     {datasets}
                                 </Input>
                             </InputGroup>
