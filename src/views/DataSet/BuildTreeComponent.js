@@ -468,9 +468,142 @@ export default class BuildTree extends Component {
         this.updateMomDataPerInDataSet = this.updateMomDataPerInDataSet.bind(this);
         this.updateTreeData = this.updateTreeData.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.saveTreeData = this.saveTreeData.bind(this);
+        this.calculateAfterDragDrop = this.calculateAfterDragDrop.bind(this);
+        // this.treeCalculations = this.treeCalculations.bind(this);
+        this.callAfterScenarioChange = this.callAfterScenarioChange.bind(this);
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
         this.createOrUpdateTree = this.createOrUpdateTree.bind(this);
         this.treeDataChange = this.treeDataChange.bind(this);
+    }
+
+    callAfterScenarioChange(scenarioId) {
+        let { curTreeObj } = this.state;
+        let { currentItemConfig } = this.state;
+        let { treeTemplate } = this.state;
+
+        var items = curTreeObj.tree.flatList;
+        var scenarioId = scenarioId;
+        var arr = [];
+        var currentScenario;
+        for (let i = 0; i < items.length; i++) {
+            console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
+            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
+            } else {
+                var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
+                console.log("api parent value---", parentValue);
+
+                (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[scenarioId])[0].dataValue) / 100;
+            }
+            console.log("load---", items[i])
+            // arr.push(items[i]);
+        }
+        var scenario = document.getElementById("scenarioId");
+        var selectedText = scenario.options[scenario.selectedIndex].text;
+        this.setState({
+            items,
+            selectedScenario: scenarioId,
+            selectedScenarioLabel: selectedText
+        }, () => {
+
+            this.handleAMonthDissmis3(this.state.singleValue2);
+            // console.log("currentScenario---", this.state.currentScenario);
+        });
+    }
+    calculateAfterDragDrop() {
+        // var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
+        // var dataEnc = dataSetObj;
+        // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        // console.log("dataSetObj.programData***>>>", programData);
+        // this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
+        //     calculateModelingData(dataEnc, this, "BuildTree");
+        // });
+        var items = this.state.curTreeObj.tree.flatList;
+        console.log("items>>>", items);
+        for (let i = 0; i < items.length; i++) {
+            var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+        }
+        this.setState({
+            items,
+        })
+    }
+    saveTreeData() {
+        console.log("saving tree data for calculation>>>");
+        this.setState({ loading: true });
+        let { curTreeObj } = this.state;
+        let { treeData } = this.state;
+        let { dataSetObj } = this.state;
+        var items = this.state.items;
+
+        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        programData.treeList = treeData;
+        console.log("program data>>>", programData);
+
+        curTreeObj.tree.flatList = items;
+        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+        treeData[findTreeIndex] = curTreeObj;
+
+        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        programData.treeList = treeData;
+        console.log("dataSetDecrypt>>>", programData);
+
+
+        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+        dataSetObj.programData = programData;
+
+        console.log("encpyDataSet>>>", dataSetObj)
+        // store update object in indexdb
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: '#BA0C2F'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+            var programRequest = programTransaction.put(dataSetObj);
+            transaction.oncomplete = function (event) {
+
+                console.log("all good >>>>");
+                console.log("Data update success");
+                calculateModelingData(dataSetObj, this, 'BuildTree');
+                // this.setState({
+                //     loading: false,
+                //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                //     color: "green",
+                //     isChanged: false
+                // }, () => {
+                //     this.hideSecondComponent();
+                //     this.buildJExcel();
+                // });
+
+            }.bind(this);
+            transaction.onerror = function (event) {
+                this.setState({
+                    loading: false,
+                    // message: 'Error occured.',
+                    color: "#BA0C2F",
+                }, () => {
+                    this.hideSecondComponent();
+                });
+                console.log("Data update errr");
+            }.bind(this);
+        }.bind(this);
+     
     }
 
 
@@ -2116,14 +2249,14 @@ export default class BuildTree extends Component {
         if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
             if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                 if (type == 1) {
-                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue);
+                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                 } else if (type == 3) {
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].dataValue)
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                         })
                         return sum;
                     } else {
@@ -2134,21 +2267,21 @@ export default class BuildTree extends Component {
                 }
             } else {
                 if (type == 1) {
-                    return (itemConfig.payload.nodeDataMap[scenarioId])[0].dataValue + "% of parent";
+                    return (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue + "% of parent";
                 } else if (type == 3) {
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].dataValue)
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                         })
                         return sum;
                     } else {
                         return "";
                     }
                 } else {
-                    return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].calculatedDataValue) : "");
+                    return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
                 }
             }
         } else {
@@ -4350,35 +4483,18 @@ export default class BuildTree extends Component {
 
         if (event.target.name == "scenarioId") {
             console.log("scenario id---", event.target.value)
-            if (event.target.value != "") {
-                var items = curTreeObj.tree.flatList;
-                var scenarioId = event.target.value;
-                var arr = [];
-                var currentScenario;
-                for (let i = 0; i < items.length; i++) {
-                    console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
-                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                        (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
-                    } else {
-                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
-                        console.log("api parent value---", parentValue);
 
-                        (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[scenarioId])[0].dataValue) / 100;
-                    }
-                    console.log("load---", items[i])
-                    // arr.push(items[i]);
-                }
+            if (event.target.value != "") {
+                var scenarioId = event.target.value;
                 var scenario = document.getElementById("scenarioId");
                 var selectedText = scenario.options[scenario.selectedIndex].text;
-                this.setState({
-                    items,
-                    selectedScenario: scenarioId,
-                    selectedScenarioLabel: selectedText
-                }, () => {
 
-                    this.handleAMonthDissmis3(this.state.singleValue2);
-                    // console.log("currentScenario---", this.state.currentScenario);
+                this.setState({
+                    selectedScenario: scenarioId,
+                    selectedScenarioLabel: selectedText,
+                    currentScenario: []
+                }, () => {
+                    this.callAfterScenarioChange(scenarioId);
                 });
             } else {
                 this.setState({
@@ -6434,10 +6550,11 @@ export default class BuildTree extends Component {
 
     updateTreeData() {
         var items = this.state.curTreeObj.tree.flatList;
+        console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
-            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = nodeDataModelingMap[0].calculatedValue;
-            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = nodeDataModelingMap[0].endValue;
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
         }
         this.setState({
             items,
@@ -6445,6 +6562,7 @@ export default class BuildTree extends Component {
     }
     render() {
         const { datasetList } = this.state;
+        const { items } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
@@ -6490,6 +6608,7 @@ export default class BuildTree extends Component {
                     const dropResult = monitor.getDropResult()
                     if (dropResult) {
                         onMoveItem(dropResult.id, item.id);
+                        // treeCalculator(items);
                         // *****************
                         // console.log("anchal***************************************");
                         // this.createOrUpdateTree();
@@ -7280,6 +7399,7 @@ export default class BuildTree extends Component {
                                                     </CardBody>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
+                                                        <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5>
                                                         <Provider>
                                                             <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
@@ -7299,9 +7419,10 @@ export default class BuildTree extends Component {
                                                         </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                                        <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-times"></i>Calculated</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+
                                                     </CardFooter>
                                                 </Form>
 
