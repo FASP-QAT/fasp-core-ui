@@ -603,7 +603,7 @@ export default class BuildTree extends Component {
                 console.log("Data update errr");
             }.bind(this);
         }.bind(this);
-     
+
     }
 
 
@@ -1253,15 +1253,16 @@ export default class BuildTree extends Component {
             console.log("dataSetObj>>>", dataSetObj);
             var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            console.log("programData---?????????", programData.realmCountry.realmCountryId);
             var treeList = programData.treeList;
             for (var k = 0; k < treeList.length; k++) {
                 proList.push(treeList[k])
             }
-
             this.setState({
+                realmCountryId: programData.realmCountry.realmCountryId,
                 treeData: proList,
-                items:[],
-                selectedScenario : '',
+                items: [],
+                selectedScenario: '',
                 programId,
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
@@ -1277,16 +1278,19 @@ export default class BuildTree extends Component {
                         this.getTreeByTreeId(treeId);
                     })
                 }
+                
                 // this.getTreeList();
             });
         } else {
             this.setState({
-                items:[],
-                selectedScenario : '',
+                realmCountryId: '',
+                items: [],
+                selectedScenario: '',
                 programId,
                 treeData: proList
             })
         }
+        this.getRegionList();
     }
     momCheckbox(e) {
         var checked = e.target.checked;
@@ -1782,8 +1786,19 @@ export default class BuildTree extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                var regionList = [];
+                if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
+                    regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
+                    console.log("filter if regionList---", regionList);
+                } else {
+                    regionList = myResult;
+                    this.setState({
+                        regionValues : []
+                    });
+                    console.log("filter else regionList---", regionList);
+                }
                 this.setState({
-                    regionList: myResult
+                    regionList
                 });
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("myResult--->", myResult[i])
@@ -2661,12 +2676,14 @@ export default class BuildTree extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 console.log("userId---", userId);
                 console.log("myResult.length---", myResult.length);
+                var realmCountryId = "";
                 if (this.state.programId != null && this.state.programId != "") {
-                    console.log("inside if condition-------------------->",this.state.programId);
+                    console.log("inside if condition-------------------->", this.state.programId);
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
                     console.log("dataSetObj tree>>>", dataSetObj);
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
                     for (var k = 0; k < treeList.length; k++) {
                         proList.push(treeList[k])
@@ -2689,6 +2706,7 @@ export default class BuildTree extends Component {
                 }
                 console.log("pro list---", proList);
                 this.setState({
+                    realmCountryId,
                     treeData: proList
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
@@ -3707,7 +3725,7 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             // if (this.state.programId != "") {
-                this.getTreeList();
+            this.getTreeList();
             // }
             this.getTracerCategoryList();
             this.getForecastMethodList();
