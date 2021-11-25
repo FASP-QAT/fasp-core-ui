@@ -499,16 +499,18 @@ export default class BuildTree extends Component {
             }
             console.log("load---", items[i])
             // arr.push(items[i]);
-        }
+        }scenarioId
         var scenario = document.getElementById("scenarioId");
         var selectedText = scenario.options[scenario.selectedIndex].text;
         this.setState({
             items,
             selectedScenario: scenarioId,
-            selectedScenarioLabel: selectedText
+            selectedScenarioLabel: selectedText,
+            // currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
+            
         }, () => {
-
             this.handleAMonthDissmis3(this.state.singleValue2);
+            this.calculateValuesForAggregateNode(items);
             // console.log("currentScenario---", this.state.currentScenario);
         });
     }
@@ -4762,6 +4764,9 @@ export default class BuildTree extends Component {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].dataValue = value;
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = value;
+                
+                items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayDataValue = value;
+                items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue = value;
 
                 this.setState({
                     items: items,
@@ -4773,6 +4778,9 @@ export default class BuildTree extends Component {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "";
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "";
+
+                items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayDataValue = "";
+                items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue = "";
 
                 this.setState({
                     items: items,
@@ -6571,8 +6579,11 @@ export default class BuildTree extends Component {
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
-            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
-            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+            console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
+            if (nodeDataModelingMap.length > 0) {
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+            }
         }
         this.setState({
             items,
