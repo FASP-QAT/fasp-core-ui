@@ -499,7 +499,7 @@ export default class BuildTree extends Component {
             }
             console.log("load---", items[i])
             // arr.push(items[i]);
-        }scenarioId
+        }
         var scenario = document.getElementById("scenarioId");
         var selectedText = scenario.options[scenario.selectedIndex].text;
         this.setState({
@@ -2805,7 +2805,8 @@ export default class BuildTree extends Component {
     }
 
     duplicateNode(itemConfig) {
-        console.log("duplicate node called---", this.state.currentItemConfig);
+        console.log("duplicate node called 1---", this.state.currentItemConfig);
+        console.log("duplicate node called 2---", itemConfig);
         const { items } = this.state;
         var newItem = {
             id: parseInt(items.length + 1),
@@ -4554,7 +4555,7 @@ export default class BuildTree extends Component {
             this.getUsageText();
         }
         // if (event.target.name === "forecastMethodId") {
-        //     treeTemplate.forecastMethod.id = event.target.value;
+        //     treeTemplatee.forecastMethod.id = event.target.value;
         // }
 
         if (event.target.name === "usageTemplateId") {
@@ -4564,6 +4565,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "nodeTitle") {
+            console.log("before change node title---",currentItemConfig);
             currentItemConfig.context.payload.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTypeId") {
@@ -4744,6 +4746,7 @@ export default class BuildTree extends Component {
 
     calculateValuesForAggregateNode(items) {
         console.log("start>>>", Date.now());
+        console.log("start aggregation node>>>",items);
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
             b = b.id;
@@ -4951,9 +4954,11 @@ export default class BuildTree extends Component {
     updateNodeInfoInJson(currentItemConfig) {
         console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex] = currentItemConfig;
+        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+        console.log("findNodeIndex---",findNodeIndex);
+        nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+        console.log("nodes---",nodes);
         this.setState({
             items: nodes,
             openAddNodeModal: false,
