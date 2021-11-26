@@ -499,7 +499,7 @@ export default class BuildTree extends Component {
             }
             console.log("load---", items[i])
             // arr.push(items[i]);
-        }scenarioId
+        } scenarioId
         var scenario = document.getElementById("scenarioId");
         var selectedText = scenario.options[scenario.selectedIndex].text;
         this.setState({
@@ -507,7 +507,7 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             selectedScenarioLabel: selectedText,
             // currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
-            
+
         }, () => {
             this.handleAMonthDissmis3(this.state.singleValue2);
             this.calculateValuesForAggregateNode(items);
@@ -1262,8 +1262,8 @@ export default class BuildTree extends Component {
 
             this.setState({
                 treeData: proList,
-                items:[],
-                selectedScenario : '',
+                items: [],
+                selectedScenario: '',
                 programId,
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
@@ -1283,8 +1283,8 @@ export default class BuildTree extends Component {
             });
         } else {
             this.setState({
-                items:[],
-                selectedScenario : '',
+                items: [],
+                selectedScenario: '',
                 programId,
                 treeData: proList
             })
@@ -2258,7 +2258,7 @@ export default class BuildTree extends Component {
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
                         })
                         return sum;
                     } else {
@@ -2269,14 +2269,14 @@ export default class BuildTree extends Component {
                 }
             } else {
                 if (type == 1) {
-                    return (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue + "% of parent";
+                    return Math.round((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                 } else if (type == 3) {
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
                         })
                         return sum;
                     } else {
@@ -2664,7 +2664,7 @@ export default class BuildTree extends Component {
                 console.log("userId---", userId);
                 console.log("myResult.length---", myResult.length);
                 if (this.state.programId != null && this.state.programId != "") {
-                    console.log("inside if condition-------------------->",this.state.programId);
+                    console.log("inside if condition-------------------->", this.state.programId);
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
                     console.log("dataSetObj tree>>>", dataSetObj);
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
@@ -3709,7 +3709,7 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             // if (this.state.programId != "") {
-                this.getTreeList();
+            this.getTreeList();
             // }
             this.getTracerCategoryList();
             this.getForecastMethodList();
@@ -4746,7 +4746,7 @@ export default class BuildTree extends Component {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].dataValue = value;
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = value;
-                
+
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayDataValue = value;
                 items[findNodeIndex].payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue = value;
 
