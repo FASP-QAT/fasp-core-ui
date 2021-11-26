@@ -185,7 +185,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
                     proListProblemStatus.sort((a, b) => {
                         var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -241,7 +241,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         procList.sort((a, b) => {
                             var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -458,7 +458,7 @@ export default class ConsumptionDetails extends React.Component {
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
                         programQPLDetailsGetRequest.onsuccess = function (event) {
                             var programObj = getRequest.result;
-                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             var programQPLDetails = programQPLDetailsGetRequest.result;
@@ -526,14 +526,14 @@ export default class ConsumptionDetails extends React.Component {
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
                             programQPLDetails.addressedCount = addressedCount;
-                            programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            programObj.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
                             var putRequest = problemOs.put(programObj);
                             putRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 })
                             }.bind(this);
                             putRequest.onsuccess = function (event) {
@@ -597,6 +597,7 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
+        console.log("problemList====>",problemList);
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -605,7 +606,7 @@ export default class ConsumptionDetails extends React.Component {
             data[1] = problemList[j].problemActionIndex
             data[2] = problemList[j].program.code
             data[3] = problemList[j].versionId
-            data[4] = (problemList[j].region.label != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
+            data[4] = (problemList[j].region != null && problemList[j].region.id != 0) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
@@ -1215,7 +1216,7 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 console.log("callback")
                             })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 
@@ -1326,8 +1327,13 @@ export default class ConsumptionDetails extends React.Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
+        if(transList.length==0){
+            console.log("this problem report id do not have trans+++",row.problemReportId);
+            return ""
+        }else{
         var listLength = transList.length;
         return transList[listLength - 1].notes;
+        } 
     }
     handleProblemStatusChange = (event) => {
 

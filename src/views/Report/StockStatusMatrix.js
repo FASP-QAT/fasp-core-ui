@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
@@ -37,7 +37,7 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "red", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
@@ -53,7 +53,9 @@ export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - 10);
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       realms: [],
       productCategories: [],
@@ -72,7 +74,8 @@ export default class StockStatusMatrix extends React.Component {
       message: '',
       planningUnitValues: [],
       planningUnitLabels: [],
-      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+      rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       startYear: new Date().getFullYear() - 1,
       endYear: new Date().getFullYear(),
       loading: true,
@@ -435,12 +438,27 @@ export default class StockStatusMatrix extends React.Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             planningUnitIds.map(planningUnitId => {
-
+              var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+              var programJson = {}
+              if (planningUnitDataIndex != -1) {
+                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                programJson = JSON.parse(programData);
+              } else {
+                programJson = {
+                  consumptionList: [],
+                  inventoryList: [],
+                  shipmentList: [],
+                  batchInfoList: [],
+                  supplyPlan: []
+                }
+              }
               var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
               for (var from = this.state.startYear, to = this.state.endYear; from <= to; from++) {
@@ -676,23 +694,31 @@ export default class StockStatusMatrix extends React.Component {
           var programRequest = programTransaction.get(program);
 
           programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            var InventoryList = (programJson.inventoryList);
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
             let productCategories = [];
-            var json;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+              var planningUnitData = (planningUnitDataList)[pu];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              var programJson = JSON.parse(programData);
+              var InventoryList = (programJson.inventoryList);
+              var json;
 
-            InventoryList.map(ele => (
-              productCategories.push({
-                payload: {
-                  productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
-                  label: ele.planningUnit.forecastingUnit.productCategory.label,
-                  active: true
-                }
-              })
+              InventoryList.map(ele => (
+                productCategories.push({
+                  payload: {
+                    productCategoryId: ele.planningUnit.forecastingUnit.productCategory.id,
+                    label: ele.planningUnit.forecastingUnit.productCategory.label,
+                    active: true
+                  }
+                })
 
-            ))
+              ))
+            }
+
 
 
 
@@ -898,7 +924,7 @@ export default class StockStatusMatrix extends React.Component {
           if (myResult[i].userId == userId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
             console.log(programNameLabel)
 
@@ -1014,7 +1040,7 @@ export default class StockStatusMatrix extends React.Component {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
 
@@ -1188,8 +1214,14 @@ export default class StockStatusMatrix extends React.Component {
             //let productCategoryId = document.getElementById("productCategoryId").value;
             ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
               console.log('**' + JSON.stringify(response.data))
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
               this.setState({
-                planningUnits: response.data,
+                planningUnits: listArray,
                 planningUnitValues: response.data.map((item, i) => {
                   return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
@@ -1842,6 +1874,7 @@ export default class StockStatusMatrix extends React.Component {
                       bsSize="sm"
                       value={this.state.tracerCategoryValues}
                       onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                      disabled={this.state.loading}
                       options=
                       {tracerCategories.length > 0 ?
                         tracerCategories.map((item, i) => {
@@ -1863,6 +1896,7 @@ export default class StockStatusMatrix extends React.Component {
                       value={this.state.planningUnitValues}
                       onChange={(e) => { this.handlePlanningUnitChange(e) }}
                       options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                      disabled={this.state.loading}
                     />     </div></FormGroup>
 
                 <FormGroup className="col-md-3">

@@ -194,7 +194,7 @@ export default class InventoryTurns extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -319,7 +319,7 @@ export default class InventoryTurns extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -723,7 +723,7 @@ export default class InventoryTurns extends Component {
 
     formSubmit() {
         var programId = this.state.CostOfInventoryInput.programId;
-        var versionId = this.state.CostOfInventoryInput.versionId
+        var versionId = this.state.CostOfInventoryInput.versionId.toString();
         if (programId != 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.includes('Local')) {
@@ -758,9 +758,10 @@ export default class InventoryTurns extends Component {
                     programRequest.onsuccess = function (e) {
                         this.setState({ loading: true })
                         console.log(programRequest)
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        // var programJson = JSON.parse(programData);
                         var proList = []
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
@@ -796,7 +797,23 @@ export default class InventoryTurns extends Component {
                                     var dtstr = m[n].startDate
                                     var enddtStr = m[n].endDate
 
-                                    var dt = dtstr
+                                    var dt = dtstr;
+                                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnit.planningUnit.id);
+                                    var programJson = {}
+                                    if (planningUnitDataIndex != -1) {
+                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnit.planningUnit.id))[0];
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
+                                    } else {
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
+                                        }
+                                    }
                                     var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dt)
                                     //console.log(dtstr, ' ', enddtStr,' list',list)
                                     reportList = [...reportList, ...list]

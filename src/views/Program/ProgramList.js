@@ -462,19 +462,26 @@ export default class ProgramList extends Component {
 
   buildJExcel() {
     let programList = this.state.selProgram;
-    // console.log("programList---->", programList);
+    console.log("programList---->", programList);
+    console.log("healthAreaList---->", programList.healthAreaList);
     let programArray = [];
+    
     let count = 0;
 
     for (var j = 0; j < programList.length; j++) {
       data = [];
+      let healthAreaLabels=programList[j].healthAreaList;
+      let haValues=[];
+      healthAreaLabels.map(c=>{
+        haValues.push(getLabelText(c.label,this.state.lang));
+      })
       data[0] = programList[j].programId
       data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
       data[2] = getLabelText(programList[j].label, this.state.lang)
       data[3] = programList[j].programCode;
       data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
       data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
-      data[6] = getLabelText(programList[j].healthArea.label, this.state.lang)
+      data[6] = haValues.toString();
       data[7] = programList[j].lastModifiedBy.username;
       data[8] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
 
@@ -836,7 +843,7 @@ export default class ProgramList extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '} */}

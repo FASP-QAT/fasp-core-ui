@@ -177,8 +177,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
         var programJson = this.props.items.programJson;
+        var generalProgramJson=this.props.items.generalProgramJson;
         this.setState({
-            actualProgramId: programJson.programId
+            actualProgramId: generalProgramJson.programId
         })
         var db1;
         var shipmentStatusList = [];
@@ -192,7 +193,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-            this.props.updateState("color", "red");
+            this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -202,7 +203,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var shipmentStatusRequest = shipmentStatusOs.getAll();
             shipmentStatusRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             shipmentStatusRequest.onsuccess = function (event) {
@@ -222,7 +223,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var paRequest = paOs.getAll();
                 paRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 paRequest.onsuccess = function (event) {
@@ -244,7 +245,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var papuRequest = papuOs.getAll();
                     papuRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
@@ -259,14 +260,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var fsRequest = fsOs.getAll();
                         fsRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "red");
+                            this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
                         fsRequest.onsuccess = function (event) {
                             var fsResult = [];
                             fsResult = fsRequest.result;
                             for (var k = 0; k < fsResult.length; k++) {
-                                if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                if (fsResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId) {
                                     var fsJson = {
                                         name: fsResult[k].fundingSourceCode,
                                         id: fsResult[k].fundingSourceId,
@@ -283,7 +284,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var budgetListAll = []
                             bRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                this.props.updateState("color", "red");
+                                this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
                             bRequest.onsuccess = function (event) {
@@ -291,7 +292,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 bResult = bRequest.result;
                                 budgetList.push({ id: '', name: i18n.t('static.common.select') });
                                 for (var k = 0; k < bResult.length; k++) {
-                                    if (bResult[k].program.id == programJson.programId) {
+                                    if (bResult[k].program.id == generalProgramJson.programId) {
                                         var bJson = {
                                             name: bResult[k].budgetCode,
                                             id: bResult[k].budgetId,
@@ -315,7 +316,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                                 this.setState({
                                     budgetListAll: budgetListAll,
-                                    programIdForBudget: programJson.programId
+                                    programIdForBudget: generalProgramJson.programId
                                 })
 
                                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -323,7 +324,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var dataSourceRequest = dataSourceOs.getAll();
                                 dataSourceRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                    this.props.updateState("color", "red");
+                                    this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
                                 dataSourceRequest.onsuccess = function (event) {
@@ -331,8 +332,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     dataSourceResult = dataSourceRequest.result;
 
                                     for (var k = 0; k < dataSourceResult.length; k++) {
-                                        if ((dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0)) {
-                                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE) {
+                                        if ((dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0)) {
+                                            if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE) {
                                                 var dataSourceJson = {
                                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                                     id: dataSourceResult[k].dataSourceId,
@@ -349,7 +350,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     var currencyRequest = currencyOs.getAll();
                                     currencyRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                        this.props.updateState("color", "red");
+                                        this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
                                     currencyRequest.onsuccess = function (event) {
@@ -484,11 +485,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             var isEmergencyOrder = shipmentList[i].emergencyOrder;
                                             if (shipmentList[i].shipmentStatus.id == "" && shipmentList[i].expectedDeliveryDate != "") {
-                                                var expectedArrivedDate = moment(shipmentList[i].expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                var expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedArrivedDate = moment(shipmentList[i].expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(generalProgramJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(generalProgramJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                var expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                 if (moment(expectedPlannedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                                     isEmergencyOrder = true;
                                                 } else {
@@ -836,18 +837,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                                                                 openRequest.onerror = function (event) {
                                                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                                                    this.props.updateState("color", "red");
+                                                                    this.props.updateState("color", "#BA0C2F");
                                                                     this.props.hideFirstComponent();
                                                                 }.bind(this);
                                                                 openRequest.onsuccess = function (e) {
                                                                     db1 = e.target.result;
                                                                     var programJson = this.props.items.programJson;
+                                                                    var generalProgramJson=this.props.items.generalProgramJson;
                                                                     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                     var papuOs = papuTransaction.objectStore('procurementAgent');
                                                                     var papuRequest = papuOs.get(parseInt(procurementAgent));
                                                                     papuRequest.onerror = function (event) {
                                                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                                                        this.props.updateState("color", "red");
+                                                                        this.props.updateState("color", "#BA0C2F");
                                                                         this.props.hideFirstComponent();
                                                                     }.bind(this);
                                                                     papuRequest.onsuccess = function (event) {
@@ -912,25 +914,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             var ppUnit = papuResult;
                                                                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                                                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                                                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                                                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                                                             }
                                                                             var approvedToShippedLeadTime = "";
                                                                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                                                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                                                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                                                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                                                             }
 
                                                                             var shippedToArrivedLeadTime = ""
                                                                             if (shipmentMode == 2) {
-                                                                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
+                                                                                shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
                                                                             } else {
-                                                                                shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
+                                                                                shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                                                             }
-                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                             expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                             expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                             expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                            expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                         }
 
                                                                         var tableEditable = shipmentEditable;
@@ -1758,6 +1760,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedDeliveryDate = rowData[4];
         var shipmentMode = rowData[5];
         var programJson = this.props.items.programJson;
+        var generalProgramJson=this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
                 // var db1;
@@ -1795,25 +1798,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var ppUnit = papuResult;
                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                        submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                     }
                     var approvedToShippedLeadTime = "";
                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                        approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                     }
 
                     var shippedToArrivedLeadTime = ""
                     if (shipmentMode == 2) {
-                        shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
+                        shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
                     } else {
-                        shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
+                        shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                     }
-                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                     expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                     expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                     expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 }
                 var expectedDate = expectedPlannedDate;
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
@@ -1844,15 +1847,15 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                     expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                 } else {
-                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                     if (shipmentMode == 2) {
-                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
                     } else {
-                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(programJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
+                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
                     }
-                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(programJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(programJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(generalProgramJson.approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(generalProgramJson.submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 }
                 var expectedDate = expectedPlannedDate;
                 if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
@@ -2194,11 +2197,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                     var freightCost = 0;
                     if (rowData[5] == 1) {
-                        var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
+                        var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
                         freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
                         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     } else {
-                        var airFreightPercentage = this.props.items.programJson.airFreightPerc;
+                        var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
                         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                     }
@@ -2216,11 +2219,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
                 var freightCost = 0;
                 if (rowData[5] == 1) {
-                    var seaFreightPercentage = this.props.items.programJson.seaFreightPerc;
+                    var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
                     freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
                     elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 } else {
-                    var airFreightPercentage = this.props.items.programJson.airFreightPerc;
+                    var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
                     freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                     elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
                 }
@@ -2738,6 +2741,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             // openRequest.onsuccess = function (e) {
             //     db1 = e.target.result;
             var programJson = this.props.items.programJson;
+            var generalProgramJson=this.props.items.generalProgramJson;
             //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             //     var papuOs = papuTransaction.objectStore('procurementAgent');
             //     var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -2764,27 +2768,27 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var ppUnit = papuResult;
                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                    submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                    submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                 }
                 var approvedToShippedLeadTime = "";
                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                    approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                    approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                 }
 
                 var shippedToArrivedLeadTime = ""
                 if (shipmentMode == 2) {
-                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
+                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
                 } else {
-                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
+                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                 }
 
                 plannedDate = moment(Date.now()).format("YYYY-MM-DD");
-                submittedDate = moment(plannedDate).add(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                submittedDate = moment(plannedDate).add(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 approvedDate = moment(submittedDate).add(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 shippedDate = moment(approvedDate).add(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                 arrivedDate = moment(shippedDate).add(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                expectedDeliveryDate = moment(arrivedDate).add(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                expectedDeliveryDate = moment(arrivedDate).add(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
             }
             if (moment(elInstance.getValueFromCoords(4, y)).format("YYYY-MM-DD") != moment(expectedDeliveryDate).format("YYYY-MM-DD") && shipmentStatus != DELIVERED_SHIPMENT_STATUS) {
                 elInstance.setValueFromCoords(4, y, expectedDeliveryDate, true);
@@ -2838,18 +2842,19 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
                         var programJson = this.props.items.programJson;
+                        var generalProgramJson=this.props.items.generalProgramJson;
                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgent');
                         var papuRequest = papuOs.get(parseInt(procurementAgent));
                         papuRequest.onerror = function (event) {
                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "red");
+                            this.props.updateState("color", "#BA0C2F");
                             this.props.hideFirstComponent();
                         }.bind(this);
                         papuRequest.onsuccess = function (event) {
@@ -2875,25 +2880,25 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var ppUnit = papuResult;
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                    submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                    submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                 }
                                 var approvedToShippedLeadTime = "";
                                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                    approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                    approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                 }
 
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentMode == 2) {
-                                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedByAirLeadTime);
+                                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
                                 } else {
-                                    shippedToArrivedLeadTime = Number(programJson.shippedToArrivedBySeaLeadTime);
+                                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                 }
-                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 expectedApprovedDate = moment(expectedShippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 expectedSubmittedDate = moment(expectedApprovedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             var expectedDate = expectedPlannedDate;
                             if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS) {
@@ -3397,7 +3402,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
@@ -3415,19 +3420,37 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var programDataJson = programRequest.result.programData;
+                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                    var planningUnitId = document.getElementById("planningUnitId").value
+                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
                     var shipmentDataList = (programJson.shipmentList);
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
-                    var planningUnitId = document.getElementById("planningUnitId").value
                     var batchInfoList = (programJson.batchInfoList);
                     var minDate = "";
                     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -3818,13 +3841,20 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentDataList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList=planningUnitDataList;
+                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {

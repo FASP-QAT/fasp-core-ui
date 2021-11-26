@@ -465,7 +465,7 @@ class AddProcurementAgentComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "#BA0C2F" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -760,7 +760,10 @@ class AddProcurementAgentComponent extends Component {
     resetClicked() {
         let { procurementAgent } = this.state;
 
-        procurementAgent.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            procurementAgent.realm.id = ''
+        }
+
         procurementAgent.procurementAgentCode = ''
         procurementAgent.label.label_en = ''
         procurementAgent.submittedToApprovedLeadTime = ''

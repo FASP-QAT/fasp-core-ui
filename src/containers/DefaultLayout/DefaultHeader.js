@@ -67,7 +67,7 @@ class DefaultHeader extends Component {
     </NavItem>*/}
           <NavItem className="px-3">
             {console.log("Inside header called---", this)}
-            <NavLink to="#" className={this.props.activeModule==1?"nav-link titleColorModule1":"nav-link titleColorModule2"} ><b>{this.props.activeModule==1?"SUPPLY PLANNING MODULE":"FORECASTING MODULE"}</b><br></br><b>{this.props.title}</b></NavLink>
+            <NavLink to="#" className={this.props.activeModule==2?"nav-link titleColorModule1":"nav-link titleColorModule2"} ><b>{this.props.activeModule==2?i18n.t('static.module.supplyPlanningModule'):i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
@@ -93,7 +93,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                   {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
@@ -107,34 +107,34 @@ class DefaultHeader extends Component {
               <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
             </NavLink>
           </NavItem> */}
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && this.props.activeModule == 2 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
                   // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: 'red' }} ></i>
+                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F' }} ></i>
                 }
                 {/* {localStorage.getItem("sesLatestProgram") == "false" &&
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#20a8d8' }} ></i>}
+                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed' }} ></i>}
               </NavLink>
             </NavItem>
           }
           {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') &&
+          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
 
                 {this.props.changeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: 'red' }}></i>
+                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F' }}></i>
 
                 }
                 {!this.props.changeIcon &&
                   // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#20a8d8' }}></i>
+                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed' }}></i>
 
                 }
               </NavLink>

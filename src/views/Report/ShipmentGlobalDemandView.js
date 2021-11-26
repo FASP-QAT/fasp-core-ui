@@ -24,7 +24,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -262,7 +262,9 @@ class ShipmentGlobalDemandView extends Component {
         this.toggledata = this.toggledata.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             labels: ['PSM', 'GF', 'Local', 'Govt'],
             datasets: [{
@@ -302,7 +304,8 @@ class ShipmentGlobalDemandView extends Component {
             table1Headers: [],
             show: false,
             message: '',
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
@@ -1969,8 +1972,14 @@ class ShipmentGlobalDemandView extends Component {
                                 // (response.data).sort(function (a, b) {
                                 //     return getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang)); //using String.prototype.localCompare()
                                 // });
+                                var listArray = response.data;
+                                listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 this.setState({
-                                    planningUnits: response.data,
+                                    planningUnits: listArray,
                                 }, () => {
                                     this.fetchData()
                                 });
@@ -2234,14 +2243,14 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#205493',
+                backgroundColor: '#0067B9',
                 borderWidth: 0
 
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#a7c6ed',
+                backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }
             ]
@@ -2360,6 +2369,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.countryValues}
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
 
@@ -2376,6 +2386,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.programValues}
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
 
@@ -2468,6 +2479,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                    disabled={this.state.loading}
                                                 // options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                 />
 
@@ -2500,6 +2512,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.fundingSourceValues}
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2516,6 +2529,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     value={this.state.shipmentStatusValues}
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
+                                                    disabled={this.state.loading}
                                                 />
                                             </div>
                                         </FormGroup>

@@ -177,7 +177,7 @@ export default class QunatimedImportStepFive extends Component {
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                             openRequest.onerror = function (event) {
                                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                this.props.updateState("color", "red");
+                                this.props.updateState("color", "#BA0C2F");
                                 this.props.hideFirstComponent();
                             }.bind(this);
                             openRequest.onsuccess = function (e) {
@@ -195,29 +195,32 @@ export default class QunatimedImportStepFive extends Component {
                                 var programRequest = programTransaction.get(programId);
                                 programRequest.onerror = function (event) {
                                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                    this.props.updateState("color", "red");
+                                    this.props.updateState("color", "#BA0C2F");
                                     this.props.hideFirstComponent();
                                 }.bind(this);
                                 programRequest.onsuccess = function (event) {
-                                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                    var programJson = JSON.parse(programData);
+                                    // var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    // var programJson = JSON.parse(programData);
+
+                                    var programDataJson = programRequest.result.programData;
+                                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
 
                                     var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                     var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
                                     var rcpuRequest = rcpuOs.getAll();
                                     rcpuRequest.onerror = function (event) {
                                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                        this.props.updateState("color", "red");
+                                        this.props.updateState("color", "#BA0C2F");
                                         this.props.hideFirstComponent();
                                     }.bind(this);
                                     rcpuRequest.onsuccess = function (event) {
                                         var rcpuResult = [];
                                         rcpuResult = rcpuRequest.result;
-
-
-                                        var consumptionDataList = (programJson.consumptionList);
-                                        var actionList = (programJson.actionList);
+                                        var actionList = (generalProgramJson.actionList);
                                         if (actionList == undefined) {
                                             actionList = []
                                         }
@@ -235,7 +238,24 @@ export default class QunatimedImportStepFive extends Component {
                                                 })
                                             }
                                         }
-
+for(var pu=0;pu<finalPuList.length;pu++){
+    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalPuList[pu]);
+                                    var programJson = {}
+                                    if (planningUnitDataIndex != -1) {
+                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalPuList[pu]))[0];
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
+                                    } else {
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
+                                    }
+                                }
+                                var consumptionDataList = (programJson.consumptionList);
                                         for (var i = 0; i < qunatimedData.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
                                                 && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
@@ -287,9 +307,16 @@ export default class QunatimedImportStepFive extends Component {
                                         }
 
                                         programJson.consumptionList = consumptionDataList;
-                                        programJson.actionList = actionList;
-
-                                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                        generalProgramJson.actionList = actionList;
+                                        if (planningUnitDataIndex != -1) {
+                                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                        } else {
+                                            planningUnitDataList.push({ planningUnitId: finalPuList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                        }
+                                    }
+                                    programDataJson.planningUnitDataList = planningUnitDataList;
+                                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                    programRequest.result.programData = programDataJson;
 
                                         var transaction1;
                                         var programTransaction1;
@@ -302,7 +329,7 @@ export default class QunatimedImportStepFive extends Component {
                                         putRequest.onerror = function (event) {
 
                                             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                            this.props.updateState("color", "red");
+                                            this.props.updateState("color", "#BA0C2F");
                                             this.props.hideFirstComponent();
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
@@ -342,7 +369,8 @@ export default class QunatimedImportStepFive extends Component {
         this.el.destroy();
         var myVar = "";
         var json = this.props.items.importData.records;
-
+        console.log("Json+++",json);
+        console.log("Json+++",this.props.items);
 
         let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
         let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
@@ -357,7 +385,7 @@ export default class QunatimedImportStepFive extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-            this.props.updateState("color", "red");
+            this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -375,19 +403,44 @@ export default class QunatimedImportStepFive extends Component {
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
 
-
-                var consumptionDataList = (programJson.consumptionList);
-
-                var qunatimedData = dateFilter;
+                var finalImportQATData = dateFilter;
+                var finalQATPlanningList = [];
+                for (var i = 0; i < finalImportQATData.length; i++) {
+                    var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
+                    if (index == -1) {
+                        finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
+                    }
+                }
+                console.log("FinalQatPlanningUnitList+++",finalQATPlanningList);
+                var planningUnitDataList=(programRequest.result).programData.planningUnitDataList;
                 var finalList = [];
+                for(var fqpl=0;fqpl<finalQATPlanningList.length;fqpl++){
+                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalQATPlanningList[fqpl]);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalQATPlanningList[fqpl]))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                // var programDataBytes = CryptoJS.AES.decrypt(planningUnitData, SECRET_KEY);
+                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programJson = JSON.parse(programData);
+                var consumptionDataList = (programJson.consumptionList);
+                var qunatimedData = dateFilter.filter(c=>c.product.programPlanningUnitId==finalQATPlanningList[fqpl]);
                 for (var i = 0; i < qunatimedData.length; i++) {
                     var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
                         && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
@@ -401,6 +454,7 @@ export default class QunatimedImportStepFive extends Component {
                     qunatimedData[i].updateConsumptionQuantity = Math.round(qunatimedData[i].ingConsumption * qunatimedData[i].product.multiplier * this.props.items.program.regionConversionFactor);
                     finalList.push(qunatimedData[i]);
                 }
+            }
 
                 this.setState({
                     finalImportData: finalList

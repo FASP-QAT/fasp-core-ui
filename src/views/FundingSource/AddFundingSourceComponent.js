@@ -349,7 +349,7 @@ class AddFundingSourceComponent extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -571,7 +571,10 @@ class AddFundingSourceComponent extends Component {
   resetClicked() {
     let { fundingSource } = this.state;
 
-    fundingSource.realm.id = ''
+    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+      fundingSource.realm.id = ''
+    }
+
     fundingSource.label.label_en = ''
     fundingSource.fundingSourceCode = ''
 

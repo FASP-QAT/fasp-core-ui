@@ -94,7 +94,7 @@ export default class ImportProgram extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // if (this.props.updateState != undefined) {
             //     this.props.updateState(false);
@@ -109,7 +109,7 @@ export default class ImportProgram extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 })
                 // if (this.props.updateState != undefined) {
@@ -125,7 +125,7 @@ export default class ImportProgram extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
                         // console.log("programData---", programData);
@@ -252,6 +252,12 @@ export default class ImportProgram extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
+                                                var programModified = json.programModified;
+                                                delete json.programModified;
+                                                var openCount = json.openCount;
+                                                delete json.openCount;
+                                                var addressedCount = json.addressedCount;
+                                                delete json.addressedCount;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                 console.log("M sync country transaction start")
@@ -353,14 +359,13 @@ export default class ImportProgram extends Component {
                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                 json.userId = userId;
                                                 json.id = json.programId + "_v" + json.version + "_uId_" + userId;
-                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
+                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData.generalData, SECRET_KEY);
                                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                 var programJson = JSON.parse(programData);
-                                                console.log("@@@programJson.actionList", programJson.actionList);
                                                 if (programJson.actionList == undefined) {
                                                     programJson.actionList = [];
                                                 }
-                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var addProgramDataRequest = program2.put(json);
                                                 addProgramDataRequest.onerror = function (event) {
                                                 };
@@ -373,22 +378,11 @@ export default class ImportProgram extends Component {
                                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                 json1.userId = userId1;
                                                 json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
-                                                var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
-                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                var programJson1 = JSON.parse(programData1);
+                                                // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                // var programJson1 = JSON.parse(programData1);
 
                                                 // Adding data to program QPL details
-                                                var paList = programJson.problemReportList;
-                                                var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                console.log("LastModifiedDate@@@", lastModifiedDate);
-                                                console.log("LastModifiedDate1@@@", lastModifiedDate1);
-                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                var programModified = 0;
-                                                if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
-                                                    programModified = 1;
-                                                }
                                                 var item = {
                                                     id: json.programId + "_v" + json.version + "_uId_" + userId,
                                                     programId: json.programId,
@@ -469,6 +463,12 @@ export default class ImportProgram extends Component {
                                                                 delete json.regionList;
                                                                 var budgetList = json.budgetList;
                                                                 delete json.budgetList;
+                                                                var programModified = json.programModified;
+                                                                delete json.programModified;
+                                                                var openCount = json.openCount;
+                                                                delete json.openCount;
+                                                                var addressedCount = json.addressedCount;
+                                                                delete json.addressedCount;
 
                                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                                 console.log("M sync country transaction start")
@@ -571,14 +571,14 @@ export default class ImportProgram extends Component {
                                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                                 json.userId = userId;
                                                                 json.id = json.programId + "_v" + json.version + "_uId_" + userId;
-                                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
+                                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData.generalData, SECRET_KEY);
                                                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                 var programJson = JSON.parse(programData);
                                                                 console.log("@@@programJson.actionList", programJson.actionList);
                                                                 if (programJson.actionList == undefined) {
                                                                     programJson.actionList = [];
                                                                 }
-                                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                                json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                                 var addProgramDataRequest = program2.put(json);
                                                                 addProgramDataRequest.onerror = function (event) {
                                                                 };
@@ -588,22 +588,11 @@ export default class ImportProgram extends Component {
                                                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
                                                                 json1.userId = userId1;
                                                                 json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1;
-                                                                var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
-                                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                                var programJson1 = JSON.parse(programData1);
+                                                                // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                                // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                // var programJson1 = JSON.parse(programData1);
 
                                                                 // Adding data to program QPL details
-                                                                var paList = programJson.problemReportList;
-                                                                var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                                var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                                console.log("LastModifiedDate@@@", lastModifiedDate);
-                                                                console.log("LastModifiedDate1@@@", lastModifiedDate1);
-                                                                var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                                var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                                var programModified = 0;
-                                                                if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
-                                                                    programModified = 1;
-                                                                }
                                                                 var item = {
                                                                     id: json.programId + "_v" + json.version + "_uId_" + userId,
                                                                     programId: json.programId,
@@ -701,7 +690,7 @@ export default class ImportProgram extends Component {
 
 
                                 }
-                                var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
+                                var bytes = CryptoJS.AES.decrypt(programDataJson.programData.generalData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
                                 var programDataJsonDecrypted = JSON.parse(plaintext);
                                 console.log("programDatajson", programDataJsonDecrypted.label);
@@ -778,7 +767,7 @@ export default class ImportProgram extends Component {
         return (
             <>
                 <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
-                <h5 style={{ color: "red" }} id="div2">
+                <h5 className="red" id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Card className="mt-2">
@@ -791,62 +780,62 @@ export default class ImportProgram extends Component {
                                 handleChange,
                                 handleBlur,
                             }) => (
-                                    <Form noValidate name='simpleForm'>
-                                        {/* <CardHeader>
+                                <Form noValidate name='simpleForm'>
+                                    {/* <CardHeader>
                                             <strong>{i18n.t('static.program.import')}</strong>
                                         </CardHeader> */}
-                                        <CardBody className="pb-lg-2 pt-lg-2">
-                                            <FormGroup id="fileImportDiv">
-                                                <Col md="3">
-                                                    <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
-                                                </Col>
-                                                <Col xs="12" md="4" className="custom-file">
-                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
-                                                    <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
-                                                </Col>
-                                            </FormGroup>
-                                            <FormGroup id="programIdDiv" className="col-md-4">
-                                                <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                <Select
-                                                    bsSize="sm"
-                                                    valid={!errors.programId}
-                                                    invalid={touched.programId && !!errors.programId}
-                                                    onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                    onBlur={handleBlur} name="programId" id="programId"
-                                                    multi
-                                                    options={this.state.programList}
-                                                    value={this.state.programId}
-                                                />
-                                                <FormFeedback>{errors.programId}</FormFeedback>
-                                            </FormGroup>
-                                        </CardBody>
-                                        <div style={{ display: this.state.loading ? "none" : "block" }}></div>
-                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                <div class="align-items-center">
-                                                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                    <CardBody className="pb-lg-2 pt-lg-2">
+                                        <FormGroup id="fileImportDiv">
+                                            <Col md="3">
+                                                <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                            </Col>
+                                            <Col xs="12" md="4" className="custom-file">
+                                                {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
+                                                <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
+                                            </Col>
+                                        </FormGroup>
+                                        <FormGroup id="programIdDiv" className="col-md-4">
+                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                            <Select
+                                                bsSize="sm"
+                                                valid={!errors.programId}
+                                                invalid={touched.programId && !!errors.programId}
+                                                onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                onBlur={handleBlur} name="programId" id="programId"
+                                                multi
+                                                options={this.state.programList}
+                                                value={this.state.programId}
+                                            />
+                                            <FormFeedback>{errors.programId}</FormFeedback>
+                                        </FormGroup>
+                                    </CardBody>
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}></div>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                                    <div class="spinner-border blue ml-4" role="status">
+                                                <div class="spinner-border blue ml-4" role="status">
 
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <CardFooter>
-                                            <FormGroup>
+                                    <CardFooter>
+                                        <FormGroup>
 
-                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
 
-                                                <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                &nbsp;
-                                                </FormGroup>
-                                        </CardFooter>
-                                    </Form>
-                                )} />
+                                            <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            &nbsp;
+                                        </FormGroup>
+                                    </CardFooter>
+                                </Form>
+                            )} />
                 </Card>
 
 

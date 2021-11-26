@@ -655,7 +655,7 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].message != null ? i18n.t(consumptions[j].message) : this.roundN(consumptions[j].forecastError) + "%";
+      data[2] = consumptions[j].message != null ? "" : this.roundN(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
       data[4] = this.roundN(consumptions[j].forecastError);
 
@@ -688,7 +688,8 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.error'),
-          type: 'text',
+          type: 'numeric',
+          mask: '#,##%',
         },
         {
           title: i18n.t('static.report.noofmonth'),
@@ -706,28 +707,28 @@ class ForecastMetrics extends Component {
         entries: '',
       },
 
-      updateTable: function (el, cell, x, y, source, value, id) {
-        if (y != null) {
-          var elInstance = el.jexcel;
-          var colArr = ['A', 'B', 'C', 'D', 'E']
-          var rowData = elInstance.getRowData(y);
+      // updateTable: function (el, cell, x, y, source, value, id) {
+      //   if (y != null) {
+      //     var elInstance = el.jexcel;
+      //     var colArr = ['A', 'B', 'C', 'D', 'E']
+      //     var rowData = elInstance.getRowData(y);
 
-          var forecastError = rowData[4];
+      //     var forecastError = rowData[4];
 
-          if (forecastError > 50) {
-            for (var i = 0; i < colArr.length; i++) {
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-              //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-              let textColor = 'red'//contrast('#f48282');
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-            }
-          } else {
-            for (var i = 0; i < colArr.length; i++) {
-              elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            }
-          }
-        }
-      }.bind(this),
+      //     if (forecastError > 50) {
+      //       for (var i = 0; i < colArr.length; i++) {
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+      //         //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+      //         let textColor = 'red'//contrast('#f48282');
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+      //       }
+      //     } else {
+      //       for (var i = 0; i < colArr.length; i++) {
+      //         elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+      //       }
+      //     }
+      //   }
+      // }.bind(this),
       onsearch: function (el) {
         el.jexcel.updateTable();
       },
@@ -766,6 +767,32 @@ class ForecastMetrics extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
+    console.log("INSIDE UPDATE TABLE");
+
+    var elInstance = instance.jexcel;
+    var json = elInstance.getJson();
+
+    var colArr = ['A', 'B', 'C', 'D', 'E']
+    for (var j = 0; j < json.length; j++) {
+
+
+      var rowData = elInstance.getRowData(j);
+      // console.log("elInstance---->", elInstance);
+
+      var forecastError = rowData[4];
+      if (forecastError > 50) {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+          //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+          let textColor = '#BA0C2F'//contrast('#f48282');
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+        }
+      } else {
+        for (var i = 0; i < colArr.length; i++) {
+          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+        }
+      }
+    }
   }
 
 
@@ -785,7 +812,7 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-
+      console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
           console.log(JSON.stringify(response.data));
@@ -1575,10 +1602,11 @@ class ForecastMetrics extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
 
@@ -1597,10 +1625,11 @@ class ForecastMetrics extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>
@@ -1616,6 +1645,7 @@ class ForecastMetrics extends Component {
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
@@ -1640,6 +1670,7 @@ class ForecastMetrics extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          disabled={this.state.loading}
                         />
 
                       </div>

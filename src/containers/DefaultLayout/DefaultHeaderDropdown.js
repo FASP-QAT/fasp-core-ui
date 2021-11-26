@@ -81,14 +81,14 @@ class DefaultHeaderDropdown extends Component {
     this.props.history.push(`/ApplicationDashboard/`)
   }
   getLanguageList() {
-    console.log("Hey anchal going to get languages for profile section")
+    console.log("Going to get languages for profile section")
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -99,7 +99,7 @@ class DefaultHeaderDropdown extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);

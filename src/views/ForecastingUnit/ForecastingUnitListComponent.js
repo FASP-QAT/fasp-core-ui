@@ -595,12 +595,12 @@ export default class ForecastingUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 60, 100, 60, 60, 60, 100, 60],
+            colWidths: [60, 150, 60, 100, 60, 60, 60, 100, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'forecastingUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.forecastingUnit.forecastingUnitId'),
+                    type: 'text',
                     readOnly: true
                 },
                 {
@@ -1269,7 +1269,7 @@ export default class ForecastingUnitListComponent extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1"><strong></strong>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong> {i18n.t('static.common.listEntity', { entityname })}</strong> */}

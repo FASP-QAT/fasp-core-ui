@@ -43,6 +43,7 @@ const validationSchema = function (values) {
             // .matches(/^[a-zA-Z]+$/, i18n.t('static.common.alphabetsOnly'))                    
             // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .required(i18n.t('static.fundingsource.fundingsourceCodeText')),
         // .required(i18n.t('static.fundingsource.fundingsourceCodeText'))
         // notes: Yup.string()
         //     .required(i18n.t('static.common.notestext'))
@@ -393,7 +394,7 @@ export default class FundingSourceTicketComponent extends Component {
 
         return (
             <div className="col-md-12">
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <h4>{i18n.t('static.fundingsource.fundingsource')}</h4>
                 <br></br>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -401,10 +402,10 @@ export default class FundingSourceTicketComponent extends Component {
                         enableReinitialize={true}
                         initialValues={{
                             summary: summaryText_1,
-                            realmName: this.props.items.userRealmId,
-                            fundingSourceName: "",
-                            fundingSourceCode: "",
-                            notes: ""
+                            realmName: this.state.realmId,
+                            fundingSourceName: this.state.fundingSource.fundingSourceName,
+                            fundingSourceCode: this.state.fundingSource.fundingSourceCode,
+                            notes: this.state.fundingSource.notes
                         }}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -488,120 +489,120 @@ export default class FundingSourceTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.fundingSource.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.fundingSource.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
-                                                bsSize="sm"
-                                                valid={!errors.realmName && this.state.fundingSource.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="fundingSourceName">{i18n.t('static.fundingSource.fundingSourceName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="fundingSourceName" id="fundingSourceName"
-                                                bsSize="sm"
-                                                valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
-                                                invalid={touched.fundingSourceName && !!errors.fundingSourceName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDisplayName() }}
-                                                onBlur={handleBlur}
-                                                value={this.Capitalize(this.state.fundingSource.fundingSourceName)}
-                                                required />
-                                            <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="fundingSourceCode" id="fundingSourceCode"
-                                                bsSize="sm"
-                                                valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
-                                                invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={7}
-                                                value={this.state.fundingSource.fundingSourceCode}
-                                                required
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.fundingSource.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.fundingSource.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmName" id="realmName"
+                                            bsSize="sm"
+                                            valid={!errors.realmName && this.state.fundingSource.realmName != ''}
+                                            invalid={touched.realmName && !!errors.realmName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="fundingSourceName">{i18n.t('static.fundingSource.fundingSourceName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="fundingSourceName" id="fundingSourceName"
+                                            bsSize="sm"
+                                            valid={!errors.fundingSourceName && this.state.fundingSource.fundingSourceName != ''}
+                                            invalid={touched.fundingSourceName && !!errors.fundingSourceName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDisplayName() }}
+                                            onBlur={handleBlur}
+                                            value={this.Capitalize(this.state.fundingSource.fundingSourceName)}
+                                            required />
+                                        <FormFeedback className="red">{errors.fundingSourceName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="fundingSourceCode">{i18n.t('static.fundingsource.fundingsourceCode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="fundingSourceCode" id="fundingSourceCode"
+                                            bsSize="sm"
+                                            valid={!errors.fundingSourceCode && this.state.fundingSource.fundingSourceCode != ''}
+                                            invalid={touched.fundingSourceCode && !!errors.fundingSourceCode}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={7}
+                                            value={this.state.fundingSource.fundingSourceCode}
+                                            required
+                                        />
+                                        <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
+                                        <FormGroup check inline className="ml-5">
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="allowedInBudget1"
+                                                name="allowedInBudget"
+                                                value={true}
+                                                checked={this.state.fundingSource.allowedInBudget === true}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                             />
-                                            <FormFeedback className="red">{errors.fundingSourceCode}</FormFeedback>
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-active1">
+                                                {i18n.t('static.program.yes')}
+                                            </Label>
                                         </FormGroup>
-                                        <FormGroup>
-                                            <Label className="P-absltRadio">{i18n.t('static.fundingSource.allowInBudget')}&nbsp;&nbsp;</Label>
-                                            <FormGroup check inline className="ml-5">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    id="allowedInBudget1"
-                                                    name="allowedInBudget"
-                                                    value={true}
-                                                    checked={this.state.fundingSource.allowedInBudget === true}
-                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-active1">
-                                                    {i18n.t('static.program.yes')}
-                                                </Label>
-                                            </FormGroup>
-                                            <FormGroup check inline>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    id="allowedInBudget2"
-                                                    name="allowedInBudget"
-                                                    value={false}
-                                                    checked={this.state.fundingSource.allowedInBudget === false}
-                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-active2">
-                                                    {i18n.t('static.program.no')}
-                                                </Label>
-                                            </FormGroup>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.fundingSource.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.fundingSource.notes}
-                                            // required 
+                                        <FormGroup check inline>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="allowedInBudget2"
+                                                name="allowedInBudget"
+                                                value={false}
+                                                checked={this.state.fundingSource.allowedInBudget === false}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                             />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-active2">
+                                                {i18n.t('static.program.no')}
+                                            </Label>
                                         </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.fundingSource.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.fundingSource.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

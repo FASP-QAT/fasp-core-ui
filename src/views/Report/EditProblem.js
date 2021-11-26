@@ -665,7 +665,7 @@ export default class EditLanguageComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card className="EditproblemCard" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -689,7 +689,7 @@ export default class EditLanguageComponent extends Component {
                                     openRequest.onerror = function (event) {
                                         this.setState({
                                             message: i18n.t('static.program.errortext'),
-                                            color: 'red'
+                                            color: '#BA0C2F'
                                         })
                                     }.bind(this);
 
@@ -767,7 +767,7 @@ export default class EditLanguageComponent extends Component {
                                             putRequest.onerror = function (event) {
                                                 this.setState({
                                                     message: i18n.t('static.program.errortext'),
-                                                    color: 'red'
+                                                    color: '#BA0C2F'
                                                 })
                                             };
 

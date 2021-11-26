@@ -39,6 +39,7 @@ class SupplyPlanFormulas extends Component {
       stockstatusacrossplaningunit: false,
       shipmentcost: false,
       stockstatusmatrix: false,
+      showtermslogic:false,
     };
     this.toggle = this.toggle.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
@@ -53,6 +54,7 @@ class SupplyPlanFormulas extends Component {
     this.toggleStockStatusAcrossPlaningUnit = this.toggleStockStatusAcrossPlaningUnit.bind(this);
     this.toggleShippmentCost = this.toggleShippmentCost.bind(this);
     this.toggleStockStatusMatrix = this.toggleStockStatusMatrix.bind(this);
+    this.toggleShowTermLogic = this.toggleShowTermLogic.bind(this);
   }
 
   toggle(tab) {
@@ -129,6 +131,13 @@ class SupplyPlanFormulas extends Component {
       stockstatusmatrix: !this.state.stockstatusmatrix,
     });
   }
+
+  toggleShowTermLogic() {
+    this.setState({
+      showtermslogic: !this.state.showtermslogic,
+    });
+  }
+
 
   render() {
     return (
@@ -682,6 +691,55 @@ class SupplyPlanFormulas extends Component {
                   <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
                 </ListGroupItemText>
               </ListGroupItem>
+            </ListGroup>
+          </ModalBody>
+        </Modal>
+
+         {/*Show term logic*/}
+         <Modal isOpen={this.state.showtermslogic} className={'modal-xl ' + this.props.className} >
+          <ModalHeader toggle={this.toggleShowTermLogic} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
+          <ModalBody >
+            <ListGroup style={{ height: '300px', overflowY: 'scroll' }}>
+              <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <img className="formula-img-mr img-fluid" src={amc} /><br></br>
+                  <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx1')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx2')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx3')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx4')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx5')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx6')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx7')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx8')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx9')}<br></br>
+
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx10")}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx11')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
+                    {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
+                </ListGroupItemText>
+              </ListGroupItem>
+              <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+
+                  <img className="formula-img-mr img-fluid" src={mos} />
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.amcEx13")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
+                </ListGroupItemText>
+              </ListGroupItem>
+              <div className="mt-2" >
+                <p>{i18n.t("static.supplyPlanFormula.costOfInventoryNote")}</p>
+              </div>
             </ListGroup>
           </ModalBody>
         </Modal>

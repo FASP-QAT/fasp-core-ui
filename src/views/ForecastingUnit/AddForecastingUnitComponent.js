@@ -463,7 +463,7 @@ export default class AddForecastingUnitComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -699,7 +699,9 @@ export default class AddForecastingUnitComponent extends Component {
         let { forecastingUnit } = this.state
 
         forecastingUnit.label.label_en = ''
-        forecastingUnit.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            forecastingUnit.realm.id = ''
+        }
         forecastingUnit.tracerCategory.id = ''
         forecastingUnit.productCategory.id = ''
         forecastingUnit.genericLabel.label_en = ''

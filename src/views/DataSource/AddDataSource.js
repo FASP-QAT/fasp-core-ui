@@ -403,7 +403,7 @@ export default class AddDataSource extends Component {
                 //     this.setState({ loading: loading })
                 // }}
                 />
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -612,7 +612,9 @@ export default class AddDataSource extends Component {
 
         this.state.label.label_en = ''
         this.state.dataSourceType.id = ''
-        this.state.realm.id = ''
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+            this.state.realm.id = '';
+        }
         this.state.program.id = ''
 
         let { dataSource } = this.state

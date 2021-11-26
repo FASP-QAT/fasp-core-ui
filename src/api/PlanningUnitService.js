@@ -66,8 +66,18 @@ class PlanningUnitService {
         );
     }
 
+    getActivePlanningUnitListByFUId(forecastingUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/forecastingUnit/${forecastingUnitId}`, {}
+        );
+    }
+
     getPlanningUnitByProgramIdsAndTracerCategorieIds(json) {
         return axios.post(`${API_URL}/api/planningUnit/tracerCategory/program/`, json, {}
+        );
+    }
+
+    getProcurementAgentPlanningUnitByPlanningUnitIds(json) {
+        return axios.post(`${API_URL}/api/procurementAgent/planningUnits`, json, {}
         );
     }
 }

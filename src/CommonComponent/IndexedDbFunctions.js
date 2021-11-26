@@ -58,6 +58,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('organisation')) {
             storeOS = db1.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('organisationType')) {
+            storeOS = db1.createObjectStore('organisationType', { keyPath: 'organisationTypeId', autoIncrement: true });
+        }
         if (!db1.objectStoreNames.contains('healthArea')) {
             storeOS = db1.createObjectStore('healthArea', { keyPath: 'healthAreaId', autoIncrement: true });
         }
@@ -144,6 +147,42 @@ export function getDatabase() {
         }
         if(!db1.objectStoreNames.contains('programQPLDetails')){
             storeOS = db1.createObjectStore('programQPLDetails', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('usageType')){
+            storeOS = db1.createObjectStore('usageType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('nodeType')){
+            storeOS = db1.createObjectStore('nodeType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethodType')){
+            storeOS = db1.createObjectStore('forecastMethodType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('usagePeriod')){
+            storeOS = db1.createObjectStore('usagePeriod', { keyPath: 'usagePeriodId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('modelingType')){
+            storeOS = db1.createObjectStore('modelingType', { keyPath: 'modelingTypeId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethod')){
+            storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'forecastMethodId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('datasetData')){
+            storeOS = db1.createObjectStore('datasetData', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('downloadedDatasetData')){
+            storeOS = db1.createObjectStore('downloadedDatasetData', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('usageTemplate')){
+            storeOS = db1.createObjectStore('usageTemplate', { keyPath: 'usageTemplateId'});
+        }
+        if(!db1.objectStoreNames.contains('treeTemplate')){
+            storeOS = db1.createObjectStore('treeTemplate', { keyPath: 'treeTemplateId'});
+        }
+        if(!db1.objectStoreNames.contains('versionType')){
+            storeOS = db1.createObjectStore('versionType', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('versionStatus')){
+            storeOS = db1.createObjectStore('versionStatus', { keyPath: 'id'});
         }
         console.log("indexed db completed----------------------")
         
