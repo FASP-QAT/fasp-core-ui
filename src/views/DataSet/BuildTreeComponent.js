@@ -708,11 +708,12 @@ export default class BuildTree extends Component {
             treeData.push(tempTree);
             console.log("create update tree object--->>>", treeData);
             this.setState({
+                treeId,
                 treeData,
                 openTreeDataModal: false
             }, () => {
                 console.log("---------->>>>>>>>", this.state.regionValues);
-                // this.getTreeByTreeId(treeId);
+                this.getTreeByTreeId(treeId);
             })
 
         }
