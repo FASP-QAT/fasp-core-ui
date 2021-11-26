@@ -22,6 +22,9 @@ import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import TracerCategoryService from '../../api/TracerCategoryService';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import PlanningUnitService from '../../api/PlanningUnitService';
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
@@ -69,13 +72,406 @@ export default class PlanningUnitSetting extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             allowAdd: false,
+            allTracerCategoryList: [],
+            allPlanningUnitList: [],
+            allProcurementAgentList: [],
+            selectedForecastProgram: '',
+            filterProcurementAgent: '',
 
         }
         this.getDatasetList = this.getDatasetList.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.tracerCategoryList = this.tracerCategoryList.bind(this);
+        this.planningUnitList = this.planningUnitList.bind(this);
+        this.procurementAgentList = this.procurementAgentList.bind(this);
+        this.getPlanningUnitByTracerCategoryId = this.getPlanningUnitByTracerCategoryId.bind(this);
+        this.getProcurementAgentPlanningUnitByPlanningUnitIds = this.getProcurementAgentPlanningUnitByPlanningUnitIds.bind(this);
     }
+
+    getPlanningUnitByTracerCategoryId(tracerCategoryId) {
+        TracerCategoryService.getPlanningUnitByTracerCategoryId(tracerCategoryId)
+            .then(response => {
+                if (response.status == 200) {
+                    return response.data;
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitList) {
+        PlanningUnitService.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitList)
+            .then(response => {
+                if (response.status == 200) {
+                    // console.log("planningUnitId------->2", response.data);
+                    var mylist = [];
+                    mylist[0] = {
+                        name: 'Custom',
+                        id: -1,
+                        price: 0
+                    }
+
+                    let procurementAgentPlanningUnit = response.data;
+                    let loopvar = procurementAgentPlanningUnit[planningUnitList[0]]
+
+                    for (var i = 0; i < loopvar.length; i++) {
+                        let obj = {
+                            name: loopvar[i].procurementAgent.code,
+                            id: loopvar[i].procurementAgent.id,
+                            price: loopvar[i].catalogPrice,
+                        }
+                        mylist.push(obj);
+                    }
+
+                    console.log("planningUnitId------->3", mylist);
+
+                    return mylist;
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    tracerCategoryList() {
+        TracerCategoryService.getTracerCategoryListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("List------->tr-original", response.data)
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].label, this.state.lang),
+                                id: parseInt(listArray[i].tracerCategoryId),
+                                active: listArray[i].active,
+                                healthArea: listArray[i].healthArea
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+                    this.setState({
+                        allTracerCategoryList: tempList,
+                        // tracerCategoryList1: response.data
+                        // loading: false
+                    },
+                        () => {
+                            console.log("List------->tr", this.state.allTracerCategoryList)
+                            this.procurementAgentList();
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    planningUnitList() {
+        PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId()).then(response => {
+            console.log("RESP----->", response.data);
+
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+
+            let tempList = [];
+            if (listArray.length > 0) {
+                for (var i = 0; i < listArray.length; i++) {
+                    var paJson = {
+                        name: getLabelText(listArray[i].label, this.state.lang),
+                        id: parseInt(listArray[i].planningUnitId),
+                        active: listArray[i].active,
+                    }
+                    tempList[i] = paJson
+                }
+            }
+            this.setState({
+                allPlanningUnitList: tempList,
+            }, () => {
+                console.log("List------->pu", this.state.allPlanningUnitList)
+                this.tracerCategoryList();
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+
+    procurementAgentList() {
+        ProcurementAgentService.getProcurementAgentListAll()
+            .then(response => {
+                if (response.status == 200) {
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+                    tempList[0] = {
+                        name: 'Custom',
+                        id: -1,
+                        active: true,
+                    }
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                // name: getLabelText(listArray[i].label, this.state.lang),
+                                name: listArray[i].procurementAgentCode,
+                                id: parseInt(listArray[i].procurementAgentId),
+                                active: listArray[i].active,
+                                code: listArray[i].procurementAgentCode,
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+
+                    this.setState({
+                        allProcurementAgentList: tempList,
+                    },
+                        () => {
+                            console.log("List------->pa", this.state.allProcurementAgentList)
+                            // this.buildJExcel();
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
 
     componentDidMount() {
         this.getDatasetList();
@@ -134,7 +530,7 @@ export default class PlanningUnitSetting extends Component {
                 this.setState({
                     datasetList: datasetList,
                 }, () => {
-                    // this.getTracerCategoryList();
+                    this.planningUnitList();
                 })
 
 
@@ -154,20 +550,22 @@ export default class PlanningUnitSetting extends Component {
             let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-            let d1 = new Date(startDateSplit[1] - 3 + '-' + new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 + '01 00:00:00');
+            let d1 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
             d1.setMonth(d1.getMonth() - 1);
 
             this.setState(
                 {
                     datasetId: event.target.value,
                     rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                    startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1] + ' ' + startDateSplit[1] - 3,
-                    endDateDisplay: months[forecastStopDate.getMonth() + 1] + ' ' + forecastStopDate.getFullYear(),
-                    beforeEndDateDisplay: months[d1.getMonth() + 1] + ' ' + forecastStopDate.getFullYear(),
+                    startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+                    endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+                    beforeEndDateDisplay: months[(d1.getMonth())] + ' ' + d1.getFullYear(),
                 }, () => {
-                    console.log("d----------->1", this.state.startDateDisplay);
-                    console.log("d----------->2", this.state.endDateDisplay);
-                    console.log("d----------->3", this.state.beforeEndDateDisplay);
+                    // console.log("d----------->0", d1);
+                    // console.log("d----------->00", (d1.getMonth()));
+                    // console.log("d----------->1", this.state.startDateDisplay);
+                    // console.log("d----------->2", this.state.endDateDisplay);
+                    // console.log("d----------->3", this.state.beforeEndDateDisplay);
 
                     this.filterData();
                 })
@@ -205,6 +603,7 @@ export default class PlanningUnitSetting extends Component {
             this.setState(
                 {
                     selsource: selectedForecastProgram.planningUnitList,
+                    selectedForecastProgram: selectedForecastProgram,
                 }, () => {
                     this.buildJExcel();
                 })
@@ -262,17 +661,18 @@ export default class PlanningUnitSetting extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            data[0] = getLabelText(outPutList[j].planningUnit.forecastingUnit.productCategory.label, this.state.lang)
-            data[1] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
+            // data[0] = getLabelText(outPutList[j].planningUnit.forecastingUnit.productCategory.label, this.state.lang)
+            data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
+            data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
             data[3] = outPutList[j].treeForecast;
             data[4] = outPutList[j].stock;
             data[5] = outPutList[j].existingShipments;
             data[6] = outPutList[j].monthsOfStock;
-            data[7] = (outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? 'Custom' : outPutList[j].procurementAgent.code);
+            data[7] = (outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? -1 : outPutList[j].procurementAgent.id);
             data[8] = outPutList[j].price;
             data[9] = outPutList[j].programPlanningUnitId;
-            data[10] = 1;
+            data[10] = 0;
 
             outPutListArray[count] = data;
             count++;
@@ -295,12 +695,16 @@ export default class PlanningUnitSetting extends Component {
             columns: [
                 {
                     title: 'Planning Unit Category',
-                    type: 'text',
+                    type: 'autocomplete',
+                    source: this.state.allTracerCategoryList,
+                    filter: this.filterTracerCategoryByHealthArea
                     // readOnly: true// 0A
                 },
                 {
                     title: 'Planning Unit',
-                    type: 'text',
+                    type: 'autocomplete',
+                    source: this.state.allPlanningUnitList,
+                    filter: this.filterPlanningUnitListByTracerCategoryId
                     // readOnly: true //1B
                 },
                 {
@@ -314,23 +718,25 @@ export default class PlanningUnitSetting extends Component {
                     // readOnly: true //3D
                 },
                 {
-                    title: 'Stock (end of Dec 2020)',
+                    title: 'Stock (end of ' + this.state.beforeEndDateDisplay + ')',
                     type: 'text',
                     // readOnly: true //4E
                 },
                 {
-                    title: 'Existing Shipments (Jan 2021 - Dec 2023)',
+                    title: 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
                     type: 'text',
                     // readOnly: true //5F
                 },
                 {
-                    title: 'Desired Months of Stock (end of Dec 2023)',
+                    title: 'Desired Months of Stock (end of ' + this.state.endDateDisplay + ')',
                     type: 'text',
                     // readOnly: true //6G
                 },
                 {
                     title: 'Price Type',
-                    type: 'text',
+                    type: 'autocomplete',
+                    source: this.state.allProcurementAgentList,
+                    filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
                 {
@@ -400,6 +806,136 @@ export default class PlanningUnitSetting extends Component {
             languageEl: languageEl, loading: false, allowAdd: true
         })
     }
+
+    filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
+
+        var mylist = [];
+        var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        // console.log("planningUnitId------->1", planningUnitId);
+        let tempList = [];
+        tempList.push(planningUnitId);
+        // let mylist = this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
+
+        // console.log("planningUnitId------->33", mylist);
+        // return mylist;
+        // return this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
+
+        PlanningUnitService.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList)
+            .then(response => {
+                if (response.status == 200) {
+                    // console.log("planningUnitId------->2", response.data);
+
+                    mylist[0] = {
+                        name: 'Custom',
+                        id: -1,
+                        price: 0
+                    }
+
+                    let procurementAgentPlanningUnit = response.data;
+                    let loopvar = procurementAgentPlanningUnit[tempList[0]]
+
+                    for (var i = 0; i < loopvar.length; i++) {
+                        let obj = {
+                            name: loopvar[i].procurementAgent.code,
+                            id: loopvar[i].procurementAgent.id,
+                            price: loopvar[i].catalogPrice,
+                        }
+                        mylist.push(obj);
+                    }
+                    console.log("planningUnitId------->2", mylist);
+                    return mylist;
+
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        console.log("planningUnitId------->3", mylist);
+
+        return mylist;
+
+    }.bind(this)
+
+
+
+    filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
+        let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
+
+        let allPlanningUnitList = this.state.allPlanningUnitList;
+
+        for (var i = 0; i < planningUnitId.length; i++) {
+            let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
+            mylist.push(list);
+        }
+
+        console.log("mylist--------->32", mylist);
+        return mylist;
+
+    }.bind(this)
+
+    filterTracerCategoryByHealthArea = function (instance, cell, c, r, source) {
+        var mylist = [];
+        let selectedForecastProgramHealthAreaList = this.state.selectedForecastProgram.healthAreaList;
+        for (var i = 0; i < selectedForecastProgramHealthAreaList.length; i++) {
+            let list = this.state.allTracerCategoryList.filter(c => c.healthArea.id == selectedForecastProgramHealthAreaList[i].id);
+            // mylist.push(list);
+            if (list.length != 0) {
+                mylist = mylist.concat(list);
+            }
+
+        }
+        console.log("mylist--------->32", mylist);
+        return mylist;
+
+    }.bind(this)
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
