@@ -499,7 +499,7 @@ export default class BuildTree extends Component {
             }
             console.log("load---", items[i])
             // arr.push(items[i]);
-        } scenarioId
+        }
         var scenario = document.getElementById("scenarioId");
         var selectedText = scenario.options[scenario.selectedIndex].text;
         this.setState({
@@ -1255,12 +1255,13 @@ export default class BuildTree extends Component {
             console.log("dataSetObj>>>", dataSetObj);
             var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            console.log("programData---?????????", programData.realmCountry.realmCountryId);
             var treeList = programData.treeList;
             for (var k = 0; k < treeList.length; k++) {
                 proList.push(treeList[k])
             }
-
             this.setState({
+                realmCountryId: programData.realmCountry.realmCountryId,
                 treeData: proList,
                 items: [],
                 selectedScenario: '',
@@ -1279,16 +1280,19 @@ export default class BuildTree extends Component {
                         this.getTreeByTreeId(treeId);
                     })
                 }
+                
                 // this.getTreeList();
             });
         } else {
             this.setState({
+                realmCountryId: '',
                 items: [],
                 selectedScenario: '',
                 programId,
                 treeData: proList
             })
         }
+        this.getRegionList();
     }
     momCheckbox(e) {
         var checked = e.target.checked;
@@ -1784,8 +1788,19 @@ export default class BuildTree extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                var regionList = [];
+                if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
+                    regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
+                    console.log("filter if regionList---", regionList);
+                } else {
+                    regionList = myResult;
+                    this.setState({
+                        regionValues : []
+                    });
+                    console.log("filter else regionList---", regionList);
+                }
                 this.setState({
-                    regionList: myResult
+                    regionList
                 });
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("myResult--->", myResult[i])
@@ -2663,12 +2678,14 @@ export default class BuildTree extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 console.log("userId---", userId);
                 console.log("myResult.length---", myResult.length);
+                var realmCountryId = "";
                 if (this.state.programId != null && this.state.programId != "") {
                     console.log("inside if condition-------------------->", this.state.programId);
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
                     console.log("dataSetObj tree>>>", dataSetObj);
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
                     for (var k = 0; k < treeList.length; k++) {
                         proList.push(treeList[k])
@@ -2691,6 +2708,7 @@ export default class BuildTree extends Component {
                 }
                 console.log("pro list---", proList);
                 this.setState({
+                    realmCountryId,
                     treeData: proList
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
@@ -2787,7 +2805,8 @@ export default class BuildTree extends Component {
     }
 
     duplicateNode(itemConfig) {
-        console.log("duplicate node called---", this.state.currentItemConfig);
+        console.log("duplicate node called 1---", this.state.currentItemConfig);
+        console.log("duplicate node called 2---", itemConfig);
         const { items } = this.state;
         var newItem = {
             id: parseInt(items.length + 1),
@@ -4536,7 +4555,7 @@ export default class BuildTree extends Component {
             this.getUsageText();
         }
         // if (event.target.name === "forecastMethodId") {
-        //     treeTemplate.forecastMethod.id = event.target.value;
+        //     treeTemplatee.forecastMethod.id = event.target.value;
         // }
 
         if (event.target.name === "usageTemplateId") {
@@ -4546,6 +4565,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "nodeTitle") {
+            console.log("before change node title---",currentItemConfig);
             currentItemConfig.context.payload.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTypeId") {
@@ -4726,6 +4746,7 @@ export default class BuildTree extends Component {
 
     calculateValuesForAggregateNode(items) {
         console.log("start>>>", Date.now());
+        console.log("start aggregation node>>>",items);
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
             b = b.id;
@@ -4933,9 +4954,11 @@ export default class BuildTree extends Component {
     updateNodeInfoInJson(currentItemConfig) {
         console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex] = currentItemConfig;
+        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+        console.log("findNodeIndex---",findNodeIndex);
+        nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+        console.log("nodes---",nodes);
         this.setState({
             items: nodes,
             openAddNodeModal: false,
