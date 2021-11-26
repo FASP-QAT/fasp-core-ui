@@ -2272,7 +2272,7 @@ export default class BuildTree extends Component {
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
                         })
                         return sum;
                     } else {
@@ -2283,14 +2283,14 @@ export default class BuildTree extends Component {
                 }
             } else {
                 if (type == 1) {
-                    return (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue + "% of parent";
+                    return Math.round((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                 } else if (type == 3) {
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
                         })
                         return sum;
                     } else {
