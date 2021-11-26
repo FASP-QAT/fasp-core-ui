@@ -3854,6 +3854,11 @@ margin-left: -45px;
   background-color: transparent !important;
   border-color: transparent !important;
   }
+  .en-btnlogin.btn-secondary:hover {
+    color: #002f6c !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
   .logo-MarginTop{
   margin-top: -2%!important;
   }
@@ -5356,11 +5361,27 @@ fieldset.scheduler-border {
   .perNodeData {
     margin-top: -34px;
   }
-  .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
-    top: unset!important;
-    left: unset!important;
+  // .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  // .ScalingTable .jexcel .jcalendar .jcalendar-container{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  // .ScalingTable .jcontextmenu{
+  //   position: absolute!important;
+  //   // top: 255px!important;
+  //   // left: 600px!important;
+  // }
+  // .ScalingTable .jexcel_filters{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  .FiltermomjexcelPer .jexcel_filters{
+    position: fixed!important;
   }
-
+  
 .leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
 	text-align:left !important;
 }
