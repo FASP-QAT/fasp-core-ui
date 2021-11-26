@@ -1071,6 +1071,7 @@ content: '\f1ec';
   background-attachment: fixed;
   top: 0;
   width: 100%;
+
 }
 @media only screen and (min-width: 1200px) {
   .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
@@ -1144,15 +1145,26 @@ content: '\f1ec';
     margin: 0 auto;
     // margin-left: 2%;
   }
+  .card-marginTop {
+    flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: 0% !important;
+  }
 }
-
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation : portrait) {
+  .card-marginTop {
+    flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: 0% !important;
+  }
+}
 @media (max-width: 489px) {
   .stock-status-search{position: relative;
     margin-left: 0px;
     top: 0px;}
   .upper-logo {
     // min-width: 100%;
-    min-width: 300px;
+    min-width: 200px;
     // margin-top: 1%;
     margin: 0 auto;
     // margin-left: 2%;
@@ -5432,4 +5444,7 @@ fieldset.scheduler-border {
   color: #fff;
   background-color: #19437A!important;
   border-color: #19437A!important;
+}
+.bg-height{
+  height: 100vh;
 }
