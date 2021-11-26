@@ -5362,14 +5362,13 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            {/* <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
-                                {/* <FontAwesomeIcon icon={faCopy} /> */}
                                 <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button>
+                            </button> */}
 
 
                             <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}

@@ -708,9 +708,9 @@ export default class BuildTree extends Component {
             treeData.push(tempTree);
             console.log("create update tree object--->>>", treeData);
             this.setState({
+                treeId,
                 treeData,
-                openTreeDataModal: false,
-                treeId
+                openTreeDataModal: false
             }, () => {
                 console.log("---------->>>>>>>>", this.state.regionValues);
                 this.getTreeByTreeId(treeId);
@@ -1272,15 +1272,15 @@ export default class BuildTree extends Component {
                 maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
             }, () => {
                 console.log("program id after update--->", this.state.programId);
-                if (proList.length == 1) {
-                    var treeId = proList[0].treeId;
-                    this.setState({
-                        treeId: treeId
-                    }, () => {
-                        this.getTreeByTreeId(treeId);
-                    })
-                }
-                
+                // if (proList.length == 1) {
+                //     var treeId = proList[0].treeId;
+                //     this.setState({
+                //         treeId: treeId
+                //     }, () => {
+                //         this.getTreeByTreeId(treeId);
+                //     })
+                // }
+
                 // this.getTreeList();
             });
         } else {
@@ -1795,7 +1795,7 @@ export default class BuildTree extends Component {
                 } else {
                     regionList = myResult;
                     this.setState({
-                        regionValues : []
+                        regionValues: []
                     });
                     console.log("filter else regionList---", regionList);
                 }
@@ -4566,7 +4566,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "nodeTitle") {
-            console.log("before change node title---",currentItemConfig);
+            console.log("before change node title---", currentItemConfig);
             currentItemConfig.context.payload.label.label_en = event.target.value;
         }
         if (event.target.name === "nodeTypeId") {
@@ -4747,7 +4747,7 @@ export default class BuildTree extends Component {
 
     calculateValuesForAggregateNode(items) {
         console.log("start>>>", Date.now());
-        console.log("start aggregation node>>>",items);
+        console.log("start aggregation node>>>", items);
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
             b = b.id;
@@ -4913,7 +4913,7 @@ export default class BuildTree extends Component {
     onCursoChanged(event, data) {
         const { context: item } = data;
         if (item != null) {
-
+            this.setState({ currentItemConfig: [] });
             this.setState({
                 showCalculatorFields: false,
                 showMomData: false,
@@ -4956,10 +4956,10 @@ export default class BuildTree extends Component {
         console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
-        console.log("findNodeIndex---",findNodeIndex);
+        console.log("findNodeIndex---", findNodeIndex);
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
-        console.log("nodes---",nodes);
+        console.log("nodes---", nodes);
         this.setState({
             items: nodes,
             openAddNodeModal: false,
@@ -6942,14 +6942,13 @@ export default class BuildTree extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            {/* <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
-                                {/* <FontAwesomeIcon icon={faCopy} /> */}
                                 <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button>
+                            </button> */}
 
 
                             <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
