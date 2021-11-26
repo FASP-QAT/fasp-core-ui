@@ -430,6 +430,100 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
   }
 
+  interpolationMissingActualConsumption() {
+    console.log("Interploate");
+    var monthArray = this.state.monthArray;
+    var regionList = this.state.regionList;
+    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+    var curUser = AuthenticationService.getLoggedInUserId();
+    var fullConsumptionList = this.state.consumptionList;
+    var consumptionUnit = this.state.selectedConsumptionUnitObject;
+    var elInstance = this.state.dataEl;
+    for (var i = 0; i < monthArray.length - 2; i++) {
+      var columnData = elInstance.getColumnData([i + 1]);
+      var actualConsumptionCount = 2;
+      var reportingRateCount = 3;
+      var daysOfStockOutCount = 4;
+      for (var r = 0; r < regionList.length; r++) {
+        var index = 0;
+        index = fullConsumptionList.findIndex(c => c.consumptionUnit.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+        if (columnData[actualConsumptionCount] > 0) {
+          if (index != -1) {
+            fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
+            fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
+            fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
+          } else {
+            var json = {
+              actualConsumption: columnData[actualConsumptionCount],
+              consumptionUnit: consumptionUnit,
+              createdBy: {
+                userId: curUser
+              },
+              createdDate: curDate,
+              daysOfStockOut: 0,
+              exculde: false,
+              forecastConsumptionId: 0,
+              month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+              region: {
+                id: regionList[r].regionId
+              },
+              reportingRate: 100
+            }
+            fullConsumptionList.push(json);
+          }
+        }
+        actualConsumptionCount += 8;
+        reportingRateCount += 8;
+        daysOfStockOutCount += 8
+      }
+    }
+
+    for (var r = 0; r < regionList.length; r++) {
+      for (var j = 0; j < monthArray.length; j++) {
+        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.actualConsumption >= 0);
+        if (consumptionData.length == 0) {
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.actualConsumption >= 0)
+            .sort(function (a, b) {
+              return new Date(a.month) - new Date(b.month);
+            });
+          var startVal = startValList[startValList.length - 1].actualConsumption;
+          var startMonthVal = startValList[startValList.length - 1].month;
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.actualConsumption >= 0)
+            .sort(function (a, b) {
+              return new Date(a.month) - new Date(b.month);
+            });
+          var endVal = endValList[0].actualConsumption;
+          var endMonthVal = endValList[0].month;
+
+          //y=y1+(x-x1)*y2-y1/x2-x1;
+          var missingActualConsumption = startVal + (moment(monthArray[j].date).format("YYYY-MM") - startMonthVal) * endVal - startVal / endMonthVal - startMonthVal;
+          var json = {
+            actualConsumption: missingActualConsumption,
+            consumptionUnit: consumptionUnit,
+            createdBy: {
+              userId: curUser
+            },
+            createdDate: curDate,
+            daysOfStockOut: columnData[daysOfStockOutCount],
+            exculde: false,
+            forecastConsumptionId: 0,
+            month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+            region: {
+              id: regionList[r].regionId
+            },
+            reportingRate: columnData[reportingRateCount]
+          }
+          fullConsumptionList.push(json);
+        }
+      }
+    }
+    this.setState({
+      consumptionList:fullConsumptionList
+    })
+    this.buildDataJexcel(this.state.selectedConsumptionUnitId);    
+  }
+
+
   saveConsumptionList() {
     this.setState({
       loading: true
@@ -1103,7 +1197,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     {this.state.dataEl != "" &&
                       <>
                         <FormGroup className="col-md-6 pt-lg-3 pl-lg-0">
-                          <Label htmlFor="appendedInputButton" style={{fontSize:'15px'}}>{i18n.t('static.dashboard.planningunitheader')}</Label>
+                          <Label htmlFor="appendedInputButton" style={{ fontSize: '15px' }}>{i18n.t('static.dashboard.planningunitheader')}</Label>
                           <div className="controls ">
                             <InputGroup>
                               <Input
@@ -1146,30 +1240,44 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </>
                     }
                     <div className="row">
-                   
+
                       <div className="col-md-8 pl-lg-3 pr-lg-3">
-                      <div className="col-md-12 card-header-action">
-                <a className="card-header-action">
-                  <span style={{ cursor: 'pointer',float:'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
-                </a>
-                </div>
+                        <div className="col-md-12 card-header-action">
+                          <a className="card-header-action">
+                            <span style={{ cursor: 'pointer', float: 'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                          </a>
+                        </div>
                         <div id="smallTableDiv" className="jexcelremoveReadonlybackground pt-lg-3">
                         </div>
+                        <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>Interpolate Missing values</Button>
                       </div>
                     </div>
-                    
+
+                    {/* <div className="row pt-lg-3">
+                      <div className="col-md-12 pl-lg-3 pr-lg-3">
+                        <div>
+                          <label>Notes : </label>
+                          <input type="textarea"
+                            name="textValue"
+                           // onChange={this.handleChange}
+                          />
+                        </div>
+                      </div>
+                    </div> */}
+
+
                     <div className="row pt-lg-3">
                       <div className="col-md-12 pl-lg-3 pr-lg-3">
-                      <div className="col-md-12 card-header-action">
-                <a className="card-header-action">
-                  <span style={{ cursor: 'pointer',float:'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
-                </a>
-                </div>
+                        <div className="col-md-12 card-header-action">
+                          <a className="card-header-action">
+                            <span style={{ cursor: 'pointer', float: 'right', }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                          </a>
+                        </div>
                         <div id="tableDiv" className="leftAlignTable pt-lg-3">
                         </div>
                       </div>
                     </div>
-                   
+
                     {this.state.dataEl != "" &&
                       <div className="col-md-12 pt-lg-3">
                         <div className="col-md-12">
