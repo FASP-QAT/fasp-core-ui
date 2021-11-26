@@ -1,6 +1,6 @@
 import React, { Component, lazy } from 'react';
 import { Bar } from 'react-chartjs-2';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import {
     Card,
     CardBody,
@@ -60,7 +60,7 @@ class ForecastOutput extends Component {
             regionVal: [],
             regionListFiltered: [],
             versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
-            forecastingUnits: [{ value: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" },{ value: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }],
+            forecastingUnits: [{ value: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, { value: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }],
             planningUnitListAll: [
                 { planningUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30", forecastingUnit: { forecastingUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
                 { planningUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30", forecastingUnit: { forecastingUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
@@ -107,7 +107,7 @@ class ForecastOutput extends Component {
 
     }
 
-    planningUnitCheckedChanged(id){
+    planningUnitCheckedChanged(id) {
         var consumptionData = this.state.consumptionData;
         var index = this.state.consumptionData.findIndex(c => c.planningUnit.id == id);
         consumptionData[index].display = !consumptionData[index].display;
@@ -131,11 +131,11 @@ class ForecastOutput extends Component {
     }
 
     showData() {
-        var planningUnitIds=[];
-        this.state.planningUnitId.map(c=>{
+        var planningUnitIds = [];
+        this.state.planningUnitId.map(c => {
             planningUnitIds.push(c.value);
         })
-        var consumptionData = this.state.consumptionDataAll.filter(c=>planningUnitIds.includes(c.planningUnit.id));
+        var consumptionData = this.state.consumptionDataAll.filter(c => planningUnitIds.includes(c.planningUnit.id));
         this.setState({
             consumptionData: consumptionData
         })
@@ -272,6 +272,7 @@ class ForecastOutput extends Component {
 
     componentDidMount() {
         this.getPrograms();
+        document.getElementById("forecastingUnitDiv").style.display = "none";
         this.setState({
             regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
             regionList: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
@@ -419,7 +420,7 @@ class ForecastOutput extends Component {
                 }
             } else if (viewById == 1) {
                 document.getElementById("planningUnitDiv").style.display = "block";
-                document.getElementById("forecastingUnitDiv").style.display = "block";
+                document.getElementById("forecastingUnitDiv").style.display = "none";
                 if (this.state.forecastingUnitId > 0) {
                     this.showData()
                 }
@@ -437,7 +438,8 @@ class ForecastOutput extends Component {
 
         var chartOptions = {
             title: {
-                display: false,
+                display: true,
+                text: 'Monthly Forecast (Planning Units)'
             },
             scales: {
                 yAxes: [
@@ -445,7 +447,7 @@ class ForecastOutput extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "Units",
+                            labelString: "Planning Units",
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -502,7 +504,7 @@ class ForecastOutput extends Component {
         let bar = {}
         if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0) {
             var datasetsArr = [];
-            this.state.consumptionData.filter(c=>c.display==true).map(item => {
+            this.state.consumptionData.filter(c => c.display == true).map(item => {
                 {
                     var consumptionValue = [];
                     this.state.monthArrayList.map(item1 => {
@@ -649,23 +651,7 @@ class ForecastOutput extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
 
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
@@ -688,24 +674,23 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.yaxisEquUnit')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="yaxisEquUnit"
-                                                            id="yaxisEquUnit"
-                                                            bsSize="sm"
-                                                            value={this.state.yaxisEquUnit}
-                                                            onChange={(e) => { this.yAxisChange(e); }}
-                                                        >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
 
-                                                    </InputGroup>
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
                                                 </div>
                                             </FormGroup>
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                                 <div className="controls">
@@ -721,25 +706,6 @@ class ForecastOutput extends Component {
                                                             <option value="1">{i18n.t('static.report.planningUnit')}</option>
                                                             <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
                                                         </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                <Label htmlFor="appendedInputButton">Equivalency Unit</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="equivalencyUnitId"
-                                                            id="equivalencyUnitId"
-                                                            value={this.state.equivalencyUnitId}
-                                                            onChange={this.setEquivalencyUnit}
-                                                            bsSize="sm"
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            <option value="1">Patient Months</option>
-                                                        </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -776,6 +742,67 @@ class ForecastOutput extends Component {
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
 
+                                                </div>
+                                            </FormGroup>
+
+
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.yaxisEquUnit')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="yaxisEquUnit"
+                                                            id="yaxisEquUnit"
+                                                            bsSize="sm"
+                                                            value={this.state.yaxisEquUnit}
+                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-3" id="equivalencyUnitDiv" style={{ display: "none" }}>
+                                                <Label htmlFor="appendedInputButton">Equivalency Unit</Label>
+                                                <div className="controls">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="equivalencyUnitId"
+                                                            id="equivalencyUnitId"
+                                                            value={this.state.equivalencyUnitId}
+                                                            onChange={this.setEquivalencyUnit}
+                                                            bsSize="sm"
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="1">Patient Months</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">X-axis Aggregate By Year</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="yaxisEquUnit"
+                                                            id="yaxisEquUnit"
+                                                            bsSize="sm"
+                                                            value={this.state.yaxisEquUnit}
+                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
                                                 </div>
                                             </FormGroup>
                                         </div>
