@@ -197,6 +197,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            treeTemplateObj: [],
             scalingMonth: new Date(),
             showModelingValidation: true,
             scenario: {
@@ -254,6 +255,7 @@ export default class BuildTree extends Component {
                 forecastMethod: { id: '' },
                 label: { label_en: '' },
                 notes: '',
+                regionList: [],
                 active: true
             },
             treeData: [],
@@ -669,13 +671,15 @@ export default class BuildTree extends Component {
             tempArray.push(tempJson);
             nodeDataMap[1] = tempArray;
             var treeId = parseInt(maxTreeId) + 1;
+            console.log("region values---", this.state.regionValues);
+
             var tempTree = {
                 treeId: treeId,
                 active: curTreeObj.active,
                 forecastMethod: curTreeObj.forecastMethod,
                 label: curTreeObj.label,
                 notes: curTreeObj.notes,
-                regionList: [],
+                regionList: curTreeObj.regionList,
                 scenarioList: [{
                     id: 1,
                     label: {
@@ -1266,6 +1270,10 @@ export default class BuildTree extends Component {
             var treeList = programData.treeList;
             for (var k = 0; k < treeList.length; k++) {
                 proList.push(treeList[k])
+            }
+            if (this.state.treeTemplateObj != null && this.state.treeTemplateObj != "") {
+                proList.push(this.state.treeTemplateObj);
+                // this.setState
             }
             this.setState({
                 dataSetObj: datasetEnc,
@@ -1949,7 +1957,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.00', 
+                    mask: '#,##.00',
                     decimal: '.',
                     readOnly: true
                 },
@@ -2553,12 +2561,29 @@ export default class BuildTree extends Component {
     }
     handleRegionChange = (regionIds) => {
         console.log("regionIds---", regionIds);
+        const { curTreeObj } = this.state;
+        
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label)
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
+            if ((this.state.regionValues).length > 0) {
+                var regionList = [];
+                var regions = this.state.regionValues;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionList.push(json);
+                }
+                curTreeObj.regionList = regionList;
+                this.setState({ curTreeObj });
+            }
         })
     }
     getTreeTemplateById(treeTemplateId) {
@@ -2619,7 +2644,8 @@ export default class BuildTree extends Component {
                 treeData.push(tempTree);
                 this.setState({
                     treeData,
-                    treeId
+                    treeId,
+                    treeTemplateObj: tempTree
                 }, () => {
                     this.getTreeByTreeId(treeId);
                     console.log("tree template obj---", this.state.treeData)
