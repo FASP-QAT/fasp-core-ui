@@ -6,7 +6,7 @@ import {
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from "react-multi-select-component";
+import MultiSelect from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
