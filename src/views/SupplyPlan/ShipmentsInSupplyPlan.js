@@ -80,6 +80,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 (instance.jexcel).setValueFromCoords(21, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance.jexcel).setValueFromCoords(16, data[i].y, `=ROUND(P${parseInt(data[i].y) + 1}*K${parseInt(data[i].y) + 1},2)`, true);
                 (instance.jexcel).setValueFromCoords(18, data[i].y, `=ROUND(ROUND(K${parseInt(data[i].y) + 1}*P${parseInt(data[i].y) + 1},2)+R${parseInt(data[i].y) + 1},2)`, true);
+                (instance.jexcel).setValueFromCoords(17, data[i].y, `=ROUND(Q${parseInt(data[i].y)+1}*IF(F${(parseInt(data[i].y)+1)}==1,AK${parseInt(data[i].y)+1},AL${parseInt(data[i].y)+1}),2)`, true);                    
                 if (index == "" || index == null || index == undefined) {
                     (instance.jexcel).setValueFromCoords(22, data[i].y, false, true);
                     (instance.jexcel).setValueFromCoords(23, data[i].y, "", true);
@@ -123,9 +124,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 // }
                 (instance.jexcel).setValueFromCoords(15, data[i].y, pricePerUnit, true);
             }
-            if (data[i].x == 17 && data[i].value != "") {
-                (instance.jexcel).setValueFromCoords(17, data[i].y, data[i].value, true);
-            }
+            // if (data[i].x == 17 && data[i].value != "") {
+            //     (instance.jexcel).setValueFromCoords(17, data[i].y, data[i].value, true);
+            // }
             if (data[i].x == 11 && data[i].value != "") {
                 (instance.jexcel).setValueFromCoords(11, data[i].y, data[i].value, true);
             }
@@ -164,9 +165,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(15, y, parseFloat(rowData[15]), true);
         } else if (x == 16 && !isNaN(rowData[16]) && rowData[16].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(16, y, parseFloat(rowData[16]), true);
-        } else if (x == 17 && !isNaN(rowData[17]) && rowData[17].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(17, y, parseFloat(rowData[17]), true);
-        } else if (x == 18 && !isNaN(rowData[18]) && rowData[18].toString().indexOf('.') != -1) {
+        }
+        //  else if (x == 17 && !isNaN(rowData[17]) && rowData[17].toString().indexOf('.') != -1) {
+        //     elInstance.setValueFromCoords(17, y, parseFloat(rowData[17]), true);
+        // } 
+        else if (x == 18 && !isNaN(rowData[18]) && rowData[18].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(18, y, parseFloat(rowData[18]), true);
         }
 
@@ -177,7 +180,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
             actualProgramId: generalProgramJson.programId
         })
@@ -515,8 +518,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[14] = shipmentList[i].currency.currencyId;//O
                                             data[15] = Number(shipmentList[i].rate).toFixed(2);//P
                                             data[16] = `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                                            data[17] = Number(shipmentList[i].freightCost).toFixed(2);//R
-
+                                            data[17] = !shipmentList[i].erpFlag?`=ROUND(Q${parseInt(i)+1}*IF(F${(parseInt(i)+1)}==1,AK${parseInt(i)+1},AL${parseInt(i)+1}),2)`:Number(shipmentList[i].freightCost).toFixed(2);//R
                                             data[18] = `=ROUND(ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)+R${parseInt(i) + 1},2)`;
 
                                             data[19] = shipmentList[i].dataSource.id;//T
@@ -536,6 +538,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[33] = shipmentList[i].shipmentQty;
                                             data[34] = shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? 1 : 0;
                                             data[35] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;//E
+                                            data[36] = Number(Number(this.props.items.generalProgramJson.seaFreightPerc) / 100);//AK
+                                            data[37] = Number(Number(this.props.items.generalProgramJson.airFreightPerc) / 100);//AL
                                             shipmentsArr.push(data);
                                         }
                                         if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
@@ -557,7 +561,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[14] = USD_CURRENCY_ID;
                                             data[15] = this.props.items.catalogPrice;
                                             data[16] = `=ROUND(P${parseInt(0) + 1}*K${parseInt(0) + 1},2)`;
-                                            data[17] = "";
+                                            data[17] = `=ROUND(Q${parseInt(0)+1}*IF(F${(parseInt(0)+1)}==1,AK${parseInt(0)+1},AL${parseInt(0)+1}),2)`;
                                             data[18] = `=ROUND(ROUND(K${parseInt(0) + 1}*P${parseInt(0) + 1},2)+R${parseInt(0) + 1},2)`;
                                             data[19] = NONE_SELECTED_DATA_SOURCE_ID;
                                             data[20] = "";
@@ -576,6 +580,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[33] = 0;
                                             data[34] = 0;
                                             data[35] = "";
+                                            data[36] = Number(Number(this.props.items.generalProgramJson.seaFreightPerc) / 100);
+                                            data[37] = Number(Number(this.props.items.generalProgramJson.airFreightPerc) / 100);
                                             shipmentsArr[0] = data;
                                         }
                                         var options = {
@@ -598,7 +604,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                 { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
-                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
+                                                { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, readOnly: true },
                                                 { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                 { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
@@ -613,6 +619,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'hidden', title: "Suggested order Qty" },
                                                 { type: 'hidden', title: "Is changed" },
                                                 { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0 },
+                                                { type: 'hidden' },
+                                                { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' },
                                                 { type: 'hidden' },
@@ -843,7 +851,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 openRequest.onsuccess = function (e) {
                                                                     db1 = e.target.result;
                                                                     var programJson = this.props.items.programJson;
-                                                                    var generalProgramJson=this.props.items.generalProgramJson;
+                                                                    var generalProgramJson = this.props.items.generalProgramJson;
                                                                     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                     var papuOs = papuTransaction.objectStore('procurementAgent');
                                                                     var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -1250,7 +1258,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[14] = USD_CURRENCY_ID;
         data[15] = this.props.items.catalogPrice;
         data[16] = `=ROUND(P${parseInt(json.length) + 1}*K${parseInt(json.length) + 1},2)`;
-        data[17] = "";
+        data[17] = `=ROUND(Q${parseInt(json.length)+1}*IF(F${(parseInt(json.length)+1)}==1,AK${parseInt(json.length)+1},AL${parseInt(json.length)+1}),2)`;
         data[18] = `=ROUND(ROUND(K${parseInt(json.length) + 1}*P${parseInt(json.length) + 1},2)+R${parseInt(json.length) + 1},2)`;
         data[19] = NONE_SELECTED_DATA_SOURCE_ID;
         data[20] = "";
@@ -1269,6 +1277,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[33] = 0;
         data[34] = 0;
         data[35] = "";
+        data[36] = Number(Number(this.props.items.generalProgramJson.seaFreightPerc) / 100);
+        data[37] = Number(Number(this.props.items.generalProgramJson.airFreightPerc) / 100);
         obj.insertRow(data);
         obj.setValueFromCoords(1, json.length, 0, true);
         obj.setValueFromCoords(10, json.length, 0, true);
@@ -1760,7 +1770,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedDeliveryDate = rowData[4];
         var shipmentMode = rowData[5];
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
                 // var db1;
@@ -2194,18 +2204,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "F", y, rowData[5], elInstance);
             if (valid == true) {
                 var rate = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                    var freightCost = 0;
-                    if (rowData[5] == 1) {
-                        var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
-                        freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
-                        elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
-                    } else {
-                        var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
-                        freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
-                        elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
-                    }
-                }
+                // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
+                //     var freightCost = 0;
+                //     if (rowData[5] == 1) {
+                //         var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
+                //         freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
+                //         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
+                //     } else {
+                //         var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
+                //         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
+                //         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
+                //     }
+                // }
                 if ((rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) && (rowData[27].expectedDeliveryDate == "" || rowData[27].expectedDeliveryDate == null || rowData[27].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
                 }
@@ -2216,18 +2226,18 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         if (x == 16) {
             var rate = elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
-            if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
-                var freightCost = 0;
-                if (rowData[5] == 1) {
-                    var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
-                    freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
-                } else {
-                    var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
-                    freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
-                    elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
-                }
-            }
+            // if (rowData[24] == -1 || rowData[24] == "" || rowData[24] == null || rowData[24] == undefined) {
+            //     var freightCost = 0;
+            //     if (rowData[5] == 1) {
+            //         var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
+            //         freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
+            //         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
+            //     } else {
+            //         var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
+            //         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
+            //         elInstance.setValueFromCoords(17, y, freightCost.toFixed(2), true);
+            //     }
+            // }
             positiveValidation("Q", y, elInstance);
         }
 
@@ -2741,7 +2751,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             // openRequest.onsuccess = function (e) {
             //     db1 = e.target.result;
             var programJson = this.props.items.programJson;
-            var generalProgramJson=this.props.items.generalProgramJson;
+            var generalProgramJson = this.props.items.generalProgramJson;
             //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             //     var papuOs = papuTransaction.objectStore('procurementAgent');
             //     var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -2848,7 +2858,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
                         var programJson = this.props.items.programJson;
-                        var generalProgramJson=this.props.items.generalProgramJson;
+                        var generalProgramJson = this.props.items.generalProgramJson;
                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgent');
                         var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -3427,7 +3437,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var planningUnitId = document.getElementById("planningUnitId").value
-                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
                         var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
@@ -3847,8 +3857,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                     }
-                    programDataJson.planningUnitDataList=planningUnitDataList;
-                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
