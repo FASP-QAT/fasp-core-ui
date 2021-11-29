@@ -280,6 +280,8 @@ const ModelingTypeList = React.lazy(() => import('../../views/ModelingType/Model
 const EquivalancyUnitList = React.lazy(() => import('../../views/EquivalancyUnit/EquivalancyUnitList'));
 const UsageTemplateList = React.lazy(() => import('../../views/UsageTemplate/UsageTemplateList'));
 
+const ExtrapolateData = React.lazy(() => import('../../views/Extrapolation/ExtrapolateDataComponent.js'));
+
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
 const ProductValidation = React.lazy(() => import('../../views/Validations/ProductValidations'))
@@ -686,6 +688,8 @@ const routes = [
 
   { path: '/usageTemplate/listUsageTemplate/:color/:message', name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
+
+  { path: '/extrapolation/extrapolateData', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Extrapolate Data' }), component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
@@ -1494,10 +1498,20 @@ class DefaultLayout extends Component {
                       {
                         name: "Consumption-Based Forecast",
                         icon: 'fa fa-list',
+                        // attributes: {
+                        // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
+
+                          {
+                            name: "Extrapolation",
+                            url: '/Extrapolation/extrapolateData',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: "Import From QAT Supply Plan",
                             url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
