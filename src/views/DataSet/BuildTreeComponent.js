@@ -742,9 +742,9 @@ export default class BuildTree extends Component {
                 var nodeValue = this.state.currentScenario.calculatedDataValue;
 
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
-                    calculatedChangeForMonth = dataValue;
+                    calculatedChangeForMonth = dataValue.toFixed(2);
                 } else if (modelingTypeId == 3 || modelingTypeId == 4) {
-                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
+                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(2);
                 }
             }
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
@@ -1611,21 +1611,21 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
                 elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
                 elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, this.state.currentTargetChangePercentage, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, this.state.currentCalculatedMomChange, true);
+                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             }
         }
         this.setState({ showCalculatorFields: false });
@@ -1888,7 +1888,7 @@ export default class BuildTree extends Component {
             } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
                 calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
             }
-            data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : parseFloat(calculatedChangeForMonth).toFixed(4)
+            data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : calculatedChangeForMonth.toFixed(2)
             data[9] = scalingList[j].nodeDataModelingId
             data[10] = 0
             scalingTotal = scalingTotal + calculatedChangeForMonth;
@@ -1949,7 +1949,8 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##.00', 
+                    decimal: '.',
                     readOnly: true
                 },
                 {
@@ -2209,9 +2210,9 @@ export default class BuildTree extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                     if (rowData[2] != 5) {
-                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(4);
+                        calculatedChangeForMonth = parseFloat((nodeValue * value) / 100).toFixed(2);
                     } else {
-                        calculatedChangeForMonth = parseFloat(value).toFixed(4);
+                        calculatedChangeForMonth = parseFloat(value).toFixed(2);
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
@@ -2282,9 +2283,9 @@ export default class BuildTree extends Component {
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                         })
-                        return sum;
+                        return sum.toFixed(2);
                     } else {
                         return "";
                     }
@@ -2293,16 +2294,16 @@ export default class BuildTree extends Component {
                 }
             } else {
                 if (type == 1) {
-                    return Math.round((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                 } else if (type == 3) {
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
                         var sum = 0;
                         childList.map(c => {
-                            sum += Math.round(Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue))
+                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                         })
-                        return sum;
+                        return sum.toFixed(2);
                     } else {
                         return "";
                     }
