@@ -77,6 +77,7 @@ export default class PlanningUnitSetting extends Component {
             allProcurementAgentList: [],
             selectedForecastProgram: '',
             filterProcurementAgent: '',
+            responsePa: [],
 
         }
         this.getDatasetList = this.getDatasetList.bind(this);
@@ -151,28 +152,33 @@ export default class PlanningUnitSetting extends Component {
             .then(response => {
                 if (response.status == 200) {
                     // console.log("planningUnitId------->2", response.data);
-                    var mylist = [];
-                    mylist[0] = {
-                        name: 'Custom',
-                        id: -1,
-                        price: 0
-                    }
+                    // var mylist = [];
+                    // mylist[0] = {
+                    //     name: 'Custom',
+                    //     id: -1,
+                    //     price: 0
+                    // }
 
-                    let procurementAgentPlanningUnit = response.data;
-                    let loopvar = procurementAgentPlanningUnit[planningUnitList[0]]
+                    // let procurementAgentPlanningUnit = response.data;
+                    // let loopvar = procurementAgentPlanningUnit[planningUnitList[0]]
 
-                    for (var i = 0; i < loopvar.length; i++) {
-                        let obj = {
-                            name: loopvar[i].procurementAgent.code,
-                            id: loopvar[i].procurementAgent.id,
-                            price: loopvar[i].catalogPrice,
-                        }
-                        mylist.push(obj);
-                    }
+                    // for (var i = 0; i < loopvar.length; i++) {
+                    //     let obj = {
+                    //         name: loopvar[i].procurementAgent.code,
+                    //         id: loopvar[i].procurementAgent.id,
+                    //         price: loopvar[i].catalogPrice,
+                    //     }
+                    //     mylist.push(obj);
+                    // }
+                    // console.log("planningUnitId------->3", mylist);
+                    this.setState({
+                        responsePa: response.data,
+                    },
+                        () => {
+                            this.buildJExcel();
+                        })
 
-                    console.log("planningUnitId------->3", mylist);
 
-                    return mylist;
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
@@ -603,9 +609,59 @@ export default class PlanningUnitSetting extends Component {
             this.setState(
                 {
                     selsource: selectedForecastProgram.planningUnitList,
+                    // selsource: [
+                    //     {
+                    //         "a1a": "ARVs",
+                    //         "a2a": "Abacavir 300 mg Tablet, 60 Tablets",
+                    //         "a3a": true,
+                    //         "a4a": true,
+                    //         "a5a": "11,199",
+                    //         "a6a": "54,714",
+                    //         "a7a": "5",
+                    //         "a8a": "Custom",
+                    //         "a9a": "1.06"
+                    //     },
+                    //     {
+                    //         "a1a": "ARVs",
+                    //         "a2a": "Lamivudine 10 mg/mL Solution, 100 mL",
+                    //         "a3a": true,
+                    //         "a4a": true,
+                    //         "a5a": "10,938",
+                    //         "a6a": "51,751",
+                    //         "a7a": "5",
+                    //         "a8a": "GHSC-PSM",
+                    //         "a9a": "3.06"
+                    //     },
+                    //     {
+                    //         "a1a": "Condoms",
+                    //         "a2a": "Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each",
+                    //         "a3a": true,
+                    //         "a4a": false,
+                    //         "a5a": "19,352",
+                    //         "a6a": "84,472",
+                    //         "a7a": "5",
+                    //         "a8a": "GHSC-PSM",
+                    //         "a9a": "4.10"
+                    //     },
+                    //     {
+                    //         "a1a": "Condoms",
+                    //         "a2a": "Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces",
+                    //         "a3a": true,
+                    //         "a4a": true,
+                    //         "a5a": "12,633",
+                    //         "a6a": "83,678",
+                    //         "a7a": "5",
+                    //         "a8a": "UNFPA",
+                    //         "a9a": "5.10"
+                    //     }
+                    // ],
                     selectedForecastProgram: selectedForecastProgram,
                 }, () => {
-                    this.buildJExcel();
+                    // this.buildJExcel();
+                    let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
+                    // console.log("selectedForecastProgram---------->11", planningUnitIds);
+                    this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
+
                 })
         } else {
             this.setState(
@@ -661,7 +717,7 @@ export default class PlanningUnitSetting extends Component {
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            // data[0] = getLabelText(outPutList[j].planningUnit.forecastingUnit.productCategory.label, this.state.lang)
+
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
@@ -673,6 +729,18 @@ export default class PlanningUnitSetting extends Component {
             data[8] = outPutList[j].price;
             data[9] = outPutList[j].programPlanningUnitId;
             data[10] = 0;
+
+            // data[0] = outPutList[j].a1a;
+            // data[1] = outPutList[j].a2a;
+            // data[2] = outPutList[j].a3a;
+            // data[3] = outPutList[j].a4a;
+            // data[4] = outPutList[j].a5a;
+            // data[5] = outPutList[j].a6a;
+            // data[6] = outPutList[j].a7a;
+            // data[7] = outPutList[j].a8a;
+            // data[8] = outPutList[j].a9a;
+            // data[9] = 0;
+            // data[10] = 0;
 
             outPutListArray[count] = data;
             count++;
@@ -754,6 +822,62 @@ export default class PlanningUnitSetting extends Component {
                     type: 'hidden',
                     // readOnly: true //10K
                 },
+
+                // {
+                //     title: 'Planning Unit Category',
+                //     type: 'text',
+                //     readOnly: true
+                // },
+                // {
+                //     title: 'Planning Unit',
+                //     type: 'text',
+                //     readOnly: true
+                // },
+                // {
+                //     title: 'Consumption Forecast?',
+                //     type: 'checkbox',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Tree Forecast?',
+                //     type: 'checkbox',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Stock (end of Dec 2020)',
+                //     type: 'text',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Existing Shipments (Jan 2021 - Dec 2023)',
+                //     type: 'text',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Desired Months of Stock (end of Dec 2023)',
+                //     type: 'text',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Price Type',
+                //     type: 'text',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Unit Price',
+                //     type: 'text',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Unit Price',
+                //     type: 'hidden',
+                //     // readOnly: true
+                // },
+                // {
+                //     title: 'Unit Price',
+                //     type: 'hidden',
+                //     // readOnly: true
+                // },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -809,96 +933,36 @@ export default class PlanningUnitSetting extends Component {
 
     filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
 
-        var mylist = [];
-        var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
-        // console.log("planningUnitId------->1", planningUnitId);
-        let tempList = [];
-        tempList.push(planningUnitId);
+        // var mylist = [];
+        // var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        // // console.log("planningUnitId------->1", planningUnitId);
+        // let tempList = [];
+        // tempList.push(planningUnitId);
         // let mylist = this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
 
         // console.log("planningUnitId------->33", mylist);
         // return mylist;
         // return this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
 
-        PlanningUnitService.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList)
-            .then(response => {
-                if (response.status == 200) {
-                    // console.log("planningUnitId------->2", response.data);
+        var mylist = [];
+        let procurementAgentPlanningUnitList = this.state.responsePa;
+        var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
+        let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+        let paList = tempPaList.map(template => {
+            return {
+                name: paList.procurementAgent.code,
+                id: paList.procurementAgent.id,
+                price: paList.catalogPrice
+            };
+        });
 
-                    mylist[0] = {
-                        name: 'Custom',
-                        id: -1,
-                        price: 0
-                    }
+        paList.unshift({
+            id: -1,
+            name: 'Custom',
+            price: 0
+        })
 
-                    let procurementAgentPlanningUnit = response.data;
-                    let loopvar = procurementAgentPlanningUnit[tempList[0]]
-
-                    for (var i = 0; i < loopvar.length; i++) {
-                        let obj = {
-                            name: loopvar[i].procurementAgent.code,
-                            id: loopvar[i].procurementAgent.id,
-                            price: loopvar[i].catalogPrice,
-                        }
-                        mylist.push(obj);
-                    }
-                    console.log("planningUnitId------->2", mylist);
-                    return mylist;
-
-
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                }
-
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-
-        console.log("planningUnitId------->3", mylist);
-
-        return mylist;
+        return paList;
 
     }.bind(this)
 
@@ -1030,7 +1094,7 @@ export default class PlanningUnitSetting extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Range</Label>
+                                            <Label htmlFor="appendedInputButton">Forecast Period</Label>
                                             <div className="controls edit">
 
                                                 <Picker

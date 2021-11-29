@@ -704,8 +704,8 @@ const routes = [
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: 'Import From QAT Supply Plan', component: ImportFromQATSupplyPlan },
 
-  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Setting', component: PlanningUnitSetting },
-  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Setting', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },
 
 ];
 
