@@ -582,152 +582,154 @@ class ForecastSummary extends Component {
                                                     <div id="consumptionTable" />
                                                 </div>
                                             </div> */}
-                                            <Table responsive className="table-striped table-bordered text-center mt-2">
-                                            {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+                                            <div className="table-responsive">
+                                                <Table className="table-striped table-bordered text-center mt-2">
+                                                    {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
-                                                <thead>
-                                                    <tr>
-                                                        <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                        <th className="text-center" style={{ width: '20%' }}> Forecasting Unit </th>
-                                                        <th className="text-center" style={{ width: '20%' }}>Planning Unit</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Total Forecasted Quantity</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Stock (end of Dec 2020)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Stock (end of Dec 2023)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Desired Months of Stock (end of Dec 2023)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Desired Stock (end of Dec 2023)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Procurement Surplus/Gap</th>
-                                                        <th className="text-center" style={{ width: '15%' }}>Price Type</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Unit Price ($)</th>
-                                                        <th className="text-center" style={{ width: '10%' }}>Procurements Needed ($)</th>
-                                                        <th className="text-center" style={{ width: '30%' }}>Notes</th>
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                            <th className="text-center" style={{}}> Forecasting Unit </th>
+                                                            <th className="text-center" style={{}}>Planning Unit</th>
+                                                            <th className="text-center" style={{}}>Total Forecasted Quantity</th>
+                                                            <th className="text-center" style={{}}>Stock (end of Dec 2020)</th>
+                                                            <th className="text-center" style={{}}>Existing Shipments (Jan 2021 - Dec 2023)</th>
+                                                            <th className="text-center" style={{}}>Stock (end of Dec 2023)</th>
+                                                            <th className="text-center" style={{}}>Desired Months of Stock (end of Dec 2023)</th>
+                                                            <th className="text-center" style={{}}>Desired Stock (end of Dec 2023)</th>
+                                                            <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
+                                                            <th className="text-center" style={{}}>Price Type</th>
+                                                            <th className="text-center" style={{}}>Unit Price ($)</th>
+                                                            <th className="text-center" style={{}}>Procurements Needed ($)</th>
+                                                            <th className="text-center" style={{ width: '20%' }}>Notes</th>
 
-                                                    </tr>
-                                                </thead>
+                                                        </tr>
+                                                    </thead>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                            <i className="fa fa-minus-square-o supplyPlanIcon" ></i> ARVs
-                                                        </td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> ARVs
+                                                            </td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
 
-                                                    </tr>
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                        <td>Abacavir 300 mg Tablet</td>
-                                                        <td>Abacavir 300 mg Tablet, 60 Tablets</td>
-                                                        <td>191,593</td>
-                                                        <td>42,576</td>
-                                                        <td>206,920</td>
-                                                        <td>57,904</td>
-                                                        <td>5</td>
-                                                        <td>26,610</td>
-                                                        <td>31,294 </td>
-                                                        <td>Custom</td>
-                                                        <td>$1.04</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                        <td>Benzylpenicillin 5 MU Vial</td>
-                                                        <td>Benzylpenicillin 5 MU Vial, 10 Vials</td>
-                                                        <td>259,051</td>
-                                                        <td>50,371</td>
-                                                        <td>248,689</td>
-                                                        <td>40,009</td>
-                                                        <td>5</td>
-                                                        <td>35,979</td>
-                                                        <td>4,030  </td>
-                                                        <td>no price type available</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                        <td>Lamivudine 150 mg Tablet</td>
-                                                        <td>Lamivudine 150 mg Tablet, 30 Tablets</td>
-                                                        <td>202,179</td>
-                                                        <td>27,638</td>
-                                                        <td>204,963</td>
-                                                        <td>30,422</td>
-                                                        <td>5</td>
-                                                        <td>28,080</td>
-                                                        <td>2,341  </td>
-                                                        <td>GHSC-PSM*</td>
-                                                        <td>$3.00</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td>Abacavir 300 mg Tablet</td>
+                                                            <td>Abacavir 300 mg Tablet, 60 Tablets</td>
+                                                            <td>191,593</td>
+                                                            <td>42,576</td>
+                                                            <td>206,920</td>
+                                                            <td>57,904</td>
+                                                            <td>5</td>
+                                                            <td>26,610</td>
+                                                            <td>31,294 </td>
+                                                            <td>Custom</td>
+                                                            <td>$1.04</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td>Benzylpenicillin 5 MU Vial</td>
+                                                            <td>Benzylpenicillin 5 MU Vial, 10 Vials</td>
+                                                            <td>259,051</td>
+                                                            <td>50,371</td>
+                                                            <td>248,689</td>
+                                                            <td>40,009</td>
+                                                            <td>5</td>
+                                                            <td>35,979</td>
+                                                            <td>4,030  </td>
+                                                            <td>no price type available</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td>Lamivudine 150 mg Tablet</td>
+                                                            <td>Lamivudine 150 mg Tablet, 30 Tablets</td>
+                                                            <td>202,179</td>
+                                                            <td>27,638</td>
+                                                            <td>204,963</td>
+                                                            <td>30,422</td>
+                                                            <td>5</td>
+                                                            <td>28,080</td>
+                                                            <td>2,341  </td>
+                                                            <td>GHSC-PSM*</td>
+                                                            <td>$3.00</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
 
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                            <i className="fa fa-minus-square-o supplyPlanIcon" ></i> Condoms
-                                                        </td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> Condoms
+                                                            </td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
 
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                        <td>Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</td>
-                                                        <td>Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each</td>
-                                                        <td>229,205</td>
-                                                        <td>38,698</td>
-                                                        <td>215,933</td>
-                                                        <td>25,426</td>
-                                                        <td>5</td>
-                                                        <td>31,834</td>
-                                                        <td>(6,408)</td>
-                                                        <td>GHSC-PSM*</td>
-                                                        <td>$3.00</td>
-                                                        <td>$19,225.14</td>
-                                                        <td></td>
-                                                    </tr>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td>Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</td>
+                                                            <td>Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each</td>
+                                                            <td>229,205</td>
+                                                            <td>38,698</td>
+                                                            <td>215,933</td>
+                                                            <td>25,426</td>
+                                                            <td>5</td>
+                                                            <td>31,834</td>
+                                                            <td>(6,408)</td>
+                                                            <td>GHSC-PSM*</td>
+                                                            <td>$3.00</td>
+                                                            <td>$19,225.14</td>
+                                                            <td></td>
+                                                        </tr>
 
-                                                    <tr>
-                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                        <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm Male Condom</td>
-                                                        <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces</td>
-                                                        <td>223,136</td>
-                                                        <td>43,388</td>
-                                                        <td>236,524</td>
-                                                        <td>56,776</td>
-                                                        <td>5</td>
-                                                        <td>30,991</td>
-                                                        <td>25,785 </td>
-                                                        <td>Global Fund*</td>
-                                                        <td>$4.00</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                </tbody>
-                                            </Table>
+                                                        <tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm Male Condom</td>
+                                                            <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces</td>
+                                                            <td>223,136</td>
+                                                            <td>43,388</td>
+                                                            <td>236,524</td>
+                                                            <td>56,776</td>
+                                                            <td>5</td>
+                                                            <td>30,991</td>
+                                                            <td>25,785 </td>
+                                                            <td>Global Fund*</td>
+                                                            <td>$4.00</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </Table>
+                                            </div>
                                         </div>
                                     </div>
 
