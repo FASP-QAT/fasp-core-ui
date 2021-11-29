@@ -153,6 +153,7 @@ export default class ListTreeComponent extends Component {
                     // data[1] = programList[j].programCode
                     data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
                     data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                    console.log("forecast method--->",treeList[k].forecastMethod.label)
                     data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
                     data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
                     data[6] = treeList[k].notes
@@ -312,7 +313,7 @@ export default class ListTreeComponent extends Component {
         } else {
 
             var treeId = this.el.getValueFromCoords(0, x);
-            var programId = this.el.getValueFromCoords(7, x);
+            var programId = this.el.getValueFromCoords(8, x);
             console.log("programId>>>", programId);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
