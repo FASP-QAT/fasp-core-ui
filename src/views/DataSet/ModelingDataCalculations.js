@@ -71,9 +71,9 @@ export function calculateModelingData(dataset, props, page) {
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
                             // console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
-                            
+                            console.log("((nodeDataMap[scenarioList[ndm].id])[0]>>>", ((nodeDataMap[scenarioList[ndm].id])[0]));
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
-                            // console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
+                            console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
                             var startValue = 0;
                             var startValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
@@ -121,12 +121,12 @@ export function calculateModelingData(dataset, props, page) {
                                     differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
                                 //Exponential %
-                                else if (nodeDataModeling.modelingType.id == 4  && nodeDataModeling.transferNodeDataId == null) {
+                                else if (nodeDataModeling.modelingType.id == 4 && nodeDataModeling.transferNodeDataId == null) {
                                     difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                                     differenceWMC += Number((Number(startValueWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
                                 //Linear % point
-                                else if (nodeDataModeling.modelingType.id == 5  && nodeDataModeling.transferNodeDataId == null) {
+                                else if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId == null) {
                                     difference += Number(nodeDataModeling.dataValue);
                                     differenceWMC += Number(nodeDataModeling.dataValue);
                                 }
@@ -162,7 +162,7 @@ export function calculateModelingData(dataset, props, page) {
                                 differenceWMC += Number(transferNodeValue);
                             }
 
-                            var nodeDataOverrideListFiltered = nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
+                            var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD")) : [];
                             var endValueWithoutManualChange = endValue;
                             var endValueWithoutManualChangeWMC = endValueWMC;
                             var totalManualChange = 0;
