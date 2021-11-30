@@ -579,10 +579,29 @@ export default class BuildTree extends Component {
             // programs.forEach(program => {
             var programRequest = programTransaction.put(dataSetObj);
             transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get('2551_v1_uId_5');
+                datasetDetailsRequest.onsuccess = function (e) {
+                    console.log("all good >>>>");
+                    console.log("Data update success");
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    calculateModelingData(dataSetObj, this, 'BuildTree');
+                }.bind(this);
+                datasetDetailsRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "#BA0C2F",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this)
 
-                console.log("all good >>>>");
-                console.log("Data update success");
-                calculateModelingData(dataSetObj, this, 'BuildTree');
                 // this.setState({
                 //     loading: false,
                 //     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -1940,7 +1959,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.00', 
+                    mask: '#,##.00',
                     decimal: '.',
                     readOnly: true
                 },

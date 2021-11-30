@@ -72,6 +72,7 @@ class LoadDeleteDataSet extends Component {
                     var index = prgList.findIndex(c => c.program.id == programId);
                     prgList[index].versionList = prgList[index].versionList.concat(response.data.versionList);
                     prgList[index].currentPage = response.data.currentPage;
+
                     this.setState({
                         prgList,
                         loading: false
@@ -267,8 +268,8 @@ class LoadDeleteDataSet extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
+            var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+            var program = transaction.objectStore('datasetDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -293,7 +294,8 @@ class LoadDeleteDataSet extends Component {
                         // var programJson1 = JSON.parse(programData);
                         var programJson = {
                             programId: myResult[i].programId,
-                            versionId: myResult[i].version
+                            versionId: myResult[i].version,
+                            changed:myResult[i].changed
                         }
                         proList.push(programJson);
                     }
@@ -311,183 +313,183 @@ class LoadDeleteDataSet extends Component {
         document.getElementById("treeDiv").style.display = "block";
         // AuthenticationService.setupAxiosInterceptors();
         if (this.state.realmId != "" && this.state.realmId > 0) {
-        //     this.setState({
-        //         message: ""
-        //     })
-        //     RealmCountryService.getRealmCountryForProgram(this.state.realmId)
-        //         .then(response => {
-        //             if (response.status == 200) {
-                        // this.setState({
-                        //     countryList: response.data
-                        // })
-                        // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
-                        //     .then(response => {
-                        //         if (response.status == 200) {
-                        //             this.setState({
-                        //                 healthAreaList: response.data
-                        //             })
-                        DatasetService.loadDataset()
-                            // getProgramList()
-                            .then(response => {
-                                console.log(">>>", response);
-                                if (response.status == 200) {
+            //     this.setState({
+            //         message: ""
+            //     })
+            //     RealmCountryService.getRealmCountryForProgram(this.state.realmId)
+            //         .then(response => {
+            //             if (response.status == 200) {
+            // this.setState({
+            //     countryList: response.data
+            // })
+            // HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
+            //     .then(response => {
+            //         if (response.status == 200) {
+            //             this.setState({
+            //                 healthAreaList: response.data
+            //             })
+            DatasetService.loadDataset()
+                // getProgramList()
+                .then(response => {
+                    console.log(">>>", response);
+                    if (response.status == 200) {
+                        this.setState({
+                            countryList: response.data.realmCountryList,
+                            prgList: response.data.programList,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode,
+                            loading: false,
+                            color: "#BA0C2F"
+                        }, () => {
+                            this.hideFirstComponent()
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false,
+                                color: "#BA0C2F"
+                            }, () => {
+                                this.hideFirstComponent()
+                            })
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
                                     this.setState({
-                                        countryList: response.data.realmCountryList,
-                                        prgList: response.data.programList,
-                                        loading: false
-                                    })
-                                } else {
-                                    this.setState({
-                                        message: response.data.messageCode,
+                                        message: error.response.data.messageCode,
                                         loading: false,
                                         color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
-                                }
-                            }).catch(
-                                error => {
-                                    if (error.message === "Network Error") {
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false,
-                                            color: "#BA0C2F"
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        })
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: "#BA0C2F"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "#BA0C2F"
+                                    }, () => {
+                                        this.hideFirstComponent()
+                                    })
+                                    break;
+                            }
+                        }
+                    }
+                );
+            //     } else {
+            //         this.setState({
+            //             message: response.data.messageCode,
+            //             loading: false, color: "red"
+            //         })
+            //         this.hideFirstComponent()
+            //     }
+            // }).catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message, loading: false, color: "red" });
+            //             this.hideFirstComponent()
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode, color: "red" });
+            //                     this.hideFirstComponent()
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError', color: "red" });
+            //                     this.hideFirstComponent()
+            //                     break;
+            //             }
+            //             this.setState({ loading: false })
+            //         }
+            //     }
+            // );
+            //     } else {
+            //         this.setState({
+            //             message: response.data.messageCode,
+            //             loading: false, color: "red"
+            //         }, () => {
+            //             this.hideFirstComponent()
+            //         })
+            //     }
+            // }).catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({
+            //                 message: 'static.unkownError',
+            //                 loading: false,
+            //                 color: "red"
+            //             }, () => {
+            //                 this.hideFirstComponent()
+            //             })
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
 
-                                            case 401:
-                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                break;
-                                            case 403:
-                                                this.props.history.push(`/accessDenied`)
-                                                break;
-                                            case 500:
-                                            case 404:
-                                            case 406:
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false,
-                                                    color: "#BA0C2F"
-                                                }, () => {
-                                                    this.hideFirstComponent()
-                                                })
-                                                break;
-                                            case 412:
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false,
-                                                    color: "#BA0C2F"
-                                                }, () => {
-                                                    this.hideFirstComponent()
-                                                })
-                                                break;
-                                            default:
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false,
-                                                    color: "#BA0C2F"
-                                                }, () => {
-                                                    this.hideFirstComponent()
-                                                })
-                                                break;
-                                        }
-                                    }
-                                }
-                            );
-                        //     } else {
-                        //         this.setState({
-                        //             message: response.data.messageCode,
-                        //             loading: false, color: "red"
-                        //         })
-                        //         this.hideFirstComponent()
-                        //     }
-                        // }).catch(
-                        //     error => {
-                        //         if (error.message === "Network Error") {
-                        //             this.setState({ message: error.message, loading: false, color: "red" });
-                        //             this.hideFirstComponent()
-                        //         } else {
-                        //             switch (error.response ? error.response.status : "") {
-                        //                 case 500:
-                        //                 case 401:
-                        //                 case 404:
-                        //                 case 406:
-                        //                 case 412:
-                        //                     this.setState({ message: error.response.data.messageCode, color: "red" });
-                        //                     this.hideFirstComponent()
-                        //                     break;
-                        //                 default:
-                        //                     this.setState({ message: 'static.unkownError', color: "red" });
-                        //                     this.hideFirstComponent()
-                        //                     break;
-                        //             }
-                        //             this.setState({ loading: false })
-                        //         }
-                        //     }
-                        // );
-                //     } else {
-                //         this.setState({
-                //             message: response.data.messageCode,
-                //             loading: false, color: "red"
-                //         }, () => {
-                //             this.hideFirstComponent()
-                //         })
-                //     }
-                // }).catch(
-                //     error => {
-                //         if (error.message === "Network Error") {
-                //             this.setState({
-                //                 message: 'static.unkownError',
-                //                 loading: false,
-                //                 color: "red"
-                //             }, () => {
-                //                 this.hideFirstComponent()
-                //             })
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-
-                //                 case 401:
-                //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                //                     break;
-                //                 case 403:
-                //                     this.props.history.push(`/accessDenied`)
-                //                     break;
-                //                 case 500:
-                //                 case 404:
-                //                 case 406:
-                //                     this.setState({
-                //                         message: error.response.data.messageCode,
-                //                         loading: false,
-                //                         color: "red"
-                //                     }, () => {
-                //                         this.hideFirstComponent()
-                //                     })
-                //                     break;
-                //                 case 412:
-                //                     this.setState({
-                //                         message: error.response.data.messageCode,
-                //                         loading: false,
-                //                         color: "red"
-                //                     }, () => {
-                //                         this.hideFirstComponent()
-                //                     })
-                //                     break;
-                //                 default:
-                //                     this.setState({
-                //                         message: 'static.unkownError',
-                //                         loading: false,
-                //                         color: "red"
-                //                     }, () => {
-                //                         this.hideFirstComponent()
-                //                     })
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
+            //                 case 401:
+            //                     this.props.history.push(`/login/static.message.sessionExpired`)
+            //                     break;
+            //                 case 403:
+            //                     this.props.history.push(`/accessDenied`)
+            //                     break;
+            //                 case 500:
+            //                 case 404:
+            //                 case 406:
+            //                     this.setState({
+            //                         message: error.response.data.messageCode,
+            //                         loading: false,
+            //                         color: "red"
+            //                     }, () => {
+            //                         this.hideFirstComponent()
+            //                     })
+            //                     break;
+            //                 case 412:
+            //                     this.setState({
+            //                         message: error.response.data.messageCode,
+            //                         loading: false,
+            //                         color: "red"
+            //                     }, () => {
+            //                         this.hideFirstComponent()
+            //                     })
+            //                     break;
+            //                 default:
+            //                     this.setState({
+            //                         message: 'static.unkownError',
+            //                         loading: false,
+            //                         color: "red"
+            //                     }, () => {
+            //                         this.hideFirstComponent()
+            //                     })
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         } else {
             document.getElementById("treeDiv").style.display = "none";
@@ -537,8 +539,8 @@ class LoadDeleteDataSet extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
+            var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+            var program = transaction.objectStore('datasetDetails');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -556,6 +558,8 @@ class LoadDeleteDataSet extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                console.log("myResult>>>", myResult);
+
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
@@ -567,7 +571,8 @@ class LoadDeleteDataSet extends Component {
                         // var programJson1 = JSON.parse(programData);
                         var programJson = {
                             programId: myResult[i].programId,
-                            versionId: myResult[i].version
+                            versionId: myResult[i].version,
+                            changed: myResult[i].changed
                         }
                         proList.push(programJson)
                     }
@@ -575,6 +580,7 @@ class LoadDeleteDataSet extends Component {
                 // this.setState({
                 //     programs: proList
                 // })
+                console.log("ProList>>>", proList);
                 this.checkNewerVersions(proList);
                 // if (this.props.updateState != undefined) {
                 //     this.props.updateState(false);
@@ -615,7 +621,7 @@ class LoadDeleteDataSet extends Component {
                                 <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                     <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
                                     <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Dataset is not loaded.</span></li>
+                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">Version is not loaded.</span></li>
                                     <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">Keep latest  version and delete older versions.</span></li>
                                     <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">Delete the version</span></li>
                                 </ul>
@@ -685,16 +691,18 @@ class LoadDeleteDataSet extends Component {
                                                                                 <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
                                                                                 <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
                                                                                 <ul>
+
                                                                                     {
                                                                                         this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
                                                                                             (item3.versionList).map((item4, count) => (
+
                                                                                                 <>
                                                                                                     <li><span className="tree_label">
                                                                                                         <span className="">
                                                                                                             <div className="checkbox m-0">
                                                                                                                 <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcontree"></i>}
+                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{" for forecast period "}<b>{(moment(item4.forecastStartDate).format(DATE_FORMAT_CAP))}</b>{" to "}<b>{(moment(item4.forecastStopDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && c.changed == 1).length > 0  && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcontree"></i>}
                                                                                                             </div>
                                                                                                         </span>
                                                                                                     </span>
@@ -867,13 +875,13 @@ class LoadDeleteDataSet extends Component {
                         programTransaction1.delete(id);
                     }
                     transaction1.oncomplete = function (event) {
-                        // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                        // var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                        // for (var i = 0; i < listOfProgramVersion.length; i++) {
-                        //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                        //     programTransaction2.delete(id);
-                        // }
-                        // transaction2.oncomplete = function (event) {
+                        var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                        var programTransaction2 = transaction2.objectStore('datasetDetails');
+                        for (var i = 0; i < listOfProgramVersion.length; i++) {
+                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                            programTransaction2.delete(id);
+                        }
+                        transaction2.oncomplete = function (event) {
                         // this.setState({
                         //     loading: false,
                         //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
@@ -883,7 +891,7 @@ class LoadDeleteDataSet extends Component {
                         // })
                         this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
                         window.location.reload();
-                        // }.bind(this)
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -926,13 +934,13 @@ class LoadDeleteDataSet extends Component {
                                     programTransaction1.delete(id);
                                 }
                                 transaction1.oncomplete = function (event) {
-                                    // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                                    // var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                                    // for (var i = 0; i < listOfProgramVersion.length; i++) {
-                                    //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                    //     programTransaction2.delete(id);
-                                    // }
-                                    // transaction2.oncomplete = function (event) {
+                                    var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                                    var programTransaction2 = transaction2.objectStore('datasetDetails');
+                                    for (var i = 0; i < listOfProgramVersion.length; i++) {
+                                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+                                        programTransaction2.delete(id);
+                                    }
+                                    transaction2.oncomplete = function (event) {
                                     this.setState({
                                         loading: false,
                                         message: "Dataset deleted successfully",
@@ -942,7 +950,7 @@ class LoadDeleteDataSet extends Component {
                                     })
                                     this.getPrograms();
                                     this.getLocalPrograms();
-                                    // }.bind(this)
+                                    }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -970,7 +978,7 @@ class LoadDeleteDataSet extends Component {
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Do you want to delete this version",
+            message: "Changes are not saved still do you want to delete this version.",
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -996,10 +1004,10 @@ class LoadDeleteDataSet extends Component {
                                 var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
                                 var deleteRequest1 = programTransaction1.delete(id);
                                 deleteRequest1.onsuccess = function (event) {
-                                    // var transaction2 = db1.transaction(['programQPLDetails'], 'readwrite');
-                                    // var programTransaction2 = transaction2.objectStore('programQPLDetails');
-                                    // var deleteRequest2 = programTransaction2.delete(id);
-                                    // deleteRequest2.onsuccess = function (event) {
+                                    var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                                    var programTransaction2 = transaction2.objectStore('datasetDetails');
+                                    var deleteRequest2 = programTransaction2.delete(id);
+                                    deleteRequest2.onsuccess = function (event) {
                                     this.setState({
                                         loading: false,
                                         message: "Dataset delete succesfully.",
@@ -1010,7 +1018,7 @@ class LoadDeleteDataSet extends Component {
                                     this.getPrograms();
                                     this.getLocalPrograms();
 
-                                    // }.bind(this)
+                                    }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -1347,39 +1355,37 @@ class LoadDeleteDataSet extends Component {
                                             var putRequest = downloadedProgramSaveData.put(item);
 
                                         }
-                                        // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                        // var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                        // var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                        // var programIds = []
-                                        // for (var r = 0; r < json.length; r++) {
-                                        //     var programQPLDetailsJson = {
-                                        //         id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                        //         programId: json[r].programId,
-                                        //         version: json[r].currentVersion.versionId,
-                                        //         userId: userId,
-                                        //         programCode: json[r].programCode,
-                                        //         openCount: 0,
-                                        //         addressedCount: 0,
-                                        //         programModified: 0
-                                        //     };
-                                        // programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                        // var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                        // }
-                                        // programQPLDetailsTransaction.oncomplete = function (event) {
-                                        this.setState({
-                                            message: 'static.program.downloadsuccess',
-                                            color: 'green',
-                                            loading: false
-                                        })
-                                        this.hideFirstComponent();
-                                        // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
-                                        this.setState({ loading: false })
-                                        // this.refs.programListChild.checkNewerVersions();
-                                        this.getPrograms();
-                                        this.getLocalPrograms();
-                                        this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
-                                        // }.bind(this)
-                                        // }.bind(this)
+                                        transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                            var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                            var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                            var programIds = []
+                                            for (var r = 0; r < json.length; r++) {
+                                                var programQPLDetailsJson = {
+                                                    id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                    programId: json[r].programId,
+                                                    version: json[r].currentVersion.versionId,
+                                                    userId: userId,
+                                                    programCode: json[r].programCode,
+                                                    changed: 0
+                                                };
+                                                programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                            }
+                                            programQPLDetailsTransaction.oncomplete = function (event) {
+                                                this.setState({
+                                                    message: 'static.program.downloadsuccess',
+                                                    color: 'green',
+                                                    loading: false
+                                                })
+                                                this.hideFirstComponent();
+                                                // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
+                                                this.setState({ loading: false })
+                                                // this.refs.programListChild.checkNewerVersions();
+                                                this.getPrograms();
+                                                this.getLocalPrograms();
+                                                this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
+                                            }.bind(this)
+                                        }.bind(this)
                                     }.bind(this)
                                 }
                             }.bind(this)
