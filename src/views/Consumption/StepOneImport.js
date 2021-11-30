@@ -125,7 +125,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             if (listArray.length > 0) {
                 for (var i = 0; i < listArray.length; i++) {
                     var paJson = {
-                        name: getLabelText(listArray[i].label, this.state.lang),
+                        name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
                         id: parseInt(listArray[i].planningUnitId),
                         multiplier: listArray[i].multiplier,
                         active: listArray[i].active,
@@ -791,22 +791,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 data = [];
                 data[0] = papuList[j].planningUnit.id
-                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                 data[2] = papuList[j].multiplier
                 data[3] = papuList[j].forecastingUnit.id
                 data[4] = planningUnitObj.forecastingUnit.tracerCategory.id
 
-                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
-                let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
-                let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
+                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
+                // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
+                // let match = filteredForecastingUnit.filter(c => c.id == papuList[j].forecastingUnit.id);
 
-                // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
-                // let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
-                // let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
+                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
+                let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
+                // console.log("filteredPlanningUnit---------->", filteredPlanningUnit);
+                let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
 
                 if (match.length > 0) {
                     data[5] = papuList[j].planningUnit.id
-                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang)
+                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                     data[7] = papuList[j].multiplier
                     data[8] = 1
                     data[9] = 1
@@ -860,7 +861,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 {
                     title: 'Supply Plan Planning Unit Id',
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true//0 A
                 },
                 {
@@ -889,7 +890,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 {
                     title: 'Forecast Planning Unit Id',
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true//5 F
                 },
                 {
@@ -1271,7 +1272,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label> */}
                             <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
                             <div className="controls ">
@@ -1293,7 +1294,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
 
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label> */}
                             <Label htmlFor="appendedInputButton">Supply Plan Version</Label>
                             <div className="controls">
@@ -1314,7 +1315,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
 
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label> */}
                             <Label htmlFor="appendedInputButton">Forecast Program</Label>
                             <div className="controls ">
@@ -1334,11 +1335,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </InputGroup>
                             </div>
                         </FormGroup>
-
-
-                    </div>
-                    <div className="row">
-                        <FormGroup className="col-md-3">
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label> */}
                             <Label htmlFor="appendedInputButton">Range</Label>
                             <div className="controls  Regioncalender">
@@ -1357,12 +1354,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                             </div>
                         </FormGroup>
+
                     </div>
+
                 </div>
 
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" style={{ marginTop: '-15px;' }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
