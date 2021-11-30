@@ -60,7 +60,7 @@ class ForecastOutput extends Component {
             regionVal: [],
             regionListFiltered: [],
             versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
-            forecastingUnits: [{ value: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, { value: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }],
+            forecastingUnits: [{ id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }],
             planningUnitListAll: [
                 { planningUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30", forecastingUnit: { forecastingUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
                 { planningUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30", forecastingUnit: { forecastingUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
@@ -79,10 +79,15 @@ class ForecastOutput extends Component {
                 { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 29927 }, { consumptionDate: "2021-02-01", consumptionQty: 30113 }, { consumptionDate: "2021-03-01", consumptionQty: 30305 }, { consumptionDate: "2021-04-01", consumptionQty: 30496 }, { consumptionDate: "2021-05-01", consumptionQty: 30688 }, { consumptionDate: "2021-06-01", consumptionQty: 30879 }, { consumptionDate: "2021-07-01", consumptionQty: 31077 }, { consumptionDate: "2021-08-01", consumptionQty: 31274 }, { consumptionDate: "2021-09-01", consumptionQty: 31471 }, { consumptionDate: "2021-10-01", consumptionQty: 31668 }, { consumptionDate: "2021-11-01", consumptionQty: 31870 }, { consumptionDate: "2021-12-01", consumptionQty: 32073 }] },
                 { planningUnit: { id: 3, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90" }, scenario: { id: 3, label: "C. Consumption Low" }, color: "#118b70", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 32920 }, { consumptionDate: "2021-02-01", consumptionQty: 33124 }, { consumptionDate: "2021-03-01", consumptionQty: 33336 }, { consumptionDate: "2021-04-01", consumptionQty: 33546 }, { consumptionDate: "2021-05-01", consumptionQty: 33757 }, { consumptionDate: "2021-06-01", consumptionQty: 33967 }, { consumptionDate: "2021-07-01", consumptionQty: 34185 }, { consumptionDate: "2021-08-01", consumptionQty: 34401 }, { consumptionDate: "2021-09-01", consumptionQty: 34618 }, { consumptionDate: "2021-10-01", consumptionQty: 34835 }, { consumptionDate: "2021-11-01", consumptionQty: 35057 }, { consumptionDate: "2021-12-01", consumptionQty: 35280 }] }
             ],
+            // consumptionDataAll: [
+            //     { planningUnit: { id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30" }, scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 299147 }] },
+            //     { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 244759 }] },
+            //     { planningUnit: { id: 3, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90" }, scenario: { id: 3, label: "C. Consumption Low" }, color: "#118b70", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 269235 }] }
+            // ],
             consumptionData: [],
             scenarioList: [],
             selectedScenarioId: 1,
-
+            monthArrayListTemp1: ["2020", "2021"]
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -408,8 +413,8 @@ class ForecastOutput extends Component {
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,
-            planningUnitId: "",
-            forecastingUnitId: "",
+            planningUnitId: [],
+            forecastingUnitId: [],
             consumptionData: []
         }, () => {
             if (viewById == 2) {
@@ -439,7 +444,8 @@ class ForecastOutput extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: 'Monthly Forecast (Planning Units)'
+                // text: 'Monthly Forecast (Planning Units)'
+                text: 'Monthly Forecast (Forecasting Unit)'
             },
             scales: {
                 yAxes: [
@@ -447,10 +453,11 @@ class ForecastOutput extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "Planning Units",
+                            // labelString: "Planning Units",
+                            labelString: "ARV Patient Months",
                             fontColor: 'black'
                         },
-                        stacked: false,
+                        stacked: true,
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black'
@@ -523,7 +530,7 @@ class ForecastOutput extends Component {
                             type: 'line',
                             stack: 3,
                             yAxisID: 'A',
-                            backgroundColor: 'transparent',
+                            backgroundColor: item.color,
                             borderColor: item.color,
                             borderStyle: 'dotted',
                             ticks: {
@@ -545,6 +552,64 @@ class ForecastOutput extends Component {
 
                 labels: [...new Set(this.state.monthArrayList.map(ele => (moment(ele).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
                 datasets: datasetsArr
+
+                // labels: ['2020', '2021'],
+                // datasets: [
+                //     {
+                //         label: 'abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30',
+                //         type: 'line',
+                //         stack: 3,
+                //         yAxisID: 'A',
+                //         backgroundColor: '#ba0c2f',
+                //         borderColor: '#ba0c2f',
+                //         borderStyle: 'dotted',
+                //         ticks: {
+                //             fontSize: 2,
+                //             fontColor: 'transparent',
+                //         },
+                //         lineTension: 0,
+                //         pointStyle: 'line',
+                //         pointRadius: 0,
+                //         showInLegend: true,
+                //         data: ['0', '299147']
+                //     },
+                //     {
+                //         label: 'dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30',
+                //         type: 'line',
+                //         stack: 3,
+                //         yAxisID: 'A',
+                //         backgroundColor: '#0067b9',
+                //         borderColor: '#0067b9',
+                //         borderStyle: 'dotted',
+                //         ticks: {
+                //             fontSize: 2,
+                //             fontColor: 'transparent',
+                //         },
+                //         lineTension: 0,
+                //         pointStyle: 'line',
+                //         pointRadius: 0,
+                //         showInLegend: true,
+                //         data: ['0', '244759']
+                //     },
+                //     {
+                //         label: 'dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90',
+                //         type: 'line',
+                //         stack: 3,
+                //         yAxisID: 'A',
+                //         backgroundColor: '#118b70',
+                //         borderColor: '#118b70',
+                //         borderStyle: 'dotted',
+                //         ticks: {
+                //             fontSize: 2,
+                //             fontColor: 'transparent',
+                //         },
+                //         lineTension: 0,
+                //         pointStyle: 'line',
+                //         pointRadius: 0,
+                //         showInLegend: true,
+                //         data: ['0', '269235']
+                //     }
+                // ]
 
             };
         }
@@ -700,8 +765,8 @@ class ForecastOutput extends Component {
                                                             name="viewById"
                                                             id="viewById"
                                                             bsSize="sm"
-                                                            value={this.state.viewById}
-                                                            onChange={this.setViewById}
+                                                        // value={this.state.viewById}
+                                                        // onChange={this.setViewById}
                                                         >
                                                             <option value="1">{i18n.t('static.report.planningUnit')}</option>
                                                             <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
@@ -727,7 +792,8 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3" id="planningUnitDiv">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label> */}
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls ">
                                                     {/* <InputGroup className="box"> */}
@@ -795,8 +861,8 @@ class ForecastOutput extends Component {
                                                             name="yaxisEquUnit"
                                                             id="yaxisEquUnit"
                                                             bsSize="sm"
-                                                            value={this.state.yaxisEquUnit}
-                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                            value={false}
+                                                        // onChange={(e) => { this.yAxisChange(e); }}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>
@@ -848,11 +914,15 @@ class ForecastOutput extends Component {
                                                             <thead>
                                                                 <tr>
                                                                     <th>Display?</th>
-                                                                    <th>Planning Unit</th>
+                                                                    <th>Forecasting Unit</th>
                                                                     <th>Tree Name + Scenario</th>
                                                                     {this.state.monthArrayList.map(item => (
                                                                         <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
                                                                     ))}
+                                                                    {/* {this.state.monthArrayListTemp1.map(item => (
+                                                                        <th>{item}</th>
+                                                                    ))} */}
+
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -864,6 +934,24 @@ class ForecastOutput extends Component {
                                                                         {this.state.monthArrayList.map(item1 => (
                                                                             <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
                                                                         ))}
+                                                                        {/* {item.planningUnit.id == 1 &&
+                                                                            <>
+                                                                                <td>0</td>
+                                                                                <td>299,147</td>
+                                                                            </>
+                                                                        }
+                                                                        {item.planningUnit.id == 2 &&
+                                                                            <>
+                                                                                <td>0</td>
+                                                                                <td>244,759</td>
+                                                                            </>
+                                                                        }
+                                                                        {item.planningUnit.id == 3 &&
+                                                                            <>
+                                                                                <td>0</td>
+                                                                                <td>269,235</td>
+                                                                            </>
+                                                                        } */}
                                                                     </tr>
                                                                 ))}
 

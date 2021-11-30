@@ -588,20 +588,33 @@ class ForecastSummary extends Component {
 
                                                     <thead>
                                                         <tr>
+                                                            <th style={{ border: "none" }}></th>
+                                                            <th style={{ border: "none" }}></th>
+                                                            <th style={{ border: "none" }}></th>
+                                                            <th colspan="3">North</th>
+                                                            <th colspan="3">South</th>
+                                                            <th colspan="3">East</th>
+                                                            <th colspan="3">West</th>
+                                                            <th style={{ border: "none" }}></th>
+
+                                                        </tr>
+                                                        <tr>
                                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                             <th className="text-center" style={{}}> Forecasting Unit </th>
                                                             <th className="text-center" style={{}}>Planning Unit</th>
-                                                            <th className="text-center" style={{}}>Total Forecasted Quantity</th>
-                                                            <th className="text-center" style={{}}>Stock (end of Dec 2020)</th>
-                                                            <th className="text-center" style={{}}>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Desired Months of Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Desired Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
-                                                            <th className="text-center" style={{}}>Price Type</th>
-                                                            <th className="text-center" style={{}}>Unit Price ($)</th>
-                                                            <th className="text-center" style={{}}>Procurements Needed ($)</th>
-                                                            <th className="text-center" style={{ width: '20%' }}>Notes</th>
+                                                            <th className="text-center" style={{}}>Selected Forecast</th>
+                                                            <th className="text-center" style={{}}>Forecasted Quantity</th>
+                                                            <th className="text-center" style={{ width: '114px' }}>Notes</th>
+                                                            <th className="text-center" style={{}}>Selected Forecast</th>
+                                                            <th className="text-center" style={{}}>Forecasted Quantity</th>
+                                                            <th className="text-center" style={{ width: '114px' }}>Notes</th>
+                                                            <th className="text-center" style={{}}>Selected Forecast</th>
+                                                            <th className="text-center" style={{}}>Forecasted Quantity</th>
+                                                            <th className="text-center" style={{ width: '114px' }}>Notes</th>
+                                                            <th className="text-center" style={{}}>Selected Forecast</th>
+                                                            <th className="text-center" style={{}}>Forecasted Quantity</th>
+                                                            <th className="text-center" style={{ width: '114px' }}>Notes</th>
+                                                            <th className="text-center" style={{}}>All Regions Total Forecasted Quantity</th>
 
                                                         </tr>
                                                     </thead>
@@ -624,55 +637,64 @@ class ForecastSummary extends Component {
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
+                                                            <td></td>
+                                                            <td></td>
+
 
                                                         </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td>Abacavir 300 mg Tablet</td>
                                                             <td>Abacavir 300 mg Tablet, 60 Tablets</td>
-                                                            <td>191,593</td>
-                                                            <td>42,576</td>
-                                                            <td>206,920</td>
-                                                            <td>57,904</td>
-                                                            <td>5</td>
-                                                            <td>26,610</td>
-                                                            <td>31,294 </td>
-                                                            <td>Custom</td>
-                                                            <td>$1.04</td>
+                                                            <td>C. Consumption Low</td>
+                                                            <td>77,079 </td>
                                                             <td></td>
+                                                            <td>C. Consumption Low</td>
+                                                            <td>12,105 </td>
                                                             <td></td>
+                                                            <td>C. Consumption Low </td>
+                                                            <td>80,738 </td>
+                                                            <td></td>
+                                                            <td>C. Consumption Low</td>
+                                                            <td>21,671 </td>
+                                                            <td></td>
+                                                            <td>191,593 </td>
                                                         </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td>Benzylpenicillin 5 MU Vial</td>
                                                             <td>Benzylpenicillin 5 MU Vial, 10 Vials</td>
-                                                            <td>259,051</td>
-                                                            <td>50,371</td>
-                                                            <td>248,689</td>
-                                                            <td>40,009</td>
-                                                            <td>5</td>
-                                                            <td>35,979</td>
-                                                            <td>4,030  </td>
-                                                            <td>no price type available</td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>97,336 </td>
                                                             <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>36,686 </td>
                                                             <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>99,195 </td>
                                                             <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>25,834 </td>
+                                                            <td></td>
+                                                            <td>259,051  </td>
                                                         </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td>Lamivudine 150 mg Tablet</td>
                                                             <td>Lamivudine 150 mg Tablet, 30 Tablets</td>
-                                                            <td>202,179</td>
-                                                            <td>27,638</td>
-                                                            <td>204,963</td>
-                                                            <td>30,422</td>
-                                                            <td>5</td>
-                                                            <td>28,080</td>
-                                                            <td>2,341  </td>
-                                                            <td>GHSC-PSM*</td>
-                                                            <td>$3.00</td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>51,029  </td>
                                                             <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>74,128  </td>
                                                             <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>10,848  </td>
+                                                            <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>66,174  </td>
+                                                            <td></td>
+                                                            <td>202,179 </td>
                                                         </tr>
 
                                                         <tr>
@@ -692,40 +714,47 @@ class ForecastSummary extends Component {
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
+                                                            <td></td>
+                                                            <td></td>
+
                                                         </tr>
 
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td>Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</td>
                                                             <td>Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each</td>
-                                                            <td>229,205</td>
-                                                            <td>38,698</td>
-                                                            <td>215,933</td>
-                                                            <td>25,426</td>
-                                                            <td>5</td>
-                                                            <td>31,834</td>
-                                                            <td>(6,408)</td>
-                                                            <td>GHSC-PSM*</td>
-                                                            <td>$3.00</td>
-                                                            <td>$19,225.14</td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>52,755 </td>
                                                             <td></td>
+                                                            <td>C. Consumption Low</td>
+                                                            <td>29,505 </td>
+                                                            <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>54,155 </td>
+                                                            <td></td>
+                                                            <td>A. Consumption High</td>
+                                                            <td>32,730  </td>
+                                                            <td></td>
+                                                            <td>229,205  </td>
                                                         </tr>
 
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm Male Condom</td>
                                                             <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces</td>
-                                                            <td>223,136</td>
-                                                            <td>43,388</td>
-                                                            <td>236,524</td>
-                                                            <td>56,776</td>
-                                                            <td>5</td>
-                                                            <td>30,991</td>
-                                                            <td>25,785 </td>
-                                                            <td>Global Fund*</td>
-                                                            <td>$4.00</td>
+                                                            <td>E Demographic -</td>
+                                                            <td>39,429 </td>
                                                             <td></td>
+                                                            <td>E Demographic -</td>
+                                                            <td>78,217 </td>
                                                             <td></td>
+                                                            <td>E Demographic - </td>
+                                                            <td>15,564 </td>
+                                                            <td></td>
+                                                            <td>E Demographic -</td>
+                                                            <td>89,926 </td>
+                                                            <td></td>
+                                                            <td>223,136 </td>
                                                         </tr>
                                                     </tbody>
                                                 </Table>
