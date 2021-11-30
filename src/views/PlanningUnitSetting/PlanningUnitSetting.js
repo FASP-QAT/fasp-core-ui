@@ -80,6 +80,7 @@ export default class PlanningUnitSetting extends Component {
             responsePa: [],
 
         }
+        this.changed = this.changed.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addRow = this.addRow.bind(this);
@@ -89,6 +90,49 @@ export default class PlanningUnitSetting extends Component {
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.getPlanningUnitByTracerCategoryId = this.getPlanningUnitByTracerCategoryId.bind(this);
         this.getProcurementAgentPlanningUnitByPlanningUnitIds = this.getProcurementAgentPlanningUnitByPlanningUnitIds.bind(this);
+    }
+
+    changed = function (instance, cell, x, y, value) {
+        //Planning Unit
+        if (x == 1 && value != null && value != '') {
+            let planningUnitArray = [];
+            var tableJson = this.el.getJson(null, false);
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                planningUnitArray.push(map1.get("1"));
+            }
+            console.log("mylist--------->31", planningUnitArray);
+            this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitArray);
+        }
+
+        if (x == 7) {
+            if (value != -1 && value !== null && value !== '') {
+                let planningUnitId = this.el.getValueFromCoords(1, y);
+                // let planningUnitId = this.el.getValueFromCoords(7, y);
+                let procurementAgentPlanningUnitList = this.state.responsePa;
+                let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+                console.log("mylist--------->1111", procurementAgentPlanningUnitList);
+                console.log("mylist--------->1112", planningUnitId);
+
+                let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+
+                this.el.setValueFromCoords(8, y, obj.catalogPrice, true);
+            } else {
+                this.el.setValueFromCoords(8, y, '', true);
+            }
+
+        }
+
+        if (x == 0) {
+            this.el.setValueFromCoords(1, y, '', true);
+            this.el.setValueFromCoords(7, y, '', true);
+            this.el.setValueFromCoords(8, y, '', true);
+        }
+        if (x == 1) {
+            this.el.setValueFromCoords(7, y, '', true);
+            this.el.setValueFromCoords(8, y, '', true);
+        }
+
     }
 
     getPlanningUnitByTracerCategoryId(tracerCategoryId) {
@@ -175,7 +219,8 @@ export default class PlanningUnitSetting extends Component {
                         responsePa: response.data,
                     },
                         () => {
-                            this.buildJExcel();
+                            console.log("RESPO-------->", this.state.responsePa);
+                            // this.buildJExcel();
                         })
 
 
@@ -334,6 +379,7 @@ export default class PlanningUnitSetting extends Component {
                         name: getLabelText(listArray[i].label, this.state.lang),
                         id: parseInt(listArray[i].planningUnitId),
                         active: listArray[i].active,
+                        forecastingUnit: listArray[i].forecastingUnit
                     }
                     tempList[i] = paJson
                 }
@@ -661,6 +707,7 @@ export default class PlanningUnitSetting extends Component {
                     let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
                     // console.log("selectedForecastProgram---------->11", planningUnitIds);
                     this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
+                    this.buildJExcel();
 
                 })
         } else {
@@ -822,7 +869,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'hidden',
                     // readOnly: true //10K
                 },
-
+                //-----------------
                 // {
                 //     title: 'Planning Unit Category',
                 //     type: 'text',
@@ -910,7 +957,8 @@ export default class PlanningUnitSetting extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
+            onchange: this.changed,
 
 
             oneditionend: this.onedit,
@@ -933,36 +981,35 @@ export default class PlanningUnitSetting extends Component {
 
     filterProcurementAgentByPlanningUnit = function (instance, cell, c, r, source) {
 
-        // var mylist = [];
-        // var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
-        // // console.log("planningUnitId------->1", planningUnitId);
-        // let tempList = [];
-        // tempList.push(planningUnitId);
-        // let mylist = this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
-
-        // console.log("planningUnitId------->33", mylist);
-        // return mylist;
-        // return this.getProcurementAgentPlanningUnitByPlanningUnitIds(tempList);
-
         var mylist = [];
         let procurementAgentPlanningUnitList = this.state.responsePa;
         var planningUnitId = (instance.jexcel.getJson(null, false)[r])[1];
-        let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
-        let paList = tempPaList.map(template => {
-            return {
-                name: paList.procurementAgent.code,
-                id: paList.procurementAgent.id,
-                price: paList.catalogPrice
-            };
-        });
+        console.log("ID------->", planningUnitId);
 
-        paList.unshift({
-            id: -1,
-            name: 'Custom',
-            price: 0
-        })
+        if (planningUnitId !== '') {
 
-        return paList;
+            let tempPaList = procurementAgentPlanningUnitList[planningUnitId];
+            let paList = tempPaList.map(template => {
+                return {
+                    name: template.procurementAgent.code,
+                    id: template.procurementAgent.id,
+                    price: template.catalogPrice
+                };
+            });
+
+            paList.unshift({
+                id: -1,
+                name: 'Custom',
+                price: 0
+            })
+
+            // console.log("planningUnitId------->33", paList);
+
+            return paList;
+        } else {
+            return [];
+        }
+
 
     }.bind(this)
 
@@ -971,14 +1018,15 @@ export default class PlanningUnitSetting extends Component {
     filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
         var tracerCategoryId = (instance.jexcel.getJson(null, false)[r])[0];
-        let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
+        // let planningUnitId = this.getPlanningUnitByTracerCategoryId(tracerCategoryId);
+        // let allPlanningUnitList = this.state.allPlanningUnitList;
 
-        let allPlanningUnitList = this.state.allPlanningUnitList;
+        // for (var i = 0; i < planningUnitId.length; i++) {
+        //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
+        //     mylist.push(list);
+        // }
 
-        for (var i = 0; i < planningUnitId.length; i++) {
-            let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
-            mylist.push(list);
-        }
+        mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
 
         console.log("mylist--------->32", mylist);
         return mylist;
