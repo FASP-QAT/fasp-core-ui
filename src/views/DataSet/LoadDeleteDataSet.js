@@ -295,7 +295,7 @@ class LoadDeleteDataSet extends Component {
                         var programJson = {
                             programId: myResult[i].programId,
                             versionId: myResult[i].version,
-                            changed:myResult[i].changed
+                            changed: myResult[i].changed
                         }
                         proList.push(programJson);
                     }
@@ -702,7 +702,7 @@ class LoadDeleteDataSet extends Component {
                                                                                                             <div className="checkbox m-0">
                                                                                                                 <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
                                                                                                                 <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; })) == item4.versionId).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 ? "redColor" : ""} htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{" for forecast period "}<b>{(moment(item4.forecastStartDate).format(DATE_FORMAT_CAP))}</b>{" to "}<b>{(moment(item4.forecastStopDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId && c.changed == 1).length > 0  && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId))} className="ml-1 fa fa-trash DeleteIcontree"></i>}
+                                                                                                                {this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId).length > 0 && <i title="Delete" onClick={() => this.deleteLocalVersion(item2.program.id, parseInt(item4.versionId),this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == item4.versionId)[0].changed)} className="ml-1 fa fa-trash DeleteIcontree"></i>}
                                                                                                             </div>
                                                                                                         </span>
                                                                                                     </span>
@@ -882,15 +882,15 @@ class LoadDeleteDataSet extends Component {
                             programTransaction2.delete(id);
                         }
                         transaction2.oncomplete = function (event) {
-                        // this.setState({
-                        //     loading: false,
-                        //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                        //     color: 'green'
-                        // }, () => {
-                        //     this.hideFirstComponent()
-                        // })
-                        this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
-                        window.location.reload();
+                            // this.setState({
+                            //     loading: false,
+                            //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
+                            //     color: 'green'
+                            // }, () => {
+                            //     this.hideFirstComponent()
+                            // })
+                            this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+                            window.location.reload();
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
@@ -941,15 +941,15 @@ class LoadDeleteDataSet extends Component {
                                         programTransaction2.delete(id);
                                     }
                                     transaction2.oncomplete = function (event) {
-                                    this.setState({
-                                        loading: false,
-                                        message: "Dataset deleted successfully",
-                                        color: 'green'
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    this.getPrograms();
-                                    this.getLocalPrograms();
+                                        this.setState({
+                                            loading: false,
+                                            message: "Dataset deleted successfully",
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
@@ -974,11 +974,11 @@ class LoadDeleteDataSet extends Component {
 
     }
 
-    deleteLocalVersion(programId, versionId) {
-
+    deleteLocalVersion(programId, versionId, changed) {
+        console.log(">>>",changed);
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Changes are not saved still do you want to delete this version.",
+            message: changed == 1 ? "Changes are not saved still do you want to delete this version." : "Delete this version",
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -1008,15 +1008,15 @@ class LoadDeleteDataSet extends Component {
                                     var programTransaction2 = transaction2.objectStore('datasetDetails');
                                     var deleteRequest2 = programTransaction2.delete(id);
                                     deleteRequest2.onsuccess = function (event) {
-                                    this.setState({
-                                        loading: false,
-                                        message: "Dataset delete succesfully.",
-                                        color: 'green'
-                                    }, () => {
-                                        this.hideFirstComponent()
-                                    })
-                                    this.getPrograms();
-                                    this.getLocalPrograms();
+                                        this.setState({
+                                            loading: false,
+                                            message: "Dataset delete succesfully.",
+                                            color: 'green'
+                                        }, () => {
+                                            this.hideFirstComponent()
+                                        })
+                                        this.getPrograms();
+                                        this.getLocalPrograms();
 
                                     }.bind(this)
                                 }.bind(this)

@@ -585,7 +585,7 @@ export default class BuildTree extends Component {
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get('2551_v1_uId_5');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.match.params.programId);
                 datasetDetailsRequest.onsuccess = function (e) {
                     console.log("all good >>>>");
                     console.log("Data update success");
