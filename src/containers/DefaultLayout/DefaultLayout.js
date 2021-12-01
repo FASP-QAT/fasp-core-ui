@@ -284,6 +284,7 @@ const ExtrapolateData = React.lazy(() => import('../../views/Extrapolation/Extra
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
+const CompareVersion = React.lazy(() => import('../../views/CompareVersion/CompareVersion'))
 const ProductValidation = React.lazy(() => import('../../views/Validations/ProductValidations'))
 const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAndSelect/CompareAndSelectScenario'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
@@ -308,6 +309,7 @@ const routes = [
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
+  { path: '/report/compareVersion', exact: true, name: 'Compare Version', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'Product Validation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'Compare and Select Scenario', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
@@ -1570,6 +1572,12 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
+                          {
+                            name: 'Compare Version',
+                            url: '/report/compareVersion',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                           {
                             name: 'Compare and Select Scenario',
                             url: '/report/compareAndSelectScenario',

@@ -1309,6 +1309,7 @@ class AuthenticationService {
                     case "/validation/productValidation":
                     case "/validation/modelingValidation":
                     case "/report/compareAndSelectScenario":
+                    case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
