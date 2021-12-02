@@ -6051,7 +6051,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -6117,7 +6117,7 @@ export default class BuildTree extends Component {
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
                                     <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i> Save</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                     </div>
                                 </>
@@ -6128,7 +6128,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
-                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowJexcelPer()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 </>
                             }
@@ -7522,7 +7522,7 @@ export default class BuildTree extends Component {
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-times"></i>Calculated</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
 
                                                     </CardFooter>
@@ -7648,7 +7648,7 @@ export default class BuildTree extends Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
