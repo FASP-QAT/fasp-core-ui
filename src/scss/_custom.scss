@@ -2054,22 +2054,27 @@ input::placeholder {
 
 .progressbartext1Import {
   // left: 7px;
-  left: -3%;
-  transform: translateX(18%) scale(1);
+  // left: -3%;
+  // transform: translateX(18%) scale(1);
+  left: 0%;
+  transform: translateX(-3%) scale(1);
 }
-
 .progressbartext2Import {
   // left: 7px;
-  left: 48.6667%;
-  transform: translateX(-14%) scale(1);
+  // left: 48.6667%;
+  // transform: translateX(-14%) scale(1);
+  left: 49.6667%;
+  transform: translateX(-38%) scale(1);
 }
 
 .progressbartext3Import {
   // left: 7px;
-  left: 97.3333%;
-  transform: translateX(-40%) scale(1);
+  // left: 97.3333%;
+  // transform: translateX(-40%) scale(1);
+  width: 100px;
+  left: 100%;
+  transform: translateX(-63%) scale(1);
 }
-
 
 
 @media only screen and (max-width: 1024px) {

@@ -1296,16 +1296,21 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/planningUnitSetting/listPlanningUnitSetting":
+                    case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
-                            // if (true) {
                             return true;
                         }
                         break;
                     case "/extrapolation/extrapolateData":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
+                            return true;
+                        }
+                        break;
                     case "/validation/productValidation":
                     case "/validation/modelingValidation":
                     case "/dataentry/consumptionDataEntryAndAdjustment":

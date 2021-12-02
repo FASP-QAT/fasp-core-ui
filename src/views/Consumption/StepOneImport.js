@@ -136,7 +136,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
 
             tempList.unshift({
-                name: 'Do not import',
+                name: i18n.t('static.quantimed.doNotImport'),
                 id: -1,
                 multiplier: 1,
                 active: true,
@@ -674,7 +674,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             } else {
                 this.setState({
-                    message: 'Supply Plan Program and Forecast Program should belong to same Country',
+                    message: i18n.t('static.importFromQATSupplyPlan.belongsSameCountry'),
                     color: 'red'
                 },
                     () => {
@@ -686,7 +686,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
-                message: 'Please select supply plan program'
+                message: i18n.t('static.importFromQATSupplyPlan.selectSupplyPlanProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             this.el.destroy();
@@ -695,7 +695,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
-                message: 'Please select supply plan version'
+                message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectSupplyPlanVersion'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             this.el.destroy();
@@ -704,7 +704,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
-                message: 'Please select forecast program'
+                message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectForecastProgram'),
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             this.el.destroy();
@@ -865,7 +865,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//0 A
                 },
                 {
-                    title: 'Supply Plan Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'text',
                     readOnly: true,//1 B
                 },
@@ -894,7 +894,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//5 F
                 },
                 {
-                    title: 'Forecast Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     // readOnly: true,
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
@@ -912,7 +912,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true//7 H
                 },
                 {
-                    title: 'Conversion Factor (Supply Plan to Forecast Planning Unit)',
+                    title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
                     type: 'numeric',
                     decimal: '.',
                     // readOnly: true,
@@ -1274,7 +1274,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     <div className="row ">
                         <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
@@ -1295,8 +1295,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
 
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Supply Plan Version</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label>
                             <div className="controls">
                                 <InputGroup>
                                     <Input
@@ -1316,8 +1315,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
 
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Forecast Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
@@ -1336,8 +1334,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span></Label> */}
-                            <Label htmlFor="appendedInputButton">Range</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker
