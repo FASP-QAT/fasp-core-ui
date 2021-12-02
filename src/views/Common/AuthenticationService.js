@@ -1310,6 +1310,7 @@ class AuthenticationService {
                     case "/validation/modelingValidation":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
+                    case "/dataset/commitTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":

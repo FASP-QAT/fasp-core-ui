@@ -288,6 +288,7 @@ const ProductValidation = React.lazy(() => import('../../views/Validations/Produ
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 const VersionSettingsComponent = React.lazy(() => import('../../views/DataSet/VersionSettingsComponent'));
@@ -692,6 +693,7 @@ const routes = [
   { path: '/extrapolation/extrapolateData', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Extrapolate Data' }), component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
+  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Commit Tree' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
 
   { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
@@ -1555,6 +1557,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
+                          {
+                            name: "Commit Version",
+                            url: '/dataset/commitTree',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          }
 
                         ]
                       },

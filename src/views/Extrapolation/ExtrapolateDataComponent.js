@@ -372,6 +372,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </option>
             )
         }, this);
+
         const { planningUnitList } = this.state;
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
@@ -977,7 +978,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <thead>
                                         <tr>
                                             <td width="230px"><b>Errors</b></td>
-                                            <td width="110px"><b>Moving Averages</b></td>
+                                            {this.state.movingAvgId &&
+                                                <td width="110px"><b>Moving Averages</b></td>
+                                            }
                                             <td width="110px"><b>Semi Averages</b></td>
                                             <td width="110px"><b>linear Regression</b></td>
                                             <td width="110px"><b>TES(Lower Confidence Bound)</b></td>
@@ -989,7 +992,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <tbody>
                                         <tr>
                                             <td>RMSE</td>
-                                            <td>199.896015</td>
+                                            {this.state.movingAvgId &&
+                                                <td>199.896015</td>
+                                            }
                                             <td>180.873394</td>
                                             <td bgcolor="#118B70">176.258641</td>
                                             <td></td>
@@ -999,7 +1004,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td>MAPE</td>
-                                            <td>0.506926</td>
+                                            {this.state.movingAvgId &&
+                                                <td>0.506926</td>
+                                            }
                                             <td>0.531222</td>
                                             <td bgcolor="#118B70">0.506034</td>
                                             <td></td>
@@ -1009,7 +1016,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td>MSE</td>
-                                            <td>39958.416892</td>
+                                            {this.state.movingAvgId &&
+                                                <td>39958.416892</td>
+                                            }
                                             <td>32715.184570</td>
                                             <td bgcolor="#118B70">31067.108640</td>
                                             <td></td>
@@ -1019,7 +1028,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td>WAPE</td>
-                                            <td></td>
+                                            {this.state.movingAvgId &&
+                                                <td></td>
+                                            }
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -1029,7 +1040,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td>R^2</td>
-                                            <td></td>
+                                            {this.state.movingAvgId &&
+                                                <td></td>
+                                            }
                                             <td></td>
                                             <td></td>
                                             <td></td>
