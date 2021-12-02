@@ -13,7 +13,8 @@ import {
     MONTHS_IN_PAST_FOR_SUPPLY_PLAN,
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
     PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_WITHOUT_DATE,
-    REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH
+    REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH,
+    JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE
 } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
@@ -65,9 +66,10 @@ export default class PlanningUnitSetting extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             selsource: [],
-            loading: false,
+            loading: true,
             datasetId: '',
             datasetList: [],
+            datasetList1: [],
             startDateDisplay: '',
             endDateDisplay: '',
             beforeEndDateDisplay: '',
@@ -78,6 +80,8 @@ export default class PlanningUnitSetting extends Component {
             selectedForecastProgram: '',
             filterProcurementAgent: '',
             responsePa: [],
+            forecastProgramId: '',
+            forecastProgramVersionId: ''
 
         }
         this.changed = this.changed.bind(this);
@@ -87,9 +91,181 @@ export default class PlanningUnitSetting extends Component {
         this.formSubmit = this.formSubmit.bind(this);
         this.tracerCategoryList = this.tracerCategoryList.bind(this);
         this.planningUnitList = this.planningUnitList.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
         this.procurementAgentList = this.procurementAgentList.bind(this);
         this.getPlanningUnitByTracerCategoryId = this.getPlanningUnitByTracerCategoryId.bind(this);
         this.getProcurementAgentPlanningUnitByPlanningUnitIds = this.getProcurementAgentPlanningUnitByPlanningUnitIds.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    cancelClicked() {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
+    }
+
+    oneditionend = function (instance, cell, x, y, value) {
+        var elInstance = instance.jexcel;
+        var rowData = elInstance.getRowData(y);
+
+        if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
+            // console.log("RESP---------", parseFloat(rowData[8]));
+            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
+        elInstance.setValueFromCoords(10, y, 1, true);
+
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        console.log("json.length-------", json.length);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(10, y);
+            if (parseInt(value) == 1) {
+
+                //tracer category
+                var col = ("A").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(0, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                //planning unit
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                console.log("value------------->E", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("F").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                var col = ("G").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+                //procurement agent
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(7, y);
+                console.log("value-----", value);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+                var col = ("I").concat(parseInt(y) + 1);
+                var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+
+                }
+
+
+
+
+            }
+        }
+        return valid;
     }
 
     changed = function (instance, cell, x, y, value) {
@@ -131,6 +307,137 @@ export default class PlanningUnitSetting extends Component {
         if (x == 1) {
             this.el.setValueFromCoords(7, y, '', true);
             this.el.setValueFromCoords(8, y, '', true);
+        }
+
+        //tracerCategory
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //planning unit
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //stock
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+        }
+
+        //existing shipments
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+        }
+
+        //desired months of stock
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            }
+        }
+
+
+        //procurement Agent
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+
+        //unit price
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = DECIMAL_NO_REGEX;
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+            }
         }
 
     }
@@ -379,7 +686,8 @@ export default class PlanningUnitSetting extends Component {
                         name: getLabelText(listArray[i].label, this.state.lang),
                         id: parseInt(listArray[i].planningUnitId),
                         active: listArray[i].active,
-                        forecastingUnit: listArray[i].forecastingUnit
+                        forecastingUnit: listArray[i].forecastingUnit,
+                        label: listArray[i].label
                     }
                     tempList[i] = paJson
                 }
@@ -446,11 +754,7 @@ export default class PlanningUnitSetting extends Component {
                     });
 
                     let tempList = [];
-                    tempList[0] = {
-                        name: 'Custom',
-                        id: -1,
-                        active: true,
-                    }
+
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
@@ -459,14 +763,24 @@ export default class PlanningUnitSetting extends Component {
                                 id: parseInt(listArray[i].procurementAgentId),
                                 active: listArray[i].active,
                                 code: listArray[i].procurementAgentCode,
+                                label: listArray[i].label
                             }
                             tempList[i] = paJson
                         }
                     }
 
+                    tempList.unshift({
+                        name: 'CUSTOM',
+                        id: -1,
+                        active: true,
+                        code: 'CUSTOM',
+                        label: {}
+                    });
+
 
                     this.setState({
                         allProcurementAgentList: tempList,
+                        loading: false
                     },
                         () => {
                             console.log("List------->pa", this.state.allProcurementAgentList)
@@ -539,6 +853,7 @@ export default class PlanningUnitSetting extends Component {
             var program = transaction.objectStore('datasetData');
             var getRequest = program.getAll();
             var datasetList = [];
+            var datasetList1 = [];
 
             getRequest.onerror = function (event) {
                 // Handle errors!
@@ -575,12 +890,13 @@ export default class PlanningUnitSetting extends Component {
                         realmCountry: programJson1.realmCountry,
                         planningUnitList: programJson1.planningUnitList,
                     });
-
+                    datasetList1.push(filteredGetRequestList[i])
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
                 this.setState({
                     datasetList: datasetList,
+                    datasetList1: datasetList1
                 }, () => {
                     this.planningUnitList();
                 })
@@ -591,11 +907,13 @@ export default class PlanningUnitSetting extends Component {
     }
 
     setProgramId(event) {
-        if (event.target.value != 0) {
+        // console.log("PID----------------->", document.getElementById("forecastProgramId").value);
+        var pID = document.getElementById("forecastProgramId").value;
+        if (pID != 0) {
             var sel = document.getElementById("forecastProgramId");
             var tempId = sel.options[sel.selectedIndex].text;
             let forecastProgramVersionId = tempId.split('~')[1];
-            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == event.target.value && c.versionId == forecastProgramVersionId)[0]
+            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == pID && c.versionId == forecastProgramVersionId)[0]
             let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
             let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
@@ -607,7 +925,7 @@ export default class PlanningUnitSetting extends Component {
 
             this.setState(
                 {
-                    datasetId: event.target.value,
+                    datasetId: pID,
                     rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                     startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
                     endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
@@ -654,7 +972,10 @@ export default class PlanningUnitSetting extends Component {
             console.log("selectedForecastProgram---------->", selectedForecastProgram);
             this.setState(
                 {
+                    forecastProgramId: forecastProgramId,
+                    forecastProgramVersionId: forecastProgramVersionId,
                     selsource: selectedForecastProgram.planningUnitList,
+                    loading: true,
                     // selsource: [
                     //     {
                     //         "a1a": "ARVs",
@@ -732,6 +1053,7 @@ export default class PlanningUnitSetting extends Component {
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
+
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
@@ -765,7 +1087,7 @@ export default class PlanningUnitSetting extends Component {
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
 
-            data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
+            data[0] = outPutList[j].planningUnit.forecastingUnit.tracerCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
             data[3] = outPutList[j].treeForecast;
@@ -834,17 +1156,29 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: 'Stock (end of ' + this.state.beforeEndDateDisplay + ')',
-                    type: 'text',
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                     // readOnly: true //4E
                 },
                 {
                     title: 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
-                    type: 'text',
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
                 {
                     title: 'Desired Months of Stock (end of ' + this.state.endDateDisplay + ')',
-                    type: 'text',
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                     // readOnly: true //6G
                 },
                 {
@@ -856,7 +1190,11 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: 'Unit Price',
-                    type: 'text',
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    // mask: '#,##.00',
+                    // disabledMaskOnEdition: true
                     // readOnly: true //8I
                 },
                 {
@@ -942,6 +1280,15 @@ export default class PlanningUnitSetting extends Component {
                     cellA.classList.add('readonly');
                 }
 
+                var procurementAgentId = rowData[7];
+                if (procurementAgentId == -1) {
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.remove('readonly');
+                } else {
+                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                    cell.classList.add('readonly');
+                }
+
             },
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -961,7 +1308,7 @@ export default class PlanningUnitSetting extends Component {
             onchange: this.changed,
 
 
-            oneditionend: this.onedit,
+            oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -999,7 +1346,7 @@ export default class PlanningUnitSetting extends Component {
 
             paList.unshift({
                 id: -1,
-                name: 'Custom',
+                name: 'CUSTOM',
                 price: 0
             })
 
@@ -1054,7 +1401,148 @@ export default class PlanningUnitSetting extends Component {
     }
 
     formSubmit = function () {
+        var validation = this.checkValidation();
+        console.log("validation------------>", validation);
+        if (validation == true) {
+            this.setState({
+                loading: true
+            })
+            var tableJson = this.el.getJson(null, false);
+            var programs = [];
+            var count = 0;
+            var planningUnitList = [];
 
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+
+                let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
+                let procurementAgentObj = "";
+                if (parseInt(map1.get("7")) === -1) {
+                    procurementAgentObj = null
+                } else {
+                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                }
+
+
+                let tempJson = {
+                    "programPlanningUnitId": parseInt(map1.get("9")),
+                    "planningUnit": {
+                        "id": parseInt(map1.get("1")),
+                        "label": planningUnitObj.label,
+                        "forecastingUnit": {
+                            "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                            "label": planningUnitObj.forecastingUnit.label,
+                            "tracerCategory": {
+                                "id": planningUnitObj.forecastingUnit.tracerCategory.id,
+                                "label": planningUnitObj.forecastingUnit.tracerCategory.label,
+                                "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
+                            },
+                            "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                        },
+                        "idString": "" + parseInt(map1.get("1"))
+                    },
+                    "consuptionForecast": map1.get("2"),
+                    "treeForecast": map1.get("3"),
+                    "stock": map1.get("4"),
+                    "existingShipments": map1.get("5"),
+                    "monthsOfStock": map1.get("6"),
+                    "procurementAgent": (procurementAgentObj == null ? null : {
+                        "id": parseInt(map1.get("7")),
+                        "label": procurementAgentObj.label,
+                        "code": procurementAgentObj.code,
+                        "idString": "" + parseInt(map1.get("7"))
+                    }),
+                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                }
+
+                planningUnitList.push(tempJson);
+
+            }
+
+            console.log("Final-------------->1", planningUnitList);
+            console.log("Final-------------->00", this.state.datasetList);
+            console.log("Final-------------->01", this.state.forecastProgramId);
+            console.log("Final-------------->02", this.state.forecastProgramVersionId);
+
+            var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
+            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+
+            console.log("Final-------------->2", programData.planningUnitList);
+
+            programData.planningUnitList = planningUnitList;
+
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+
+            programs.push(program);
+
+            console.log("programs to update---", programs);
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+                this.props.updateStepOneData("loading", false);
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
+                    console.log("---hurrey---");
+                })
+                transaction.oncomplete = function (event) {
+                    // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
+                    // this.props.updateStepOneData("color", "green");
+                    // this.setState({
+                    //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                    //     color: "green",
+                    // }, () => {
+                    //     this.props.hideSecondComponent();
+                    //     this.props.finishedStepThree();
+                    //     // this.buildJExcel();
+                    // });
+
+                    this.setState({
+                        // loading: false,
+                        message: i18n.t('static.mt.dataUpdateSuccess'),
+                        color: "green",
+                        // allowAdd: false
+                    }, () => {
+                        this.hideSecondComponent();
+                        // this.filterData();
+                        // this.setProgramId();
+                        this.getDatasetList();
+                    });
+                    console.log("Data update success");
+                    // alert("success");
+
+
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                        this.props.updateStepOneData("loading", false);
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
+
+
+
+        }
     }
 
     addRow = function () {
@@ -1109,7 +1597,8 @@ export default class PlanningUnitSetting extends Component {
             <div className="animated fadeIn" >
 
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
 
@@ -1155,7 +1644,8 @@ export default class PlanningUnitSetting extends Component {
                                                     onChange={this.handleRangeChange}
                                                     onDismiss={this.handleRangeDissmis}
                                                 >
-                                                    <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    {/* <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} /> */}
+                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>
                                             </div>
 

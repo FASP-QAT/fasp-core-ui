@@ -1497,6 +1497,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-code-fork',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
+                          {
+                            name: 'Planning Unit Settings',
+                            url: '/planningUnitSetting/listPlanningUnitSetting',
+                            icon: 'fa fa-code-fork',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                         ]
                       },
                       {
