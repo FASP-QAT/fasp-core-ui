@@ -13,6 +13,7 @@ import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from 
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
+import { ItemMeta } from 'semantic-ui-react';
 const entityname = i18n.t('static.common.listtree');
 export default class ListTreeComponent extends Component {
 
@@ -63,55 +64,21 @@ export default class ListTreeComponent extends Component {
     }
 
     getTreeList(datasetId) {
-        var proList = [];
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
-            var getRequest = program.getAll();
+        // var proList = [];
+        var datasetList = this.state.datasetList;
+        console.log("filter tree---", datasetList);
+        if (datasetId != 0) {
+            datasetList = datasetList.filter(x => x.id == datasetId);
+            console.log('inside if')
+            // proList.push(datasetList)
+        }
 
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                console.log("1---", userId);
-                console.log("2---", myResult);
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("3---", myResult[i]);
-                    if (myResult[i].userId == userId) {
-                        console.log("4---");
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                        console.log("5--->", programData);
-                        // var f = 0
-                        var treeList = programData.treeList;
-                        // for (var k = 0; k < treeList.length; k++) {
-                        if (datasetId == 0) {
-                            console.log('inside else')
-                            proList.push(programData)
-                        } else if (programData.programId == datasetId) {
-                            console.log('inside if')
-                            proList.push(programData)
-                        }
-                        // }
-                    }
-                }
-                console.log("pro list---", proList);
-                this.setState({
-                    treeData: proList
-                }, () => {
-                    this.buildJexcel();
-                });
-
-            }.bind(this);
-        }.bind(this);
+        // console.log("pro list---", proList);
+        this.setState({
+            treeData: datasetList
+        }, () => {
+            this.buildJexcel();
+        });
     }
     getDatasetList() {
         var db1;
@@ -129,8 +96,16 @@ export default class ListTreeComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                for (var i = 0; i < myResult.length; i++) {
+                    var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    myResult[i].programData = programData;
+                }
                 this.setState({
                     datasetList: myResult
+                }, () => {
+                    console.log("datasetList---", this.state.datasetList);
+                    this.getTreeList(0);
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("datasetList--->", myResult[i])
@@ -163,23 +138,30 @@ export default class ListTreeComponent extends Component {
     }
     buildJexcel() {
         let programList = this.state.treeData;
-        console.log(">>>",programList);
+        console.log(">>>", programList);
         let treeArray = [];
         let count = 0;
         for (var j = 0; j < programList.length; j++) {
-            var treeList = programList[j].treeList;
-            for (var k = 0; k < treeList.length; k++) {
-                data = [];
-                data[0] = treeList[k].treeId
-                data[1] = programList[j].programCode
-                data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
-                data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
-                data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                data[6] = treeList[k].notes
-                data[7] = programList[j].programId
-                treeArray[count] = data;
-                count++;
+            console.log("programList[j]---", programList[j]);
+            var treeList = programList[j].programData.treeList;
+
+            if (treeList.length > 0) {
+                for (var k = 0; k < treeList.length; k++) {
+                    data = [];
+                    data[0] = treeList[k].treeId
+                    data[1] = programList[j].programCode + "~v" + programList[j].programData.currentVersion.versionId
+                    // data[1] = programList[j].programCode
+                    data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
+                    data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                    console.log("forecast method--->",treeList[k].forecastMethod.label)
+                    data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
+                    data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                    data[6] = treeList[k].notes
+                    data[7] = programList[j].programId
+                    data[8] = programList[j].id
+                    treeArray[count] = data;
+                    count++;
+                }
             }
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -230,6 +212,11 @@ export default class ListTreeComponent extends Component {
                 },
                 {
                     title: 'ProgramId',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: 'versionId',
                     type: 'hidden',
                     readOnly: true
                 }
@@ -314,7 +301,6 @@ export default class ListTreeComponent extends Component {
         this.hideFirstComponent();
         this.getDatasetList();
         this.getTreeTemplateList();
-        this.getTreeList(0);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -327,7 +313,7 @@ export default class ListTreeComponent extends Component {
         } else {
 
             var treeId = this.el.getValueFromCoords(0, x);
-            var programId = this.el.getValueFromCoords(7, x);
+            var programId = this.el.getValueFromCoords(8, x);
             console.log("programId>>>", programId);
             // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
             this.props.history.push({
@@ -353,8 +339,8 @@ export default class ListTreeComponent extends Component {
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {item.programCode}
+                    <option key={i} value={item.id}>
+                        {item.programCode + "~v" + item.programData.currentVersion.versionId}
                     </option>
                 )
             }, this);
