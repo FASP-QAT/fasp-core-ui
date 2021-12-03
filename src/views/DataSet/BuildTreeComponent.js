@@ -198,6 +198,7 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             showDiv:false,
+            treeTemplateObj: [],
             scalingMonth: new Date(),
             showModelingValidation: true,
             scenario: {
@@ -255,6 +256,7 @@ export default class BuildTree extends Component {
                 forecastMethod: { id: '' },
                 label: { label_en: '' },
                 notes: '',
+                regionList: [],
                 active: true
             },
             treeData: [],
@@ -590,10 +592,29 @@ export default class BuildTree extends Component {
             // programs.forEach(program => {
             var programRequest = programTransaction.put(dataSetObj);
             transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.match.params.programId);
+                datasetDetailsRequest.onsuccess = function (e) {
+                    console.log("all good >>>>");
+                    console.log("Data update success");
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    calculateModelingData(dataSetObj, this, 'BuildTree');
+                }.bind(this);
+                datasetDetailsRequest.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "#BA0C2F",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this)
 
-                console.log("all good >>>>");
-                console.log("Data update success");
-                calculateModelingData(dataSetObj, this, 'BuildTree');
                 // this.setState({
                 //     loading: false,
                 //     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -679,13 +700,15 @@ export default class BuildTree extends Component {
             tempArray.push(tempJson);
             nodeDataMap[1] = tempArray;
             var treeId = parseInt(maxTreeId) + 1;
+            console.log("region values---", this.state.regionValues);
+
             var tempTree = {
                 treeId: treeId,
                 active: curTreeObj.active,
                 forecastMethod: curTreeObj.forecastMethod,
                 label: curTreeObj.label,
                 notes: curTreeObj.notes,
-                regionList: [],
+                regionList: curTreeObj.regionList,
                 scenarioList: [{
                     id: 1,
                     label: {
@@ -1276,6 +1299,10 @@ export default class BuildTree extends Component {
             var treeList = programData.treeList;
             for (var k = 0; k < treeList.length; k++) {
                 proList.push(treeList[k])
+            }
+            if (this.state.treeTemplateObj != null && this.state.treeTemplateObj != "") {
+                proList.push(this.state.treeTemplateObj);
+                // this.setState
             }
             this.setState({
                 dataSetObj: datasetEnc,
@@ -1959,7 +1986,7 @@ export default class BuildTree extends Component {
                 {
                     title: "Calculated change for month",
                     type: 'numeric',
-                    mask: '#,##.00', 
+                    mask: '#,##.00',
                     decimal: '.',
                     readOnly: true
                 },
@@ -2563,12 +2590,29 @@ export default class BuildTree extends Component {
     }
     handleRegionChange = (regionIds) => {
         console.log("regionIds---", regionIds);
+        const { curTreeObj } = this.state;
+        
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label)
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
+            if ((this.state.regionValues).length > 0) {
+                var regionList = [];
+                var regions = this.state.regionValues;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionList.push(json);
+                }
+                curTreeObj.regionList = regionList;
+                this.setState({ curTreeObj });
+            }
         })
     }
     getTreeTemplateById(treeTemplateId) {
@@ -2629,7 +2673,8 @@ export default class BuildTree extends Component {
                 treeData.push(tempTree);
                 this.setState({
                     treeData,
-                    treeId
+                    treeId,
+                    treeTemplateObj: tempTree
                 }, () => {
                     this.getTreeByTreeId(treeId);
                     console.log("tree template obj---", this.state.treeData)
@@ -6016,7 +6061,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -6082,7 +6127,7 @@ export default class BuildTree extends Component {
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
                                     <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i> Save</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                     </div>
                                 </>
@@ -6093,7 +6138,7 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
-                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> Save</Button>
+                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowJexcelPer()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 </>
                             }
@@ -7634,13 +7679,10 @@ export default class BuildTree extends Component {
                                                         </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                        <div class="row">
-                                                   <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
-                                                       <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-times"></i>Calculated</Button>
+                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                        </div>
-                                                    </div>
+                                                       
                                                     </CardFooter>
                                                 </Form>
 
@@ -7764,7 +7806,7 @@ export default class BuildTree extends Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openTreeDataModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>

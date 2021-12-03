@@ -530,6 +530,7 @@ label.arrow_label:after {
   background-color: #fff !important;
   color: #212721 !important;
   font-weight: bold;
+  font-style: normal !important;
 }
 .jexcel > tbody > tr > td:first-child {
   background-color: #fff !important;
@@ -5457,3 +5458,46 @@ fieldset.scheduler-border {
 .collapse-bg{
 background-color: #f5f5f5;
 }
+.greyColor{
+  background-color:#CFCDC9; 
+}
+
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(4) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(5) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(6) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(7) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(8) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(9) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(10) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.jexcel > thead.resizable > tr > .InfoTr::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 2px;
+     cursor: col-resize;
+     font-size: 14px;
+   }
