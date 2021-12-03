@@ -1621,7 +1621,7 @@ export default class PlanningUnitSetting extends Component {
                                                         bsSize="sm"
                                                         onChange={(e) => { this.setProgramId(e); }}
                                                         value={this.state.datasetId}
-
+                                                        disabled={this.state.loading}
                                                     >
                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                         {datasets}
