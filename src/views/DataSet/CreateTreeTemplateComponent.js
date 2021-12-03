@@ -197,7 +197,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
-            tempItems : [],
+            orgCurrentItemConfig: {},
+            tempItems: [],
             preItem: [],
             filteredModelingType: [],
             minMonth: '',
@@ -433,29 +434,14 @@ export default class CreateTreeTemplate extends Component {
     }
     resetNodeData() {
         console.log("reset node data function called");
-        // var currentItemConfig  = this.state.currentItemConfig;
-        // console.log("before currentItemConfig---",currentItemConfig);
-        // const { tempItems } = this.state;
-        // const itemIndex = tempItems.findIndex(o => o.id === currentItemConfig.context.id);
-        // var childItem = tempItems[itemIndex];
-        // console.log("============1============",childItem);
-        // const itemIndex1 = tempItems.findIndex(o => o.id === currentItemConfig.context.parent);
-        // var parentItem = tempItems[itemIndex1];
-        // console.log("============2============");
-        // currentItemConfig.context.payload = childItem.payload;
-        // console.log("============3============",currentItemConfig.context.level);
-        // if (currentItemConfig.context.level != 0) {
-        //     currentItemConfig.parentItem = parentItem.payload;
-        //     console.log("============4============");
-        // }
-        // console.log("after currentItemConfig---",currentItemConfig);
-        // console.log("preItem---", this.state.preItem)
-        // console.log("currentItemConfig before---", this.state.currentItemConfig)
-        // this.setState({
-        //     currentItemConfig
-        // }, () => {
-        //     console.log("currentItemConfig after---", this.state.currentItemConfig)
-        // });
+        const { orgCurrentItemConfig, currentItemConfig } = this.state;
+        currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
+        console.log("============1============", orgCurrentItemConfig);
+        this.setState({
+            currentItemConfig
+        }, () => {
+            console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
+        });
     }
     momCheckbox(e) {
         var checked = e.target.checked;
@@ -2794,7 +2780,7 @@ export default class CreateTreeTemplate extends Component {
                 this.setState({
                     treeTemplate: response.data,
                     items,
-                    tempItems : items,
+                    tempItems: items,
                     loading: false
                 }, () => {
                     console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
@@ -3226,7 +3212,6 @@ export default class CreateTreeTemplate extends Component {
 
         this.setState({ currentItemConfig }, () => {
             console.log("after state update---", this.state.currentItemConfig);
-            console.log("after state update org---", this.state.preItem);
         });
     }
     onAddButtonClick(itemConfig) {
@@ -3415,16 +3400,14 @@ export default class CreateTreeTemplate extends Component {
         console.log("cursor changed called---", data)
         const { context: item } = data;
         console.log("cursor changed item---", item);
-        // this.setState({ preItem: data });
-        const preItem = {
-            payload: item.payload
-        };
+        // const preItem = JSON.parse(JSON.stringify(data.context));
         if (item != null) {
             this.setState({
                 showCalculatorFields: false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
-                preItem: preItem,
+                // preItem: preItem,
+                orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: data,
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
@@ -5242,13 +5225,13 @@ export default class CreateTreeTemplate extends Component {
                                             parent: itemConfig.id,
                                             payload: {
                                                 label: {
-
+                                                    label_en: ""
                                                 },
                                                 nodeType: {
                                                     id: ''
                                                 },
                                                 nodeUnit: {
-
+                                                    id: ''
                                                 },
                                                 nodeDataMap: [
                                                     [
@@ -5351,6 +5334,9 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("add click config---", this.state.currentItemConfig);
                                     console.log("add click nodeflag---", this.state.addNodeFlag);
                                     console.log("item config---", itemConfig);
+                                    this.setState({
+                                        orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
+                                    });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
                                     if (itemConfig.payload.nodeType.id == 4) {

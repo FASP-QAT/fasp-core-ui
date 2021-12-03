@@ -197,6 +197,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            orgCurrentItemConfig: {},
             treeTemplateObj: [],
             scalingMonth: new Date(),
             showModelingValidation: true,
@@ -477,6 +478,20 @@ export default class BuildTree extends Component {
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
         this.createOrUpdateTree = this.createOrUpdateTree.bind(this);
         this.treeDataChange = this.treeDataChange.bind(this);
+        this.resetNodeData = this.resetNodeData.bind(this);
+    }
+    resetNodeData() {
+        console.log("reset node data function called");
+        const { orgCurrentItemConfig, currentItemConfig} = this.state;
+        currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
+        // currentScenario = JSON.parse(JSON.stringify((orgCurrentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]));
+        console.log("============1============", orgCurrentItemConfig);
+        this.setState({
+            currentItemConfig,
+            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+        }, () => {
+            console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
+        });
     }
 
     callAfterScenarioChange(scenarioId) {
@@ -2581,7 +2596,7 @@ export default class BuildTree extends Component {
     handleRegionChange = (regionIds) => {
         console.log("regionIds---", regionIds);
         const { curTreeObj } = this.state;
-        
+
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label)
@@ -4984,6 +4999,7 @@ export default class BuildTree extends Component {
                 showMomDataPercent: false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
+                orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: data,
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
@@ -6051,6 +6067,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
                                 </Form>
@@ -6950,13 +6967,13 @@ export default class BuildTree extends Component {
                                             parent: itemConfig.id,
                                             payload: {
                                                 label: {
-
+                                                    label_en: ''
                                                 },
                                                 nodeType: {
                                                     id: ''
                                                 },
                                                 nodeUnit: {
-
+                                                    id: ''
                                                 },
                                                 nodeDataMap: nodeDataMap
                                             }
@@ -6981,6 +6998,9 @@ export default class BuildTree extends Component {
                                     console.log("add click config---", this.state.currentItemConfig);
                                     console.log("add click nodeflag---", this.state.addNodeFlag);
                                     console.log("add click number node flag---", this.state.numberNode);
+                                    this.setState({
+                                        orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
+                                    });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
                                     if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
