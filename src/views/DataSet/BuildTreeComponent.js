@@ -16,7 +16,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon,Collapse, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -197,6 +197,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            showDiv:false,
             scalingMonth: new Date(),
             showModelingValidation: true,
             scenario: {
@@ -475,6 +476,7 @@ export default class BuildTree extends Component {
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
         this.createOrUpdateTree = this.createOrUpdateTree.bind(this);
         this.treeDataChange = this.treeDataChange.bind(this);
+        this.toggleCollapse = this.toggleCollapse.bind(this);
     }
 
     callAfterScenarioChange(scenarioId) {
@@ -515,6 +517,14 @@ export default class BuildTree extends Component {
             // console.log("currentScenario---", this.state.currentScenario);
         });
     }
+
+
+    toggleCollapse(){
+        this.setState({
+            showDiv:!this.state.showDiv
+        })
+    }
+
     calculateAfterDragDrop() {
         // var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
         // var dataEnc = dataSetObj;
@@ -7033,7 +7043,7 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        <div className="pb-lg-0">
+                        {/* <div className="pb-lg-0">
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
@@ -7059,9 +7069,9 @@ export default class BuildTree extends Component {
                                     </Col>
                                 </div>
                             </div>
-                        </div>
-                        <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
-                            <div className="container-fluid">
+                        </div> */}
+                        <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
+                            <div className="container-fluid pl-lg-3 pr-lg-3">
 
                                 <Formik
                                     enableReinitialize={true}
@@ -7317,8 +7327,27 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
+                                                        <FormGroup className="col-md-3 pl-lg-0">
+                                                            <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="datasetId"
+                                                                    id="datasetId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.programId}
+                                                                    onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                                                >
+                                                                    <option value="">{"Please select program"}</option>
+                                                                    {datasets}
+                                                                </Input>
+                                                              
+                                                            </InputGroup>
+
+                                                        </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Tree'}</Label>
+                                                                    <InputGroup>
                                                                     <Input
                                                                         type="select"
                                                                         name="treeId"
@@ -7332,8 +7361,101 @@ export default class BuildTree extends Component {
                                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                                         {treeList}
                                                                     </Input>
+                                                                    <InputGroupAddon addonType="append">
+                                                                            <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                </FormGroup>
+                                                                   
+                                                                    <div class="collapse-bg" style={{display:this.state.showDiv?'block':'none'}}>
+                                                                    <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="forecastMethodId"
+                                id="forecastMethodId"
+                                bsSize="sm"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                required
+                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
+                            >
+                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                {forecastMethods}
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="treeName"
+                                name="treeName"
+                                bsSize="sm"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                            <div className="controls ">
+                                {/* <InMultiputGroup> */}
+                                <MultiSelect
+                                    // type="select"
+                                    name="regionId"
+                                    id="regionId"
+                                    bsSize="sm"
+                                    value={this.state.regionValues}
+                                    onChange={(e) => { this.handleRegionChange(e) }}
+                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                    labelledBy={i18n.t('static.common.regiontext')}
+                                />
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label htmlFor="currencyId">Notes</Label>
+                            <Input type="textarea"
+                                id="treeNotes"
+                                name="treeNotes"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-12">
+                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active10"
+                                    name="active"
+                                    value={true}
+                                    checked={this.state.curTreeObj.active === true}
+                                    onChange={(e) => { this.treeDataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio1">
+                                    {i18n.t('static.common.active')}
+                                </Label>
+                            </FormGroup>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active11"
+                                    name="active"
+                                    value={false}
+                                    checked={this.state.curTreeObj.active === false}
+                                    onChange={(e) => { this.treeDataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2">
+                                    {i18n.t('static.common.disabled')}
+                                </Label>
+                            </FormGroup>
+                        </FormGroup>
+                                                                    </div>
+                                                                  
+                                                                    </FormGroup>     
                                                                 <FormGroup className="col-md-3 pl-lg-0">
 
                                                                     <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
@@ -7400,8 +7522,8 @@ export default class BuildTree extends Component {
                                                                     </div>
                                                                 </FormGroup>
 
-                                                                <FormGroup className="col-md-3" >
-                                                                    <div className="check inline  pl-lg-1 pt-lg-3">
+                                                                <FormGroup className="col-md-2" >
+                                                                    <div className="check inline  pl-lg-1 pt-lg-0">
                                                                         <div>
                                                                             <Input
                                                                                 className="form-check-input checkboxMargin"
@@ -7417,6 +7539,10 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
+                                                                        </div>
+                                                                        </FormGroup>
+                                                                        <FormGroup className="col-md-3" style={{marginLeft:'-2%'}}>
+                                                                    <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
                                                                                 className="form-check-input checkboxMargin"
@@ -7432,6 +7558,10 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Forecasting Unit & Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
+                                                                        </div>
+                                                                        </FormGroup>
+                                                                        <FormGroup className="col-md-3" >
+                                                                    <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
                                                                                 className="form-check-input checkboxMargin"
@@ -7455,8 +7585,36 @@ export default class BuildTree extends Component {
 
                                                     </CardBody>
 
+                                                    <div className="pb-lg-0" style={{marginTop:'-4%'}}>
+                            <div className="card-header-actions">
+                                <div className="card-header-action pr-4 pt-lg-0">
+
+                                    <Col md="12 pl-0">
+                                        <div className="d-md-flex">
+                                            <a className="pr-lg-0 pt-lg-1">
+                                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                            </a>
+                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+
+                                                <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                    this.setState({
+                                                        openTreeDataModal: true
+                                                    })
+                                                }}><i className="fa fa-cog"></i></a>
+                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                    onClick={() => this.exportPDF()}
+                                                />
+                                                {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
+                                            </FormGroup>
+
+                                        </div>
+                                    </Col>
+                                </div>
+                            </div>
+                        </div>
+
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
-                                                        <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5>
+                                                        {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
                                                         <Provider>
                                                             <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
@@ -7476,10 +7634,13 @@ export default class BuildTree extends Component {
                                                         </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                        <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
+                                                        <div class="row">
+                                                   <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
+                                                       <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-
+                                                        </div>
+                                                    </div>
                                                     </CardFooter>
                                                 </Form>
 
@@ -7498,7 +7659,7 @@ export default class BuildTree extends Component {
                         <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
-                        <FormGroup className="col-md-12">
+                        {/* <FormGroup className="col-md-12">
                             <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
                             <InputGroup>
                                 <Input
@@ -7514,7 +7675,7 @@ export default class BuildTree extends Component {
                                 </Input>
                             </InputGroup>
 
-                        </FormGroup>
+                        </FormGroup> */}
                         <FormGroup className="col-md-12">
                             <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
                             <Input
