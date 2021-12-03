@@ -833,6 +833,24 @@ class ForecastSummary extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Hide Calculations</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="calculationId"
+                                                            id="calculationId"
+                                                            bsSize="sm"
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                            <option value="1">Yes</option>
+                                                            <option value="2">No</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
 
 
