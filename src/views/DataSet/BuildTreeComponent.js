@@ -2710,6 +2710,22 @@ export default class BuildTree extends Component {
                 scenarioList: curTreeObj.scenarioList,
                 regionValues
             }, () => {
+                if (curTreeObj.scenarioList.length == 1) {
+                    this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
+                   
+                    var scenarioId = curTreeObj.scenarioList[0].id;
+                    // var scenario = document.getElementById("scenarioId");
+                    var selectedText = curTreeObj.scenarioList[0].label.label_en;
+    
+                    this.setState({
+                        selectedScenario: scenarioId,
+                        selectedScenarioLabel: selectedText,
+                        currentScenario: []
+                    }, () => {
+                        console.log("@@@---", this.state.selectedScenario);
+                        this.callAfterScenarioChange(scenarioId);
+                    });
+                }
                 console.log("my items--->", this.state.items);
             });
         } else {
@@ -2813,36 +2829,42 @@ export default class BuildTree extends Component {
                 var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
                 nodeTypeList.push(obj);
             }
-            console.log("final nodeTypeList---", nodeTypeList);
+            // if (nodeTypeList.length == 1) {
+            //     this.state.currentItemConfig.context.payload.nodeType.id=nodeTypeList.
+            // }
+            console.log("final nodeTypeList if---", nodeTypeList);
         } else {
             nodeType = this.state.nodeTypeList.filter(c => c.id == 1)[0];
             nodeTypeList.push(nodeType);
             nodeType = this.state.nodeTypeList.filter(c => c.id == 2)[0];
             nodeTypeList.push(nodeType);
+            console.log("final nodeTypeList else---", nodeTypeList);
         }
         this.setState({
             nodeTypeFollowUpList: nodeTypeList
         }, () => {
-            // if (nodeTypeList.length == 1) {
-            //     const currentItemConfig = this.state.currentItemConfig;
-            //     currentItemConfig.context.payload.nodeType.id = nodeTypeList[0].id;
+            if (nodeTypeList.length == 1) {
+                const currentItemConfig = this.state.currentItemConfig;
+                currentItemConfig.context.payload.nodeType.id = nodeTypeList[0].id;
+                this.setState({
+                    currentItemConfig: currentItemConfig
+                }, () => {
+                    this.nodeTypeChange(nodeTypeList[0].id);
+                    if (nodeTypeList[0].id == 5) {
+                        this.getNoOfMonthsInUsagePeriod();
+                    }
+                })
+            } else {
+                // const currentItemConfig = this.state.currentItemConfig;
+                // currentItemConfig.context.payload.nodeType.id = "";
 
-            //     this.setState({
-            //         currentItemConfig: currentItemConfig
-            //     }, () => {
-            //         this.nodeTypeChange(nodeTypeList[0].id);
-            //     })
-            // } else {
-            //     const currentItemConfig = this.state.currentItemConfig;
-            //     currentItemConfig.context.payload.nodeType.id = "";
+                // this.setState({
+                //     currentItemConfig: currentItemConfig
 
-            //     this.setState({
-            //         currentItemConfig: currentItemConfig
+                // }, () => {
 
-            //     }, () => {
-
-            //     })
-            // }
+                // })
+            }
         });
     }
 
@@ -2913,7 +2935,8 @@ export default class BuildTree extends Component {
                 planningUnitList: listArray
             }, () => {
                 console.log(" get uasge template--------------", response.data);
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                console.log("@@@", this.state.planningUnitList, "@@@", this.state.currentScenario.puNode.planningUnit.id);
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentScenario.puNode.planningUnit.id != undefined) {
                     var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentScenario.puNode.planningUnit.id)[0].multiplier;
                     this.setState({
                         conversionFactor
