@@ -254,7 +254,7 @@ export default class ImportFromQATSupplyPlan extends Component {
 
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
-                                        <li className="progressbartext1Import">Program and Planning Units</li>
+                                        <li className="progressbartext1Import">{i18n.t('static.importFromQATSupplyPlan.ProgramAndPlanningUnits')}</li>
                                         <li className="progressbartext2Import">{i18n.t('static.program.region')}</li>
                                         <li className="progressbartext3Import">{i18n.t('static.quantimed.quantimedImportScreenFourth')}</li>
                                     </ul>
