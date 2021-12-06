@@ -268,8 +268,16 @@ export default class SyncMasterData extends Component {
                                 }
 =======
 
+<<<<<<< HEAD
                                         for (var pu = 0; pu < planningUnitList.length; pu++) {
 >>>>>>> QAT-899
+=======
+                            }
+                            if(pplModified.length>0){
+                                minDate=null;
+                            }
+                            // console.log("Batch Info updated", batchInfoList);
+>>>>>>> QAT-1183
 
                                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
                                             var programJson = {}
@@ -323,10 +331,22 @@ export default class SyncMasterData extends Component {
                                             }
 
                                         }
+<<<<<<< HEAD
                                         if(pplModified.length>0){
                                             minDate=null;
                                         }
                                         // console.log("Batch Info updated", batchInfoList);
+=======
+                                    }
+                                    problemReportList[index].problemReportTransList = problemReportTransList;
+                                }
+                            }
+                            for (var p = 0; p < planningUnitList.length; p++) {
+                                actionList.push({
+                                    planningUnitId: planningUnitList[p],
+                                    type: SHIPMENT_MODIFIED,
+                                    date: minDate!=null?moment(minDate).startOf('month').format("YYYY-MM-DD"):moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+>>>>>>> QAT-1183
 
                                         var problemReportArray = response.data.problemReportList;
                                         // console.log("Problem report array", problemReportArray);
@@ -904,7 +924,11 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                 syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                             }, () => {
+<<<<<<< HEAD
                                                                                                                                                                                                 this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson, readonlyProgramIds,response.programPlanningUnitList);
+=======
+                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson,response.programPlanningUnitList);
+>>>>>>> QAT-1183
                                                                                                                                                                                                 // currency
                                                                                                                                                                                                 var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                                                                                                                                                                                 // console.log("M sync currency transaction start")
