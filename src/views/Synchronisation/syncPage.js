@@ -1185,7 +1185,7 @@ export default class syncPage extends Component {
 
       putRequest.onerror = function (event) {
         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-        this.props.updateState("color", "#BA0C2F");
+        this.props.updateState("color", "red");
         this.props.hideFirstComponent();
       }.bind(this);
       putRequest.onsuccess = function (event) {
@@ -1286,9 +1286,9 @@ export default class syncPage extends Component {
                 loading: false
               })
             }
-          }else{
+          } else {
             this.setState({
-              loading:false
+              loading: false
             })
           }
         })
@@ -1381,7 +1381,7 @@ export default class syncPage extends Component {
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
         if (response1.status == 200) {
           var lastModifiedDate = response1.data;
-          console.log("LastModifiedDate+++",lastModifiedDate);
+          console.log("LastModifiedDate+++", lastModifiedDate);
           var db1;
           var storeOS;
           getDatabase();
@@ -1404,7 +1404,7 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
-              if (lastModifiedDate!=undefined && lastModifiedDate!=null && lastModifiedDate!="" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+              if (lastModifiedDate != undefined && lastModifiedDate != null && lastModifiedDate != "" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
                 this.props.history.push(`/syncProgram`)
               } else {
@@ -1934,7 +1934,7 @@ export default class syncPage extends Component {
                                               this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
                                             }.bind(this)
                                           })
-                                        }else{
+                                        } else {
                                           return false;
                                         }
 
@@ -2120,7 +2120,7 @@ export default class syncPage extends Component {
                                               this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
                                             }.bind(this)
                                           })
-                                        }else{
+                                        } else {
                                           return false;
                                         }
 
@@ -2303,7 +2303,7 @@ export default class syncPage extends Component {
                                               this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
                                             }.bind(this)
                                           })
-                                        }else{
+                                        } else {
                                           return false;
                                         }
 
@@ -2359,7 +2359,7 @@ export default class syncPage extends Component {
                 this.setState({
                   message: response.data.messageCode,
                   loading: false,
-                  color: "#BA0C2F"
+                  color: "red"
                 },
                   () => {
                     this.hideFirstComponent()
@@ -2415,7 +2415,7 @@ export default class syncPage extends Component {
           this.setState({
             message: response1.data.messageCode,
             loading: false,
-            color: "#BA0C2F"
+            color: "red"
           },
             () => {
               this.hideFirstComponent()
@@ -2977,9 +2977,10 @@ export default class syncPage extends Component {
     elInstance.options.editable = false;
     if (this.state.conflictsCount == 0) {
       this.setState({
-        progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green' }, () => {
-          this.hideFirstComponent();
-        })
+        progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green'
+      }, () => {
+        this.hideFirstComponent();
+      })
     }
   }
 
@@ -3049,7 +3050,7 @@ export default class syncPage extends Component {
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="whatIfProgramData" page="commitVersion"></QatProblemActionNew>
         {/* <QatProblemActions ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" /> */}
         <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
-        <h5 className="#BA0C2F" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
+        <h5 className="red" id="div2">{this.state.noFundsBudgetError || this.state.commitVersionError}</h5>
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -3230,7 +3231,7 @@ export default class syncPage extends Component {
                             </Col>
                           </Form>
                         )} />
-                        <h5  style={{ color: 'red' }}>{i18n.t('static.commitVersion.commitNote')}</h5>
+                    <h5 style={{ color: 'red' }}>{i18n.t('static.commitVersion.commitNote')}</h5>
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -3705,198 +3706,330 @@ export default class syncPage extends Component {
                   problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
                 }
               }
-              var programDataJson = {
-                generalData: generalEncryptedData,
-                planningUnitDataList: planningUnitDataList
-              };
-              updatedJson = programDataJson;
+              problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+              problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
+              // programJson.consumptionList = consumptionData;
+              // programJson.inventoryList = inventoryData;
+              // programJson.shipmentList = shipmentData;
+              programJson.problemReportList = problemReportList;
+              console.log("ProgramJson.consumption+++", programJson.consumptionList);
+              // programJson.problemReportList = [];
+              programJson.versionType = { id: document.getElementById("versionType").value };
+              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+              programJson.notes = document.getElementById("notes").value;
+              console.log("ProgramJson+++", programJson);
+              // ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+              //   if (response.status == 200) {
+              //     if (response.data == this.state.comparedLatestVersion) {
+              // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
+              // if (response1.status == 200) {
+              // if (response1.data == false) {
+              ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
+                if (response.status == 200) {
+                  console.log(")))) Commit Request generated successfully");
+                  // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                  // var programDataOs1 = programDataTransaction1.objectStore('programData');
+                  // var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-                        var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                        var programSaveData = transactionForSavingData.objectStore('programData');
+                  // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                  // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                  // var programRequest3 = programDataOs3.delete((this.state.programId).value);
 
-                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                  // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                  // var programRequest2 = programDataOs2.delete((this.state.programId).value);
 
-                        var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
-                        var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                        // for (var i = 0; i < json.length; i++) {
-                        var encryptedText = updatedJson;
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                        var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                  // programRequest1.onerror = function (event) {
+                  // this.setState({
+                  // supplyPlanError: i18n.t('static.program.errortext')
+                  // })
+                  // }.bind(this);
+                  // programRequest2.onsuccess = function (e) {
 
-                        var item = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                          programData: encryptedText,
-                          userId: userId
-                        };
-                        var programQPLDetails = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          userId: userId,
-                          programCode: json.programCode,
-                          openCount: openCount,
-                          addressedCount: addressedCount,
-                          programModified: 0
-                        }
-                        var putRequest = programSaveData.put(item);
-                        var putRequest1 = downloadedProgramSaveData.put(item);
-                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-                        localStorage.setItem("sesProgramId", "");
-                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                        // this.redirectToDashbaord();
-                      }.bind(this)
-                    } else {
-                      this.setState({
-                        message: response.data.messageCode,
-                        color: "#BA0C2F",
-                        loading: false
-                      })
-                      this.hideFirstComponent();
-                    }
+                  // var json = response.data;
+                  // json.actionList = [];
+                  // var version = json.requestedProgramVersion;
+                  // if (version == -1) {
+                  // version = json.currentVersion.versionId
+                  // }
+
+                  // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  // var programSaveData = transactionForSavingData.objectStore('programData');
+
+                  // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+
+                  var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                  var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
+                  // // for (var i = 0; i < json.length; i++) {
+                  // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                  // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                  // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  // var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                  // var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+
+                  // var item = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                  // programData: encryptedText.toString(),
+                  // userId: userId
+                  // };
+                  // var programQPLDetails = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // userId: userId,
+                  // programCode: json.programCode,
+                  // openCount: openCount,
+                  // addressedCount: addressedCount,
+                  // programModified: 0
+                  // }
+                  programQPLDetails.readonly = 1;
+                  // var putRequest = programSaveData.put(programRequest.result);
+                  // var putRequest1 = downloadedProgramSaveData.put(item);
+                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                  localStorage.setItem("sesProgramId", "");
+                  console.log(")))) Made program readonly");
+                  // this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                  this.setState({
+                    progressPer: 50
+                    , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                  }, () => {
+                    this.hideFirstComponent();
+                    this.redirectToDashbaord(response.data);
                   })
-                    .catch(
-                      error => {
-                        console.log("@@@Error4", error);
-                        console.log("@@@Error4", error.message);
-                        console.log("@@@Error4", error.response ? error.response.status : "")
-                        if (error.message === "Network Error") {
-                          console.log("+++in catch 7")
+                  // }.bind(this)
+                } else {
+                  this.setState({
+                    message: response.data.messageCode,
+                    color: "red",
+                    loading: false
+                  })
+                  this.hideFirstComponent();
+                }
+              })
+                .catch(
+                  error => {
+                    console.log("@@@Error4", error);
+                    console.log("@@@Error4", error.message);
+                    console.log("@@@Error4", error.response ? error.response.status : "")
+                    if (error.message === "Network Error") {
+                      console.log("+++in catch 7")
+                      this.setState({
+                        message: 'static.common.networkError',
+                        color: "red",
+                        loading: false
+                      }, () => {
+                        this.hideFirstComponent();
+                      });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                          this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 403:
+                          this.props.history.push(`/accessDenied`)
+                          break;
+                        case 406:
+                          if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                          }
                           this.setState({
-                            message: 'static.common.networkError',
-                            color: "#BA0C2F",
+                            message: error.response.data.messageCode,
+                            color: "red",
                             loading: false
                           }, () => {
-                            this.hideFirstComponent();
+                            this.hideFirstComponent()
+                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                              this.checkLastModifiedDateForProgram(this.state.programId);
+                            }
                           });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                              this.props.history.push(`/login/static.message.sessionExpired`)
-                              break;
-                            case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                            case 406:
-                                alert(i18n.t("static.commitVersion.versionIsOutDated"));         
-                                this.setState({
-                                  message: error.response.data.messageCode,
-                                  color: "#BA0C2F",
-                                  loading: false
-                                }, () => {
-                                  this.hideFirstComponent()
-                                  this.checkLastModifiedDateForProgram(this.state.programId);
-                                });
-                                break;  
-                            case 500:
-                            case 404:
-                            case 412:
-                              this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false,
-                                color: "#BA0C2F"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                            default:
-                              console.log("+++in catch 8")
-                              this.setState({
-                                message: 'static.unkownError',
-                                loading: false,
-                                color: "#BA0C2F"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                          }
-                        }
+                          break;
+                        case 500:
+                        case 404:
+                        case 412:
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                        default:
+                          console.log("+++in catch 8")
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
                       }
-                    );
-                // } else {
-                //   alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                //   this.setState({
-                //     message: i18n.t("static.commitVersion.versionIsOutDated"),
-                //     loading: false,
-                //     color: "red"
-                //   }, () => {
-                //     this.hideFirstComponent()
-                //     this.checkLastModifiedDateForProgram(this.state.programId);
-                //   });
+                    }
+                  }
+                );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.requestAlreadyExists"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         // this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
 
-                // }
-            //   } else {
-            //     this.setState({
-            //       message: response.data.messageCode,
-            //       color: "red",
-            //       loading: false
-            //     })
-            //     this.hideFirstComponent();
-            //   }
-            // })
-            //   .catch(
-            //     error => {
-            //       console.log("@@@Error5", error);
-            //       console.log("@@@Error5", error.message);
-            //       console.log("@@@Error5", error.response ? error.response.status : "")
-            //       if (error.message === "Network Error") {
-            //         console.log("+++in catch 9")
-            //         this.setState({
-            //           message: 'static.common.networkError',
-            //           color: "red",
-            //           loading: false
-            //         }, () => {
-            //           this.hideFirstComponent();
-            //         });
-            //       } else {
-            //         switch (error.response ? error.response.status : "") {
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
 
-            //           case 401:
-            //             this.props.history.push(`/login/static.message.sessionExpired`)
-            //             break;
-            //           case 403:
-            //             this.props.history.push(`/accessDenied`)
-            //             break;
-            //           case 500:
-            //           case 404:
-            //           case 406:
-            //             this.setState({
-            //               message: error.response.data.messageCode,
-            //               color: "red",
-            //               loading: false
-            //             }, () => {
-            //               this.hideFirstComponent()
-            //             });
-            //             break;
-            //           case 412:
-            //             this.setState({
-            //               message: error.response.data.messageCode,
-            //               loading: false,
-            //               color: "red"
-            //             }, () => {
-            //               this.hideFirstComponent()
-            //             });
-            //             break;
-            //           default:
-            //             console.log("+++in catch 10")
-            //             this.setState({
-            //               message: 'static.unkownError',
-            //               loading: false,
-            //               color: "red"
-            //             }, () => {
-            //               this.hideFirstComponent()
-            //             });
-            //             break;
-            //         }
-            //       }
-            //     }
-            //   );
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.versionIsOutDated"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.versionIsOutDated"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
+
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
+
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+            }.bind(this)
           }.bind(this)
         }.bind(this)
       }
@@ -3929,10 +4062,11 @@ export default class syncPage extends Component {
         if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
           this.setState({
             progressPer: 75
-            , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green' }, () => {
-              this.hideFirstComponent();
-              this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
-            })
+            , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+          }, () => {
+            this.hideFirstComponent();
+            this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+          })
           // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
         } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
           var db1;
@@ -4469,7 +4603,7 @@ export default class syncPage extends Component {
                   this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
                 }.bind(this)
               })
-            }else{
+            } else {
               return false;
             }
 

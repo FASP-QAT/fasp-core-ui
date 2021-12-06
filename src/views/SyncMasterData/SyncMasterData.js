@@ -227,7 +227,6 @@ export default class SyncMasterData extends Component {
                                         if (response.data.shipmentList.length > 0 || pplModified.length > 0) {
                                             rebuild = true;
                                         }
-<<<<<<< HEAD
                                         var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                                         // console.log("Min Date shiparray", shipArray);
                                         var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
@@ -248,39 +247,8 @@ export default class SyncMasterData extends Component {
                                                 planningUnitList.push(pplModified[ppl].planningUnit.id);
                                             }
                                         }
-<<<<<<< HEAD
-=======
->>>>>>> QAT-1365
-                                        shipmentDataList[index] = shipArrayForPlanningUnit[j];
-                                    }
-                                }
-                                // console.log("Shipment data updated", shipmentDataList);
-                                var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
-                                for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
-                                    var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
-                                    if (index == -1) {
-                                        batchInfoList.push(batchArrayForPlanningUnit[j]);
-                                    } else {
-                                        batchInfoList[index] = batchArrayForPlanningUnit[j];
-                                    }
-                                }
-                                if (planningUnitDataIndex != -1) {
-                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                } else {
-                                    planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                                }
-=======
 
-<<<<<<< HEAD
                                         for (var pu = 0; pu < planningUnitList.length; pu++) {
->>>>>>> QAT-899
-=======
-                            }
-                            if(pplModified.length>0){
-                                minDate=null;
-                            }
-                            // console.log("Batch Info updated", batchInfoList);
->>>>>>> QAT-1183
 
                                             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
                                             var programJson = {}
@@ -301,12 +269,12 @@ export default class SyncMasterData extends Component {
 
                                             var shipmentDataList = programJson.shipmentList;
                                             var batchInfoList = programJson.batchInfoList;
-
-                                            for (var j = 0; j < shipArray.length; j++) {
+                                            var shipArrayForPlanningUnit = shipArray.filter(c => c.planningUnit.id == planningUnitList[pu]);
+                                            for (var j = 0; j < shipArrayForPlanningUnit.length; j++) {
                                                 // console.log("In planning unit list", shipArray[j].planningUnit.id);
-                                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
+                                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArrayForPlanningUnit[j].shipmentId)
                                                 if (index == -1) {
-                                                    shipmentDataList.push(shipArray[j]);
+                                                    shipmentDataList.push(shipArrayForPlanningUnit[j]);
                                                 } else {
                                                     if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                                         minDate = shipmentDataList[index].expectedDeliveryDate;
@@ -314,17 +282,17 @@ export default class SyncMasterData extends Component {
                                                     if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                                         minDate = shipmentDataList[index].receivedDate;
                                                     }
-                                                    shipmentDataList[index] = shipArray[j];
+                                                    shipmentDataList[index] = shipArrayForPlanningUnit[j];
                                                 }
                                             }
                                             // console.log("Shipment data updated", shipmentDataList);
-
-                                            for (var j = 0; j < batchArray.length; j++) {
-                                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
+                                            var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
+                                            for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
+                                                var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArrayForPlanningUnit[j].expiryDate).format("YYYY-MM"));
                                                 if (index == -1) {
-                                                    batchInfoList.push(batchArray[j]);
+                                                    batchInfoList.push(batchArrayForPlanningUnit[j]);
                                                 } else {
-                                                    batchInfoList[index] = batchArray[j];
+                                                    batchInfoList[index] = batchArrayForPlanningUnit[j];
                                                 }
                                             }
                                             if (planningUnitDataIndex != -1) {
@@ -334,22 +302,10 @@ export default class SyncMasterData extends Component {
                                             }
 
                                         }
-<<<<<<< HEAD
                                         if(pplModified.length>0){
                                             minDate=null;
                                         }
                                         // console.log("Batch Info updated", batchInfoList);
-=======
-                                    }
-                                    problemReportList[index].problemReportTransList = problemReportTransList;
-                                }
-                            }
-                            for (var p = 0; p < planningUnitList.length; p++) {
-                                actionList.push({
-                                    planningUnitId: planningUnitList[p],
-                                    type: SHIPMENT_MODIFIED,
-                                    date: minDate!=null?moment(minDate).startOf('month').format("YYYY-MM-DD"):moment(Date.now()).startOf('month').format("YYYY-MM-DD")
->>>>>>> QAT-1183
 
                                         var problemReportArray = response.data.problemReportList;
                                         // console.log("Problem report array", problemReportArray);
@@ -927,11 +883,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                 syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                             }, () => {
-<<<<<<< HEAD
                                                                                                                                                                                                 this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson, readonlyProgramIds,response.programPlanningUnitList);
-=======
-                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson,response.programPlanningUnitList);
->>>>>>> QAT-1183
                                                                                                                                                                                                 // currency
                                                                                                                                                                                                 var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                                                                                                                                                                                 // console.log("M sync currency transaction start")
