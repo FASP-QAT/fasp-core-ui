@@ -3747,7 +3747,7 @@ export default class syncPage extends Component {
                         var putRequest = programSaveData.put(item);
                         var putRequest1 = downloadedProgramSaveData.put(item);
                         var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
-
+                        localStorage.setItem("sesProgramId", "");
                         this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
                         // this.redirectToDashbaord();
                       }.bind(this)

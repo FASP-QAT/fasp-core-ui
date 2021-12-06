@@ -227,6 +227,7 @@ export default class SyncMasterData extends Component {
                                         if (response.data.shipmentList.length > 0 || pplModified.length > 0) {
                                             rebuild = true;
                                         }
+<<<<<<< HEAD
                                         var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
                                         // console.log("Min Date shiparray", shipArray);
                                         var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
@@ -248,6 +249,8 @@ export default class SyncMasterData extends Component {
                                             }
                                         }
 <<<<<<< HEAD
+=======
+>>>>>>> QAT-1365
                                         shipmentDataList[index] = shipArrayForPlanningUnit[j];
                                     }
                                 }

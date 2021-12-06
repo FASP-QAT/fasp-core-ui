@@ -2381,12 +2381,15 @@ export default class SupplyPlanComponent extends React.Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    })
-                    this.getPlanningUnitList(programSelect);
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        })
+                        this.getPlanningUnitList(programSelect);
+                    }
                 }
 
             }.bind(this);
@@ -2564,7 +2567,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 supplyPlan: []
                                             }
                                         }
-                                        console.log("ProgramJson+++", programJson);
                                         this.setState({
                                             planningUnit: planningUnit,
                                             planningUnitId: planningUnitIdProp,
