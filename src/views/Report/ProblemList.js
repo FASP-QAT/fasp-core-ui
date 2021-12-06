@@ -26,8 +26,8 @@ import i18n from '../../i18n';
 import { qatProblemActions } from '../../CommonComponent/QatProblemActions';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import actualIcon from '../../assets/img/actual.png';
@@ -190,7 +190,8 @@ export default class ConsumptionDetails extends React.Component {
                     });
                     this.setState({
                         problemListForUpdate: myResult,
-                        problemStatusList: proListProblemStatus
+                        problemStatusList: proListProblemStatus,
+                        programQPLDetails:getRequest.result
                     }, () => {
                         if (localStorage.getItem("sesProblemStatus") != '' && localStorage.getItem("sesProblemStatus") != undefined) {
                             let sessionProblemList = JSON.parse(localStorage.getItem("sesProblemStatus"));
@@ -634,6 +635,7 @@ export default class ConsumptionDetails extends React.Component {
         this.el.destroy();
         var json = [];
         var data = problemArray;
+        var qplEditable=this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly;
 
         var options = {
             data: data,
@@ -749,7 +751,7 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'hidden',
                 },
             ],
-            editable: true,
+            editable: !qplEditable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
