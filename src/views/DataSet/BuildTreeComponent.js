@@ -7411,96 +7411,7 @@ export default class BuildTree extends Component {
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                   
-                                                                    <div class="collapse-bg" style={{display:this.state.showDiv?'block':'none'}}>
-                                                                    <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="forecastMethodId"
-                                id="forecastMethodId"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                required
-                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
-                            >
-                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
-                                {forecastMethods}
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="treeName"
-                                name="treeName"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
-                            <div className="controls ">
-                                {/* <InMultiputGroup> */}
-                                <MultiSelect
-                                    // type="select"
-                                    name="regionId"
-                                    id="regionId"
-                                    bsSize="sm"
-                                    value={this.state.regionValues}
-                                    onChange={(e) => { this.handleRegionChange(e) }}
-                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                    labelledBy={i18n.t('static.common.regiontext')}
-                                />
-                            </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Notes</Label>
-                            <Input type="textarea"
-                                id="treeNotes"
-                                name="treeNotes"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-12">
-                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active10"
-                                    name="active"
-                                    value={true}
-                                    checked={this.state.curTreeObj.active === true}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio1">
-                                    {i18n.t('static.common.active')}
-                                </Label>
-                            </FormGroup>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active11"
-                                    name="active"
-                                    value={false}
-                                    checked={this.state.curTreeObj.active === false}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio2">
-                                    {i18n.t('static.common.disabled')}
-                                </Label>
-                            </FormGroup>
-                        </FormGroup>
-                                                                    </div>
-                                                                  
-                                                                    </FormGroup>     
+                                                                   </FormGroup>     
                                                                 <FormGroup className="col-md-3 pl-lg-0">
 
                                                                     <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
@@ -7605,7 +7516,7 @@ export default class BuildTree extends Component {
                                                                         </div>
                                                                         </div>
                                                                         </FormGroup>
-                                                                        <FormGroup className="col-md-3" >
+                                                                        <FormGroup className="col-md-6" >
                                                                     <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
@@ -7629,8 +7540,98 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
+                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2" style={{display:this.state.showDiv?'block':'none'}}>
+                                                    
+                                                            <Row>
+                                                                    <FormGroup className="col-md-4">
+                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                            <Input
+                                type="select"
+                                name="forecastMethodId"
+                                id="forecastMethodId"
+                                bsSize="sm"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                required
+                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
+                            >
+                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                {forecastMethods}
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                            <Input type="text"
+                                id="treeName"
+                                name="treeName"
+                                bsSize="sm"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                            <div className="controls ">
+                                {/* <InMultiputGroup> */}
+                                <MultiSelect
+                                    // type="select"
+                                    name="regionId"
+                                    id="regionId"
+                                    bsSize="sm"
+                                    value={this.state.regionValues}
+                                    onChange={(e) => { this.handleRegionChange(e) }}
+                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                    labelledBy={i18n.t('static.common.regiontext')}
+                                />
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-6">
+                            <Label htmlFor="currencyId">Notes</Label>
+                            <Input type="textarea"
+                                id="treeNotes"
+                                name="treeNotes"
+                                onChange={(e) => { this.treeDataChange(e) }}
+                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
+                            ></Input>
+                        </FormGroup>
+                        <FormGroup className="col-md-6 pt-lg-4">
+                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active10"
+                                    name="active"
+                                    value={true}
+                                    checked={this.state.curTreeObj.active === true}
+                                    onChange={(e) => { this.treeDataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio1">
+                                    {i18n.t('static.common.active')}
+                                </Label>
+                            </FormGroup>
+                            <FormGroup check inline>
+                                <Input
+                                    className="form-check-input"
+                                    type="radio"
+                                    id="active11"
+                                    name="active"
+                                    value={false}
+                                    checked={this.state.curTreeObj.active === false}
+                                    onChange={(e) => { this.treeDataChange(e) }}
+                                />
+                                <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2">
+                                    {i18n.t('static.common.disabled')}
+                                </Label>
+                            </FormGroup>
+                        </FormGroup>
+                                                </Row>                    
+                                                    </div>
 
-                                                    <div className="pb-lg-0" style={{marginTop:'-4%'}}>
+                                                    <div className="pb-lg-0" style={{marginTop:'0%'}}>
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
