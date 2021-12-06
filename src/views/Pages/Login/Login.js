@@ -412,7 +412,7 @@ class Login extends Component {
 
                                 AuthenticationService.setupAxiosInterceptors();
                                 if (decoded.user.agreementAccepted) {
-                                  this.props.history.push(`/masterDataSync`)
+                                  this.props.history.push(`/syncProgram`)
                                 } else {
                                   this.props.history.push(`/userAgreement`)
                                 }

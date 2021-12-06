@@ -666,7 +666,8 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 this.setState({
                     programList: proList,
-                    loading: false
+                    loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 this.getPlanningUnitList();
             }.bind(this);
@@ -792,7 +793,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     planningUnitDataList:planningUnitDataList,
                                     dataSourceListAll: dataSourceListAll,
                                     planningUnitListForConsumption: planningUnitListForConsumption,
-                                    loading: false
+                                    loading: false,
+                                    programId: document.getElementById("programId").value
                                 },()=>{
                                     this.formSubmit(this.props.items.monthCount)
                                 })

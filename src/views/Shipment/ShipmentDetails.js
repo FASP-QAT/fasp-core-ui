@@ -62,7 +62,8 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentList: [],
             budgetList: [],
             shipmentStatusList: [],
-            showBatchSaveButton: false
+            showBatchSaveButton: false,
+            programQPLDetails:[]
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -599,7 +600,8 @@ export default class ShipmentDetails extends React.Component {
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
-                    loading: false
+                    loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -757,7 +759,7 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentTypeIds).includes(1)) {
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
@@ -1050,6 +1052,7 @@ export default class ShipmentDetails extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
+                                {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
