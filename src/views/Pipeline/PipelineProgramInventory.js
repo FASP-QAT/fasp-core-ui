@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
@@ -523,7 +523,7 @@ export default class PipelineProgramInventory extends Component {
                                     pagination: localStorage.getItem("sesRecordCount"),
                                     filters: true,
                                     contextMenu: function (obj, x, y, e) {
-                                        return [];
+                                        return false;
                                     }.bind(this),
                                     search: true,
                                     columnSorting: true,

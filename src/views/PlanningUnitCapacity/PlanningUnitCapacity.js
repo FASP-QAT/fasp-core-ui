@@ -690,8 +690,8 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet-pro';
+import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
