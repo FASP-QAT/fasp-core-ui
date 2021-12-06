@@ -482,7 +482,7 @@ export default class BuildTree extends Component {
     }
     resetNodeData() {
         console.log("reset node data function called");
-        const { orgCurrentItemConfig, currentItemConfig} = this.state;
+        const { orgCurrentItemConfig, currentItemConfig } = this.state;
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         // currentScenario = JSON.parse(JSON.stringify((orgCurrentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]));
         console.log("============1============", orgCurrentItemConfig);
@@ -2712,11 +2712,11 @@ export default class BuildTree extends Component {
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
                     this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
-                   
+
                     var scenarioId = curTreeObj.scenarioList[0].id;
                     // var scenario = document.getElementById("scenarioId");
                     var selectedText = curTreeObj.scenarioList[0].label.label_en;
-    
+
                     this.setState({
                         selectedScenario: scenarioId,
                         selectedScenarioLabel: selectedText,
@@ -3296,12 +3296,12 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.oneTimeUsage != "true") {
                     var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
 
-                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + this.state.currentScenario.fuNode.repeatCount + " " + selectedText3;
+                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + this.state.currentScenario.fuNode.repeatCount + " " + selectedText3;
                 } else {
-                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
+                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
             } else {
-                usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
+                usageText = "Every " + noOfPersons + " " + selectedText + "(s) - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) every " + usageFrequency + " " + selectedText2;
             }
         } else {
             //PU
