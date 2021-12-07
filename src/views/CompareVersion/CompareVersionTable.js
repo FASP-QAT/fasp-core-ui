@@ -127,11 +127,11 @@ export default class CompareVersion extends Component {
                     rowspan: '3'
                 },
                 {
-                    title: 'V1',
+                    title: this.props.versionLabel,
                     colspan: datasetData.regionList.length * 3,
                 },
                 {
-                    title: "V1 (Local)",
+                    title: this.props.versionLabel1,
                     colspan: datasetData1.regionList.length * 3,
                 },
             ]
