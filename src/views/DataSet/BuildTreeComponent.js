@@ -198,6 +198,7 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             showDiv:false,
+            showDiv1:false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
             scalingMonth: new Date(),
@@ -481,6 +482,7 @@ export default class BuildTree extends Component {
         this.treeDataChange = this.treeDataChange.bind(this);
         this.toggleCollapse = this.toggleCollapse.bind(this);
         this.resetNodeData = this.resetNodeData.bind(this);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
     }
     resetNodeData() {
         console.log("reset node data function called");
@@ -539,6 +541,11 @@ export default class BuildTree extends Component {
     toggleCollapse(){
         this.setState({
             showDiv:!this.state.showDiv
+        })
+    }
+    toggleDropdown(){
+        this.setState({
+            showDiv1:!this.state.showDiv1
         })
     }
 
@@ -7478,9 +7485,17 @@ export default class BuildTree extends Component {
                                                                             {scenarios}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText>
+                                                                            {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
+                                                                            <InputGroupText><i class="fa fa-caret-down icons " onClick={this.toggleDropdown} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
+                                                                    <div class="list-group DropdownScenario" style={{display:this.state.showDiv1?'block':'none'}}>
+                                                                            <a href="#" class="list-group-item list-group-item-action"> Cras justo odio</a>
+                                                                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                                                                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                                                                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                                                                            
+                                                                    </div>     
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -7583,7 +7598,7 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2" style={{display:this.state.showDiv?'block':'none'}}>
+                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{display:this.state.showDiv?'block':'none'}} >
                                                     
                                                             <Row>
                                                                     <FormGroup className="col-md-4">
@@ -7674,7 +7689,7 @@ export default class BuildTree extends Component {
                                                 </Row>                    
                                                     </div>
 
-                                                    <div className="pb-lg-0" style={{marginTop:'0%'}}>
+                                                    <div className="pb-lg-0" style={{marginTop:'-4%'}}>
                             <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
@@ -7725,7 +7740,7 @@ export default class BuildTree extends Component {
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                     <div class="row">
                                                    <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
-                                                   <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-times"></i>Calculated</Button>
+                                                   <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
                                                         {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                        </div>
