@@ -242,6 +242,9 @@ export default class BuildTree extends Component {
                         label: {
                             label_en: ''
                         }
+                    },
+                    repeatUsagePeriod: {
+                        usagePeriodId: ''
                     }
                 }
             },
@@ -3284,9 +3287,9 @@ export default class BuildTree extends Component {
 
             if (this.state.currentScenario.fuNode.usageType.id == 2 || this.state.currentScenario.fuNode.oneTimeUsage != "true") {
                 console.log("this.state.currentScenario.fuNode---", this.state.currentScenario.fuNode);
-                if (this.state.addNodeFlag) {
+                // if (this.state.addNodeFlag) {
                     selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
-                }
+                // }
             }
         }
         // FU
@@ -3296,7 +3299,7 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.oneTimeUsage != "true") {
                     var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
 
-                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + this.state.currentScenario.fuNode.repeatCount + " " + selectedText3;
+                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3;
                 } else {
                     usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
@@ -4753,26 +4756,12 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "repeatUsagePeriodId") {
-            // var repeatUsagePeriodId = '';
-            // if (event.target.value != "") {
-            //     var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
-            //     repeatUsagePeriodId = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
-            // }
-            // if ((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod != null) {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId = event.target.value;
-            // (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.label.label_en = repeatUsagePeriodId;
-            // } else {
-            //     var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
-            //     var repeatUsagePeriod = {
-            //         usagePeriodId: event.target.value,
-            //         label: {
-            //             label_en: repeatUsagePeriodId
-            //         }
-            //     }
-            //     fuNode.repeatUsagePeriod = repeatUsagePeriod;
-            //     (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
-            // }
-
+            var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
+            var repeatUsagePeriod = {
+                usagePeriodId: event.target.value
+            }
+            fuNode.repeatUsagePeriod = repeatUsagePeriod;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
             this.getNoFURequired();
             this.getUsageText();
         }
@@ -6006,7 +5995,7 @@ export default class BuildTree extends Component {
                                                                     name="repeatUsagePeriodId"
                                                                     bsSize="sm"
                                                                     onChange={(e) => { this.dataChange(e) }}
-                                                                    value={this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId}>
+                                                                    value={this.state.currentScenario.fuNode.repeatUsagePeriod != null ? this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId : ''}>
 
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     {this.state.usagePeriodList.length > 0
@@ -7006,7 +6995,7 @@ export default class BuildTree extends Component {
                                             }
                                         },
                                         parentItem: {
-                                            parent : itemConfig.parent,
+                                            parent: itemConfig.parent,
                                             payload: {
                                                 nodeType: {
                                                     id: itemConfig.payload.nodeType.id
@@ -7037,13 +7026,13 @@ export default class BuildTree extends Component {
                                         this.getForecastingUnitListByTracerCategoryId();
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
-                                        console.log("fu id---",itemConfig);
+                                        console.log("fu id---", itemConfig);
                                         this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id);
                                         this.getNoOfFUPatient();
                                         this.getNoOfMonthsInUsagePeriod();
-                                        console.log("my data 1--->",itemConfig.parent);
-                                        console.log("my data 2--->",this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload);
-                                        console.log("my data 3--->",this.state.items);
+                                        console.log("my data 1--->", itemConfig.parent);
+                                        console.log("my data 2--->", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload);
+                                        console.log("my data 3--->", this.state.items);
                                         // this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en
                                         this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
                                     } else {

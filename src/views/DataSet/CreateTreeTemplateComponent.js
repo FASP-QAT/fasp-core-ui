@@ -289,7 +289,7 @@ export default class CreateTreeTemplate extends Component {
                                             }
                                         },
                                         repeatUsagePeriod: {
-                                            usagePeriodId: 0
+                                            usagePeriodId: ''
                                         }
                                     },
                                     puNode: {
@@ -2094,21 +2094,21 @@ export default class CreateTreeTemplate extends Component {
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                 if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+                    var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
+                    // if (this.state.addNodeFlag) {
+                    //     var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
+                    //     var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
+                    // } else {
+                    //     var selectedText3 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.;
+                    // }
 
-                    if (this.state.addNodeFlag) {
-                        var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
-                        var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
-                    } else {
-                        var selectedText3 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.label.label_en;
-                    }
-
-
-                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount + " " + selectedText3;
+                    var repeatCount = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount : '';
+                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + repeatCount + " " + selectedText3;
                 } else {
-                    usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
+                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
             } else {
-                usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
+                usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) every " + usageFrequency + " " + selectedText2;
             }
         } else {
             //PU
@@ -2130,11 +2130,6 @@ export default class CreateTreeTemplate extends Component {
                 }
                 usageText = "For each " + nodeUnitTxt + " we need " + sharePu + " " + planningUnit;
             } else {
-                // need grand parent here 
-                // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
-                // console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
-                // console.log("3>>>", this.state.conversionFactor);
-                // console.log("4>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / 1) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths);
                 usageText = "For each " + nodeUnitTxt + " we need " + addCommas(puPerInterval) + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
             }
@@ -3145,7 +3140,12 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name === "repeatUsagePeriodId") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId = event.target.value;
+            var fuNode = (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode;
+            var repeatUsagePeriod = {
+                usagePeriodId: event.target.value
+            }
+            fuNode.repeatUsagePeriod = repeatUsagePeriod;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode = fuNode;
             this.getNoFURequired();
             this.getUsageText();
         }
@@ -4414,7 +4414,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     name="repeatUsagePeriodId"
                                                                     bsSize="sm"
                                                                     onChange={(e) => { this.dataChange(e) }}
-                                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId}>
+                                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId : ''}>
 
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     {this.state.usagePeriodList.length > 0
@@ -5279,7 +5279,7 @@ export default class CreateTreeTemplate extends Component {
                                             }
                                         },
                                         parentItem: {
-                                            parent : itemConfig.parent,
+                                            parent: itemConfig.parent,
                                             payload: {
                                                 nodeType: {
                                                     id: itemConfig.payload.nodeType.id
