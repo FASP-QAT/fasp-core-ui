@@ -50,7 +50,7 @@ class ForecastOutput extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            loading: true,
+            loading: false,
             programId: '',
             versionId: '',
             planningUnitLabel: '',
@@ -82,6 +82,12 @@ class ForecastOutput extends Component {
             consumptionData: [],
             scenarioList: [],
             selectedScenarioId: 1,
+            forecastPeriod: '',
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            forecastingUnits: [],
+            forecastingUnitValues: [],
+            forecastingUnitLabels: [],
 
 
         };
@@ -97,13 +103,9 @@ class ForecastOutput extends Component {
         this.setVersionId = this.setVersionId.bind(this);
         // this.setVersionId = this.setVersionId.bind(this);
         this.setForecastingUnit = this.setForecastingUnit.bind(this);
-        this.setRegionVal = this.setRegionVal.bind(this);
-        this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
-        this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
-        this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
-        this.storeProduct = this.storeProduct.bind(this);
         this.setEquivalencyUnit = this.setEquivalencyUnit.bind(this);
         this.yAxisChange = this.yAxisChange.bind(this);
+        this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
 
     }
 
@@ -116,6 +118,10 @@ class ForecastOutput extends Component {
         })
     }
 
+    getEquivalencyUnitData() {
+
+    }
+
     yAxisChange(e) {
         var yaxisEquUnit = e.target.value;
         console.log("e.target.value+++", e.target.value)
@@ -124,8 +130,11 @@ class ForecastOutput extends Component {
         }, () => {
             if (yaxisEquUnit == "true") {
                 document.getElementById("equivalencyUnitDiv").style.display = "block";
+                this.getEquivalencyUnitData();
+                this.filterData();
             } else {
                 document.getElementById("equivalencyUnitDiv").style.display = "none";
+                this.filterData();
             }
         })
     }
@@ -146,98 +155,28 @@ class ForecastOutput extends Component {
         this.setState({
             equivalencyUnitId
         }, () => {
-            if (this.state.viewById == 3 && equivalencyUnitId > 0) {
-                this.showData();
-            }
+            // if (this.state.viewById == 3 && equivalencyUnitId > 0) {
+            //     this.showData();
+            // }
         })
     }
 
-    storeProduct(e) {
-        console.log("E++++++++", e.target)
-        // var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
-        var planningUnitId = e;
+
+    setForecastingUnit = (event) => {
+        console.log('***', event)
+        var forecastingUnitIds = event
+        forecastingUnitIds = forecastingUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            planningUnitId: e,
-            // planningUnitLabel: name[0].label,
+            forecastingUnitValues: forecastingUnitIds.map(ele => ele),
+            forecastingUnitLabels: forecastingUnitIds.map(ele => ele.label)
         }, () => {
-            this.showData();
+
+            this.filterData()
         })
     }
 
-    toggleAccordionTotalActual() {
-        this.setState({
-            showTotalActual: !this.state.showTotalActual
-        })
-        var fields = document.getElementsByClassName("totalActual");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalActual == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    toggleAccordionTotalForecast() {
-        this.setState({
-            showTotalForecast: !this.state.showTotalForecast
-        })
-        var fields = document.getElementsByClassName("totalForecast");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalForecast == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    toggleAccordionTotalDiffernce() {
-        this.setState({
-            showTotalDifference: !this.state.showTotalDifference
-        })
-        var fields = document.getElementsByClassName("totalDifference");
-        for (var i = 0; i < fields.length; i++) {
-            if (!this.state.showTotalDifference == true) {
-                fields[i].style.display = "";
-            } else {
-                fields[i].style.display = "none";
-            }
-        }
-    }
-
-    setRegionVal(e) {
-        console.log("e+++", e);
-        var regionIdArr = [];
-        for (var i = 0; i < e.length; i++) {
-            regionIdArr.push(e[i].value);
-        }
-        var regionListFiltered = this.state.regionList.filter(c => regionIdArr.includes(c.value));
-        this.setState({
-            regionVal: e,
-            regionListFiltered
-        })
-    }
-
-    setForecastingUnit(e) {
-        var forecastingUnitId = e;
-        this.setState({
-            forecastingUnitId
-        }, () => {
-            // this.filterPlanningUnit()
-            if (this.state.viewById == 2) {
-                this.showData()
-            }
-        })
-    }
-
-    filterPlanningUnit() {
-        var planningUnitListAll = this.state.planningUnitListAll;
-        var planningUnits = planningUnitListAll.filter(c => c.program.programId == this.state.programId && c.forecastingUnit.forecastingUnitId == this.state.forecastingUnitId);
-        this.setState({
-            planningUnits
-        })
-    }
 
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -254,30 +193,240 @@ class ForecastOutput extends Component {
     }
 
     filterData() {
+        let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
+        let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value).toString())
         let programId = document.getElementById("programId").value;
-        let viewById = document.getElementById("viewById").value;
         let versionId = document.getElementById("versionId").value;
-        let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log('values =>', planningUnitId, programId, versionId);
-        if (planningUnitId > 0 && programId > 0 && versionId != 0) {
+        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+        let viewById = document.getElementById("viewById").value;
+        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
+        let equivalencyUnitId = document.getElementById("equivalencyUnitId").value;
+        let xaxisId = document.getElementById("xaxis").value;
+
+        if (versionId != 0 && programId > 0 && (viewById == 1 ? planningUnitIds.length > 0 : forecastingUnitIds.length > 0) && (yaxisEquUnitId == 1 ? equivalencyUnitId > 0 : true)) {
+            if (versionId.includes('Local')) {
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var program = transaction.objectStore('datasetData');
+                    var getRequest = program.getAll();
+                    var datasetList = [];
+                    var datasetList1 = [];
+
+                    getRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        // console.log("DATASET----------->", myResult);
+                        // this.setState({
+                        //     datasetList: myResult
+                        // });
+
+
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson1 = JSON.parse(programData);
+                            console.log("programJson1-------->1", programJson1);
+                            let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
+                            const ids = dupForecastingUnitObj.map(o => o.id)
+                            const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
+                            // console.log("programJson1-------->2", filtered);
+
+                            let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
+                            let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
+                            const idsPU = dupPlanningUnitObj.map(o => o.id)
+                            const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
+
+                            datasetList.push({
+                                programCode: filteredGetRequestList[i].programCode,
+                                programVersion: filteredGetRequestList[i].version,
+                                programId: filteredGetRequestList[i].programId,
+                                versionId: filteredGetRequestList[i].version,
+                                id: filteredGetRequestList[i].id,
+                                loading: false,
+                                forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                                forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                                healthAreaList: programJson1.healthAreaList,
+                                consumptionList: programJson1.consumptionList,
+                                filteredForecastingUnit: filtered,
+                                filteredPlanningUnit: filteredPU,
+                                regionList: programJson1.regionList,
+                                label: programJson1.label,
+                                realmCountry: programJson1.realmCountry,
+                            });
+                            datasetList1.push(filteredGetRequestList[i])
+                            // }
+                        }
+                        console.log("DATASET-------->", datasetList);
+                        this.setState({
+                            datasetList: datasetList,
+                            datasetList1: datasetList1
+                        }, () => {
+                            let filteredProgram = this.state.datasetList.filter()[0];
+                        })
+
+
+                    }.bind(this);
+                }.bind(this);
+
+            } else {//api call
+
+
+
+            }
+
+
+        } else {//validation message
+
         }
+
     }
 
 
     getPrograms() {
-        this.setState({ programs: [{ label: "FASPonia MOH 1", programId: 1 }], loading: false });
+        // this.setState({ programs: [{ label: "FASPonia MOH 1", programId: 1 }], loading: false });
+
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getDataSetListAll()
+                .then(response => {
+                    this.setState({
+                        programs: response.data
+                    }, () => { this.consolidatedProgramList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            programs: [], loading: false
+                        }, () => { this.consolidatedProgramList() })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+            this.setState({ loading: false })
+        }
+
+
+    }
+
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                    }
+
+
+                }
+                var lang = this.state.lang;
+
+                this.setState({
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
+                }, () => {
+                    console.log("programs------------------>", this.state.programs);
+                })
+
+
+            }.bind(this);
+
+        }.bind(this);
+
+
     }
 
     componentDidMount() {
         this.getPrograms();
         document.getElementById("forecastingUnitDiv").style.display = "none";
-        this.setState({
-            regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
-            regionList: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
-            regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
-        })
     }
 
     setProgramId(event) {
@@ -285,67 +434,338 @@ class ForecastOutput extends Component {
             programId: event.target.value,
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
+            this.filterData();
             this.getVersionIds();
         })
     }
 
-    setVersionId(event) {
+    // setVersionId(event) {
+    //     this.setState({
+    //         versionId: event.target.value,
+    //     }, () => {
+    //         // localStorage.setItem("sesVersionIdReport", '');
+    //         // this.filterVersion();
+    //     })
+    // }
+
+    getForecastingUnit = () => {
+
+    }
+
+    getPlanningUnit = () => {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+
+        // let programId = this.state.programId;
+        // let versionId = this.state.versionId;
+
         this.setState({
-            versionId: event.target.value,
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: []
         }, () => {
-            // localStorage.setItem("sesVersionIdReport", '');
-            // this.filterVersion();
-        })
+
+            if (versionId == 0) {
+                // this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
+            } else {
+                // localStorage.setItem("sesVersionIdReport", versionId);
+                // if (versionId.includes('Local')) {
+                //     const lan = 'en';
+                //     var db1;
+                //     var storeOS;
+                //     getDatabase();
+                //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                //     openRequest.onsuccess = function (e) {
+                //         db1 = e.target.result;
+                //         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                //         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+                //         var planningunitRequest = planningunitOs.getAll();
+                //         var planningList = []
+                //         planningunitRequest.onerror = function (event) {
+                //             // Handle errors!
+                //         };
+                //         planningunitRequest.onsuccess = function (e) {
+                //             var myResult = [];
+                //             myResult = planningunitRequest.result;
+                //             var programId = (document.getElementById("programId").value).split("_")[0];
+                //             var proList = []
+                //             console.log(myResult)
+                //             for (var i = 0; i < myResult.length; i++) {
+                //                 if (myResult[i].program.id == programId && myResult[i].active == true) {
+
+                //                     proList[i] = myResult[i]
+                //                 }
+                //             }
+                //             var lang = this.state.lang;
+                //             this.setState({
+                //                 planningUnits: proList.sort(function (a, b) {
+                //                     a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                //                     b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                //                     return a < b ? -1 : a > b ? 1 : 0;
+                //                 }), message: ''
+                //             }, () => {
+                //                 this.filterData();
+                //             })
+                //         }.bind(this);
+                //     }.bind(this)
+
+
+                // }
+                // else {                    
+
+                //     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
+                //         console.log('**' + JSON.stringify(response.data))
+                //         var listArray = response.data;
+                //         listArray.sort((a, b) => {
+                //             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                //             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                //             return itemLabelA > itemLabelB ? 1 : -1;
+                //         });
+                //         this.setState({
+                //             planningUnits: listArray,
+                //             message: ''
+                //         }, () => {
+                //             this.filterData();
+                //         })
+                //     }).catch(
+                //         error => {
+                //             this.setState({
+                //                 planningUnits: [],
+                //             })
+                //             if (error.message === "Network Error") {
+                //                 this.setState({
+                //                     message: 'static.unkownError',
+                //                     loading: false
+                //                 });
+                //             } else {
+                //                 switch (error.response ? error.response.status : "") {
+
+                //                     case 401:
+                //                         this.props.history.push(`/login/static.message.sessionExpired`)
+                //                         break;
+                //                     case 403:
+                //                         this.props.history.push(`/accessDenied`)
+                //                         break;
+                //                     case 500:
+                //                     case 404:
+                //                     case 406:
+                //                         this.setState({
+                //                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                     case 412:
+                //                         this.setState({
+                //                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                     default:
+                //                         this.setState({
+                //                             message: 'static.unkownError',
+                //                             loading: false
+                //                         });
+                //                         break;
+                //                 }
+                //             }
+                //         }
+                //     );
+                // }
+            }
+        });
+
     }
 
-    scenarioCheckedChanged(id) {
-        var scenarioList = this.state.scenarioList;
-        var index = this.state.scenarioList.findIndex(c => c.scenarioId == id);
-        scenarioList[index].checked = !scenarioList[index].checked;
-        this.setState({
-            scenarioList
-        })
 
-    }
+    setVersionId(event) {
 
-    scenarioOrderChanged(id) {
-        var scenarioList = this.state.scenarioList;
-        var filteredScenarioList = scenarioList.filter(c => c.scenarioId == id);
-        var remainingScenarioList = scenarioList.filter(c => c.scenarioId != id);
-        var finalList = [];
-        finalList = finalList.concat(filteredScenarioList).concat(remainingScenarioList)
-        this.setState({
-            scenarioList: finalList,
-            selectedScenarioId: id
-        })
+
+
+        var versionId = event.target.value;
+        var programId = this.state.programId;
+
+        if (programId != -1 && versionId != -1) {
+            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+
+            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+            var month = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ]
+
+            let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+            let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+            // let startDateSplit = selectedForecastProgram.currentVersion.forecastStartDate.split('-');
+            // let stopDateSplit = selectedForecastProgram.currentVersion.forecastStopDate.split('-');
+
+            let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+            this.setState({
+                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                versionId: versionId,
+            }, () => {
+                this.state.viewById == 1 ? this.getPlanningUnit() : this.getForecastingUnit();
+
+            })
+        } else {
+            this.setState({
+                forecastPeriod: '',
+                versionId: event.target.value,
+            }, () => {
+                // this.filterData();
+                // localStorage.setItem("sesVersionIdReport", '');
+                // this.filterVersion();
+                if (versionId > 0 && this.state.programId > 0) {
+                    // this.buildJexcel();
+                }
+            })
+        }
+
+
     }
 
     getVersionIds() {
-        var versionListAll = this.state.versionListAll;
-        var planningUnitListAll = this.state.planningUnitListAll;
-        var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
-        var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
-        var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
+        // var versionListAll = this.state.versionListAll;
+        // var planningUnitListAll = this.state.planningUnitListAll;
+        // var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
+        // var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
+        // var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
 
-        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
-        let stopDate = endDate;
-        var monthArrayList = [];
-        let cursorDate = startDate;
-        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
-            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
-            monthArrayList.push(dt);
+        // var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
+        // let stopDate = endDate;
+        // var monthArrayList = [];
+        // let cursorDate = startDate;
+        // for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+        //     var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+        //     cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+        //     monthArrayList.push(dt);
+        // }
+        // var planningUnitList = [];
+        // var planningUnitListFiltered = planningUnitListAll.filter(c => c.program.programId == this.state.programId);
+        // planningUnitListFiltered.map(item => {
+        //     planningUnitList.push({
+        //         label: item.label, value: item.planningUnitId
+        //     })
+        // })
+
+        // // var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
+        // this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitList, rangeValue: rangeValue, monthArrayList: monthArrayList });
+
+
+        let programId = this.state.programId;
+        if (programId != 0) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (isSiteOnline()) {
+                    this.setState({
+                        versions: [],
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+
+
+                } else {
+                    this.setState({
+                        versions: [],
+
+                    }, () => {
+                        this.consolidatedVersionList(programId)
+                    })
+                }
+            } else {
+
+                this.setState({
+                    versions: [],
+
+                }, () => { })
+
+            }
+        } else {
+            this.setState({
+                versions: [],
+
+            }, () => { })
         }
-        var planningUnitList = [];
-        var planningUnitListFiltered = planningUnitListAll.filter(c => c.program.programId == this.state.programId);
-        planningUnitListFiltered.map(item => {
-            planningUnitList.push({
-                label: item.label, value: item.planningUnitId
-            })
-        })
+    }
 
-        // var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
-        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitList, rangeValue: rangeValue, monthArrayList: monthArrayList });
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
+                versionList.reverse();
+                this.setState({
+                    versions: versionList,
+                    // versionId: versionList[0].versionId
+                }, () => {
+                    this.filterData();
+                    // this.getPlanningUnit();
+                })
+
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
+
     }
 
     show() {
@@ -408,30 +828,47 @@ class ForecastOutput extends Component {
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,
-            planningUnitId: "",
-            forecastingUnitId: "",
-            consumptionData: []
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            forecastingUnitValues: [],
+            forecastingUnitLabels: [],
         }, () => {
-            if (viewById == 2) {
-                document.getElementById("planningUnitDiv").style.display = "none";
-                document.getElementById("forecastingUnitDiv").style.display = "block";
-                if (this.state.planningUnitId > 0) {
-                    this.showData()
-                }
-            } else if (viewById == 1) {
-                document.getElementById("planningUnitDiv").style.display = "block";
-                document.getElementById("forecastingUnitDiv").style.display = "none";
-                if (this.state.forecastingUnitId > 0) {
-                    this.showData()
-                }
-            } else {
-                document.getElementById("planningUnitDiv").style.display = "none";
-                document.getElementById("forecastingUnitDiv").style.display = "none";
-                if (this.state.equivalencyUnitId > 0) {
-                    this.showData()
-                }
-            }
+            // if (viewById == 2) {
+            //     document.getElementById("planningUnitDiv").style.display = "none";
+            //     document.getElementById("forecastingUnitDiv").style.display = "block";
+            //     if (this.state.planningUnitId > 0) {
+            //         this.showData()
+            //     }
+            // } else if (viewById == 1) {
+            //     document.getElementById("planningUnitDiv").style.display = "block";
+            //     document.getElementById("forecastingUnitDiv").style.display = "none";
+            //     if (this.state.forecastingUnitId > 0) {
+            //         this.showData()
+            //     }
+            // } else {
+            //     document.getElementById("planningUnitDiv").style.display = "none";
+            //     document.getElementById("forecastingUnitDiv").style.display = "none";
+            //     if (this.state.equivalencyUnitId > 0) {
+            //         this.showData()
+            //     }
+            // }
         })
+    }
+
+    handlePlanningUnitChange = (event) => {
+        console.log('***', event)
+        var planningUnitIds = event
+        planningUnitIds = planningUnitIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            planningUnitValues: planningUnitIds.map(ele => ele),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label)
+        }, () => {
+
+            this.filterData()
+        })
+
     }
 
     render() {
@@ -548,12 +985,15 @@ class ForecastOutput extends Component {
 
             };
         }
-        const { planningUnits } = this.state;
+
         const { forecastingUnits } = this.state;
-        let planningUnitList = [];
-        planningUnits.map((item, i) => {
-            planningUnitList.push({ label: item.label, value: item.planningUnitId })
-        }, this);
+
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+
+            }, this);
 
         let forecastingUnitList = [];
         forecastingUnits.map((item, i) => {
@@ -565,7 +1005,7 @@ class ForecastOutput extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {item.label}
+                        {item.label.label_en}
                     </option>
                 )
             }, this);
@@ -575,7 +1015,8 @@ class ForecastOutput extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {item.versionId}
+                        {/* {item.versionId} */}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
                     </option>
                 )
             }, this);
@@ -673,6 +1114,26 @@ class ForecastOutput extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="text"
+                                                            name="forecastPeriod"
+                                                            id="forecastPeriod"
+                                                            value={this.state.forecastPeriod}
+                                                            bsSize="sm"
+                                                            disabled={true}
+
+                                                        >
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
@@ -734,12 +1195,11 @@ class ForecastOutput extends Component {
                                                     <MultiSelect
                                                         name="planningUnitId"
                                                         id="planningUnitId"
-                                                        bsSize="sm"
-                                                        onChange={this.filterData}
-                                                        value={this.state.planningUnitId}
-                                                        onChange={(e) => { this.storeProduct(e); }}
-                                                        options={this.state.planningUnits && this.state.planningUnits.length > 0 ? this.state.planningUnits : []}
+                                                        options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                                        value={this.state.planningUnitValues}
+                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -778,7 +1238,7 @@ class ForecastOutput extends Component {
                                                             onChange={this.setEquivalencyUnit}
                                                             bsSize="sm"
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="0">{i18n.t('static.common.all')}</option>
                                                             <option value="1">Patient Months</option>
                                                         </Input>
 
@@ -792,11 +1252,12 @@ class ForecastOutput extends Component {
                                                     <InputGroup>
                                                         <Input
                                                             type="select"
-                                                            name="yaxisEquUnit"
-                                                            id="yaxisEquUnit"
+                                                            name="xaxis"
+                                                            id="xaxis"
                                                             bsSize="sm"
-                                                            value={this.state.yaxisEquUnit}
-                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                            // value={this.state.yaxisEquUnit}
+                                                            // onChange={(e) => { this.filterData(e); }}
+                                                            onChange={this.filterData}
                                                         >
                                                             <option value="true">{i18n.t('static.program.yes')}</option>
                                                             <option value="false">{i18n.t('static.program.no')}</option>
