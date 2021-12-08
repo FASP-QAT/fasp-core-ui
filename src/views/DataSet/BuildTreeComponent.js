@@ -4400,18 +4400,21 @@ export default class BuildTree extends Component {
         scenarioList = [...scenarioList, newTabObject];
         // console.log("tabList---", tabList1)
         if (this.state.treeId != "") {
-            var items = this.state.items;
-            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-            var obj = {
-                nodeDataId: scenarioId,
-                label: {
-                    label_en: scenario.label.label_en
-                },
-                notes: scenario.notes
+            if (this.state.scenarioList.length > 1) {
+
             }
-                (item.payload.nodeDataMap[scenarioId])[0] = obj;
-            items[itemIndex1] = item;
+            // var items = this.state.items;
+            // var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+            // const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+            // var obj = {
+            //     nodeDataId: scenarioId,
+            //     label: {
+            //         label_en: scenario.label.label_en
+            //     },
+            //     notes: scenario.notes
+            // }
+            //     (item.payload.nodeDataMap[scenarioId])[0] = obj;
+            // items[itemIndex1] = item;
         }
         this.setState({
             selectedScenario: scenarioId,
@@ -4823,6 +4826,8 @@ export default class BuildTree extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
         }
@@ -5027,7 +5032,7 @@ export default class BuildTree extends Component {
                 console.log("cursor change current item config---", this.state.currentItemConfig);
                 if (data.context.level != 0) {
                     this.setState({
-                        parentValue : this.state.parentScenario.calculatedDataValue
+                        parentValue: this.state.parentScenario.calculatedDataValue
                     });
                 }
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
@@ -6683,14 +6688,19 @@ export default class BuildTree extends Component {
     }
 
     updateTreeData() {
-        var items = this.state.curTreeObj.tree.flatList;
+        var items = this.state.items;
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
             if (nodeDataModelingMap.length > 0) {
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+                if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+                } else {
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+                }
             }
         }
         this.setState({
