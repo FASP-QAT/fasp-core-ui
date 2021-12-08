@@ -205,9 +205,9 @@ export default class QunatimedImportStepFive extends Component {
 
                                     var programDataJson = programRequest.result.programData;
                                     var planningUnitDataList = programDataJson.planningUnitDataList;
-                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-                                var generalProgramJson = JSON.parse(generalProgramData);
+                                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                    var generalProgramJson = JSON.parse(generalProgramData);
 
                                     var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                                     var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
@@ -238,85 +238,86 @@ export default class QunatimedImportStepFive extends Component {
                                                 })
                                             }
                                         }
-for(var pu=0;pu<finalPuList.length;pu++){
-    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalPuList[pu]);
-                                    var programJson = {}
-                                    if (planningUnitDataIndex != -1) {
-                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalPuList[pu]))[0];
-                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                        programJson = JSON.parse(programData);
-                                    } else {
-                                        programJson = {
-                                            consumptionList: [],
-                                            inventoryList: [],
-                                            shipmentList: [],
-                                            batchInfoList: [],
-                                            supplyPlan: []
-                                    }
-                                }
-                                var consumptionDataList = (programJson.consumptionList);
-                                        for (var i = 0; i < qunatimedData.length; i++) {
-                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
-                                                && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
-                                                && c.actualFlag == false && c.multiplier == 1);
-
-                                            if (index != -1) {
-                                                consumptionDataList[index].consumptionQty = qunatimedData[i].updateConsumptionQuantity;
-                                                consumptionDataList[index].consumptionRcpuQty = qunatimedData[i].updateConsumptionQuantity;
-                                                consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
-
-                                                consumptionDataList[index].lastModifiedBy.userId = curUser;
-                                                consumptionDataList[index].lastModifiedDate = curDate;
+                                        for (var pu = 0; pu < finalPuList.length; pu++) {
+                                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalPuList[pu]);
+                                            var programJson = {}
+                                            if (planningUnitDataIndex != -1) {
+                                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalPuList[pu]))[0];
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
                                             } else {
-
-                                                var consumptionJson = {
-                                                    consumptionId: 0,
-                                                    dataSource: {
-                                                        id: QUANTIMED_DATA_SOURCE_ID
-                                                    },
-                                                    region: {
-                                                        id: this.props.items.program.regionId
-                                                    },
-                                                    consumptionDate: moment(qunatimedData[i].dtmPeriod).startOf('month').format("YYYY-MM-DD"),
-                                                    consumptionRcpuQty: qunatimedData[i].ingConsumption.toString().replaceAll("\,", ""),
-                                                    consumptionQty: qunatimedData[i].ingConsumption.toString().replaceAll("\,", ""),
-                                                    dayOfStockOut: "",
-                                                    active: true,
-                                                    realmCountryPlanningUnit: {
-                                                        id: rcpuResult.filter(c => c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
-                                                    },
-                                                    multiplier: 1,
-                                                    planningUnit: {
-                                                        id: qunatimedData[i].product.programPlanningUnitId
-                                                    },
-                                                    notes: "",
+                                                programJson = {
+                                                    consumptionList: [],
+                                                    inventoryList: [],
+                                                    shipmentList: [],
                                                     batchInfoList: [],
-                                                    actualFlag: false,
-                                                    createdBy: {
-                                                        userId: curUser
-                                                    },
-                                                    createdDate: curDate,
-                                                    lastModifiedBy: {
-                                                        userId: curUser
-                                                    },
-                                                    lastModifiedDate: curDate
+                                                    supplyPlan: []
                                                 }
-                                                consumptionDataList.push(consumptionJson);
+                                            }
+                                            var consumptionDataList = (programJson.consumptionList);
+                                            var qunatimedDataFiltered = qunatimedData.filter(c => c.product.programPlanningUnitId == finalPuList[pu]);
+                                            for (var i = 0; i < qunatimedDataFiltered.length; i++) {
+                                                var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedDataFiltered[i].dtmPeriod).format("YYYY-MM")
+                                                    && c.planningUnit.id == qunatimedDataFiltered[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
+                                                    && c.actualFlag == false && c.multiplier == 1);
+
+                                                if (index != -1) {
+                                                    consumptionDataList[index].consumptionQty = qunatimedDataFiltered[i].updateConsumptionQuantity;
+                                                    consumptionDataList[index].consumptionRcpuQty = qunatimedDataFiltered[i].updateConsumptionQuantity;
+                                                    consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
+
+                                                    consumptionDataList[index].lastModifiedBy.userId = curUser;
+                                                    consumptionDataList[index].lastModifiedDate = curDate;
+                                                } else {
+
+                                                    var consumptionJson = {
+                                                        consumptionId: 0,
+                                                        dataSource: {
+                                                            id: QUANTIMED_DATA_SOURCE_ID
+                                                        },
+                                                        region: {
+                                                            id: this.props.items.program.regionId
+                                                        },
+                                                        consumptionDate: moment(qunatimedDataFiltered[i].dtmPeriod).startOf('month').format("YYYY-MM-DD"),
+                                                        consumptionRcpuQty: qunatimedDataFiltered[i].ingConsumption.toString().replaceAll("\,", ""),
+                                                        consumptionQty: qunatimedDataFiltered[i].ingConsumption.toString().replaceAll("\,", ""),
+                                                        dayOfStockOut: "",
+                                                        active: true,
+                                                        realmCountryPlanningUnit: {
+                                                            id: rcpuResult.filter(c => c.planningUnit.id == qunatimedDataFiltered[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                        },
+                                                        multiplier: 1,
+                                                        planningUnit: {
+                                                            id: qunatimedDataFiltered[i].product.programPlanningUnitId
+                                                        },
+                                                        notes: "",
+                                                        batchInfoList: [],
+                                                        actualFlag: false,
+                                                        createdBy: {
+                                                            userId: curUser
+                                                        },
+                                                        createdDate: curDate,
+                                                        lastModifiedBy: {
+                                                            userId: curUser
+                                                        },
+                                                        lastModifiedDate: curDate
+                                                    }
+                                                    consumptionDataList.push(consumptionJson);
+                                                }
+                                            }
+
+                                            programJson.consumptionList = consumptionDataList;
+                                            generalProgramJson.actionList = actionList;
+                                            if (planningUnitDataIndex != -1) {
+                                                planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                            } else {
+                                                planningUnitDataList.push({ planningUnitId: finalPuList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                             }
                                         }
-
-                                        programJson.consumptionList = consumptionDataList;
-                                        generalProgramJson.actionList = actionList;
-                                        if (planningUnitDataIndex != -1) {
-                                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                        } else {
-                                            planningUnitDataList.push({ planningUnitId: finalPuList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                                        }
-                                    }
-                                    programDataJson.planningUnitDataList = planningUnitDataList;
-                                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                                    programRequest.result.programData = programDataJson;
+                                        programDataJson.planningUnitDataList = planningUnitDataList;
+                                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                        programRequest.result.programData = programDataJson;
 
                                         var transaction1;
                                         var programTransaction1;
@@ -369,8 +370,8 @@ for(var pu=0;pu<finalPuList.length;pu++){
         this.el.destroy();
         var myVar = "";
         var json = this.props.items.importData.records;
-        console.log("Json+++",json);
-        console.log("Json+++",this.props.items);
+        console.log("Json+++", json);
+        console.log("Json+++", this.props.items);
 
         let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
         let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
@@ -416,11 +417,11 @@ for(var pu=0;pu<finalPuList.length;pu++){
                         finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
                     }
                 }
-                console.log("FinalQatPlanningUnitList+++",finalQATPlanningList);
-                var planningUnitDataList=(programRequest.result).programData.planningUnitDataList;
+                console.log("FinalQatPlanningUnitList+++", finalQATPlanningList);
+                var planningUnitDataList = (programRequest.result).programData.planningUnitDataList;
                 var finalList = [];
-                for(var fqpl=0;fqpl<finalQATPlanningList.length;fqpl++){
-                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalQATPlanningList[fqpl]);
+                for (var fqpl = 0; fqpl < finalQATPlanningList.length; fqpl++) {
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalQATPlanningList[fqpl]);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
                         var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalQATPlanningList[fqpl]))[0];
@@ -436,25 +437,25 @@ for(var pu=0;pu<finalPuList.length;pu++){
                             supplyPlan: []
                         }
                     }
-                // var programDataBytes = CryptoJS.AES.decrypt(planningUnitData, SECRET_KEY);
-                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                // var programJson = JSON.parse(programData);
-                var consumptionDataList = (programJson.consumptionList);
-                var qunatimedData = dateFilter.filter(c=>c.product.programPlanningUnitId==finalQATPlanningList[fqpl]);
-                for (var i = 0; i < qunatimedData.length; i++) {
-                    var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
-                        && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
-                        && c.actualFlag == false && c.multiplier == 1);
+                    // var programDataBytes = CryptoJS.AES.decrypt(planningUnitData, SECRET_KEY);
+                    // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    // var programJson = JSON.parse(programData);
+                    var consumptionDataList = (programJson.consumptionList);
+                    var qunatimedData = dateFilter.filter(c => c.product.programPlanningUnitId == finalQATPlanningList[fqpl]);
+                    for (var i = 0; i < qunatimedData.length; i++) {
+                        var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(qunatimedData[i].dtmPeriod).format("YYYY-MM")
+                            && c.planningUnit.id == qunatimedData[i].product.programPlanningUnitId && c.region.id == this.props.items.program.regionId
+                            && c.actualFlag == false && c.multiplier == 1);
 
-                    if (index != -1) {
-                        qunatimedData[i].existingConsumptionQty = consumptionDataList[index].consumptionQty;
-                    } else {
-                        qunatimedData[i].existingConsumptionQty = "";
+                        if (index != -1) {
+                            qunatimedData[i].existingConsumptionQty = consumptionDataList[index].consumptionQty;
+                        } else {
+                            qunatimedData[i].existingConsumptionQty = "";
+                        }
+                        qunatimedData[i].updateConsumptionQuantity = Math.round(qunatimedData[i].ingConsumption * qunatimedData[i].product.multiplier * this.props.items.program.regionConversionFactor);
+                        finalList.push(qunatimedData[i]);
                     }
-                    qunatimedData[i].updateConsumptionQuantity = Math.round(qunatimedData[i].ingConsumption * qunatimedData[i].product.multiplier * this.props.items.program.regionConversionFactor);
-                    finalList.push(qunatimedData[i]);
                 }
-            }
 
                 this.setState({
                     finalImportData: finalList
@@ -585,7 +586,7 @@ for(var pu=0;pu<finalPuList.length;pu++){
                             &nbsp;
                         </FormGroup>
                         &nbsp;
-                {/* </CardFooter> */}
+                        {/* </CardFooter> */}
                     </CardBody>
                 </Row>
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
