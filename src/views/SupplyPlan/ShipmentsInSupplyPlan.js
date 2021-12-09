@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jspreadsheet-pro';
-import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -419,7 +419,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
 
                                         var roleList = AuthenticationService.getLoggedInUserRole();
-                                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c=>c.id==this.props.items.programId)[0].readonly) {
+                                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                                             shipmentEditable = false;
                                         }
                                         var paginationOption = false;
@@ -3216,7 +3216,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("13"));
                         var usedBudgetTotalAmount = 0;
                         for (var s = 0; s < shipmentList.length; s++) {
-                            usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
+                            if (shipmentList[s].currency != "" && shipmentList[s].currency != undefined) {
+                                usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
+                            }
                         }
                         var totalCost = Number(elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + Number(elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
@@ -3253,6 +3255,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             positiveValidation("G", y, elInstance);
                         }
                     }
+                } else {
+                    valid = false;
                 }
 
                 var validation = checkValidtion("text", "M", y, rowData[12], elInstance);
