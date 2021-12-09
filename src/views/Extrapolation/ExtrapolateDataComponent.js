@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table
+    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY } from "../../Constants";
@@ -12,19 +12,22 @@ import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
 import jexcel from 'jexcel-pro';
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import moment from "moment"
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 
+
 export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
         super(props);
         this.options = props.options;
-        var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        var startDate1 = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate1 = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        var startDate = moment("2021-05-01").format("YYYY-MM-DD");
+        var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
             forecastProgramId: -1,
             forecastProgramList: [],
@@ -33,16 +36,27 @@ export default class ExtrapolateDataComponent extends React.Component {
             regionId: -1,
             regionList: [],
             lang: localStorage.getItem("lang"),
-            movingAvgId: false,
-            semiAvgId: false,
-            linearRegressionId: false,
-            showAdvanceId: false,
-            dataList: [{ 'months': 'Jan-20', 'actuals': '155', 'tesLcb': '155', 'tesM': '155', 'tesUcb': '155', 'arimaForecast': '155', 'linearRegression': '211', 'semiAveragesForecast': '277', 'movingAverages': '' }, { 'months': 'Feb-20', 'actuals': '180', 'tesLcb': '180', 'tesM': '180', 'tesUcb': '180', 'arimaForecast': '180', 'linearRegression': '225', 'semiAveragesForecast': '283', 'movingAverages': '155' }, { 'months': 'Mar-20', 'actuals': '260', 'tesLcb': '260', 'tesM': '260', 'tesUcb': '260', 'arimaForecast': '260', 'linearRegression': '240', 'semiAveragesForecast': '288', 'movingAverages': '168' }, { 'months': 'Apr-20', 'actuals': '560', 'tesLcb': '560', 'tesM': '560', 'tesUcb': '560', 'arimaForecast': '560', 'linearRegression': '254', 'semiAveragesForecast': '294', 'movingAverages': '198' }, { 'months': 'May-20', 'actuals': '160', 'tesLcb': '160', 'tesM': '160', 'tesUcb': '160', 'arimaForecast': '160', 'linearRegression': '268', 'semiAveragesForecast': '299', 'movingAverages': '289' }, { 'months': 'Jun-20', 'actuals': '185', 'tesLcb': '185', 'tesM': '185', 'tesUcb': '185', 'arimaForecast': '185', 'linearRegression': '282', 'semiAveragesForecast': '304', 'movingAverages': '263' }, { 'months': 'Jul-20', 'actuals': '270', 'tesLcb': '270', 'tesM': '270', 'tesUcb': '270', 'arimaForecast': '270', 'linearRegression': '297', 'semiAveragesForecast': '310', 'movingAverages': '269' }, { 'months': 'Aug-20', 'actuals': '600', 'tesLcb': '600', 'tesM': '600', 'tesUcb': '600', 'arimaForecast': '600', 'linearRegression': '311', 'semiAveragesForecast': '315', 'movingAverages': '287' }, { 'months': 'Sep-20', 'actuals': '165', 'tesLcb': '165', 'tesM': '165', 'tesUcb': '165', 'arimaForecast': '165', 'linearRegression': '325', 'semiAveragesForecast': '321', 'movingAverages': '355' }, { 'months': 'Oct-20', 'actuals': '190', 'tesLcb': '190', 'tesM': '190', 'tesUcb': '190', 'arimaForecast': '190', 'linearRegression': '339', 'semiAveragesForecast': '326', 'movingAverages': '276' }, { 'months': 'Nov-20', 'actuals': '280', 'tesLcb': '280', 'tesM': '280', 'tesUcb': '280', 'arimaForecast': '280', 'linearRegression': '354', 'semiAveragesForecast': '332', 'movingAverages': '282' }, { 'months': 'Dec-20', 'actuals': '635', 'tesLcb': '635', 'tesM': '635', 'tesUcb': '635', 'arimaForecast': '635', 'linearRegression': '368', 'semiAveragesForecast': '337', 'movingAverages': '301' }, { 'months': 'Jan-21', 'actuals': '172', 'tesLcb': '172', 'tesM': '172', 'tesUcb': '172', 'arimaForecast': '172', 'linearRegression': '382', 'semiAveragesForecast': '342', 'movingAverages': '374' }, { 'months': 'Feb-21', 'actuals': '226', 'tesLcb': '226', 'tesM': '226', 'tesUcb': '226', 'arimaForecast': '226', 'linearRegression': '396', 'semiAveragesForecast': '348', 'movingAverages': '288' }, { 'months': 'Mar-21', 'actuals': '329', 'tesLcb': '329', 'tesM': '329', 'tesUcb': '329', 'arimaForecast': '329', 'linearRegression': '411', 'semiAveragesForecast': '353', 'movingAverages': '301' }, { 'months': 'Apr-21', 'actuals': '721', 'tesLcb': '721', 'tesM': '721', 'tesUcb': '721', 'arimaForecast': '721', 'linearRegression': '425', 'semiAveragesForecast': '359', 'movingAverages': '328' }, { 'months': 'May-21', 'actuals': '', 'tesLcb': '332', 'tesM': '', 'tesUcb': '', 'arimaForecast': '363', 'linearRegression': '439', 'semiAveragesForecast': '364', 'movingAverages': '417' }, { 'months': 'Jun-21', 'actuals': '', 'tesLcb': '619', 'tesM': '', 'tesUcb': '', 'arimaForecast': '362', 'linearRegression': '453', 'semiAveragesForecast': '370', 'movingAverages': '373' }, { 'months': 'Jul-21', 'actuals': '', 'tesLcb': '575', 'tesM': '', 'tesUcb': '', 'arimaForecast': '361', 'linearRegression': '468', 'semiAveragesForecast': '375', 'movingAverages': '413' }, { 'months': 'Aug-21', 'actuals': '', 'tesLcb': '280', 'tesM': '', 'tesUcb': '', 'arimaForecast': '360', 'linearRegression': '482', 'semiAveragesForecast': '381', 'movingAverages': '451' }, { 'months': 'Sep-21', 'actuals': '', 'tesLcb': '389', 'tesM': '', 'tesUcb': '', 'arimaForecast': '359', 'linearRegression': '496', 'semiAveragesForecast': '386', 'movingAverages': '475' }, { 'months': 'Oct-21', 'actuals': '', 'tesLcb': '540', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '510', 'semiAveragesForecast': '391', 'movingAverages': '426' }, { 'months': 'Nov-21', 'actuals': '', 'tesLcb': '359', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '525', 'semiAveragesForecast': '397', 'movingAverages': '427' }, { 'months': 'Dec-21', 'actuals': '', 'tesLcb': '834', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '539', 'semiAveragesForecast': '402', 'movingAverages': '438' }, { 'months': 'Jan-22', 'actuals': '', 'tesLcb': '437', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '553', 'semiAveragesForecast': '408', 'movingAverages': '443' }, { 'months': 'Feb-22', 'actuals': '', 'tesLcb': '756', 'tesM': '', 'tesUcb': '', 'arimaForecast': '356', 'linearRegression': '567', 'semiAveragesForecast': '413', 'movingAverages': '442' }],
+            movingAvgId: true,
+            semiAvgId: true,
+            linearRegressionId: true,
+            smoothingId: true,
+            // showAdvanceId: true,
+            arimaId: true,
+            dataList: [{ 'months': 'Jan-2020', 'actuals': '155', 'tesLcb': '155', 'tesM': '155', 'tesUcb': '155', 'arimaForecast': '155', 'linearRegression': '211', 'semiAveragesForecast': '277', 'movingAverages': '' }, { 'months': 'Feb-2020', 'actuals': '180', 'tesLcb': '180', 'tesM': '180', 'tesUcb': '180', 'arimaForecast': '180', 'linearRegression': '225', 'semiAveragesForecast': '283', 'movingAverages': '155' }, { 'months': 'Mar-2020', 'actuals': '260', 'tesLcb': '260', 'tesM': '260', 'tesUcb': '260', 'arimaForecast': '260', 'linearRegression': '240', 'semiAveragesForecast': '288', 'movingAverages': '168' }, { 'months': 'Apr-2020', 'actuals': '560', 'tesLcb': '560', 'tesM': '560', 'tesUcb': '560', 'arimaForecast': '560', 'linearRegression': '254', 'semiAveragesForecast': '294', 'movingAverages': '198' }, { 'months': 'May-2020', 'actuals': '160', 'tesLcb': '160', 'tesM': '160', 'tesUcb': '160', 'arimaForecast': '160', 'linearRegression': '268', 'semiAveragesForecast': '299', 'movingAverages': '289' }, { 'months': 'Jun-2020', 'actuals': '185', 'tesLcb': '185', 'tesM': '185', 'tesUcb': '185', 'arimaForecast': '185', 'linearRegression': '282', 'semiAveragesForecast': '304', 'movingAverages': '263' }, { 'months': 'Jul-2020', 'actuals': '270', 'tesLcb': '270', 'tesM': '270', 'tesUcb': '270', 'arimaForecast': '270', 'linearRegression': '297', 'semiAveragesForecast': '310', 'movingAverages': '269' }, { 'months': 'Aug-2020', 'actuals': '600', 'tesLcb': '600', 'tesM': '600', 'tesUcb': '600', 'arimaForecast': '600', 'linearRegression': '311', 'semiAveragesForecast': '315', 'movingAverages': '287' }, { 'months': 'Sep-2020', 'actuals': '165', 'tesLcb': '165', 'tesM': '165', 'tesUcb': '165', 'arimaForecast': '165', 'linearRegression': '325', 'semiAveragesForecast': '321', 'movingAverages': '355' }, { 'months': 'Oct-2020', 'actuals': '190', 'tesLcb': '190', 'tesM': '190', 'tesUcb': '190', 'arimaForecast': '190', 'linearRegression': '339', 'semiAveragesForecast': '326', 'movingAverages': '276' }, { 'months': 'Nov-2020', 'actuals': '280', 'tesLcb': '280', 'tesM': '280', 'tesUcb': '280', 'arimaForecast': '280', 'linearRegression': '354', 'semiAveragesForecast': '332', 'movingAverages': '282' }, { 'months': 'Dec-2020', 'actuals': '635', 'tesLcb': '635', 'tesM': '635', 'tesUcb': '635', 'arimaForecast': '635', 'linearRegression': '368', 'semiAveragesForecast': '337', 'movingAverages': '301' }, { 'months': 'Jan-2021', 'actuals': '172', 'tesLcb': '172', 'tesM': '172', 'tesUcb': '172', 'arimaForecast': '172', 'linearRegression': '382', 'semiAveragesForecast': '342', 'movingAverages': '374' }, { 'months': 'Feb-2021', 'actuals': '226', 'tesLcb': '226', 'tesM': '226', 'tesUcb': '226', 'arimaForecast': '226', 'linearRegression': '396', 'semiAveragesForecast': '348', 'movingAverages': '288' }, { 'months': 'Mar-2021', 'actuals': '329', 'tesLcb': '329', 'tesM': '329', 'tesUcb': '329', 'arimaForecast': '329', 'linearRegression': '411', 'semiAveragesForecast': '353', 'movingAverages': '301' }, { 'months': 'Apr-2021', 'actuals': '721', 'tesLcb': '721', 'tesM': '721', 'tesUcb': '721', 'arimaForecast': '721', 'linearRegression': '425', 'semiAveragesForecast': '359', 'movingAverages': '328' }, { 'months': 'May-2021', 'actuals': '', 'tesLcb': '332', 'tesM': '', 'tesUcb': '', 'arimaForecast': '363', 'linearRegression': '439', 'semiAveragesForecast': '364', 'movingAverages': '417' }, { 'months': 'Jun-2021', 'actuals': '', 'tesLcb': '619', 'tesM': '', 'tesUcb': '', 'arimaForecast': '362', 'linearRegression': '453', 'semiAveragesForecast': '370', 'movingAverages': '373' }, { 'months': 'Jul-2021', 'actuals': '', 'tesLcb': '575', 'tesM': '', 'tesUcb': '', 'arimaForecast': '361', 'linearRegression': '468', 'semiAveragesForecast': '375', 'movingAverages': '413' }, { 'months': 'Aug-2021', 'actuals': '', 'tesLcb': '280', 'tesM': '', 'tesUcb': '', 'arimaForecast': '360', 'linearRegression': '482', 'semiAveragesForecast': '381', 'movingAverages': '451' }, { 'months': 'Sep-2021', 'actuals': '', 'tesLcb': '389', 'tesM': '', 'tesUcb': '', 'arimaForecast': '359', 'linearRegression': '496', 'semiAveragesForecast': '386', 'movingAverages': '475' }, { 'months': 'Oct-2021', 'actuals': '', 'tesLcb': '540', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '510', 'semiAveragesForecast': '391', 'movingAverages': '426' }, { 'months': 'Nov-2021', 'actuals': '', 'tesLcb': '359', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '525', 'semiAveragesForecast': '397', 'movingAverages': '427' }, { 'months': 'Dec-2021', 'actuals': '', 'tesLcb': '834', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '539', 'semiAveragesForecast': '402', 'movingAverages': '438' }, { 'months': 'Jan-2022', 'actuals': '', 'tesLcb': '437', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '553', 'semiAveragesForecast': '408', 'movingAverages': '443' }, { 'months': 'Feb-2022', 'actuals': '', 'tesLcb': '756', 'tesM': '', 'tesUcb': '', 'arimaForecast': '356', 'linearRegression': '567', 'semiAveragesForecast': '413', 'movingAverages': '442' }],
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            rangeValue1: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
+            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            popoverOpenMa: false,
+            popoverOpenSa: false,
+            popoverOpenLr: false,
+            popoverOpenTes: false,
+            popoverOpenArima: false,
+            extrapolationMethodId: -1,
+            showGuidance: false
         }
+        this.toggle = this.toggle.bind(this)
+        this.reset = this.reset.bind(this)
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
@@ -98,11 +112,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.buildJxl();
     }
 
+    reset() {
+        console.log('Inside reset')
+        this.componentDidMount();
+    }
+
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value })
     }
     handleRangeDissmis1(value) {
-        this.setState({ rangeValue: value })
+        this.setState({ rangeValue1: value })
     }
 
     buildJxl() {
@@ -115,13 +134,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             data = [];
             data[0] = dataList[j].months
             data[1] = dataList[j].actuals;
-            data[2] = dataList[j].tesLcb;
-            data[3] = dataList[j].tesM;
-            data[4] = dataList[j].tesUcb;
-            data[5] = dataList[j].arimaForecast
-            data[6] = dataList[j].linearRegression;
-            data[7] = dataList[j].semiAveragesForecast;
-            data[8] = dataList[j].movingAverages;
+            data[2] = dataList[j].movingAverages;
+            data[3] = dataList[j].semiAveragesForecast;
+            data[4] = dataList[j].linearRegression;
+            data[5] = dataList[j].tesLcb;
+            data[6] = dataList[j].tesM;
+            data[7] = dataList[j].tesUcb;
+            data[8] = dataList[j].arimaForecast
 
             dataArray.push(data);
         }
@@ -134,11 +153,23 @@ export default class ExtrapolateDataComponent extends React.Component {
             // colWidths: [0, 150, 150, 150, 100, 100, 100],
             columns: [
                 {
-                    title: 'Months',
+                    title: 'Month',
                     type: 'text'
                 },
                 {
-                    title: 'Actuals',
+                    title: 'Adjusted Actuals',
+                    type: 'number'
+                },
+                {
+                    title: 'Moving Averages',
+                    type: 'number'
+                },
+                {
+                    title: 'Semi-Averages',
+                    type: 'number'
+                },
+                {
+                    title: 'Linear Regression',
                     type: 'number'
                 },
                 {
@@ -154,19 +185,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     type: 'number'
                 },
                 {
-                    title: 'ARIMA Forecast',
-                    type: 'number'
-                },
-                {
-                    title: 'Linear Regression',
-                    type: 'number'
-                },
-                {
-                    title: 'Semi-Averages Forecast',
-                    type: 'number'
-                },
-                {
-                    title: 'Moving Averages',
+                    title: 'ARIMA',
                     type: 'number'
                 }
             ],
@@ -177,7 +196,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 entries: '',
             },
             onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
+            pagination: false,
             search: true,
             columnSorting: true,
             tableOverflow: true,
@@ -202,7 +221,20 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionWithoutPagination(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+
+        tr.children[2].classList.add('InfoTr');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+
+
     }
     getPlanningUnitList(e) {
         var forecastProgramId = e.target.value;
@@ -263,24 +295,31 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
+    setExtrapolationMethodId(e) {
+        var extrapolationMethodId = e.target.value;
+        this.setState({
+            extrapolationMethodId: extrapolationMethodId
+        })
+    }
+
     setMovingAvgId(e) {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId
         })
     }
-    // setSemiAvgId(e) {
-    //     var semiAvgId = e.target.checked;
-    //     this.setState({
-    //         semiAvgId: semiAvgId
-    //     })
-    // }
-    // setLinearRegressionId(e) {
-    //     var linearRegressionId = e.target.checked;
-    //     this.setState({
-    //         linearRegressionId: linearRegressionId
-    //     })
-    // }
+    setSemiAvgId(e) {
+        var semiAvgId = e.target.checked;
+        this.setState({
+            semiAvgId: semiAvgId
+        })
+    }
+    setLinearRegressionId(e) {
+        var linearRegressionId = e.target.checked;
+        this.setState({
+            linearRegressionId: linearRegressionId
+        })
+    }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
@@ -293,10 +332,22 @@ export default class ExtrapolateDataComponent extends React.Component {
             arimaId: arimaId
         })
     }
-    setShowAdvanceId(e) {
-        var showAdvanceId = e.target.checked;
+    // setShowAdvanceId(e) {
+    //     var showAdvanceId = e.target.checked;
+    //     this.setState({
+    //         showAdvanceId: showAdvanceId
+    //     })
+    // }
+
+    toggle(key, value) {
         this.setState({
-            showAdvanceId: showAdvanceId
+            [key]: value,
+        });
+    }
+
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
         })
     }
 
@@ -344,10 +395,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             },
 
             scales: {
-
                 yAxes: [{
                     scaleLabel: {
-                        display: false
+                        display: true,
+                        labelString: 'Consumption Quantity',
+                        fontColor: 'black'
                     },
                     ticks: {
                         beginAtZero: true,
@@ -363,15 +415,44 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
                             }
                             return x1 + x2;
-
                         }
                     }
                 }],
-                xAxes: [{
-                    ticks: {
-                        fontColor: 'black'
-                    }
-                }]
+                xAxes: [
+                    {
+                        id: 'xAxis1',
+                        gridLines: {
+                            color: "rgba(0, 0, 0, 0)",
+                        },
+                        ticks: {
+                            fontColor: 'black',
+                            callback: function (label) {
+                                var xAxis1 = label
+                                xAxis1 += '';
+                                var month = xAxis1.split('-')[0];
+                                return month;
+                            }
+                        }
+                    },
+                    {
+                        id: 'xAxis2',
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                        ticks: {
+                            callback: function (label) {
+                                var xAxis2 = label
+                                xAxis2 += '';
+                                var month = xAxis2.split('-')[0];
+                                var year = xAxis2.split('-')[1];
+                                if (month === "Feb") {
+                                    return year;
+                                } else {
+                                    return "";
+                                }
+                            }
+                        }
+                    }]
             },
 
             // tooltips: {
@@ -410,16 +491,17 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
 
 
-        let bar = "";
-        bar = {
+        let line = "";
+        line = {
             labels: this.state.dataList.map((item, index) => (item.months)),
             datasets: [
                 {
                     type: "line",
+                    pointRadius: 0,
                     lineTension: 0,
-                    label: 'Actuals',
+                    label: 'Adjusted Actuals',
                     backgroundColor: 'transparent',
-                    borderColor: '#808080',
+                    borderColor: '#CFCDC9',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -432,10 +514,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 },
                 {
                     type: "line",
+                    pointRadius: 0,
                     lineTension: 0,
-                    label: 'TES (Lower Confidence Bound)',
+                    label: 'Moving Averages',
                     backgroundColor: 'transparent',
-                    borderColor: '#000080',
+                    borderColor: '#A7C6ED',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -444,46 +527,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.tesLcb > 0 ? item.tesLcb : null))
+                    data: this.state.dataList.map((item, index) => (item.movingAverages > 0 ? item.movingAverages : null))
                 },
                 {
                     type: "line",
+                    pointRadius: 0,
                     lineTension: 0,
-                    label: 'ARIMA Forecast',
+                    label: 'Semi-Averages',
                     backgroundColor: 'transparent',
-                    borderColor: '#800000',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
-                },
-                {
-                    type: "line",
-                    lineTension: 0,
-                    label: 'Linear Regression',
-                    backgroundColor: 'transparent',
-                    borderColor: '#006400',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.linearRegression > 0 ? item.linearRegression : null))
-                },
-                {
-                    type: "line",
-                    lineTension: 0,
-                    label: 'Semi-Averages Forecast',
-                    backgroundColor: 'transparent',
-                    borderColor: '#BCDCB5',
+                    borderColor: '#49A4A1',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -496,10 +548,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 },
                 {
                     type: "line",
+                    pointRadius: 0,
                     lineTension: 0,
-                    label: 'Moving Averages',
+                    label: 'Linear Regression',
                     backgroundColor: 'transparent',
-                    borderColor: '#9ACB8F',
+                    borderColor: '#118B70',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -508,19 +561,63 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.movingAverages > 0 ? item.movingAverages : null))
+                    data: this.state.dataList.map((item, index) => (item.linearRegression > 0 ? item.linearRegression : null))
+                },
+                {
+                    type: "line",
+                    pointRadius: 0,
+                    lineTension: 0,
+                    label: 'TES (Lower Confidence Bound)',
+                    backgroundColor: 'transparent',
+                    borderColor: '#002FC6',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    showInLegend: true,
+                    pointStyle: 'line',
+                    pointBorderWidth: 5,
+                    yValueFormatString: "###,###,###,###",
+                    data: this.state.dataList.map((item, index) => (item.tesLcb > 0 ? item.tesLcb : null))
+                },
+                {
+                    type: "line",
+                    pointRadius: 0,
+                    lineTension: 0,
+                    label: 'ARIMA',
+                    backgroundColor: 'transparent',
+                    borderColor: '#BA0C2F',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    showInLegend: true,
+                    pointStyle: 'line',
+                    pointBorderWidth: 5,
+                    yValueFormatString: "###,###,###,###",
+                    data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
                 }
             ]
         }
 
+
         return (
             <div className="animated fadeIn">
                 <Card>
-                    <div className="Card-header-reporticon pb-2">
+                    <div className="Card-header-reporticon">
+                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
                         <div className="card-header-actions">
+                            <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">Show Guidance</small></span>
+                            </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                         </div>
                     </div>
+                    {/* <div className="Card-header-reporticon pb-2">
+                        <div className="card-header-actions">
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                        </div>
+                    </div> */}
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
@@ -573,8 +670,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
+                                    <FormGroup className="col-md-3 ">
+                                        <Label htmlFor="appendedInputButton">Extrapolation Method</Label>
+                                        <div className="controls ">
+                                            <Input
+                                                type="select"
+                                                name="extrapolationMethodId"
+                                                id="extrapolationMethodId"
+                                                bsSize="sm"
+                                                value={this.state.extrapolationMethodId}
+                                                onChange={(e) => { this.setExtrapolationMethodId(e); }}
+                                            >
+                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="1">Extrapolate National</option>
+                                                <option value="2">Extrapolate by Region from National</option>
+                                                <option value="3">Extrapolate by Region</option>
+                                            </Input>
+                                        </div>
+                                    </FormGroup>
                                     <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">Existing Forecast Period<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
 
                                             <Picker
@@ -582,16 +697,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 ref={this.pickRange}
                                                 value={rangeValue}
                                                 lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis}
+                                                // theme="light"
+                                                // onChange={this.handleRangeChange}
+                                                // onDismiss={this.handleRangeDissmis}
+                                                className="greyColor"
                                             >
-                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
                                             </Picker>
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">Extrapolate Forecast Period<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <Label htmlFor="appendedInputButton">Select date range for historical data<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
 
                                             <Picker
@@ -599,9 +715,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 ref={this.pickRange1}
                                                 value={rangeValue1}
                                                 lang={pickerLang}
-                                                //theme="light"
+                                                // theme="light"
                                                 onChange={this.handleRangeChange1}
                                                 onDismiss={this.handleRangeDissmis1}
+                                                readOnly
                                             >
                                                 <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this._handleClickRangeBox1} />
                                             </Picker>
@@ -615,6 +732,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <FormGroup className="col-md-12 ">
                                         <div className="check inline  pl-lg-3 pt-lg-3">
                                             <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <div>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -627,6 +749,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>Moving Averages</b>
+                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
                                             {this.state.movingAvgId &&
@@ -641,19 +764,30 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </div>
                                             }
                                             <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <div>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
                                                     id="semiAvgId"
                                                     name="semiAvgId"
-                                                // checked={this.state.semiAvgId}
-                                                // onClick={(e) => { this.setSemiAvgId(e); }}
+                                                    checked={this.state.semiAvgId}
+                                                    onClick={(e) => { this.setSemiAvgId(e); }}
                                                 />
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>Semi-Averages</b>
+                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
+                                            </div>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
                                             </div>
                                             <div>
                                                 <Input
@@ -661,14 +795,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     type="checkbox"
                                                     id="linearRegressionId"
                                                     name="linearRegressionId"
-                                                // checked={this.state.linearRegressionId}
-                                                // onClick={(e) => { this.setLinearRegressionId(e); }}
+                                                    checked={this.state.linearRegressionId}
+                                                    onClick={(e) => { this.setLinearRegressionId(e); }}
                                                 />
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>Linear Regression</b>
+                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
+                                            </div>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
                                             </div>
                                             <div>
                                                 <Input
@@ -683,11 +823,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>Triple-Exponential Smoothing (Holts-Winters)</b>
+                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
                                             {this.state.smoothingId &&
-                                                <div className="row">
-                                                    <div className="col-md-3">
+                                                <div className="row col-md-12">
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Confidence level</Label>
                                                         <Input
                                                             className="controls"
@@ -696,7 +837,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="confidenceLevelId"
                                                         />
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Seasonality</Label>
                                                         <Input
                                                             className="controls"
@@ -705,7 +846,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="seasonalityId"
                                                         />
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    {/* <div className="col-md-3">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -719,12 +860,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             Show Advance
                                                         </Label>
-                                                    </div>
-                                                </div>
-                                            }
-                                            {this.state.showAdvanceId && this.state.smoothingId &&
-                                                <div className="row">
-                                                    <div className="col-md-3">
+                                                    </div> */}
+
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Alpha</Label>
                                                         <Input
                                                             className="controls"
@@ -733,7 +871,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="alphaId"
                                                         />
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Beta</Label>
                                                         <Input
                                                             className="controls"
@@ -742,7 +880,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="betaId"
                                                         />
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Gamma</Label>
                                                         <Input
                                                             className="controls"
@@ -751,7 +889,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="gammaId"
                                                         />
                                                     </div>
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Phi</Label>
                                                         <Input
                                                             className="controls"
@@ -762,6 +900,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             }
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <div>
                                                 <Input
                                                     className="form-check-input"
@@ -774,7 +917,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>ARIMA (Autoregressive Integrated Moving Average)</b>
+                                                    <b>Autoregressive Integrated Moving Average (ARIMA)</b>
+                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
                                             {this.state.arimaId &&
@@ -812,54 +956,79 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup>
                                 </div>
                             </div>
+                            <div className="col-md-12">
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
+                            </div>
                         </Form>
-                        <div id="tableDiv"></div>
+
+                        {/* Graph */}
+                        <div className="col-md-12">
+                            <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                <Line id="cool-canvas" data={line} options={options} />
+                                <div>
+
+                                </div>
+                            </div>
+                        </div><br /><br />
                         <div className="table-scroll">
                             <div className="table-wrap table-responsive">
                                 <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                    <thead>
+                                        <tr>
+                                            <td width="230px"><b>Errors</b></td>
+                                            <td width="110px"><b>Moving Averages</b></td>
+                                            <td width="110px"><b>Semi Averages</b></td>
+                                            <td width="110px"><b>linear Regression</b></td>
+                                            <td width="110px"><b>TES(Lower Confidence Bound)</b></td>
+                                            <td width="110px"><b>TES(Medium)</b></td>
+                                            <td width="110px"><b>TES(Upper Confidence Bound</b></td>
+                                            <td width="110px"><b>ARIMA</b></td>
+                                        </tr>
+                                    </thead>
                                     <tbody>
                                         <tr>
-                                            <td width="230px">RMSE</td>
-                                            <td width="110px"></td>
-                                            <td width="110px"></td>
-                                            <td width="110px"></td>
-                                            <td width="110px"></td>
-                                            <td>176.258641</td>
-                                            <td>180.873394</td>
+                                            <td>RMSE</td>
                                             <td>199.896015</td>
+                                            <td>180.873394</td>
+                                            <td bgcolor="#118B70">176.258641</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>MAPE</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>0.506034</td>
-                                            <td>0.531222</td>
                                             <td>0.506926</td>
+                                            <td>0.531222</td>
+                                            <td bgcolor="#118B70">0.506034</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>MSE</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>31067.108640</td>
-                                            <td>32715.184570</td>
                                             <td>39958.416892</td>
-                                        </tr>
-                                        <tr>
-                                            <td>wape?</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                            <td>32715.184570</td>
+                                            <td bgcolor="#118B70">31067.108640</td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                         </tr>
                                         <tr>
-                                            <td>R^2?</td>
+                                            <td>WAPE</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>R^2</td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -872,18 +1041,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 </Table>
                             </div>
                         </div>
-
-                        {/* Graph */}
-                        <div className="col-md-12">
-                            <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
-                                <Bar id="cool-canvas" data={bar} options={options} />
-                                <div>
-
-                                </div>
-                            </div>
-                        </div>
+                        <div id="tableDiv" className="extrapolateTable"></div>
                     </CardBody>
                 </Card>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
+                        <strong>Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <p>Methods are organized from simple to robust
+
+                            More sophisticated models are more sensitive to problems in the data
+
+                            If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
+</p>
+                        </ModalBody>
+                    </div>
+                </Modal>
             </div>
         )
     }

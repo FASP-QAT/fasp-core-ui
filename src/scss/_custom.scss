@@ -530,6 +530,7 @@ label.arrow_label:after {
   background-color: #fff !important;
   color: #212721 !important;
   font-weight: bold;
+  font-style: normal !important;
 }
 .jexcel > tbody > tr > td:first-child {
   background-color: #fff !important;
@@ -2053,22 +2054,27 @@ input::placeholder {
 
 .progressbartext1Import {
   // left: 7px;
-  left: -3%;
-  transform: translateX(18%) scale(1);
+  // left: -3%;
+  // transform: translateX(18%) scale(1);
+  left: 0%;
+  transform: translateX(-3%) scale(1);
 }
-
 .progressbartext2Import {
   // left: 7px;
-  left: 48.6667%;
-  transform: translateX(-14%) scale(1);
+  // left: 48.6667%;
+  // transform: translateX(-14%) scale(1);
+  left: 49.6667%;
+  transform: translateX(-38%) scale(1);
 }
 
 .progressbartext3Import {
   // left: 7px;
-  left: 97.3333%;
-  transform: translateX(-40%) scale(1);
+  // left: 97.3333%;
+  // transform: translateX(-40%) scale(1);
+  width: 100px;
+  left: 100%;
+  transform: translateX(-63%) scale(1);
 }
-
 
 
 @media only screen and (max-width: 1024px) {
@@ -3853,6 +3859,11 @@ margin-left: -45px;
   background-color: transparent !important;
   border-color: transparent !important;
   }
+  .en-btnlogin.btn-secondary:hover {
+    color: #002f6c !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
   .logo-MarginTop{
   margin-top: -2%!important;
   }
@@ -5355,11 +5366,27 @@ fieldset.scheduler-border {
   .perNodeData {
     margin-top: -34px;
   }
-  .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
-    top: unset!important;
-    left: unset!important;
+  // .ScalingTable .jexcel .jdropdown-default .jdropdown-container{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  // .ScalingTable .jexcel .jcalendar .jcalendar-container{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  // .ScalingTable .jcontextmenu{
+  //   position: absolute!important;
+  //   // top: 255px!important;
+  //   // left: 600px!important;
+  // }
+  // .ScalingTable .jexcel_filters{
+  //   top: unset!important;
+  //   left: unset!important;
+  // }
+  .FiltermomjexcelPer .jexcel_filters{
+    position: fixed!important;
   }
-
+  
 .leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
 	text-align:left !important;
 }
@@ -5412,3 +5439,46 @@ fieldset.scheduler-border {
   background-color: #19437A!important;
   border-color: #19437A!important;
 }
+.greyColor{
+  background-color:#CFCDC9; 
+}
+
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(4) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(5) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(6) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(7) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(8) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(9) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.extrapolateTable .jexcel_content .draggable tr td:nth-child(10) {
+	color: rgb(170, 85, 161);
+  font-style: italic;
+}
+.jexcel > thead.resizable > tr > .InfoTr::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 2px;
+     cursor: col-resize;
+     font-size: 14px;
+   }
