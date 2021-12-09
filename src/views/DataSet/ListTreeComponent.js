@@ -180,7 +180,7 @@ export default class ListTreeComponent extends Component {
                     type: 'hidden'
                 },
                 {
-                    title: 'Program',
+                    title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
                     readOnly: true
                 },
@@ -253,7 +253,7 @@ export default class ListTreeComponent extends Component {
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            title: 'Delete',
+                            title: i18n.t('static.common.delete'),
                             onclick: function () {
 
                             }.bind(this)
@@ -387,8 +387,8 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="">{'+ Add Tree'}</option>
-                                                            <option value="0">{'(blank)'}</option>
+                                                            <option value="">{i18n.t('static.tree.+AddTree')}</option>
+                                                            <option value="0">{i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
                                                         </Input>
                                                     </InputGroup>
@@ -410,7 +410,7 @@ export default class ListTreeComponent extends Component {
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="3" className="pl-0">
                             <FormGroup className="Selectdiv">
-                                <Label htmlFor="appendedInputButton">{'Program'}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
