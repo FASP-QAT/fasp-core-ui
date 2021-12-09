@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jspreadsheet-pro';
-import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -135,7 +135,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
         var inventoryList = this.props.items.inventoryList;
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -190,7 +190,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
                                     active: dataSourceResult[k].active,
-                                    label:dataSourceResult[k].label
+                                    label: dataSourceResult[k].label
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -232,7 +232,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
 
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c=>c.id==this.props.items.programId)[0].readonly) {
+                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                         inventoryEditable = false;
                     }
 
@@ -1581,7 +1581,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
-                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
                         var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1700,10 +1700,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         programJson: programJson,
-                        planningUnitDataList:planningUnitDataList
+                        planningUnitDataList: planningUnitDataList
                     })
-                    programDataJson.planningUnitDataList=planningUnitDataList;
-                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 

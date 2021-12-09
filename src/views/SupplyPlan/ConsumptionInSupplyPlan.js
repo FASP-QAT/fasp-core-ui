@@ -1,6 +1,6 @@
 import React from "react";
-import jexcel from 'jspreadsheet-pro';
-import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -220,7 +220,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
 
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c=>c.id==this.props.items.programId)[0].readonly) {
+                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                         consumptionEditable = false;
                     }
                     if (document.getElementById("addConsumptionRowSupplyPlan") != null) {
@@ -1513,10 +1513,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         programJson: programJson,
-                        planningUnitDataList:planningUnitDataList
+                        planningUnitDataList: planningUnitDataList
                     })
                     programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 

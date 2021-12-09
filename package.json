@@ -54,6 +54,7 @@
     "i18next-localstorage-cache": "^1.1.1",
     "i18next-xhr-backend": "^3.2.2",
     "jspreadsheet-pro": "^7.12.5",
+    "jexcel-pro": "^7.9.3",
     "jspdf": "^1.5.3",
     "jspdf-autotable": "^3.5.3",
     "jsstore": "^3.7.6",
