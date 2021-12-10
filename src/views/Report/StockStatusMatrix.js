@@ -28,7 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -933,9 +933,11 @@ export default class StockStatusMatrix extends React.Component {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
                 console.log('already exist')
+                console.log("programData------------->0", programData);
               }
             }
             if (f == 0) {
+              console.log("programData------------->1", programData);
               proList.push(programData)
             }
           }
@@ -963,6 +965,8 @@ export default class StockStatusMatrix extends React.Component {
               b = getLabelText(b.label, lang).toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             })
+          }, () => {
+            console.log("programs------------------>", this.state.programs);
           })
         }
 

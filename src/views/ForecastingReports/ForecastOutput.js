@@ -43,7 +43,6 @@ class ForecastOutput extends Component {
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
             programs: [],
-            planningUnits: [],
             versions: [],
             show: false,
             message: '',
@@ -53,41 +52,19 @@ class ForecastOutput extends Component {
             loading: false,
             programId: '',
             versionId: '',
-            planningUnitLabel: '',
             viewById: 1,
             equivalencyUnitId: "",
-            regionList: [],
-            regionVal: [],
-            regionListFiltered: [],
-            versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
-            forecastingUnits: [{ value: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, { value: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }],
-            planningUnitListAll: [
-                { planningUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30", forecastingUnit: { forecastingUnitId: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
-                { planningUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30", forecastingUnit: { forecastingUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
-                { planningUnitId: 3, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90", forecastingUnit: { forecastingUnitId: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO)" }, program: { programId: 1 } },
-            ],
-            planningUnits: [],
-            forecastingUnitId: [],
-            showTotalForecast: true,
-            showTotalActual: true,
-            showTotalDifference: true,
             monthArrayList: [],
-            planningUnitId: [],
-            yaxisEquUnit: false,
-            consumptionDataAll: [
-                { planningUnit: { id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30" }, scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 36577 }, { consumptionDate: "2021-02-01", consumptionQty: 36805 }, { consumptionDate: "2021-03-01", consumptionQty: 37039 }, { consumptionDate: "2021-04-01", consumptionQty: 37273 }, { consumptionDate: "2021-05-01", consumptionQty: 37507 }, { consumptionDate: "2021-06-01", consumptionQty: 37741 }, { consumptionDate: "2021-07-01", consumptionQty: 37982 }, { consumptionDate: "2021-08-01", consumptionQty: 38223 }, { consumptionDate: "2021-09-01", consumptionQty: 38464 }, { consumptionDate: "2021-10-01", consumptionQty: 38705 }, { consumptionDate: "2021-11-01", consumptionQty: 38953 }, { consumptionDate: "2021-12-01", consumptionQty: 39200 }] },
-                { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 29927 }, { consumptionDate: "2021-02-01", consumptionQty: 30113 }, { consumptionDate: "2021-03-01", consumptionQty: 30305 }, { consumptionDate: "2021-04-01", consumptionQty: 30496 }, { consumptionDate: "2021-05-01", consumptionQty: 30688 }, { consumptionDate: "2021-06-01", consumptionQty: 30879 }, { consumptionDate: "2021-07-01", consumptionQty: 31077 }, { consumptionDate: "2021-08-01", consumptionQty: 31274 }, { consumptionDate: "2021-09-01", consumptionQty: 31471 }, { consumptionDate: "2021-10-01", consumptionQty: 31668 }, { consumptionDate: "2021-11-01", consumptionQty: 31870 }, { consumptionDate: "2021-12-01", consumptionQty: 32073 }] },
-                { planningUnit: { id: 3, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90" }, scenario: { id: 3, label: "C. Consumption Low" }, color: "#118b70", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 32920 }, { consumptionDate: "2021-02-01", consumptionQty: 33124 }, { consumptionDate: "2021-03-01", consumptionQty: 33336 }, { consumptionDate: "2021-04-01", consumptionQty: 33546 }, { consumptionDate: "2021-05-01", consumptionQty: 33757 }, { consumptionDate: "2021-06-01", consumptionQty: 33967 }, { consumptionDate: "2021-07-01", consumptionQty: 34185 }, { consumptionDate: "2021-08-01", consumptionQty: 34401 }, { consumptionDate: "2021-09-01", consumptionQty: 34618 }, { consumptionDate: "2021-10-01", consumptionQty: 34835 }, { consumptionDate: "2021-11-01", consumptionQty: 35057 }, { consumptionDate: "2021-12-01", consumptionQty: 35280 }] }
-            ],
+            yaxisEquUnit: 2,
             consumptionData: [],
-            scenarioList: [],
-            selectedScenarioId: 1,
             forecastPeriod: '',
+            planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
             forecastingUnits: [],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
+            downloadedProgramData: []
 
 
         };
@@ -103,7 +80,6 @@ class ForecastOutput extends Component {
         this.setVersionId = this.setVersionId.bind(this);
         // this.setVersionId = this.setVersionId.bind(this);
         this.setForecastingUnit = this.setForecastingUnit.bind(this);
-        this.setEquivalencyUnit = this.setEquivalencyUnit.bind(this);
         this.yAxisChange = this.yAxisChange.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
 
@@ -128,7 +104,7 @@ class ForecastOutput extends Component {
         this.setState({
             yaxisEquUnit: yaxisEquUnit
         }, () => {
-            if (yaxisEquUnit == "true") {
+            if (yaxisEquUnit == 1) {
                 document.getElementById("equivalencyUnitDiv").style.display = "block";
                 this.getEquivalencyUnitData();
                 this.filterData();
@@ -150,16 +126,6 @@ class ForecastOutput extends Component {
         })
     }
 
-    setEquivalencyUnit(e) {
-        var equivalencyUnitId = e.target.value;
-        this.setState({
-            equivalencyUnitId
-        }, () => {
-            // if (this.state.viewById == 3 && equivalencyUnitId > 0) {
-            //     this.showData();
-            // }
-        })
-    }
 
 
     setForecastingUnit = (event) => {
@@ -198,7 +164,7 @@ class ForecastOutput extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-        let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let viewById = document.getElementById("viewById").value;
         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
         let equivalencyUnitId = document.getElementById("equivalencyUnitId").value;
@@ -276,7 +242,13 @@ class ForecastOutput extends Component {
                             datasetList: datasetList,
                             datasetList1: datasetList1
                         }, () => {
-                            let filteredProgram = this.state.datasetList.filter()[0];
+                            let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
+
+                            const dateFilter = filteredProgram.consumptionList.filter(c => moment(c.month).isBetween(startDate, endDate, null, '[)'))
+                            console.log("dateFilter------->>>", dateFilter);
+
+                            
+
                         })
 
 
@@ -382,6 +354,7 @@ class ForecastOutput extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                let downloadedProgramData = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
@@ -395,11 +368,13 @@ class ForecastOutput extends Component {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
                                 console.log('already exist')
+                                console.log("programJson1-------->1", programData);
                             }
                         }
                         if (f == 0) {
                             proList.push(programData)
                         }
+                        downloadedProgramData.push(programData);
                     }
 
 
@@ -411,7 +386,8 @@ class ForecastOutput extends Component {
                         a = getLabelText(a.label, lang).toLowerCase();
                         b = getLabelText(b.label, lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
-                    })
+                    }),
+                    downloadedProgramData: downloadedProgramData
                 }, () => {
                     console.log("programs------------------>", this.state.programs);
                 })
@@ -432,6 +408,7 @@ class ForecastOutput extends Component {
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
+            versionId: ''
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
             this.filterData();
@@ -452,7 +429,7 @@ class ForecastOutput extends Component {
 
     }
 
-    getPlanningUnit = () => {
+    getPlanningUnitForecastingUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
 
@@ -465,112 +442,87 @@ class ForecastOutput extends Component {
             planningUnitLabels: []
         }, () => {
 
-            if (versionId == 0) {
-                // this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
+            if (versionId == -1) {
+                this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
             } else {
                 // localStorage.setItem("sesVersionIdReport", versionId);
-                // if (versionId.includes('Local')) {
-                //     const lan = 'en';
-                //     var db1;
-                //     var storeOS;
-                //     getDatabase();
-                //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                //     openRequest.onsuccess = function (e) {
-                //         db1 = e.target.result;
-                //         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                //         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                //         var planningunitRequest = planningunitOs.getAll();
-                //         var planningList = []
-                //         planningunitRequest.onerror = function (event) {
-                //             // Handle errors!
-                //         };
-                //         planningunitRequest.onsuccess = function (e) {
-                //             var myResult = [];
-                //             myResult = planningunitRequest.result;
-                //             var programId = (document.getElementById("programId").value).split("_")[0];
-                //             var proList = []
-                //             console.log(myResult)
-                //             for (var i = 0; i < myResult.length; i++) {
-                //                 if (myResult[i].program.id == programId && myResult[i].active == true) {
+                if (versionId.includes('Local')) {
+                    let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
+                    let forecastingUnitList = [];
+                    let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
 
-                //                     proList[i] = myResult[i]
-                //                 }
-                //             }
-                //             var lang = this.state.lang;
-                //             this.setState({
-                //                 planningUnits: proList.sort(function (a, b) {
-                //                     a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                //                     b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                //                     return a < b ? -1 : a > b ? 1 : 0;
-                //                 }), message: ''
-                //             }, () => {
-                //                 this.filterData();
-                //             })
-                //         }.bind(this);
-                //     }.bind(this)
+                    for (var i = 0; i < planningUnitList.length; i++) {
+                        forecastingUnitList.push(planningUnitList[i].forecastingUnit);
+                    }
+                    console.log("Shruti----------------->", forecastingUnitList);
+                    this.setState({
+                        planningUnits: planningUnitList,
+                        forecastingUnits: forecastingUnitList
+                    }, () => {
+                        this.filterData();
+                    })
 
+                }
+                else {
 
-                // }
-                // else {                    
+                    // ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
+                    //     console.log('**' + JSON.stringify(response.data))
+                    //     var listArray = response.data;
+                    //     listArray.sort((a, b) => {
+                    //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    //         return itemLabelA > itemLabelB ? 1 : -1;
+                    //     });
+                    //     this.setState({
+                    //         planningUnits: listArray,
+                    //         message: ''
+                    //     }, () => {
+                    //         this.filterData();
+                    //     })
+                    // }).catch(
+                    //     error => {
+                    //         this.setState({
+                    //             planningUnits: [],
+                    //         })
+                    //         if (error.message === "Network Error") {
+                    //             this.setState({
+                    //                 message: 'static.unkownError',
+                    //                 loading: false
+                    //             });
+                    //         } else {
+                    //             switch (error.response ? error.response.status : "") {
 
-                //     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                //         console.log('**' + JSON.stringify(response.data))
-                //         var listArray = response.data;
-                //         listArray.sort((a, b) => {
-                //             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                //             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                //             return itemLabelA > itemLabelB ? 1 : -1;
-                //         });
-                //         this.setState({
-                //             planningUnits: listArray,
-                //             message: ''
-                //         }, () => {
-                //             this.filterData();
-                //         })
-                //     }).catch(
-                //         error => {
-                //             this.setState({
-                //                 planningUnits: [],
-                //             })
-                //             if (error.message === "Network Error") {
-                //                 this.setState({
-                //                     message: 'static.unkownError',
-                //                     loading: false
-                //                 });
-                //             } else {
-                //                 switch (error.response ? error.response.status : "") {
-
-                //                     case 401:
-                //                         this.props.history.push(`/login/static.message.sessionExpired`)
-                //                         break;
-                //                     case 403:
-                //                         this.props.history.push(`/accessDenied`)
-                //                         break;
-                //                     case 500:
-                //                     case 404:
-                //                     case 406:
-                //                         this.setState({
-                //                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                //                             loading: false
-                //                         });
-                //                         break;
-                //                     case 412:
-                //                         this.setState({
-                //                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                //                             loading: false
-                //                         });
-                //                         break;
-                //                     default:
-                //                         this.setState({
-                //                             message: 'static.unkownError',
-                //                             loading: false
-                //                         });
-                //                         break;
-                //                 }
-                //             }
-                //         }
-                //     );
-                // }
+                    //                 case 401:
+                    //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                    //                     break;
+                    //                 case 403:
+                    //                     this.props.history.push(`/accessDenied`)
+                    //                     break;
+                    //                 case 500:
+                    //                 case 404:
+                    //                 case 406:
+                    //                     this.setState({
+                    //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                    //                         loading: false
+                    //                     });
+                    //                     break;
+                    //                 case 412:
+                    //                     this.setState({
+                    //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                    //                         loading: false
+                    //                     });
+                    //                     break;
+                    //                 default:
+                    //                     this.setState({
+                    //                         message: 'static.unkownError',
+                    //                         loading: false
+                    //                     });
+                    //                     break;
+                    //             }
+                    //         }
+                    //     }
+                    // );
+                }
             }
         });
 
@@ -581,7 +533,8 @@ class ForecastOutput extends Component {
 
 
 
-        var versionId = event.target.value;
+        var versionId = (event.target.value.split('(')[0]).trim();
+        // var version = (versionId.split('(')[0]).trim()
         var programId = this.state.programId;
 
         if (programId != -1 && versionId != -1) {
@@ -607,30 +560,38 @@ class ForecastOutput extends Component {
             let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
             let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
 
-            // let startDateSplit = selectedForecastProgram.currentVersion.forecastStartDate.split('-');
-            // let stopDateSplit = selectedForecastProgram.currentVersion.forecastStopDate.split('-');
-
             let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
             this.setState({
                 forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
-                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                versionId: versionId,
             }, () => {
-                this.state.viewById == 1 ? this.getPlanningUnit() : this.getForecastingUnit();
 
             })
         } else {
             this.setState({
                 forecastPeriod: '',
-                versionId: event.target.value,
             }, () => {
-                // this.filterData();
-                // localStorage.setItem("sesVersionIdReport", '');
-                // this.filterVersion();
-                if (versionId > 0 && this.state.programId > 0) {
-                    // this.buildJexcel();
-                }
+
+            })
+        }
+
+
+        var viewById = document.getElementById("viewById").value;
+        if (versionId != '' || versionId != undefined) {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                // localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.getPlanningUnitForecastingUnit()
+
+            })
+        } else {
+            this.setState({
+                versionId: event.target.value
+            }, () => {
+                // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.getPlanningUnitForecastingUnit()
             })
         }
 
@@ -833,25 +794,15 @@ class ForecastOutput extends Component {
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
         }, () => {
-            // if (viewById == 2) {
-            //     document.getElementById("planningUnitDiv").style.display = "none";
-            //     document.getElementById("forecastingUnitDiv").style.display = "block";
-            //     if (this.state.planningUnitId > 0) {
-            //         this.showData()
-            //     }
-            // } else if (viewById == 1) {
-            //     document.getElementById("planningUnitDiv").style.display = "block";
-            //     document.getElementById("forecastingUnitDiv").style.display = "none";
-            //     if (this.state.forecastingUnitId > 0) {
-            //         this.showData()
-            //     }
-            // } else {
-            //     document.getElementById("planningUnitDiv").style.display = "none";
-            //     document.getElementById("forecastingUnitDiv").style.display = "none";
-            //     if (this.state.equivalencyUnitId > 0) {
-            //         this.showData()
-            //     }
-            // }
+            if (viewById == 2) {
+                document.getElementById("planningUnitDiv").style.display = "none";
+                document.getElementById("forecastingUnitDiv").style.display = "block";
+                this.filterData();
+            } else if (viewById == 1) {
+                document.getElementById("planningUnitDiv").style.display = "block";
+                document.getElementById("forecastingUnitDiv").style.display = "none";
+                this.filterData();
+            }
         })
     }
 
@@ -986,19 +937,20 @@ class ForecastOutput extends Component {
             };
         }
 
-        const { forecastingUnits } = this.state;
-
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
-        let forecastingUnitList = [];
-        forecastingUnits.map((item, i) => {
-            forecastingUnitList.push({ label: item.label, value: item.forecastingUnitId })
-        }, this);
+        const { forecastingUnits } = this.state;
+        let forecastingUnitList = forecastingUnits.length > 0
+            && forecastingUnits.map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+            }, this);
+
 
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -1161,7 +1113,7 @@ class ForecastOutput extends Component {
                                                             name="viewById"
                                                             id="viewById"
                                                             bsSize="sm"
-                                                            value={this.state.viewById}
+                                                            // value={this.state.viewById}
                                                             onChange={this.setViewById}
                                                         >
                                                             <option value="1">{i18n.t('static.report.planningUnit')}</option>
@@ -1180,8 +1132,10 @@ class ForecastOutput extends Component {
                                                         id="forecastingUnitId"
                                                         value={this.state.forecastingUnitId}
                                                         onChange={(e) => this.setForecastingUnit(e)}
-                                                        options={this.state.forecastingUnits && this.state.forecastingUnits.length > 0 ? this.state.forecastingUnits : []}
+                                                        options={forecastingUnitList && forecastingUnitList.length > 0 ? forecastingUnitList : []}
+                                                        value={this.state.forecastingUnitValues}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        disabled={this.state.loading}
                                                     />
 
                                                 </div>
@@ -1216,10 +1170,11 @@ class ForecastOutput extends Component {
                                                             id="yaxisEquUnit"
                                                             bsSize="sm"
                                                             value={this.state.yaxisEquUnit}
+                                                            // onChange={this.filterData}
                                                             onChange={(e) => { this.yAxisChange(e); }}
                                                         >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                            <option value="1">{i18n.t('static.program.yes')}</option>
+                                                            <option value="2">{i18n.t('static.program.no')}</option>
                                                         </Input>
 
                                                     </InputGroup>
@@ -1234,12 +1189,12 @@ class ForecastOutput extends Component {
                                                             type="select"
                                                             name="equivalencyUnitId"
                                                             id="equivalencyUnitId"
-                                                            value={this.state.equivalencyUnitId}
-                                                            onChange={this.setEquivalencyUnit}
+                                                            // value={this.state.equivalencyUnitId}
+                                                            onChange={this.filterData}
                                                             bsSize="sm"
                                                         >
                                                             <option value="0">{i18n.t('static.common.all')}</option>
-                                                            <option value="1">Patient Months</option>
+                                                            <option value="1">Patient Months of ARVs</option>
                                                         </Input>
 
                                                     </InputGroup>
@@ -1259,8 +1214,8 @@ class ForecastOutput extends Component {
                                                             // onChange={(e) => { this.filterData(e); }}
                                                             onChange={this.filterData}
                                                         >
-                                                            <option value="true">{i18n.t('static.program.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                            <option value="1">{i18n.t('static.program.yes')}</option>
+                                                            <option value="2">{i18n.t('static.program.no')}</option>
                                                         </Input>
 
                                                     </InputGroup>
