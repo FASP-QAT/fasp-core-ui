@@ -16,7 +16,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon,Collapse, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -62,7 +62,7 @@ const pickerLang = {
 }
 
 const ItemTypes = {
-    NODE: 'node'
+    NODE: i18n.t('static.tree.node')
 }
 
 let initialValues = {
@@ -81,11 +81,11 @@ let initialValuesNodeData = {
 const validationSchemaNodeData = function (values) {
     return Yup.object().shape({
         nodeTypeId: Yup.string()
-            .required('This is required'),
+            .required(i18n.t('static.validation.fieldRequired')),
         nodeTitle: Yup.string()
-            .required('This is required'),
+            .required(i18n.t('static.validation.fieldRequired')),
         nodeUnitId: Yup.string()
-            .test('nodeUnitId', 'This is required',
+            .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("nodeUnitId").value == "") {
                         return false;
@@ -94,7 +94,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         percentageOfParent: Yup.string()
-            .test('percentageOfParent', 'This is required',
+            .test('percentageOfParent', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("percentageOfParent").value == "") {
                         return false;
@@ -141,9 +141,9 @@ const getErrorsFromValidationErrorNodeData = (validationError) => {
 const validationSchema = function (values) {
     return Yup.object().shape({
         forecastMethodId: Yup.string()
-            .required("Please select forecast method"),
+            .required(i18n.t('static.validation.selectForecastMethod')),
         treeName: Yup.string()
-            .required("Please enter tree name"),
+            .required(i18n.t('static.validation.selectTreeName')),
 
     })
 }
@@ -197,8 +197,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            showDiv:false,
-            showDiv1:false,
+            showDiv: false,
+            showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
             scalingMonth: new Date(),
@@ -541,14 +541,14 @@ export default class BuildTree extends Component {
     }
 
 
-    toggleCollapse(){
+    toggleCollapse() {
         this.setState({
-            showDiv:!this.state.showDiv
+            showDiv: !this.state.showDiv
         })
     }
-    toggleDropdown(){
+    toggleDropdown() {
         this.setState({
-            showDiv1:!this.state.showDiv1
+            showDiv1: !this.state.showDiv1
         })
     }
 
@@ -737,7 +737,7 @@ export default class BuildTree extends Component {
                 scenarioList: [{
                     id: 1,
                     label: {
-                        label_en: "Default"
+                        label_en: i18n.t('static.realm.default')
                     }
                 }],
                 tree: {
@@ -1042,44 +1042,44 @@ export default class BuildTree extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Month',
+                    title: i18n.t('static.common.month'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
                 {
-                    title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month Start)",
+                    title: i18n.t('static.tree.%of') + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.monthStart'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
-                    title: "Calculated Change (+/- %)",
+                    title: i18n.t('static.tree.calculatedChange'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: "Manual Change (+/- %)",
+                    title: i18n.t('static.tree.manualChange'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.'
 
                 },
                 {
-                    title: "% of " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
+                    title: i18n.t('static.tree.%of') + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " (Month End)",
+                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " (Month End)",
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -1157,42 +1157,42 @@ export default class BuildTree extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Month',
+                    title: i18n.t('static.common.month'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
                 {
-                    title: "Month Start (no seasonality)",
+                    title: i18n.t('static.tree.monthStartNoSeasonality'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
-                    title: "Calculated change (+/-)",
+                    title: i18n.t('static.tree.calculatedChange+-'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: "Monthly End (no seasonality)",
+                    title: i18n.t('static.tree.monthlyEndNoSeasonality'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: "Seasonality index",
+                    title: i18n.t('static.tree.seasonalityIndex'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
                 },
                 {
-                    title: "Manual Change (+/-)",
+                    title: i18n.t('static.tree.manualChange+-'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
 
                 },
                 {
-                    title: "Month End",
+                    title: i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -1574,7 +1574,7 @@ export default class BuildTree extends Component {
                 else if (diff <= 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, 'Please enter valid date');
+                    this.el.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
                     valid = false;
                 }
                 else {
@@ -1970,46 +1970,46 @@ export default class BuildTree extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Transfer to node',
+                    title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
                     source: this.state.sameLevelNodeList
                 },
                 {
-                    title: "Note",
+                    title: i18n.t('static.tree.Note'),
                     type: 'text',
 
                 },
                 {
-                    title: 'Modeling type',
+                    title: i18n.t('static.tree.modelingType'),
                     type: 'dropdown',
                     source: this.state.filteredModelingType
                 },
                 {
-                    title: 'Start Date',
+                    title: i18n.t('static.common.startdate'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
                 },
                 {
-                    title: 'Stop Date',
+                    title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
                 },
                 {
-                    title: "Monthly Change (%)",
+                    title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                 },
                 {
-                    title: "Monthly Change (#)",
+                    title: i18n.t('static.tree.MonthlyChange#'),
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
                 },
                 {
-                    title: "Modeling Calculater",
+                    title: i18n.t('static.tree.modelingCalculater'),
                     type: 'image',
                 },
                 {
-                    title: "Calculated change for month",
+                    title: i18n.t('static.tree.calculatedChangeForMonth'),
                     type: 'numeric',
                     mask: '#,##.00',
                     decimal: '.',
@@ -3316,12 +3316,12 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.oneTimeUsage != "true") {
                     var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
 
-                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3;
+                    usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + i18n.t('static.tree.timesPer') + selectedText2 + i18n.t('static.tree.for') + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3;
                 } else {
-                    usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
+                    usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
             } else {
-                usageText = "Every " + noOfPersons + " " + selectedText + "(s) - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) every " + usageFrequency + " " + selectedText2;
+                usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) " + i18n.t('static.usageTemplate.every') + usageFrequency + " " + selectedText2;
             }
         } else {
             //PU
@@ -3342,7 +3342,7 @@ export default class BuildTree extends Component {
                 } else {
                     sharePu = Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                 }
-                usageText = "For each " + nodeUnitTxt + " we need " + sharePu + " " + planningUnit;
+                usageText = i18n.t('static.tree.forEach') + nodeUnitTxt + i18n.t('static.tree.weNeed') + sharePu + " " + planningUnit;
             } else {
                 // need grand parent here 
                 // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson);
@@ -3350,7 +3350,7 @@ export default class BuildTree extends Component {
                 // console.log("3>>>", this.state.conversionFactor);
                 // console.log("4>>>", this.state.currentScenario.puNode.refillMonths);
                 var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / 1) / this.state.currentScenario.puNode.refillMonths);
-                usageText = "For each " + nodeUnitTxt + " we need " + addCommas(puPerInterval) + " " + planningUnit + " every " + this.state.currentScenario.puNode.refillMonths + " months";
+                usageText = i18n.t('static.tree.forEach') + nodeUnitTxt + i18n.t('static.tree.weNeed') + addCommas(puPerInterval) + " " + planningUnit + i18n.t('static.usageTemplate.every') + this.state.currentScenario.puNode.refillMonths + i18n.t('static.report.month');
             }
         }
 
@@ -5377,7 +5377,7 @@ export default class BuildTree extends Component {
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Scenario</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')}</Label>
                                             <Input type="text"
                                                 name="scenarioTxt"
                                                 bsSize="sm"
@@ -5387,7 +5387,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         {this.state.level0 &&
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Parent</Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')}</Label>
                                                 <Input type="text"
                                                     name="parent"
                                                     bsSize="sm"
@@ -5399,7 +5399,7 @@ export default class BuildTree extends Component {
                                                 ></Input>
                                             </FormGroup>}
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="nodeTitle"
                                                 name="nodeTitle"
@@ -5414,11 +5414,11 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
-                                                <PopoverBody>Lag is the delay between the parent node date and the user consumption the product. This is often for phased treatement.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.tree.lagMessage')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Node Type<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
                                                 id="nodeTypeId"
@@ -5447,7 +5447,7 @@ export default class BuildTree extends Component {
                                         {this.state.aggregationNode &&
 
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="nodeUnitId"
@@ -5501,7 +5501,7 @@ export default class BuildTree extends Component {
                                         {this.state.numberNode &&
                                             <>
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         id="percentageOfParent"
                                                         name="percentageOfParent"
@@ -5515,7 +5515,7 @@ export default class BuildTree extends Component {
                                                     <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         id="parentValue"
                                                         name="parentValue"
@@ -5528,7 +5528,7 @@ export default class BuildTree extends Component {
                                                 </FormGroup></>}
                                         {this.state.aggregationNode &&
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Node Value{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="nodeValue"
                                                     name="nodeValue"
@@ -5546,7 +5546,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>}
 
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Notes</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                                             <Input type="textarea"
                                                 id="notes"
                                                 name="notes"
@@ -5587,7 +5587,7 @@ export default class BuildTree extends Component {
                                                     </Input>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
 
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
@@ -5635,7 +5635,7 @@ export default class BuildTree extends Component {
                                                     </Input>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Planning unit<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
 
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
@@ -5658,7 +5658,7 @@ export default class BuildTree extends Component {
                                                     </Input>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')}<span class="red Reqasterisk">*</span></Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
                                                     <Input type="text"
@@ -5706,7 +5706,7 @@ export default class BuildTree extends Component {
                                                 {this.state.parentScenario.fuNode.usageType.id == 2 &&
                                                     <>
                                                         <FormGroup className="col-md-2">
-                                                            <Label htmlFor="currencyId">QAT estimate for interval (Every _ months)<span class="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.QATEstimateForIntervalEvery_months')}<span class="red Reqasterisk">*</span></Label>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-10">
                                                             <Input type="text"
@@ -5720,7 +5720,7 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-2">
-                                                            <Label htmlFor="currencyId">Consumption interval (Every X months)<span class="red Reqasterisk">*</span></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span></Label>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-10">
                                                             <Input type="text"
@@ -5733,7 +5733,7 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                         </FormGroup></>}
                                                 <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Will Clients share one PU?<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span></Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10">
                                                     <Input type="select"
@@ -5744,8 +5744,8 @@ export default class BuildTree extends Component {
                                                         value={this.state.currentScenario.puNode.sharePlanningUnit}>
 
                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                        <option value="true">Yes</option>
-                                                        <option value="false">No</option>
+                                                        <option value="true">{i18n.t('static.realm.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
 
                                                     </Input>
                                                 </FormGroup>
@@ -5770,7 +5770,7 @@ export default class BuildTree extends Component {
                                         <div className="row">
 
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="tracerCategoryId"
@@ -5793,7 +5793,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Copy from Template</Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.copyFromTemplate')}</Label>
                                                 <Input
                                                     type="select"
                                                     name="usageTemplateId"
@@ -5815,7 +5815,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <FormGroup className="col-md-12">
-                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
@@ -5867,7 +5867,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="lagInMonths"
                                                     name="lagInMonths"
@@ -5880,7 +5880,7 @@ export default class BuildTree extends Component {
                                         <div className="row">
 
                                             <FormGroup className="col-md-2">
-                                                <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
 
                                             </FormGroup>
                                             <FormGroup className="col-md-5">
@@ -5914,7 +5914,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                             </FormGroup>
                                             <FormGroup className="col-md-2">
-                                                <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.requires')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-5">
                                                 <Input type="text"
@@ -5947,7 +5947,7 @@ export default class BuildTree extends Component {
                                             {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
                                                 <>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.singleUse')}<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
                                                         <Input type="select"
@@ -5958,8 +5958,8 @@ export default class BuildTree extends Component {
                                                             value={this.state.currentScenario.fuNode.oneTimeUsage}>
 
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            <option value="true">Yes</option>
-                                                            <option value="false">No</option>
+                                                            <option value="true">{i18n.t('static.realm.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
 
                                                         </Input>
                                                     </FormGroup>
@@ -5979,7 +5979,7 @@ export default class BuildTree extends Component {
                                                                     name="timesPer"
                                                                     bsSize="sm"
                                                                     readOnly={true}
-                                                                    value={'times per'}></Input>
+                                                                    value={i18n.t('static.tree.timesPer')}></Input>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4">
                                                                 <Input
@@ -6037,7 +6037,7 @@ export default class BuildTree extends Component {
                                             {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                 <>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-5">
                                                         <Input type="text"
@@ -6072,30 +6072,30 @@ export default class BuildTree extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU required for period</td>
+                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
                                                             <td>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of months in period</td>
+                                                            <td>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU required</td>
+                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
                                                             <td>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
@@ -6144,7 +6144,7 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">Month<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="">{i18n.t('static.common.monthprogramheader')}<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
@@ -6172,8 +6172,8 @@ export default class BuildTree extends Component {
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
-                                    <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>Total : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
-                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
+                                    <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
+                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
                                         <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                     </div>
@@ -6184,7 +6184,7 @@ export default class BuildTree extends Component {
                                     <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
                                     </div>
                                 </div>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> View monthly data</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
                                     <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowJexcelPer()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 </>
@@ -6196,14 +6196,14 @@ export default class BuildTree extends Component {
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0">
                                 <fieldset className="scheduler-border">
-                                    <legend className="scheduler-border">Modeling Calculater Tool:</legend>
+                                    <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool:')}</legend>
                                     <div className="row">
                                         {/* <div className="row"> */}
                                         {/* <FormGroup className="col-md-12 pt-lg-1">
                                         <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
                                     </FormGroup> */}
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Start Date<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth4}
                                                 // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
@@ -6219,7 +6219,7 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Target Date<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth5}
                                                 // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
@@ -6235,7 +6235,7 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Start Value<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startValue"
                                                 name="startValue"
@@ -6249,7 +6249,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Start Percentage<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="startPercentage"
                                                 name="startPercentage"
@@ -6266,7 +6266,7 @@ export default class BuildTree extends Component {
                                         {/* <div className="row"> */}
 
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">Target ending {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
@@ -6280,7 +6280,7 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-1 mt-lg-4">
-                                            <Label htmlFor="currencyId">or</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.or')}</Label>
                                         </FormGroup>
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span></Label>
@@ -6302,7 +6302,7 @@ export default class BuildTree extends Component {
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
                                         {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Change (#)<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="currentTargetChangeNumber"
                                                 name="currentTargetChangeNumber"
@@ -6318,7 +6318,7 @@ export default class BuildTree extends Component {
                                     </div>
                                     <div className="row col-md-12 pl-lg-0">
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Calculated Month-on-Month change<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.CalculatedMonth-on-MonthChange')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 id="calculatedMomChange"
                                                 name="calculatedMomChange"
@@ -6419,7 +6419,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">Monthly Data:</legend>
+                                <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-6">
@@ -6479,7 +6479,7 @@ export default class BuildTree extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataInDataSet}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
 
                                 </div>
                                 {/* </div> */}
@@ -6491,7 +6491,7 @@ export default class BuildTree extends Component {
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
-                                <legend className="scheduler-border">Monthly Data:</legend>
+                                <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                     <div className="col-md-6">
@@ -6528,7 +6528,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> for node <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a % of parent <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
+                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
                                 <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"}>
                                 </div>
@@ -6539,7 +6539,7 @@ export default class BuildTree extends Component {
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {'Update'}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.updateMomDataPerInDataSet}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
 
                                 </div>
                                 {/* </div> */}
@@ -7433,49 +7433,49 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                        <FormGroup className="col-md-3 pl-lg-0">
-                                                            <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="datasetId"
-                                                                    id="datasetId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
-                                                                >
-                                                                    <option value="">{"Please select program"}</option>
-                                                                    {datasets}
-                                                                </Input>
-                                                              
-                                                            </InputGroup>
-
-                                                        </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
-                                                                    <Label htmlFor="languageId">{'Tree'}</Label>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="currencyId">{i18n.t('static.consumption.program')}<span class="red Reqasterisk">*</span></Label>
                                                                     <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="treeId"
-                                                                        id="treeId"
-                                                                        bsSize="sm"
-                                                                        required
-                                                                        value={this.state.treeId}
-                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="datasetId"
+                                                                            id="datasetId"
+                                                                            bsSize="sm"
+                                                                            value={this.state.programId}
+                                                                            onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                                                        >
+                                                                            <option value="">{"Please select program"}</option>
+                                                                            {datasets}
+                                                                        </Input>
 
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {treeList}
-                                                                    </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                    </InputGroup>
+
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.forecastMethod.tree')}</Label>
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="treeId"
+                                                                            id="treeId"
+                                                                            bsSize="sm"
+                                                                            required
+                                                                            value={this.state.treeId}
+                                                                            onChange={(e) => { this.dataChange(e) }}
+
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            {treeList}
+                                                                        </Input>
+                                                                        <InputGroupAddon addonType="append">
                                                                             <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                   </FormGroup>     
+                                                                </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
 
-                                                                    <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}<span class="red Reqasterisk">*</span></Label>
                                                                     <InputGroup>
                                                                         {/* <InputGroupAddon addonType="append">
                                                                         <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
@@ -7500,17 +7500,17 @@ export default class BuildTree extends Component {
                                                                             <InputGroupText><i class="fa fa-caret-down icons " onClick={this.toggleDropdown} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
-                                                                    <div class="list-group DropdownScenario" style={{display:this.state.showDiv1?'block':'none'}}>
-                                                                            <a href="#" class="list-group-item list-group-item-action"> Cras justo odio</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-                                                                            
-                                                                    </div>     
+                                                                    <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
+                                                                        <a href="#" class="list-group-item list-group-item-action"> Cras justo odio</a>
+                                                                        <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                                                                        <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                                                                        <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+
+                                                                    </div>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Date'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')}<span class="red Reqasterisk">*</span></Label>
                                                                     <div className="controls edit">
                                                                         <Picker
                                                                             ref={this.pickAMonth3}
@@ -7564,9 +7564,9 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
-                                                                        </div>
-                                                                        </FormGroup>
-                                                                        <FormGroup className="col-md-3" style={{marginLeft:'-2%'}}>
+                                                                    </div>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
                                                                     <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
@@ -7583,9 +7583,9 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Forecasting Unit & Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
-                                                                        </div>
-                                                                        </FormGroup>
-                                                                        <FormGroup className="col-md-6" >
+                                                                    </div>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-6" >
                                                                     <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
@@ -7609,124 +7609,124 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{display:this.state.showDiv?'block':'none'}} >
-                                                    
-                                                            <Row>
-                                                                    <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="forecastMethodId"
-                                id="forecastMethodId"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                required
-                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
-                            >
-                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
-                                {forecastMethods}
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="treeName"
-                                name="treeName"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
-                            <div className="controls ">
-                                {/* <InMultiputGroup> */}
-                                <MultiSelect
-                                    // type="select"
-                                    name="regionId"
-                                    id="regionId"
-                                    bsSize="sm"
-                                    value={this.state.regionValues}
-                                    onChange={(e) => { this.handleRegionChange(e) }}
-                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                    labelledBy={i18n.t('static.common.regiontext')}
-                                />
-                            </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                            <Label htmlFor="currencyId">Notes</Label>
-                            <Input type="textarea"
-                                id="treeNotes"
-                                name="treeNotes"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6 pt-lg-4">
-                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active10"
-                                    name="active"
-                                    value={true}
-                                    checked={this.state.curTreeObj.active === true}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio1">
-                                    {i18n.t('static.common.active')}
-                                </Label>
-                            </FormGroup>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active11"
-                                    name="active"
-                                    value={false}
-                                    checked={this.state.curTreeObj.active === false}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio2">
-                                    {i18n.t('static.common.disabled')}
-                                </Label>
-                            </FormGroup>
-                        </FormGroup>
-                                                </Row>                    
+                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} >
+
+                                                        <Row>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="forecastMethodId"
+                                                                    id="forecastMethodId"
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    required
+                                                                    value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
+                                                                >
+                                                                    <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                                                    {forecastMethods}
+                                                                </Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}<span class="red Reqasterisk">*</span></Label>
+                                                                <Input type="text"
+                                                                    id="treeName"
+                                                                    name="treeName"
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
+                                                                ></Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls ">
+                                                                    {/* <InMultiputGroup> */}
+                                                                    <MultiSelect
+                                                                        // type="select"
+                                                                        name="regionId"
+                                                                        id="regionId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.regionValues}
+                                                                        onChange={(e) => { this.handleRegionChange(e) }}
+                                                                        options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                                                        labelledBy={i18n.t('static.common.regiontext')}
+                                                                    />
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <Input type="textarea"
+                                                                    id="treeNotes"
+                                                                    name="treeNotes"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
+                                                                ></Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6 pt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10"
+                                                                        name="active"
+                                                                        value={true}
+                                                                        checked={this.state.curTreeObj.active === true}
+                                                                        onChange={(e) => { this.treeDataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11"
+                                                                        name="active"
+                                                                        value={false}
+                                                                        checked={this.state.curTreeObj.active === false}
+                                                                        onChange={(e) => { this.treeDataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                        </Row>
                                                     </div>
 
-                                                    <div className="pb-lg-0" style={{marginTop:'-2%'}}>
-                            <div className="card-header-actions">
-                                <div className="card-header-action pr-4 pt-lg-0">
+                                                    <div className="pb-lg-0" style={{ marginTop: '-4%' }}>
+                                                        <div className="card-header-actions">
+                                                            <div className="card-header-action pr-4 pt-lg-0">
 
-                                    <Col md="12 pl-0">
-                                        <div className="d-md-flex">
-                                            <a className="pr-lg-0 pt-lg-1">
-                                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                                            </a>
-                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                                                <Col md="12 pl-0">
+                                                                    <div className="d-md-flex">
+                                                                        <a className="pr-lg-0 pt-lg-1">
+                                                                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                                                        </a>
+                                                                        <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
-                                                <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
-                                                    this.setState({
-                                                        openTreeDataModal: true
-                                                    })
-                                                }}><i className="fa fa-cog"></i></a>
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                                    onClick={() => this.exportPDF()}
-                                                />
-                                                {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
-                                            </FormGroup>
+                                                                            <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                                                this.setState({
+                                                                                    openTreeDataModal: true
+                                                                                })
+                                                                            }}><i className="fa fa-cog"></i></a>
+                                                                            <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                                                onClick={() => this.exportPDF()}
+                                                                            />
+                                                                            {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
+                                                                        </FormGroup>
 
-                                        </div>
-                                    </Col>
-                                </div>
-                            </div>
-                        </div>
+                                                                    </div>
+                                                                </Col>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
@@ -7749,13 +7749,13 @@ export default class BuildTree extends Component {
                                                         </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                    <div class="row">
-                                                   <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
-                                                   <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
-                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                       </div>
-                                                       </div>
+                                                        <div class="row">
+                                                            <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
+                                                            <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
+                                                                {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                            </div>
+                                                        </div>
                                                     </CardFooter>
                                                 </Form>
 
@@ -7770,7 +7770,7 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openTreeDataModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Tree Data</strong>
+                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
                         <Button size="md" onClick={() => this.setState({ openTreeDataModal: false })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
@@ -7785,14 +7785,14 @@ export default class BuildTree extends Component {
                                     value={this.state.programId}
                                     onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
                                 >
-                                    <option value="">{"Please select program"}</option>
+                                    <option value="">{i18n.t('static.common.pleaseSelect')}</option>
                                     {datasets}
                                 </Input>
                             </InputGroup>
 
                         </FormGroup> */}
                         <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                             <Input
                                 type="select"
                                 name="forecastMethodId"
@@ -7807,7 +7807,7 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup>
                         <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 id="treeName"
                                 name="treeName"
@@ -7817,7 +7817,7 @@ export default class BuildTree extends Component {
                             ></Input>
                         </FormGroup>
                         <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
                             <div className="controls ">
                                 {/* <InMultiputGroup> */}
                                 <MultiSelect
@@ -7833,7 +7833,7 @@ export default class BuildTree extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-12">
-                            <Label htmlFor="currencyId">Notes</Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                             <Input type="textarea"
                                 id="treeNotes"
                                 name="treeNotes"
@@ -7889,12 +7889,12 @@ export default class BuildTree extends Component {
                 <Modal isOpen={this.state.openAddScenarioModal}
                     className={'modal-md '} >
                     <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                        <strong>Add/Edit Scenario</strong>
+                        <strong>{i18n.t('static.tree.Add/EditTreeData')}</strong>
                         <Button size="md" onClick={this.openScenarioModal} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                     </ModalHeader>
                     <ModalBody>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Scenario Name<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.tree.scenarioName')}<span class="red Reqasterisk">*</span></Label>
                             <Input type="text"
                                 id="scenarioName"
                                 name="scenarioName"
@@ -7903,7 +7903,7 @@ export default class BuildTree extends Component {
                             ></Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="currencyId">Notes</Label>
+                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                             <Input type="text"
                                 id="scenarioDesc"
                                 name="scenarioDesc"
@@ -7914,7 +7914,7 @@ export default class BuildTree extends Component {
 
                     </ModalBody>
                     <ModalFooter>
-                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                        <Button type="submit" size="md" onClick={this.addScenario} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
@@ -7925,7 +7925,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-xl '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>Add/Edit Node</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
@@ -7945,7 +7945,7 @@ export default class BuildTree extends Component {
                                         active={this.state.activeTab1[0] === '1'}
                                         onClick={() => { this.toggleModal(0, '1'); }}
                                     >
-                                        Node Data
+                                        {i18n.t('static.tree.nodeData')}
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
@@ -7953,7 +7953,7 @@ export default class BuildTree extends Component {
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
                                     >
-                                        Modeling/Transfer
+                                        {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
 
