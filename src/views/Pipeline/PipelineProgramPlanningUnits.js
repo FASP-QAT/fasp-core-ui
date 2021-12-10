@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import jexcel from 'jspreadsheet-pro';
-import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import PipelineService from '../../api/PipelineService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
