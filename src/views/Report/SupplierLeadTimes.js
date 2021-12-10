@@ -29,8 +29,8 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import MultiSelect from 'react-multi-select-component';
-import jexcel from 'jspreadsheet-pro';
-import "../../../node_modules/jspreadsheet-pro/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
