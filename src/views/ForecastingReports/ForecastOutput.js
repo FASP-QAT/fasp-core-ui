@@ -64,7 +64,12 @@ class ForecastOutput extends Component {
             forecastingUnits: [],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
-            downloadedProgramData: []
+            downloadedProgramData: [],
+            // consumptionDataAll: [
+            //     { planningUnit: { id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30" }, scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 36577 }, { consumptionDate: "2021-02-01", consumptionQty: 36805 }, { consumptionDate: "2021-03-01", consumptionQty: 37039 }, { consumptionDate: "2021-04-01", consumptionQty: 37273 }, { consumptionDate: "2021-05-01", consumptionQty: 37507 }, { consumptionDate: "2021-06-01", consumptionQty: 37741 }, { consumptionDate: "2021-07-01", consumptionQty: 37982 }, { consumptionDate: "2021-08-01", consumptionQty: 38223 }, { consumptionDate: "2021-09-01", consumptionQty: 38464 }, { consumptionDate: "2021-10-01", consumptionQty: 38705 }, { consumptionDate: "2021-11-01", consumptionQty: 38953 }, { consumptionDate: "2021-12-01", consumptionQty: 39200 }] },
+            //     { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 29927 }, { consumptionDate: "2021-02-01", consumptionQty: 30113 }, { consumptionDate: "2021-03-01", consumptionQty: 30305 }, { consumptionDate: "2021-04-01", consumptionQty: 30496 }, { consumptionDate: "2021-05-01", consumptionQty: 30688 }, { consumptionDate: "2021-06-01", consumptionQty: 30879 }, { consumptionDate: "2021-07-01", consumptionQty: 31077 }, { consumptionDate: "2021-08-01", consumptionQty: 31274 }, { consumptionDate: "2021-09-01", consumptionQty: 31471 }, { consumptionDate: "2021-10-01", consumptionQty: 31668 }, { consumptionDate: "2021-11-01", consumptionQty: 31870 }, { consumptionDate: "2021-12-01", consumptionQty: 32073 }] },
+            //     { planningUnit: { id: 3, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 90" }, scenario: { id: 3, label: "C. Consumption Low" }, color: "#118b70", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 32920 }, { consumptionDate: "2021-02-01", consumptionQty: 33124 }, { consumptionDate: "2021-03-01", consumptionQty: 33336 }, { consumptionDate: "2021-04-01", consumptionQty: 33546 }, { consumptionDate: "2021-05-01", consumptionQty: 33757 }, { consumptionDate: "2021-06-01", consumptionQty: 33967 }, { consumptionDate: "2021-07-01", consumptionQty: 34185 }, { consumptionDate: "2021-08-01", consumptionQty: 34401 }, { consumptionDate: "2021-09-01", consumptionQty: 34618 }, { consumptionDate: "2021-10-01", consumptionQty: 34835 }, { consumptionDate: "2021-11-01", consumptionQty: 35057 }, { consumptionDate: "2021-12-01", consumptionQty: 35280 }] }
+            // ],
 
 
         };
@@ -244,10 +249,42 @@ class ForecastOutput extends Component {
                         }, () => {
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
 
-                            const dateFilter = filteredProgram.consumptionList.filter(c => moment(c.month).isBetween(startDate, endDate, null, '[)'))
-                            console.log("dateFilter------->>>", dateFilter);
 
-                            
+                            var monthArrayList = [];
+                            let cursorDate = startDate;
+                            for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
+                                var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                                cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                                monthArrayList.push(dt);
+                            }
+
+                            // console.log("planningUnitValues---------->", this.state.planningUnitValues);{label: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets", value: 2733}
+                            let planningUnit = this.state.planningUnitValues;
+                            let consumptionData = [];
+                            for (let i = 0; i < planningUnit.length; i++) {
+
+                                let filteredData = filteredProgram.consumptionList.filter(c => c.consumptionUnit.planningUnit.id == planningUnit[i].value);
+                                // console.log("Test------------------->", filteredData);
+
+                                let consumptionList = filteredData.map(m => {
+                                    // actionPlanningUnitIds.push(parseInt(m.planningUnitId));
+                                    return {
+                                        consumptionDate: m.month,
+                                        consumptionQty: m.actualConsumption
+                                    }
+                                });
+
+                                let jsonTemp = { planningUnit: this.state.planningUnits.filter(c => c.id == planningUnit[i].value)[0], scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                consumptionData.push(jsonTemp);
+                            }
+                            console.log("consumptionData------------------->", consumptionData);
+                            this.setState({
+                                consumptionData: consumptionData,
+                                monthArrayList: monthArrayList
+                            })
+
+
+
 
                         })
 
