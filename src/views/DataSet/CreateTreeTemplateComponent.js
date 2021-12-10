@@ -4306,8 +4306,10 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
                                                 <>
-                                                    <FormGroup className="col-md-12">
+                                                    <FormGroup className="col-md-1">
                                                         <Label for="isSync">Single Use </Label>
+                                                       </FormGroup>
+                                                       <div className="col-md-10" style={{marginLeft:'4%'}}>
                                                         <FormGroup className="ml-lg-3" check inline >
                                                             <Input
                                                                 className="form-check-input"
@@ -4340,7 +4342,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 {i18n.t('static.program.no')}
                                                             </Label>
                                                         </FormGroup>
-                                                    </FormGroup>
+                                                    </div>
                                                     {/* <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
