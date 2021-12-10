@@ -121,15 +121,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         const headers = [];
         // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        headers.push('Supply Plan Planning Unit');
-        headers.push('Forecast Planning Unit');
-        headers.push('Region');
-        headers.push('Month');
-        headers.push('Supply Plan Consumption');
-        headers.push('Multiplier');
-        headers.push('ConvertedConsumption');
-        headers.push('Current QAT Consumption');
-        headers.push('Import?');
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
+        headers.push(i18n.t('static.program.region'));
+        headers.push(i18n.t('static.inventoryDate.inventoryReport'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedConsumption'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
+        headers.push(i18n.t('static.quantimed.importData'));
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -145,7 +145,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = 'ImportFromQATSupplyPlan' + ".csv"
+        a.download = i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -157,7 +157,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     formSubmit() {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
-            message: "Selected rows will be imported. Note that imported data will override any existing consumption for those months, region & planning units.",
+            message: i18n.t('static.importFromQATSupplyPlan.confirmAlert'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -565,25 +565,25 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             columns: [
 
                 {
-                    title: 'Supply Plan Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'dropdown',
                     source: planningUnitListJexcel,//A0
                     readOnly: true
                 },
                 {
-                    title: 'Forecasting planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'dropdown',
                     source: planningUnitListJexcel,//B1
                     readOnly: true
                 },
                 {
-                    title: 'Region',
+                    title: i18n.t('static.program.region'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true//C2
                 },
                 {
-                    title: 'Month',
+                    title: i18n.t('static.inventoryDate.inventoryReport'),
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT,
@@ -592,20 +592,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true//D3
                 },
                 {
-                    title: 'Actual Consumption(Supply Plan Module)',
+                    title: i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)'),
                     type: 'numeric',
                     mask: '#,##',
                     textEditor: true,
                     readOnly: true//E4
                 },
                 {
-                    title: 'Conversion Factor(Supply Plan to Forecast)',
+                    title: i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true//F5
                 },
                 {
-                    title: 'Converted Actual Consumption(Supply Plan Module)',
+                    title: i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'),
                     type: 'numeric',
                     decimal: '.',
                     mask: '#,##.00',
@@ -613,14 +613,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true//G6
                 },
                 {
-                    title: 'Current Actual Consumption(Forecast Module)',
+                    title: i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)'),
                     type: 'numeric',
                     mask: '#,##',
                     textEditor: true,
                     readOnly: true//H7
                 },
                 {
-                    title: 'Import?',
+                    title: i18n.t('static.quantimed.importData'),
                     type: 'checkbox'//I8
                 },
                 {
@@ -726,11 +726,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 <div class="col-md-10 mt-2 pl-lg-0 form-group">
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
-                            <span class="legendcommitversionText red">Data already exists in Forecast Program</span>
+                            <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span>
                         </li>
                     </ul>
                 </div>
-                <h5 className="red">All values below are in supply planning units.</h5>
+                <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5>
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
@@ -750,7 +750,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <FormGroup>
                     {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
-                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>Import</Button>
+                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
                     &nbsp;
                     {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
                     <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

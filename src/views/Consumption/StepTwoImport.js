@@ -288,13 +288,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Supply Plan Region',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanRegion'),
                     type: 'text',
                     readOnly: true,
                     textEditor: true,
                 },
                 {
-                    title: 'Is region in forecast program?',
+                    title: i18n.t('static.importFromQATSupplyPlan.isRegionInForecastProgram'),
                     readOnly: true,
                     type: 'dropdown',
                     source: [
@@ -303,12 +303,12 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     ]
                 },
                 {
-                    title: 'Import?',
+                    title: i18n.t('static.quantimed.importData'),
                     type: 'dropdown',
                     source: [
-                        { id: 1, name: 'Import' },
-                        { id: 2, name: 'Do not import' },
-                        { id: 3, name: 'No region to import into' },
+                        { id: 1, name: i18n.t('static.importFromQATSupplyPlan.Import') },
+                        { id: 2, name: i18n.t('static.quantimed.doNotImport') },
+                        { id: 3, name: i18n.t('static.importFromQATSupplyPlan.noRegionToImportInto') },
                     ],
                     filter: this.filterImport
                 },
@@ -382,8 +382,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
     filterImport = function (instance, cell, c, r, source) {
         var mylist = [
-            { id: 1, name: 'Import' },
-            { id: 2, name: 'Do not import' },
+            { id: 1, name: i18n.t('static.importFromQATSupplyPlan.Import') },
+            { id: 2, name: i18n.t('static.quantimed.doNotImport') },
         ];
 
         return mylist;
