@@ -16,7 +16,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon,Collapse, InputGroupText, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -197,8 +197,10 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            showDiv:false,
-            showDiv1:false,
+            defYear1: { year: 2018, month: 4 },
+            defYear2: { year: 2020, month: 9 },
+            showDiv: false,
+            showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
             scalingMonth: new Date(),
@@ -541,14 +543,14 @@ export default class BuildTree extends Component {
     }
 
 
-    toggleCollapse(){
+    toggleCollapse() {
         this.setState({
-            showDiv:!this.state.showDiv
+            showDiv: !this.state.showDiv
         })
     }
-    toggleDropdown(){
+    toggleDropdown() {
         this.setState({
-            showDiv1:!this.state.showDiv1
+            showDiv1: !this.state.showDiv1
         })
     }
 
@@ -1336,12 +1338,17 @@ export default class BuildTree extends Component {
                 items: [],
                 selectedScenario: '',
                 programId,
+                singleValue2: {},
+                defYear1: { year: 2021, month: 1 },
+                defYear2: { year: 2021, month: 12 },
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
                 minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
                 maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
             }, () => {
                 console.log("program id after update--->", this.state.programId);
+                console.log("program min date--->", this.state.minDate);
+                console.log("program max date--->", this.state.maxDate);
                 // if (proList.length == 1) {
                 //     var treeId = proList[0].treeId;
                 //     this.setState({
@@ -4403,9 +4410,10 @@ export default class BuildTree extends Component {
         }
     }
     addScenario() {
-        const { scenario } = this.state;
+        const { scenario,curTreeObj } = this.state;
         var scenarioList = this.state.scenarioList;
         var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+        var minScenarioId = Math.min(...scenarioList.map(o => o.id));
         var scenarioId = parseInt(maxScenarioId) + 1;
         var newTabObject = {
             id: scenarioId,
@@ -4420,20 +4428,23 @@ export default class BuildTree extends Component {
             if (this.state.scenarioList.length > 1) {
 
             }
-            // var items = this.state.items;
-            // var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-            // const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-            // var obj = {
-            //     nodeDataId: scenarioId,
-            //     label: {
-            //         label_en: scenario.label.label_en
-            //     },
-            //     notes: scenario.notes
-            // }
-            //     (item.payload.nodeDataMap[scenarioId])[0] = obj;
-            // items[itemIndex1] = item;
+            var items = curTreeObj.tree.flatList;
+            console.log("***>minScenarioId---", items);
+
+            for (var i = 0; i < items.length; i++) {
+                console.log("***>items[i]----", items[i]);
+                console.log("***>(items[i].payload.nodeDataMap[minScenarioId])[0]----", (items[i].payload.nodeDataMap[minScenarioId])[0]);
+                var tempArray = [];
+                var nodeDataMap = {};
+                tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
+                nodeDataMap[scenarioId] = tempArray;
+                items[i].payload.nodeDataMap = nodeDataMap;
+            }
+            console.log("items-----------", items);
+            this.updateTreeData();
         }
         this.setState({
+            items,
             selectedScenario: scenarioId,
             scenarioList,
             openAddScenarioModal: false
@@ -6708,6 +6719,8 @@ export default class BuildTree extends Component {
         var items = this.state.items;
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
+            console.log("this.state.modelinDataForScenario---",this.state.modelinDataForScenario);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---",items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
             if (nodeDataModelingMap.length > 0) {
@@ -7433,46 +7446,46 @@ export default class BuildTree extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                        <FormGroup className="col-md-3 pl-lg-0">
-                                                            <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="datasetId"
-                                                                    id="datasetId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
-                                                                >
-                                                                    <option value="">{"Please select program"}</option>
-                                                                    {datasets}
-                                                                </Input>
-                                                              
-                                                            </InputGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="currencyId">Program<span class="red Reqasterisk">*</span></Label>
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="datasetId"
+                                                                            id="datasetId"
+                                                                            bsSize="sm"
+                                                                            value={this.state.programId}
+                                                                            onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                                                        >
+                                                                            <option value="">{"Please select program"}</option>
+                                                                            {datasets}
+                                                                        </Input>
 
-                                                        </FormGroup>
+                                                                    </InputGroup>
+
+                                                                </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Tree'}</Label>
                                                                     <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="treeId"
-                                                                        id="treeId"
-                                                                        bsSize="sm"
-                                                                        required
-                                                                        value={this.state.treeId}
-                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="treeId"
+                                                                            id="treeId"
+                                                                            bsSize="sm"
+                                                                            required
+                                                                            value={this.state.treeId}
+                                                                            onChange={(e) => { this.dataChange(e) }}
 
-                                                                    >
-                                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                                        {treeList}
-                                                                    </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                        >
+                                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                                            {treeList}
+                                                                        </Input>
+                                                                        <InputGroupAddon addonType="append">
                                                                             <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
-                                                                   </FormGroup>     
+                                                                </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
 
                                                                     <Label htmlFor="languageId">{'Scenario'}<span class="red Reqasterisk">*</span></Label>
@@ -7500,13 +7513,12 @@ export default class BuildTree extends Component {
                                                                             <InputGroupText><i class="fa fa-caret-down icons " onClick={this.toggleDropdown} title=""></i></InputGroupText>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
-                                                                    <div class="list-group DropdownScenario" style={{display:this.state.showDiv1?'block':'none'}}>
-                                                                            <a href="#" class="list-group-item list-group-item-action"> Cras justo odio</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                                                                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-                                                                            
-                                                                    </div>     
+                                                                    <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
+                                                                        <p class="list-group-item list-group-item-action" onClick={this.openScenarioModal}>Add Scenario</p>
+                                                                        <p class="list-group-item list-group-item-action" onClick={this.openScenarioModal}>Edit Scenario</p>
+                                                                        <p class="list-group-item list-group-item-action">Delete Scenario</p>
+
+                                                                    </div>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -7516,7 +7528,7 @@ export default class BuildTree extends Component {
                                                                             ref={this.pickAMonth3}
                                                                             id="monthPicker"
                                                                             name="monthPicker"
-                                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                            years={{ min: this.state.defYear1, max: this.state.defYear2 }}
                                                                             value={singleValue2}
                                                                             lang={pickerLang.months}
                                                                             // theme="dark"
@@ -7564,9 +7576,9 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
-                                                                        </div>
-                                                                        </FormGroup>
-                                                                        <FormGroup className="col-md-3" style={{marginLeft:'-2%'}}>
+                                                                    </div>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
                                                                     <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
@@ -7583,9 +7595,9 @@ export default class BuildTree extends Component {
                                                                                 <b>{'Hide Forecasting Unit & Planning Unit'}</b>
                                                                             </Label>
                                                                         </div>
-                                                                        </div>
-                                                                        </FormGroup>
-                                                                        <FormGroup className="col-md-6" >
+                                                                    </div>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-6" >
                                                                     <div className="check inline  pl-lg-0 pt-lg-0">
                                                                         <div>
                                                                             <Input
@@ -7609,124 +7621,124 @@ export default class BuildTree extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{display:this.state.showDiv?'block':'none'}} >
-                                                    
-                                                            <Row>
-                                                                    <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                                type="select"
-                                name="forecastMethodId"
-                                id="forecastMethodId"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                required
-                                value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
-                            >
-                                <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
-                                {forecastMethods}
-                            </Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                                id="treeName"
-                                name="treeName"
-                                bsSize="sm"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-4">
-                            <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
-                            <div className="controls ">
-                                {/* <InMultiputGroup> */}
-                                <MultiSelect
-                                    // type="select"
-                                    name="regionId"
-                                    id="regionId"
-                                    bsSize="sm"
-                                    value={this.state.regionValues}
-                                    onChange={(e) => { this.handleRegionChange(e) }}
-                                    options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
-                                    labelledBy={i18n.t('static.common.regiontext')}
-                                />
-                            </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-6">
-                            <Label htmlFor="currencyId">Notes</Label>
-                            <Input type="textarea"
-                                id="treeNotes"
-                                name="treeNotes"
-                                onChange={(e) => { this.treeDataChange(e) }}
-                                value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
-                            ></Input>
-                        </FormGroup>
-                        <FormGroup className="col-md-6 pt-lg-4">
-                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active10"
-                                    name="active"
-                                    value={true}
-                                    checked={this.state.curTreeObj.active === true}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio1">
-                                    {i18n.t('static.common.active')}
-                                </Label>
-                            </FormGroup>
-                            <FormGroup check inline>
-                                <Input
-                                    className="form-check-input"
-                                    type="radio"
-                                    id="active11"
-                                    name="active"
-                                    value={false}
-                                    checked={this.state.curTreeObj.active === false}
-                                    onChange={(e) => { this.treeDataChange(e) }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio2">
-                                    {i18n.t('static.common.disabled')}
-                                </Label>
-                            </FormGroup>
-                        </FormGroup>
-                                                </Row>                    
+                                                    <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} >
+
+                                                        <Row>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">Forecast Method<span class="red Reqasterisk">*</span></Label>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="forecastMethodId"
+                                                                    id="forecastMethodId"
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    required
+                                                                    value={this.state.curTreeObj.forecastMethod != null ? this.state.curTreeObj.forecastMethod.id : ''}
+                                                                >
+                                                                    <option value="-1">{i18n.t('static.common.forecastmethod')}</option>
+                                                                    {forecastMethods}
+                                                                </Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">Tree Name<span class="red Reqasterisk">*</span></Label>
+                                                                <Input type="text"
+                                                                    id="treeName"
+                                                                    name="treeName"
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    value={this.state.curTreeObj.label != null ? this.state.curTreeObj.label.label_en : ''}
+                                                                ></Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4">
+                                                                <Label htmlFor="currencyId">Region<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls ">
+                                                                    {/* <InMultiputGroup> */}
+                                                                    <MultiSelect
+                                                                        // type="select"
+                                                                        name="regionId"
+                                                                        id="regionId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.regionValues}
+                                                                        onChange={(e) => { this.handleRegionChange(e) }}
+                                                                        options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                                                        labelledBy={i18n.t('static.common.regiontext')}
+                                                                    />
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">Notes</Label>
+                                                                <Input type="textarea"
+                                                                    id="treeNotes"
+                                                                    name="treeNotes"
+                                                                    onChange={(e) => { this.treeDataChange(e) }}
+                                                                    value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
+                                                                ></Input>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6 pt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10"
+                                                                        name="active"
+                                                                        value={true}
+                                                                        checked={this.state.curTreeObj.active === true}
+                                                                        onChange={(e) => { this.treeDataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11"
+                                                                        name="active"
+                                                                        value={false}
+                                                                        checked={this.state.curTreeObj.active === false}
+                                                                        onChange={(e) => { this.treeDataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                        </Row>
                                                     </div>
 
-                                                    <div className="pb-lg-0" style={{marginTop:'-4%'}}>
-                            <div className="card-header-actions">
-                                <div className="card-header-action pr-4 pt-lg-0">
+                                                    <div className="pb-lg-0" style={{ marginTop: '-4%' }}>
+                                                        <div className="card-header-actions">
+                                                            <div className="card-header-action pr-4 pt-lg-0">
 
-                                    <Col md="12 pl-0">
-                                        <div className="d-md-flex">
-                                            <a className="pr-lg-0 pt-lg-1">
-                                                <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                                            </a>
-                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                                                <Col md="12 pl-0">
+                                                                    <div className="d-md-flex">
+                                                                        <a className="pr-lg-0 pt-lg-1">
+                                                                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                                                        </a>
+                                                                        <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
-                                                <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
-                                                    this.setState({
-                                                        openTreeDataModal: true
-                                                    })
-                                                }}><i className="fa fa-cog"></i></a>
-                                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                                    onClick={() => this.exportPDF()}
-                                                />
-                                                {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
-                                            </FormGroup>
+                                                                            <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                                                this.setState({
+                                                                                    openTreeDataModal: true
+                                                                                })
+                                                                            }}><i className="fa fa-cog"></i></a>
+                                                                            <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                                                onClick={() => this.exportPDF()}
+                                                                            />
+                                                                            {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
+                                                                        </FormGroup>
 
-                                        </div>
-                                    </Col>
-                                </div>
-                            </div>
-                        </div>
+                                                                    </div>
+                                                                </Col>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
@@ -7749,13 +7761,13 @@ export default class BuildTree extends Component {
                                                         </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                    <div class="row">
-                                                   <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
-                                                   <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
-                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                       </div>
-                                                       </div>
+                                                        <div class="row">
+                                                            <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5></div>
+                                                            <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> Calculated</Button>
+                                                                {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                                                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                            </div>
+                                                        </div>
                                                     </CardFooter>
                                                 </Form>
 
