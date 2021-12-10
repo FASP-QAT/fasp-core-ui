@@ -7700,7 +7700,7 @@ export default class BuildTree extends Component {
                                                         </Row>
                                                     </div>
 
-                                                    <div className="pb-lg-0" style={{ marginTop: '-4%' }}>
+                                                    <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
                                                         <div className="card-header-actions">
                                                             <div className="card-header-action pr-4 pt-lg-0">
 
