@@ -197,6 +197,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            scenarioActionType: '',
             defYear1: { year: 2018, month: 4 },
             defYear2: { year: 2020, month: 9 },
             showDiv: false,
@@ -504,6 +505,7 @@ export default class BuildTree extends Component {
     }
 
     callAfterScenarioChange(scenarioId) {
+        console.log("&&&&scenarioId---", scenarioId);
         let { curTreeObj } = this.state;
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
@@ -513,6 +515,7 @@ export default class BuildTree extends Component {
         var arr = [];
         var currentScenario;
         for (let i = 0; i < items.length; i++) {
+            console.log("&&&&item---", items[i]);
             console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
@@ -588,6 +591,7 @@ export default class BuildTree extends Component {
         console.log("program data>>>", programData);
 
         curTreeObj.tree.flatList = items;
+        curTreeObj.scenarioList = this.state.scenarioList;
         var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
         treeData[findTreeIndex] = curTreeObj;
 
@@ -1003,10 +1007,39 @@ export default class BuildTree extends Component {
     getStartValueForMonth(dateValue) {
         console.log("***", this.state.parentNodeDataMap);
     }
-    openScenarioModal() {
+    openScenarioModal(type) {
         this.setState({
-            openAddScenarioModal: !this.state.openAddScenarioModal
+            scenarioActionType: type
         })
+        if (type != 3) {
+            if (type == 2 && this.state.selectedScenario != "") {
+
+            } else {
+                alert("Please select scenario first.")
+            }
+            this.setState({
+                openAddScenarioModal: !this.state.openAddScenarioModal
+            })
+        } else {
+            if (this.state.selectedScenario != "") {
+                confirmAlert({
+                    message: "Are you sure you want to delete this scenario.",
+                    buttons: [
+                        {
+                            label: i18n.t('static.program.yes'),
+                            onClick: () => {
+                                this.onRemoveButtonClick(itemConfig);
+                            }
+                        },
+                        {
+                            label: i18n.t('static.program.no')
+                        }
+                    ]
+                });
+            } else {
+                alert("Please select scenario first.")
+            }
+        }
     }
     buildMomJexcelPercent() {
         this.getStartValueForMonth('');
@@ -4410,40 +4443,57 @@ export default class BuildTree extends Component {
         }
     }
     addScenario() {
-        const { scenario,curTreeObj } = this.state;
+        const { scenario, curTreeObj } = this.state;
         var scenarioList = this.state.scenarioList;
-        var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
-        var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-        var scenarioId = parseInt(maxScenarioId) + 1;
-        var newTabObject = {
-            id: scenarioId,
-            label: {
-                label_en: scenario.label.label_en
-            }
-        };
-        // console.log("tab data---", newTabObject);
-        scenarioList = [...scenarioList, newTabObject];
-        // console.log("tabList---", tabList1)
-        if (this.state.treeId != "") {
-            if (this.state.scenarioList.length > 1) {
+        var type = this.state.scenarioActionType;
+        if (type == 1) {
+            var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
+            var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+            var scenarioId = parseInt(maxScenarioId) + 1;
+            var newTabObject = {
+                id: scenarioId,
+                label: {
+                    label_en: scenario.label.label_en
+                }
+            };
+            // console.log("tab data---", newTabObject);
+            scenarioList = [...scenarioList, newTabObject];
+            // console.log("tabList---", tabList1)
+            if (this.state.treeId != "") {
+                if (this.state.scenarioList.length > 1) {
 
-            }
-            var items = curTreeObj.tree.flatList;
-            console.log("***>minScenarioId---", items);
+                }
+                var items = curTreeObj.tree.flatList;
+                console.log("***>minScenarioId---", items);
 
-            for (var i = 0; i < items.length; i++) {
-                console.log("***>items[i]----", items[i]);
-                console.log("***>(items[i].payload.nodeDataMap[minScenarioId])[0]----", (items[i].payload.nodeDataMap[minScenarioId])[0]);
-                var tempArray = [];
-                var nodeDataMap = {};
-                tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
-                nodeDataMap[scenarioId] = tempArray;
-                items[i].payload.nodeDataMap = nodeDataMap;
+                for (var i = 0; i < items.length; i++) {
+                    console.log("***>items[i]----", items[i]);
+                    console.log("***>(items[i].payload.nodeDataMap[minScenarioId])[0]----", (items[i].payload.nodeDataMap[minScenarioId])[0]);
+                    var tempArray = [];
+                    var nodeDataMap = {};
+                    // tempArray = items[i].payload.nodeDataMap;
+                    tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
+                    nodeDataMap = items[i].payload.nodeDataMap;
+                    nodeDataMap[scenarioId] = tempArray;
+                    items[i].payload.nodeDataMap = nodeDataMap;
+                }
+                console.log("items-----------", items);
+                this.updateTreeData();
             }
-            console.log("items-----------", items);
-            this.updateTreeData();
+        } else if (type == 2) {
+
         }
+        else if (type == 3) {
+            var selectedScenario = this.state.selectedScenario;
+            var scenario1 = scenarioList.filter(x => x.id == selectedScenario)[0];
+            scenario1.active = false;
+            var findNodeIndex = scenarioList.findIndex(n => n.id == selectedScenario);
+            scenarioList[findNodeIndex] = scenario1;
+            
+        }
+        curTreeObj.scenarioList = scenarioList;
         this.setState({
+            curTreeObj,
             items,
             selectedScenario: scenarioId,
             scenarioList,
@@ -6719,8 +6769,9 @@ export default class BuildTree extends Component {
         var items = this.state.items;
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
-            console.log("this.state.modelinDataForScenario---",this.state.modelinDataForScenario);
-            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---",items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
+            console.log("items[i]---", items[i]);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
             if (nodeDataModelingMap.length > 0) {
@@ -7514,9 +7565,9 @@ export default class BuildTree extends Component {
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                     <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
-                                                                        <p class="list-group-item list-group-item-action" onClick={this.openScenarioModal}>Add Scenario</p>
-                                                                        <p class="list-group-item list-group-item-action" onClick={this.openScenarioModal}>Edit Scenario</p>
-                                                                        <p class="list-group-item list-group-item-action">Delete Scenario</p>
+                                                                        <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(1) }}>Add Scenario</p>
+                                                                        <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</p>
+                                                                        <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</p>
 
                                                                     </div>
                                                                     {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
