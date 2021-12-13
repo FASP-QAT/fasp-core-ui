@@ -676,7 +676,7 @@ export default class BuildTree extends Component {
         if (this.state.treeId != null) {
             console.log("inside if hurrey------------------");
             this.setState({
-                openTreeDataModal: false
+                showDiv: false
             })
         } else {
 
@@ -744,7 +744,9 @@ export default class BuildTree extends Component {
                     id: 1,
                     label: {
                         label_en: i18n.t('static.realm.default')
-                    }
+                    },
+                    active : true,
+                    notes:''
                 }],
                 tree: {
                     flatList: [{
@@ -780,7 +782,7 @@ export default class BuildTree extends Component {
             this.setState({
                 treeId,
                 treeData,
-                openTreeDataModal: false
+                showDiv: false
             }, () => {
                 console.log("---------->>>>>>>>", this.state.regionValues);
                 this.getTreeByTreeId(treeId);
@@ -1008,18 +1010,39 @@ export default class BuildTree extends Component {
         console.log("***", this.state.parentNodeDataMap);
     }
     openScenarioModal(type) {
+        console.log("type---------", type);
+        var scenarioId = this.state.selectedScenario;
         this.setState({
             scenarioActionType: type
         })
         if (type != 3) {
-            if (type == 2 && this.state.selectedScenario != "") {
-
+            if (type == 2) {
+                console.log("edit scenario");
+                if (scenarioId != "") {
+                    console.log("my scenarioId---", scenarioId);
+                    var scenario = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
+                    console.log("my scenario---", scenario);
+                    this.setState({
+                        scenario,
+                        openAddScenarioModal: !this.state.openAddScenarioModal
+                    })
+                } else {
+                    alert("Please select scenario first.")
+                }
             } else {
-                alert("Please select scenario first.")
+                console.log("add scenario");
+                var scenario = {
+                    label: {
+                        label_en: ''
+                    },
+                    notes: ''
+                }
+                this.setState({
+                    scenario,
+                    openAddScenarioModal: !this.state.openAddScenarioModal
+                })
             }
-            this.setState({
-                openAddScenarioModal: !this.state.openAddScenarioModal
-            })
+
         } else {
             if (this.state.selectedScenario != "") {
                 confirmAlert({
@@ -1028,7 +1051,7 @@ export default class BuildTree extends Component {
                         {
                             label: i18n.t('static.program.yes'),
                             onClick: () => {
-                                this.onRemoveButtonClick(itemConfig);
+                                this.addScenario();
                             }
                         },
                         {
@@ -2767,7 +2790,7 @@ export default class BuildTree extends Component {
             console.log("regionValues--->>>>", regionValues);
             this.setState({
                 curTreeObj,
-                scenarioList: curTreeObj.scenarioList,
+                scenarioList: curTreeObj.scenarioList.filter(x => x.active == true),
                 regionValues
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
@@ -4446,15 +4469,19 @@ export default class BuildTree extends Component {
         const { scenario, curTreeObj } = this.state;
         var scenarioList = this.state.scenarioList;
         var type = this.state.scenarioActionType;
+        var items = curTreeObj.tree.flatList;
+        var scenarioId;
         if (type == 1) {
             var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
             var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-            var scenarioId = parseInt(maxScenarioId) + 1;
+            scenarioId = parseInt(maxScenarioId) + 1;
             var newTabObject = {
                 id: scenarioId,
                 label: {
                     label_en: scenario.label.label_en
-                }
+                },
+                notes: scenario.notes,
+                active: true
             };
             // console.log("tab data---", newTabObject);
             scenarioList = [...scenarioList, newTabObject];
@@ -4463,9 +4490,8 @@ export default class BuildTree extends Component {
                 if (this.state.scenarioList.length > 1) {
 
                 }
-                var items = curTreeObj.tree.flatList;
-                console.log("***>minScenarioId---", items);
 
+                console.log("***>minScenarioId---", items);
                 for (var i = 0; i < items.length; i++) {
                     console.log("***>items[i]----", items[i]);
                     console.log("***>(items[i].payload.nodeDataMap[minScenarioId])[0]----", (items[i].payload.nodeDataMap[minScenarioId])[0]);
@@ -4480,23 +4506,31 @@ export default class BuildTree extends Component {
                 console.log("items-----------", items);
                 this.updateTreeData();
             }
-        } else if (type == 2) {
+        } else if (type == 2 || type == 3) {
+            scenarioId = this.state.selectedScenario;
+            var scenario1 = scenarioList.filter(x => x.id == scenarioId)[0];
+            var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
+            if (type == 2) {
+                console.log("this.state.scenario---", this.state.scenario);
+                scenarioList[findNodeIndex] = this.state.scenario;
+                console.log("my scenarioList---", scenarioList);
+            } else if (type == 3) {
+                items = [];
+                scenarioId = '';
+                scenario1.active = false;
+                scenarioList[findNodeIndex] = scenario1;
+            }
+
 
         }
-        else if (type == 3) {
-            var selectedScenario = this.state.selectedScenario;
-            var scenario1 = scenarioList.filter(x => x.id == selectedScenario)[0];
-            scenario1.active = false;
-            var findNodeIndex = scenarioList.findIndex(n => n.id == selectedScenario);
-            scenarioList[findNodeIndex] = scenario1;
-            
-        }
+
         curTreeObj.scenarioList = scenarioList;
         this.setState({
+            showDiv1: false,
             curTreeObj,
             items,
             selectedScenario: scenarioId,
-            scenarioList,
+            scenarioList: scenarioList.filter(x => x.active == true),
             openAddScenarioModal: false
         }, () => {
             console.log("final tab list---", this.state.items);
@@ -7760,6 +7794,10 @@ export default class BuildTree extends Component {
                                                                     </Label>
                                                                 </FormGroup>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-6">
+                                                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                            </FormGroup>
                                                         </Row>
                                                     </div>
 
@@ -7962,7 +8000,7 @@ export default class BuildTree extends Component {
                                 id="scenarioName"
                                 name="scenarioName"
                                 onChange={(e) => { this.scenarioChange(e) }}
-                            // value={this.state.scenario.scenarioName}
+                                value={this.state.scenario.label.label_en}
                             ></Input>
                         </FormGroup>
                         <FormGroup>
@@ -7971,7 +8009,7 @@ export default class BuildTree extends Component {
                                 id="scenarioDesc"
                                 name="scenarioDesc"
                                 onChange={(e) => { this.scenarioChange(e) }}
-                            // value={this.state.scenario.scenarioDesc}
+                                value={this.state.scenario.notes}
                             ></Input>
                         </FormGroup>
 
