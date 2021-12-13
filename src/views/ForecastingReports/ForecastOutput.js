@@ -56,6 +56,7 @@ class ForecastOutput extends Component {
             equivalencyUnitId: "",
             monthArrayList: [],
             yaxisEquUnit: 2,
+            xaxis: 2,
             consumptionData: [],
             forecastPeriod: '',
             planningUnits: [],
@@ -86,13 +87,14 @@ class ForecastOutput extends Component {
         // this.setVersionId = this.setVersionId.bind(this);
         this.setForecastingUnit = this.setForecastingUnit.bind(this);
         this.yAxisChange = this.yAxisChange.bind(this);
+        this.xAxisChange = this.xAxisChange.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
 
     }
 
     planningUnitCheckedChanged(id) {
         var consumptionData = this.state.consumptionData;
-        var index = this.state.consumptionData.findIndex(c => c.planningUnit.id == id);
+        var index = this.state.consumptionData.findIndex(c => c.objUnit.id == id);
         consumptionData[index].display = !consumptionData[index].display;
         this.setState({
             consumptionData
@@ -120,17 +122,15 @@ class ForecastOutput extends Component {
         })
     }
 
-    showData() {
-        var planningUnitIds = [];
-        this.state.planningUnitId.map(c => {
-            planningUnitIds.push(c.value);
-        })
-        var consumptionData = this.state.consumptionDataAll.filter(c => planningUnitIds.includes(c.planningUnit.id));
+    xAxisChange(e) {
+        var xaxisEquUnit = e.target.value;
+        console.log("e.target.value+++", e.target.value)
         this.setState({
-            consumptionData: consumptionData
+            xaxis: xaxisEquUnit
+        }, () => {
+            this.filterData();
         })
     }
-
 
 
     setForecastingUnit = (event) => {
@@ -258,33 +258,100 @@ class ForecastOutput extends Component {
                                 monthArrayList.push(dt);
                             }
 
-                            // console.log("planningUnitValues---------->", this.state.planningUnitValues);{label: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets", value: 2733}
-                            let planningUnit = this.state.planningUnitValues;
                             let consumptionData = [];
-                            for (let i = 0; i < planningUnit.length; i++) {
+                            if (viewById == 1) {//planning unit id
+                                // console.log("planningUnitValues---------->", this.state.planningUnitValues);{label: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets", value: 2733}
+                                let planningUnit = this.state.planningUnitValues;
 
-                                let filteredData = filteredProgram.consumptionList.filter(c => c.consumptionUnit.planningUnit.id == planningUnit[i].value);
-                                // console.log("Test------------------->", filteredData);
+                                for (let i = 0; i < planningUnit.length; i++) {
 
-                                let consumptionList = filteredData.map(m => {
-                                    // actionPlanningUnitIds.push(parseInt(m.planningUnitId));
-                                    return {
-                                        consumptionDate: m.month,
-                                        consumptionQty: m.actualConsumption
-                                    }
-                                });
+                                    let filteredData = filteredProgram.consumptionList.filter(c => c.consumptionUnit.planningUnit.id == planningUnit[i].value);
+                                    console.log("Test------------------->1", filteredData);
 
-                                let jsonTemp = { planningUnit: this.state.planningUnits.filter(c => c.id == planningUnit[i].value)[0], scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                consumptionData.push(jsonTemp);
+                                    let consumptionList = filteredData.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            consumptionQty: m.actualConsumption
+                                        }
+                                    });
+
+                                    let jsonTemp = { objUnit: this.state.planningUnits.filter(c => c.id == planningUnit[i].value)[0], scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                    consumptionData.push(jsonTemp);
+                                }
+                            } else {//forecasting unit id
+
+                                let forecastingUnit = this.state.forecastingUnitValues;
+                                console.log("forecastingUnitVal----------->", forecastingUnit);
+                                for (let i = 0; i < forecastingUnit.length; i++) {
+
+                                    let filteredData = filteredProgram.consumptionList.filter(c => c.consumptionUnit.forecastingUnit.id == forecastingUnit[i].value);
+                                    console.log("Test------------------->2", filteredData);
+
+                                    let consumptionList = filteredData.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            consumptionQty: m.actualConsumption * m.consumptionUnit.planningUnit.multiplier,
+                                            multiplier: m.consumptionUnit.planningUnit.multiplier
+                                        }
+                                    });
+                                    console.log("Test------------------->3", consumptionList);
+
+                                    let jsonTemp = { objUnit: this.state.forecastingUnits.filter(c => c.id == forecastingUnit[i].value)[0], scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                    consumptionData.push(jsonTemp);
+                                }
+
                             }
-                            console.log("consumptionData------------------->", consumptionData);
-                            this.setState({
-                                consumptionData: consumptionData,
-                                monthArrayList: monthArrayList
-                            })
+
+                            console.log("consumptionData------------------->11", monthArrayList);
+                            console.log("consumptionData------------------->22", consumptionData);
 
 
 
+
+                            if (this.state.xaxis == 2) {
+                                this.setState({
+                                    consumptionData: consumptionData,
+                                    monthArrayList: monthArrayList
+                                })
+                            } else {
+                                let min = moment(startDate).format("YYYY");
+                                let max = moment(endDate).format("YYYY");
+                                let years = [];
+                                for (var i = min; i <= max; i++) {
+                                    years.push("" + i)
+                                }
+
+
+                                for (let i = 0; i < consumptionData.length; i++) {
+
+                                    let tempConsumptionListData = consumptionData[i].consumptionList.map(m => {
+                                        return {
+                                            consumptionDate: moment(m.consumptionDate).format("YYYY"),
+                                            consumptionQty: m.consumptionQty
+                                        }
+                                    });
+                                    // console.log("consumptionData------------------->33", tempConsumptionListData);
+                                    //logic for add same date data                            
+                                    let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
+                                        if (!a[consumptionDate])
+                                            a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
+                                        else
+                                            a[consumptionDate].consumptionQty += consumptionQty;
+                                        return a;
+                                    }, {}));
+
+                                    // console.log("consumptionData------------------->3", resultTrue);
+                                    consumptionData[i].consumptionList = resultTrue;
+
+                                }
+                                console.log("consumptionData------------------->3", years);
+                                console.log("consumptionData------------------->4", consumptionData);
+                                this.setState({
+                                    consumptionData: consumptionData,
+                                    monthArrayList: years
+                                })
+
+                            }
 
                         })
 
@@ -473,95 +540,112 @@ class ForecastOutput extends Component {
         // let programId = this.state.programId;
         // let versionId = this.state.versionId;
 
-        this.setState({
-            planningUnits: [],
-            planningUnitValues: [],
-            planningUnitLabels: []
-        }, () => {
+        if (programId != -1 && versionId != -1) {
 
-            if (versionId == -1) {
-                this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
-            } else {
-                // localStorage.setItem("sesVersionIdReport", versionId);
-                if (versionId.includes('Local')) {
-                    let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
-                    let forecastingUnitList = [];
-                    let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
+            this.setState({
+                planningUnits: [],
+                planningUnitValues: [],
+                planningUnitLabels: []
+            }, () => {
 
-                    for (var i = 0; i < planningUnitList.length; i++) {
-                        forecastingUnitList.push(planningUnitList[i].forecastingUnit);
+                if (versionId == -1) {
+                    this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
+                } else {
+                    // localStorage.setItem("sesVersionIdReport", versionId);
+                    if (versionId.includes('Local')) {
+                        let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
+                        console.log("programData---------->", programData);
+                        let forecastingUnitList = [];
+                        let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
+
+                        for (var i = 0; i < planningUnitList.length; i++) {
+                            forecastingUnitList.push(planningUnitList[i].forecastingUnit);
+                        }
+                        console.log("Shruti----------------->", forecastingUnitList);
+
+                        let dupForecastingUnitObj = programData.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
+                        const ids = dupForecastingUnitObj.map(o => o.id)
+                        const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
+                        // console.log("programData-------->2", filtered);
+
+                        let dupPlanningUnitObjwithNull = programData.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
+                        let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
+                        const idsPU = dupPlanningUnitObj.map(o => o.id)
+                        const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
+
+                        this.setState({
+                            // planningUnits: planningUnitList,
+                            // forecastingUnits: forecastingUnitList
+                            planningUnits: filteredPU,
+                            forecastingUnits: filtered
+                        }, () => {
+                            this.filterData();
+                        })
+
                     }
-                    console.log("Shruti----------------->", forecastingUnitList);
-                    this.setState({
-                        planningUnits: planningUnitList,
-                        forecastingUnits: forecastingUnitList
-                    }, () => {
-                        this.filterData();
-                    })
+                    else {
 
+                        // ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
+                        //     console.log('**' + JSON.stringify(response.data))
+                        //     var listArray = response.data;
+                        //     listArray.sort((a, b) => {
+                        //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        //         return itemLabelA > itemLabelB ? 1 : -1;
+                        //     });
+                        //     this.setState({
+                        //         planningUnits: listArray,
+                        //         message: ''
+                        //     }, () => {
+                        //         this.filterData();
+                        //     })
+                        // }).catch(
+                        //     error => {
+                        //         this.setState({
+                        //             planningUnits: [],
+                        //         })
+                        //         if (error.message === "Network Error") {
+                        //             this.setState({
+                        //                 message: 'static.unkownError',
+                        //                 loading: false
+                        //             });
+                        //         } else {
+                        //             switch (error.response ? error.response.status : "") {
+
+                        //                 case 401:
+                        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                        //                     break;
+                        //                 case 403:
+                        //                     this.props.history.push(`/accessDenied`)
+                        //                     break;
+                        //                 case 500:
+                        //                 case 404:
+                        //                 case 406:
+                        //                     this.setState({
+                        //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 case 412:
+                        //                     this.setState({
+                        //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //                 default:
+                        //                     this.setState({
+                        //                         message: 'static.unkownError',
+                        //                         loading: false
+                        //                     });
+                        //                     break;
+                        //             }
+                        //         }
+                        //     }
+                        // );
+                    }
                 }
-                else {
-
-                    // ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                    //     console.log('**' + JSON.stringify(response.data))
-                    //     var listArray = response.data;
-                    //     listArray.sort((a, b) => {
-                    //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    //         return itemLabelA > itemLabelB ? 1 : -1;
-                    //     });
-                    //     this.setState({
-                    //         planningUnits: listArray,
-                    //         message: ''
-                    //     }, () => {
-                    //         this.filterData();
-                    //     })
-                    // }).catch(
-                    //     error => {
-                    //         this.setState({
-                    //             planningUnits: [],
-                    //         })
-                    //         if (error.message === "Network Error") {
-                    //             this.setState({
-                    //                 message: 'static.unkownError',
-                    //                 loading: false
-                    //             });
-                    //         } else {
-                    //             switch (error.response ? error.response.status : "") {
-
-                    //                 case 401:
-                    //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                    //                     break;
-                    //                 case 403:
-                    //                     this.props.history.push(`/accessDenied`)
-                    //                     break;
-                    //                 case 500:
-                    //                 case 404:
-                    //                 case 406:
-                    //                     this.setState({
-                    //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                    //                         loading: false
-                    //                     });
-                    //                     break;
-                    //                 case 412:
-                    //                     this.setState({
-                    //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                    //                         loading: false
-                    //                     });
-                    //                     break;
-                    //                 default:
-                    //                     this.setState({
-                    //                         message: 'static.unkownError',
-                    //                         loading: false
-                    //                     });
-                    //                     break;
-                    //             }
-                    //         }
-                    //     }
-                    // );
-                }
-            }
-        });
+            });
+        }
 
     }
 
@@ -861,10 +945,20 @@ class ForecastOutput extends Component {
 
     render() {
 
+        const backgroundColor = [
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        ]
+
         var chartOptions = {
             title: {
                 display: true,
-                text: 'Monthly Forecast (Planning Units)'
+                text: 'Monthly Forecast ' + (this.state.viewById == 1 ? '(Planning Unit)' : '(Forecasting Unit)')
             },
             scales: {
                 yAxes: [
@@ -872,13 +966,26 @@ class ForecastOutput extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "Planning Units",
+                            labelString: (this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit'),
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black'
+                            fontColor: 'black',
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -897,19 +1004,37 @@ class ForecastOutput extends Component {
             },
             tooltips: {
                 callbacks: {
-                    label: function (tooltipItems, data) {
-                        if (tooltipItems.datasetIndex == 0) {
-                            var details = this.state.expiredStockArr[tooltipItems.index].details;
-                            var infoToShow = [];
-                            details.map(c => {
-                                infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                            });
-                            return (infoToShow.join(' | '));
-                        } else {
-                            return (tooltipItems.yLabel.toLocaleString());
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
                         }
-                    }.bind(this)
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
                 },
+                // callbacks: {
+                //     label: function (tooltipItems, data) {
+                //         if (tooltipItems.datasetIndex == 0) {
+                //             var details = this.state.expiredStockArr[tooltipItems.index].details;
+                //             var infoToShow = [];
+                //             details.map(c => {
+                //                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
+                //             });
+                //             return (infoToShow.join(' | '));
+                //         } else {
+                //             return (tooltipItems.yLabel.toLocaleString());
+                //         }
+                //     }.bind(this)
+                // },
                 enabled: false,
                 custom: CustomTooltips
             },
@@ -927,9 +1052,9 @@ class ForecastOutput extends Component {
 
 
         let bar = {}
-        if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0) {
+        if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0 && this.state.xaxis == 2) {
             var datasetsArr = [];
-            this.state.consumptionData.filter(c => c.display == true).map(item => {
+            this.state.consumptionData.filter(c => c.display == true).map((item, index) => {
                 {
                     var consumptionValue = [];
                     this.state.monthArrayList.map(item1 => {
@@ -944,12 +1069,12 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.planningUnit.label,
+                            label: item.objUnit.label.label_en,
                             type: 'line',
                             stack: 3,
                             yAxisID: 'A',
                             backgroundColor: 'transparent',
-                            borderColor: item.color,
+                            borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
                             ticks: {
                                 fontSize: 2,
@@ -969,6 +1094,51 @@ class ForecastOutput extends Component {
             bar = {
 
                 labels: [...new Set(this.state.monthArrayList.map(ele => (moment(ele).format(DATE_FORMAT_CAP_WITHOUT_DATE))))],
+                datasets: datasetsArr
+
+            };
+        } else if (this.state.consumptionData.length > 0 && this.state.monthArrayList.length > 0 && this.state.xaxis == 1) {
+            var datasetsArr = [];
+            this.state.consumptionData.filter(c => c.display == true).map((item, index) => {
+                {
+                    var consumptionValue = [];
+                    this.state.monthArrayList.map(item1 => {
+                        {
+                            var value = item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"));
+                            if (value.length > 0) {
+                                consumptionValue.push(value[0].consumptionQty)
+                            } else {
+                                consumptionValue.push("");
+                            }
+                        }
+                    })
+                    datasetsArr.push(
+                        {
+                            label: item.objUnit.label.label_en,
+                            type: 'line',
+                            stack: 3,
+                            yAxisID: 'A',
+                            backgroundColor: 'transparent',
+                            borderColor: backgroundColor[index],
+                            borderStyle: 'dotted',
+                            ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                            },
+                            lineTension: 0,
+                            pointStyle: 'line',
+                            pointRadius: 0,
+                            showInLegend: true,
+                            data: consumptionValue
+                        }
+                    )
+
+                }
+            })
+
+            bar = {
+
+                labels: [...new Set(this.state.monthArrayList.map(ele => (moment(ele).format("YYYY"))))],
                 datasets: datasetsArr
 
             };
@@ -1167,7 +1337,6 @@ class ForecastOutput extends Component {
                                                     <MultiSelect
                                                         name="foreccastingUnitId"
                                                         id="forecastingUnitId"
-                                                        value={this.state.forecastingUnitId}
                                                         onChange={(e) => this.setForecastingUnit(e)}
                                                         options={forecastingUnitList && forecastingUnitList.length > 0 ? forecastingUnitList : []}
                                                         value={this.state.forecastingUnitValues}
@@ -1247,9 +1416,9 @@ class ForecastOutput extends Component {
                                                             name="xaxis"
                                                             id="xaxis"
                                                             bsSize="sm"
-                                                            // value={this.state.yaxisEquUnit}
-                                                            // onChange={(e) => { this.filterData(e); }}
-                                                            onChange={this.filterData}
+                                                            value={this.state.xaxis}
+                                                            onChange={(e) => { this.xAxisChange(e); }}
+                                                        // onChange={this.filterData}
                                                         >
                                                             <option value="1">{i18n.t('static.program.yes')}</option>
                                                             <option value="2">{i18n.t('static.program.no')}</option>
@@ -1283,7 +1452,8 @@ class ForecastOutput extends Component {
                                                     </button>
 
                                                 </div>
-                                            </div>}
+                                            </div>
+                                        }
 
 
 
@@ -1301,21 +1471,35 @@ class ForecastOutput extends Component {
                                                             <thead>
                                                                 <tr>
                                                                     <th>Display?</th>
-                                                                    <th>Planning Unit</th>
+                                                                    <th>{this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit'}</th>
                                                                     <th>Tree Name + Scenario</th>
-                                                                    {this.state.monthArrayList.map(item => (
+                                                                    {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
                                                                         <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
+                                                                    ))}
+                                                                    {this.state.xaxis == 1 && this.state.monthArrayList.map(item => (
+                                                                        <th>{moment(item).format("YYYY")}</th>
                                                                     ))}
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {this.state.consumptionData.map(item => (
+                                                                {this.state.xaxis == 2 && this.state.consumptionData.map(item => (
                                                                     <tr>
-                                                                        <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.planningUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.planningUnit.id)} /></td>
-                                                                        <td>{item.planningUnit.label}</td>
+                                                                        <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                        <td>{item.objUnit.label.label_en}</td>
                                                                         <td>{item.scenario.label}</td>
                                                                         {this.state.monthArrayList.map(item1 => (
                                                                             <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
+                                                                        ))}
+                                                                    </tr>
+                                                                ))}
+
+                                                                {this.state.xaxis == 1 && this.state.consumptionData.map(item => (
+                                                                    <tr>
+                                                                        <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                        <td>{item.objUnit.label.label_en}</td>
+                                                                        <td>{item.scenario.label}</td>
+                                                                        {this.state.monthArrayList.map(item1 => (
+                                                                            <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                         ))}
                                                                     </tr>
                                                                 ))}
