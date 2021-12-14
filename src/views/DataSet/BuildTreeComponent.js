@@ -692,6 +692,7 @@ export default class BuildTree extends Component {
                 month: '',
                 dataValue: "",
                 calculatedDataValue: '',
+                displayDataValue: '',
                 nodeDataModelingList: [],
                 nodeDataOverrideList: [],
                 fuNode: {
@@ -745,8 +746,8 @@ export default class BuildTree extends Component {
                     label: {
                         label_en: i18n.t('static.realm.default')
                     },
-                    active : true,
-                    notes:''
+                    active: true,
+                    notes: ''
                 }],
                 tree: {
                     flatList: [{
@@ -786,6 +787,7 @@ export default class BuildTree extends Component {
             }, () => {
                 console.log("---------->>>>>>>>", this.state.regionValues);
                 this.getTreeByTreeId(treeId);
+                this.updateTreeData();
             })
 
         }
@@ -1394,9 +1396,9 @@ export default class BuildTree extends Component {
                 items: [],
                 selectedScenario: '',
                 programId,
-                singleValue2: {},
-                defYear1: { year: 2021, month: 1 },
-                defYear2: { year: 2021, month: 12 },
+                // singleValue2: {},
+                // defYear1: { year: 2021, month: 1 },
+                // defYear2: { year: 2021, month: 12 },
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
                 minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
@@ -2401,8 +2403,11 @@ export default class BuildTree extends Component {
         if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
             if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                 if (type == 1) {
+                    console.log("get payload 1--->", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
+                    console.log("get payload 1--->>>", (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                     return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                 } else if (type == 3) {
+                    console.log("get payload 2");
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
@@ -2412,15 +2417,19 @@ export default class BuildTree extends Component {
                         })
                         return sum.toFixed(2);
                     } else {
+                        console.log("get payload 3");
                         return "";
                     }
                 } else {
+                    console.log("get payload 4");
                     return "";
                 }
             } else {
                 if (type == 1) {
+                    console.log("get payload 5");
                     return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                 } else if (type == 3) {
+                    console.log("get payload 6");
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                     console.log("Child List+++", childList);
                     if (childList.length > 0) {
@@ -2430,13 +2439,16 @@ export default class BuildTree extends Component {
                         })
                         return sum.toFixed(2);
                     } else {
+                        console.log("get payload 7");
                         return "";
                     }
                 } else {
+                    console.log("get payload 8");
                     return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
                 }
             }
         } else {
+            console.log("get payload 1111");
             return "";
         }
     }
@@ -5184,6 +5196,7 @@ export default class BuildTree extends Component {
             console.log("updated tree data+++", this.state);
             this.calculateValuesForAggregateNode(this.state.items);
             calculateModelingData(this.state.dataSetObj, this, "BuildTree");
+            this.updateTreeData();
         });
     }
 
@@ -6802,20 +6815,27 @@ export default class BuildTree extends Component {
     updateTreeData() {
         var items = this.state.items;
         console.log("items>>>", items);
+        console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
+            console.log("get payload 12");
             console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
             console.log("items[i]---", items[i]);
             console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
             if (nodeDataModelingMap.length > 0) {
+                console.log("get payload 13");
                 if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
                 } else {
+                    console.log("get payload 14");
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
                 }
+            } else {
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
             }
         }
         this.setState({
@@ -7613,7 +7633,7 @@ export default class BuildTree extends Component {
                                                                             ref={this.pickAMonth3}
                                                                             id="monthPicker"
                                                                             name="monthPicker"
-                                                                            years={{ min: this.state.defYear1, max: this.state.defYear2 }}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                                             value={singleValue2}
                                                                             lang={pickerLang.months}
                                                                             // theme="dark"
