@@ -81,7 +81,7 @@ class ProductValidation extends Component {
         })
         var versionId = this.state.versionId.toString();
         console.log("In get dataset data+++", versionId);
-        if (versionId != "") {
+        if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -114,6 +114,37 @@ class ProductValidation extends Component {
                     })
                 }.bind(this)
             }.bind(this)
+        } else if (versionId != "" && !versionId.includes("Local")) {
+            var json = [{ programId: this.state.datasetId, versionId: versionId }]
+            DatasetService.getAllDatasetData(json).then(response => {
+                if (response.status == 200) {
+                    console.log("resp--------------------", response.data);
+                    var responseData = response.data[0];
+                    this.setState({
+                        datasetData: responseData,
+                        loading: false
+                    }, () => {
+                        this.getTreeList();
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    }, () => {
+                        this.hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        datasetData: {},
+                        treeList: [],
+                        treeId: "",
+                        scenarioList: [],
+                        scenarioId: "",
+                        loading: false
+                    })
+                }
+            );
         } else {
             this.setState({
                 datasetData: {},
@@ -231,32 +262,54 @@ class ProductValidation extends Component {
             var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
             console.log("MaxLevel+++", maxLevel);
             var planningUnitList = nodeDataList.filter(c => c.nodeDataMap.puNode != null);
+            var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.nodeDataMap.fuNode != null && nodeDataList.filter(f => f.parent == c.id).length == 0);
+            planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
             console.log("PlanningUnitList+++", planningUnitList);
+            console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
             var finalData = [];
             for (var i = 0; i < planningUnitList.length; i++) {
-                var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                var parentLabelList = [];
-                for (var j = 0; j < maxLevel - 1; j++) {
-                    var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
-                    console.log("ParentNode+++", parentNode)
-                    console.log("+++Id++", node.flatItem.parent)
-                    parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
-                    node = parentNode;
-                }
-                console.log("Parent Label list+++", parentLabelList)
-                var name = "";
-                console.log("Length+++", parentLabelList.length)
-                for (var p = parentLabelList.length; p > 0; p--) {
-                    console.log("In for+++")
-                    if (p != 1) {
-                        name = name.concat(parentLabelList[p - 1]) + " > "
-                    } else {
-                        name = name.concat(parentLabelList[p - 1])
+                if (planningUnitList[i].nodeDataMap.puNode != null) {
+                    var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
+                    var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
+                    var parentLabelList = [];
+                    for (var j = 0; j < maxLevel - 1; j++) {
+                        var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
+                        console.log("ParentNode+++", parentNode)
+                        console.log("+++Id++", node.flatItem.parent)
+                        parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
+                        node = parentNode;
                     }
+                    console.log("Parent Label list+++", parentLabelList)
+                    var name = "";
+                    console.log("Length+++", parentLabelList.length)
+                    for (var p = parentLabelList.length; p > 0; p--) {
+                        console.log("In for+++")
+                        if (p != 1) {
+                            name = name.concat(parentLabelList[p - 1]) + " > "
+                        } else {
+                            name = name.concat(parentLabelList[p - 1])
+                        }
+                    }
+                    console.log("Name+++", name);
+                    finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem })
+                } else {
+                    for (var j = 0; j < maxLevel - 2; j++) {
+                        var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
+                        parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
+                        node = parentNode;
+                    }
+                    var name = "";
+                    console.log("Length+++", parentLabelList.length)
+                    for (var p = parentLabelList.length; p > 0; p--) {
+                        console.log("In for+++")
+                        if (p != 1) {
+                            name = name.concat(parentLabelList[p - 1]) + " > "
+                        } else {
+                            name = name.concat(parentLabelList[p - 1])
+                        }
+                    }
+                    finalData.push({ name: name, nodeDataMap: "", flatItem: "", parentNodeNodeDataMap: planningUnitList[i].nodeDataMap, parentNodeFlatItem: planningUnitList[i].flatItem })
                 }
-                console.log("Name+++", name);
-                finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem })
             }
             console.log("FinalData+++", finalData);
             var dataArray = [];
@@ -293,72 +346,78 @@ class ProductValidation extends Component {
                     usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
                 }
                 var usageTextPU = "";
+                if (finalData[i].nodeDataMap != "") {
+                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label);
+                    var usagePeriodId;
+                    var usageTypeId;
+                    var usageFrequency;
 
-                var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label);
-                var usagePeriodId;
-                var usageTypeId;
-                var usageFrequency;
-
-                usageTypeId = finalData[i].parentNodeNodeDataMap.fuNode.usageType.id;
-                usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId;
-                usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
-                var noOfMonthsInUsagePeriod = 0;
-                if (usagePeriodId != null && usagePeriodId != "") {
-                    var convertToMonth = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.convertToMonth;
-                    console.log("convertToMonth---", convertToMonth);
-                    if (usageTypeId == 2) {
-                        var div = (convertToMonth * usageFrequency);
-                        console.log("duv---", div);
-                        if (div != 0) {
-                            noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
-                            console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                    usageTypeId = finalData[i].parentNodeNodeDataMap.fuNode.usageType.id;
+                    usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId;
+                    usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
+                    var noOfMonthsInUsagePeriod = 0;
+                    if (usagePeriodId != null && usagePeriodId != "") {
+                        var convertToMonth = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.convertToMonth;
+                        console.log("convertToMonth---", convertToMonth);
+                        if (usageTypeId == 2) {
+                            var div = (convertToMonth * usageFrequency);
+                            console.log("duv---", div);
+                            if (div != 0) {
+                                noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                            }
+                        } else {
+                            // var noOfFUPatient = this.state.noOfFUPatient;
+                            var noOfFUPatient;
+                            noOfFUPatient = (finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons);
+                            noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                         }
-                    } else {
-                        // var noOfFUPatient = this.state.noOfFUPatient;
-                        var noOfFUPatient;
-                        noOfFUPatient = (finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons);
-                        noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                     }
-                }
-                if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
-                    var sharePu;
-                    if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
-                        sharePu = (noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier);
+                    if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
+                        var sharePu;
+                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
+                            sharePu = (noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier);
+                        } else {
+                            sharePu = Math.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
+                        }
+                        usageTextPU = "For each " + selectedText + " we need " + sharePu + " " + planningUnit;
                     } else {
-                        sharePu = Math.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
+                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
+                        console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
+                        console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
+                        var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / 1) / finalData[i].nodeDataMap.puNode.refillMonths);
+                        usageTextPU = "For each " + selectedText + " we need " + puPerInterval.toFixed(2) + " " + planningUnit + " every " + finalData[i].nodeDataMap.puNode.refillMonths + " months";
                     }
-                    usageTextPU = "For each " + selectedText + " we need " + sharePu + " " + planningUnit;
-                } else {
-                    console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
-                    console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
-                    console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                    var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / 1) / finalData[i].nodeDataMap.puNode.refillMonths);
-                    usageTextPU = "For each " + selectedText + " we need " + puPerInterval.toFixed(2) + " " + planningUnit + " every " + finalData[i].nodeDataMap.puNode.refillMonths + " months";
-                }
-                var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
-                var cost = 0;
-                if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
-                    cost = (sharePu * 1.5) / currency.conversionRateToUsd;
-                } else {
-                    if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
-                        console.log("puPerInterval+++", puPerInterval)
-                        console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                        console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
-                        cost = ((puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths)) * 1.5) / currency.conversionRateToUsd;
-                    } else {
-                        cost = ((12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * 1.5) / currency.conversionRateToUsd;
+                    var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
+                    var cost = 0;
+                    var selectedPlanningUnit = datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
+                    var price = "";
+                    if (selectedPlanningUnit.length > 0) {
+                        price = selectedPlanningUnit[0].price;
                     }
-                }
-                totalCost += cost;
 
+                    if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
+                        cost = (sharePu * price) / currency.conversionRateToUsd;
+                    } else {
+                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
+                            console.log("puPerInterval+++", puPerInterval)
+                            console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
+                            console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
+                            cost = ((puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths)) * price) / currency.conversionRateToUsd;
+                        } else {
+                            cost = ((12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
+                        }
+                    }
+                    totalCost += cost;
+                }
                 data = [];
                 data[0] = finalData[i].name;
                 data[1] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.usageType.label, this.state.lang);
-                data[2] = getLabelText(finalData[i].parentNodeFlatItem.payload.label, this.state.lang);
+                data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
                 data[3] = usageText;
-                data[4] = getLabelText(finalData[i].flatItem.payload.label, this.state.lang);
+                data[4] = finalData[i].nodeDataMap != "" ? getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label, this.state.lang) : "";
                 data[5] = usageTextPU;
-                data[6] = cost.toFixed(2);
+                data[6] = selectedPlanningUnit.length > 0 ? cost.toFixed(2) : "";
                 data[7] = 0;
 
                 dataArray.push(data);
@@ -439,7 +498,7 @@ class ProductValidation extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                editable:false,
+                editable: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),

@@ -247,6 +247,7 @@ const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
 const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
 
 const ImportFromQATSupplyPlan = React.lazy(() => import('./views/Consumption/ImportFromQATSupplyPlan'));
+const PlanningUnitSetting = React.lazy(() => import('./views/PlanningUnitSetting/PlanningUnitSetting'));
 
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
@@ -624,5 +625,8 @@ const routes = [
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
+
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
 ];
 export default routes;

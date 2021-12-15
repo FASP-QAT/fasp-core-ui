@@ -1072,6 +1072,7 @@ content: '\f1ec';
   background-attachment: fixed;
   top: 0;
   width: 100%;
+  // height: 100vh;
 }
 @media only screen and (min-width: 1200px) {
   .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
@@ -1145,15 +1146,26 @@ content: '\f1ec';
     margin: 0 auto;
     // margin-left: 2%;
   }
+  .card-marginTop {
+    flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: 0% !important;
+  }
 }
-
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation : portrait) {
+  .card-marginTop {
+    flex: 1 0 0%;
+    margin-bottom: 0;
+    margin-top: 0% !important;
+  }
+}
 @media (max-width: 489px) {
   .stock-status-search{position: relative;
     margin-left: 0px;
     top: 0px;}
   .upper-logo {
     // min-width: 100%;
-    min-width: 300px;
+    min-width: 200px;
     // margin-top: 1%;
     margin: 0 auto;
     // margin-left: 2%;
@@ -2054,22 +2066,27 @@ input::placeholder {
 
 .progressbartext1Import {
   // left: 7px;
-  left: -3%;
-  transform: translateX(18%) scale(1);
+  // left: -3%;
+  // transform: translateX(18%) scale(1);
+  left: 0%;
+  transform: translateX(-3%) scale(1);
 }
-
 .progressbartext2Import {
   // left: 7px;
-  left: 48.6667%;
-  transform: translateX(-14%) scale(1);
+  // left: 48.6667%;
+  // transform: translateX(-14%) scale(1);
+  left: 49.6667%;
+  transform: translateX(-38%) scale(1);
 }
 
 .progressbartext3Import {
   // left: 7px;
-  left: 97.3333%;
-  transform: translateX(-40%) scale(1);
+  // left: 97.3333%;
+  // transform: translateX(-40%) scale(1);
+  width: 100px;
+  left: 100%;
+  transform: translateX(-63%) scale(1);
 }
-
 
 
 @media only screen and (max-width: 1024px) {
@@ -3497,6 +3514,12 @@ border-radius: 2em;
 .month-picker > .rmp-container .rmp-popup .rmp-pad 
 {
     background: rgba(238, 238, 238, 0.9)!important;
+    width:17rem!important;
+}
+}
+@media screen and (min-width: 768px){
+.month-picker > .rmp-container .rmp-popup {
+    width: 17rem!important;
 }
 }
 
@@ -5434,6 +5457,13 @@ fieldset.scheduler-border {
   background-color: #19437A!important;
   border-color: #19437A!important;
 }
+.bg-height{
+  height: 100vh;
+}
+.collapse-bg{
+background-color: #fff;
+border: 1px solid #eee;
+}
 .greyColor{
   background-color:#CFCDC9; 
 }
@@ -5477,3 +5507,10 @@ fieldset.scheduler-border {
      cursor: col-resize;
      font-size: 14px;
    }
+.DropdownScenario{
+  position: absolute;
+  z-index: 10;
+}
+.MarginBottomTree{
+  margin-bottom: 4%;
+}

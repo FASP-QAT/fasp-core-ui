@@ -172,6 +172,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('downloadedDatasetData')){
             storeOS = db1.createObjectStore('downloadedDatasetData', { keyPath: 'id'});
         }
+        if(!db1.objectStoreNames.contains('datasetDetails')){
+            storeOS = db1.createObjectStore('datasetDetails', { keyPath: 'id'});
+        }
         if(!db1.objectStoreNames.contains('usageTemplate')){
             storeOS = db1.createObjectStore('usageTemplate', { keyPath: 'usageTemplateId'});
         }
@@ -183,6 +186,9 @@ export function getDatabase() {
         }
         if(!db1.objectStoreNames.contains('versionStatus')){
             storeOS = db1.createObjectStore('versionStatus', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('equivalencyUnit')){
+            storeOS = db1.createObjectStore('equivalencyUnit', { keyPath: 'equivalencyUnitMappingId'});
         }
         console.log("indexed db completed----------------------")
         
