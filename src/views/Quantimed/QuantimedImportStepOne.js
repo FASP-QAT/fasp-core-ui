@@ -159,7 +159,7 @@ class QuantimedImportStepOne extends Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
+                    if (myResult[i].userId == userId && !myResult[i].readonly) {
 
                         // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);

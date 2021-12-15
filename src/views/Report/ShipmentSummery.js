@@ -957,7 +957,7 @@ class ShipmentSummery extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var shipmentDetailsEl = jexcel(document.getElementById("shipmentDetailsListTableDiv"), options);

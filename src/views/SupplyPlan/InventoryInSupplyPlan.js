@@ -135,7 +135,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
         var inventoryList = this.props.items.inventoryList;
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -190,7 +190,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
                                     active: dataSourceResult[k].active,
-                                    label:dataSourceResult[k].label
+                                    label: dataSourceResult[k].label
                                 }
                                 dataSourceList.push(dataSourceJson);
                             }
@@ -232,7 +232,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
 
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                         inventoryEditable = false;
                     }
 
@@ -363,6 +363,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
+                        onchangepage: this.onchangepage,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -373,23 +374,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         editable: inventoryEditable,
                         onchange: this.inventoryChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            if (y != null) {
-                                var elInstance = el.jexcel;
-                                var json = elInstance.getJson(null, false);
-                                // for (var z = 0; z < json.length; z++) {
-                                var rowData = elInstance.getRowData(y);
-                                var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-                                if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
-                                    for (var c = 0; c < colArr.length; c++) {
-                                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                        cell.classList.add('readonly');
-                                    }
-                                } else {
-
-                                }
-                                // }
-                            }
 
                         }.bind(this),
                         onsearch: function (el) {
@@ -781,21 +765,62 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             tr.children[11].classList.add('AsteriskTheadtrTd');
         }
         // (instance.jexcel).orderBy(0, 0);
-        // var elInstance = instance.jexcel;
-        // var json = elInstance.getJson(null, false);
-        // for (var z = 0; z < json.length; z++) {
-        //     var rowData = elInstance.getRowData(z);
-        //     var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-        //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-        //     if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD")) {
-        //         for (var c = 0; c < colArr.length; c++) {
-        //             var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
-        //             cell.classList.add('readonly');
-        //         }
-        //     } else {
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if (this.props.inventoryPage == "inventoryDataEntry") {
+            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            }
+        } else {
+            jsonLength = json.length;
+        }
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var z = 0; z < jsonLength; z++) {
+            var rowData = elInstance.getRowData(z);
+            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+            if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
 
-        //     }
-        // }
+            }
+        }
+    }
+
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el.jexcel;
+        var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        for (var i = start; i < jsonLength; i++) {
+            var rowData = elInstance.getRowData(i);
+            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+            if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+
+            }
+        }
     }
 
     inventoryChanged = function (instance, cell, x, y, value) {
@@ -804,6 +829,20 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
         this.props.updateState("inventoryChangedFlag", 1);
+        if (x == 0 || x == 14) {
+            var rowData = elInstance.getRowData(y);
+            console.log("RowData+++", rowData)
+            var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+            if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                }
+            } else {
+
+            }
+        }
         if (x != 15 && x != 16) {
             elInstance.setValueFromCoords(16, y, 0, true);
 
@@ -1581,7 +1620,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
-                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
                         var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
@@ -1700,10 +1739,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         programJson: programJson,
-                        planningUnitDataList:planningUnitDataList
+                        planningUnitDataList: planningUnitDataList
                     })
-                    programDataJson.planningUnitDataList=planningUnitDataList;
-                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 

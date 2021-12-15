@@ -106,7 +106,7 @@ class ProgramService {
         );
     }
 
-    saveProgramData(json,comparedVersionId) {
+    saveProgramData(json, comparedVersionId) {
         return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
@@ -191,6 +191,11 @@ class ProgramService {
         );
     }
 
+    getLatestVersionsForPrograms(programIds) {
+        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`, programIds, {}
+        );
+    }
+
     getLastModifiedDateForProgram(programId, versionId) {
         return axios.get(`${API_URL}/api/programData/getLastModifiedDateForProgram/${programId}/${versionId}`, {}
         );
@@ -213,6 +218,21 @@ class ProgramService {
 
     getActualConsumptionData(json) {
         return axios.post(`${API_URL}/api/program/actualConsumptionReport`, json, {}
+
+        );
+    }
+    checkIfCommitRequestExists(programId) {
+        return axios.get(`${API_URL}/api/programData/checkIfCommitRequestExistsForProgram/${programId}`, {}
+        );
+    }
+
+    getCommitRequests(json, requestStatus) {
+        return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
+        );
+    }
+
+    sendNotificationAsync(commitRequestId) {
+        return axios.get(`${API_URL}/api/sendNotification/${commitRequestId}`, {}
         );
     }
 
