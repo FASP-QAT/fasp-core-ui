@@ -810,7 +810,7 @@ export default class BuildTree extends Component {
                 var nodeValue = this.state.currentScenario.calculatedDataValue;
 
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
-                    calculatedChangeForMonth = dataValue.toFixed(2);
+                    calculatedChangeForMonth = parseFloat(dataValue).toFixed(2);
                 } else if (modelingTypeId == 3 || modelingTypeId == 4) {
                     calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(2);
                 }
@@ -2221,7 +2221,7 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("curDate---", curDate)
-            var curDate = "2021-11-01";
+            var curDate = new Date();
             this.filterScalingDataByMonth(curDate);
         }
         );
@@ -2888,6 +2888,13 @@ export default class BuildTree extends Component {
                     }
                 }
                 console.log("pro list---", proList);
+                if (proList.length > 0) {
+                    proList.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                }
                 this.setState({
                     realmCountryId,
                     treeData: proList
@@ -6252,7 +6259,7 @@ export default class BuildTree extends Component {
                             </Input>
                         </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">{i18n.t('static.common.monthprogramheader')}<span class="red Reqasterisk">*</span></Label>
+                            <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
@@ -7033,7 +7040,7 @@ export default class BuildTree extends Component {
                                 var tempArray = [];
                                 var tempJson = {
                                     notes: '',
-                                    month: '',
+                                    month: new Date(),
                                     dataValue: "",
                                     calculatedDataValue: '',
                                     nodeDataModelingList: [],
@@ -7832,15 +7839,15 @@ export default class BuildTree extends Component {
                                                                         </a>
                                                                         <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
-                                                                            <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
+                                                                            {/* <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                                                 this.setState({
                                                                                     openTreeDataModal: true
                                                                                 })
-                                                                            }}><i className="fa fa-cog"></i></a>
-                                                                            <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                                                            }}><i className="fa fa-cog"></i></a> */}
+                                                                            {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                                                 onClick={() => this.exportPDF()}
-                                                                            />
-                                                                            {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
+                                                                            />}
+                                                                            {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />}
                                                                         </FormGroup>
 
                                                                     </div>
@@ -7869,7 +7876,7 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                    <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}>
                                                         <div class="row">
                                                             <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
                                                             <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>

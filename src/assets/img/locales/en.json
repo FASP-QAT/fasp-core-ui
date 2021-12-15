@@ -496,7 +496,7 @@
     "static.list.listUser": "Go to User Management",
     "static.budget.budgetamountdesc": "Enter budget name",
     "static.tree.nodeTitle": "Node Title",
-    "static.common.datasetmanagement": "Program Managment",
+    "static.common.datasetmanagement": "Program Management",
     "static.common.display": "Report View",
     "static.importFromQATSupplyPlan.pleaseSelectForecastProgram": "Please select forecast program",
     "static.procurementAgentPlanningUnit.moq": "Minimum Order Quantity (MOQ)",
@@ -1012,7 +1012,7 @@
     "static.procurementAgent.selectProcurementAgent": "Select Procurement Agent",
     "static.period.selectPeriod": "Select Date Range",
     "static.common.submit": "Submit",
-    "static.tree.calculated": "Calculated",
+    "static.tree.calculated": "Calculate",
     "static.budget.fundingtext": "Select funding source",
     "static.program.validsubmittoapprovetext": "Enter `Submitted to Approved` lead time (in months)",
     "static.common.lastModifiedBy": "Last Updated By",
@@ -1984,5 +1984,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.report.exportWordDoc":"Export to word doc"
 }

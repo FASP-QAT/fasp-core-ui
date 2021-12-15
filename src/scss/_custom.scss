@@ -5514,3 +5514,29 @@ border: 1px solid #eee;
 .MarginBottomTree{
   margin-bottom: 4%;
 }
+
+  .notification-failed {
+    color: #fff;
+    background-color: #BA0C2F!important;
+    border-color: #BA0C2F!important;
+}
+
+.notification-success {
+  color: #fff;
+  background-color: #4dbd74!important;
+  border-color: #4dbd74!important;
+}
+.notification-success:hover {
+  color: #fff;
+  background-color: #3ea662!important;
+  border-color: #3ea662!important;
+  cursor: pointer;
+}
+
+.consumptionSearchMarginTop {
+  margin-top: -25px;
+}
+
+  .jexcel_contextmenu>.header{
+    display:none
+  }

@@ -101,7 +101,7 @@ export default class IntegrationListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var IntegrationListEl = jexcel(document.getElementById("tableDiv"), options);

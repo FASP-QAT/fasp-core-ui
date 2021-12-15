@@ -177,7 +177,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var shipmentListUnFiltered = this.props.items.shipmentListUnFiltered;
         var shipmentList = this.props.items.shipmentList;
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         this.setState({
             actualProgramId: generalProgramJson.programId
         })
@@ -416,7 +416,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }
 
                                         var roleList = AuthenticationService.getLoggedInUserRole();
-                                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                                             shipmentEditable = false;
                                         }
                                         var paginationOption = false;
@@ -843,7 +843,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                 openRequest.onsuccess = function (e) {
                                                                     db1 = e.target.result;
                                                                     var programJson = this.props.items.programJson;
-                                                                    var generalProgramJson=this.props.items.generalProgramJson;
+                                                                    var generalProgramJson = this.props.items.generalProgramJson;
                                                                     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                                                     var papuOs = papuTransaction.objectStore('procurementAgent');
                                                                     var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -1048,8 +1048,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 return false;
                                                                             },
                                                                             contextMenu: function (obj, x, y, e) {
-                                                                                var items = [];
-                                                                                return items;
+                                                                                return false;
                                                                             },
                                                                             license: JEXCEL_PRO_KEY,
                                                                             text: {
@@ -1760,7 +1759,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expectedDeliveryDate = rowData[4];
         var shipmentMode = rowData[5];
         var programJson = this.props.items.programJson;
-        var generalProgramJson=this.props.items.generalProgramJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         if (expectedDeliveryDate != "") {
             if (procurementAgent != "") {
                 // var db1;
@@ -2741,7 +2740,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             // openRequest.onsuccess = function (e) {
             //     db1 = e.target.result;
             var programJson = this.props.items.programJson;
-            var generalProgramJson=this.props.items.generalProgramJson;
+            var generalProgramJson = this.props.items.generalProgramJson;
             //     var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
             //     var papuOs = papuTransaction.objectStore('procurementAgent');
             //     var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -2848,7 +2847,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     openRequest.onsuccess = function (e) {
                         db1 = e.target.result;
                         var programJson = this.props.items.programJson;
-                        var generalProgramJson=this.props.items.generalProgramJson;
+                        var generalProgramJson = this.props.items.generalProgramJson;
                         var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var papuOs = papuTransaction.objectStore('procurementAgent');
                         var papuRequest = papuOs.get(parseInt(procurementAgent));
@@ -3207,7 +3206,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("13"));
                         var usedBudgetTotalAmount = 0;
                         for (var s = 0; s < shipmentList.length; s++) {
-                            usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
+                            if (shipmentList[s].currency != "" && shipmentList[s].currency != undefined) {
+                                usedBudgetTotalAmount += Number((Number(shipmentList[s].productCost) + Number(shipmentList[s].freightCost)) * Number(shipmentList[s].currency.conversionRateToUsd));
+                            }
                         }
                         var totalCost = Number(elInstance.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) + Number(elInstance.getValue(`R${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
@@ -3244,6 +3245,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             positiveValidation("G", y, elInstance);
                         }
                     }
+                } else {
+                    valid = false;
                 }
 
                 var validation = checkValidtion("text", "M", y, rowData[12], elInstance);
@@ -3427,7 +3430,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var programDataJson = programRequest.result.programData;
                     var planningUnitDataList = programDataJson.planningUnitDataList;
                     var planningUnitId = document.getElementById("planningUnitId").value
-                    var planningUnitDataIndex=(planningUnitDataList).findIndex(c=>c.planningUnitId==planningUnitId);
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
                         var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
@@ -3847,8 +3850,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                     }
-                    programDataJson.planningUnitDataList=planningUnitDataList;
-                    programDataJson.generalData=(CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
@@ -4023,8 +4026,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 editable: tableEditable,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    var items = [];
-                    return items;
+                    return false;
                 },
                 onchange: this.shipmentQtyChanged,
                 text: {
@@ -4101,8 +4103,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     onload: this.loadedQtyCalculator1,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
-                        var items = [];
-                        return items;
+                        return false;
                     },
 
                 }

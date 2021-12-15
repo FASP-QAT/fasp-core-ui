@@ -402,7 +402,7 @@ export default class PlanningUnitCapacityList extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
             license: JEXCEL_PRO_KEY,
         };

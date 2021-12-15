@@ -297,7 +297,7 @@ export default class PipelineProgramDataSource extends Component {
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 contextMenu: function (obj, x, y, e) {
-                                                    return [];
+                                                    return false;
                                                 }.bind(this),
                                                 search: true,
                                                 columnSorting: true,
