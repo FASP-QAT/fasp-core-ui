@@ -489,7 +489,34 @@ export default class BuildTree extends Component {
         this.toggleCollapse = this.toggleCollapse.bind(this);
         this.resetNodeData = this.resetNodeData.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
+        this.fetchTracerCategoryList = this.fetchTracerCategoryList.bind(this);
     }
+    fetchTracerCategoryList(programData) {
+        console.log("programData---%%%%%%%", programData);
+        var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true);
+        var forecastingUnitList = [];
+        var tracerCategoryList = [];
+        planningUnitList.map(item => {
+            forecastingUnitList.push({
+                label: item.planningUnit.forecastingUnit.label, id: item.planningUnit.forecastingUnit.id
+            })
+        })
+        console.log("duplicate fu list--->", forecastingUnitList);
+        planningUnitList.map(item => {
+            tracerCategoryList.push({
+                label: item.planningUnit.forecastingUnit.tracerCategory.label, tracerCategoryId: item.planningUnit.forecastingUnit.tracerCategory.id
+            })
+        })
+        console.log("duplicate tc list--->", tracerCategoryList);
+        forecastingUnitList = [...new Map(forecastingUnitList.map(v => [v.id, v])).values()];
+        // console.log("unique fu list--->", uniqueForecastingUnitList);
+        tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.id, v])).values()];
+        // console.log("unique tc list--->", tracerCategoryList);
+        this.setState({
+            tracerCategoryList
+        });
+    }
+
     resetNodeData() {
         console.log("reset node data function called");
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
@@ -1380,7 +1407,8 @@ export default class BuildTree extends Component {
             var datasetEnc = dataSetObj;
             var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            console.log("programData---?????????", programData.realmCountry.realmCountryId);
+            console.log("programData---?????????", programData);
+            
             var treeList = programData.treeList;
             for (var k = 0; k < treeList.length; k++) {
                 proList.push(treeList[k])
@@ -1407,6 +1435,7 @@ export default class BuildTree extends Component {
                 console.log("program id after update--->", this.state.programId);
                 console.log("program min date--->", this.state.minDate);
                 console.log("program max date--->", this.state.maxDate);
+                this.fetchTracerCategoryList(programData);
                 // if (proList.length == 1) {
                 //     var treeId = proList[0].treeId;
                 //     this.setState({
@@ -2578,7 +2607,7 @@ export default class BuildTree extends Component {
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         console.log("dataSetObj.programData***>>>", programData);
                         this.setState({ dataSetObj: dataEnc, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-                            // console.log("dataSetObj.programData.forecastStartDate---",dataSetObj);
+                            this.fetchTracerCategoryList(programData);
                             calculateModelingData(dataEnc, this, "BuildTree");
                         });
                     } else {
@@ -3398,12 +3427,12 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.oneTimeUsage != "true") {
                     var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
 
-                    usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + i18n.t('static.tree.timesPer') + selectedText2 + i18n.t('static.tree.for') + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3;
+                    usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + " " + usageFrequency + " " + i18n.t('static.tree.timesPer') + " " + selectedText2 + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3;
                 } else {
-                    usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
+                    usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
             } else {
-                usageText = i18n.t('static.usageTemplate.every') + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) " + i18n.t('static.usageTemplate.every') + usageFrequency + " " + selectedText2;
+                usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) " + i18n.t('static.usageTemplate.every') + " " + usageFrequency + " " + selectedText2;
             }
         } else {
             //PU
@@ -3927,7 +3956,7 @@ export default class BuildTree extends Component {
             // if (this.state.programId != "") {
             this.getTreeList();
             // }
-            this.getTracerCategoryList();
+            // this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
             this.getUnitList();
@@ -5168,6 +5197,8 @@ export default class BuildTree extends Component {
                 }
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
+                    console.log("on curso tracer category---",(data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
+                    console.log("on curso tracer category list---",this.state.tracerCategoryList);
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
