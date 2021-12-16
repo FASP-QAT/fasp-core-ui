@@ -82,6 +82,7 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var programList = [];
                 var myResult = programRequest.result;
+                console.log("myResult", myResult);
                 for (var i = 0; i < myResult.length; i++) {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -580,7 +581,7 @@ export default class CommitTreeComponent extends React.Component {
                                         programId: json[r].programId,
                                         version: version,
                                         programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                        programData: updatedJson[r],
+                                        programData: (CryptoJS.AES.encrypt(JSON.stringify((json[r])), SECRET_KEY)).toString(),
                                         userId: userId,
                                         programCode: json[r].programCode
                                     };
@@ -603,7 +604,7 @@ export default class CommitTreeComponent extends React.Component {
                                             programId: json[r].programId,
                                             version: version,
                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                            programData: updatedJson[r],
+                                            programData: (CryptoJS.AES.encrypt(JSON.stringify((json[r])), SECRET_KEY)).toString(),
                                             userId: userId
                                         };
                                         var putRequest = downloadedProgramSaveData.put(item);
