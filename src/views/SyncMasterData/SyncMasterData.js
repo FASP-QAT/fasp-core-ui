@@ -24,7 +24,7 @@ import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-import { calculateModelingData } from '../DataSet/ModelingDataCalculations1.js';
+import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
