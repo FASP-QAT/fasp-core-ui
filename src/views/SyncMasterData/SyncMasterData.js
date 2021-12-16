@@ -26,6 +26,7 @@ import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersi
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
+// import { calculateModelingData } from '../DataSet/ModelingDataCalculations1.js';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
