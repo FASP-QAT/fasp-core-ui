@@ -6,7 +6,7 @@ import {
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY } from "../../Constants";
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -22,6 +22,8 @@ import DatasetService from "../../api/DatasetService";
 import CompareVersionTable from '../CompareVersion/CompareVersionTable.js';
 import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
+import ProgramService from "../../api/ProgramService";
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
@@ -51,8 +53,9 @@ export default class CommitTreeComponent extends React.Component {
             datasetPlanningUnit: [],
             progressPer: 0
         }
-
+        this.synchronize = this.synchronize.bind(this);
     }
+
     componentDidMount = function () {
         var db1;
         getDatabase();
@@ -62,7 +65,7 @@ export default class CommitTreeComponent extends React.Component {
                 message: i18n.t('static.program.errortext'),
                 color: 'red'
             })
-            this.hideFirstComponent()
+            // this.hideFirstComponent()
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -74,7 +77,7 @@ export default class CommitTreeComponent extends React.Component {
                     message: i18n.t('static.program.errortext'),
                     color: 'red'
                 })
-                this.hideFirstComponent()
+                // this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
                 var programList = [];
@@ -301,7 +304,8 @@ export default class CommitTreeComponent extends React.Component {
             .then(response => {
                 this.setState({
                     programDataServer: response.data[0],
-                    showCompare: true
+                    showCompare: true,
+                    comparedLatestVersion: response.data[0].currentVersion.versionId
                 })
             })
 
@@ -481,6 +485,270 @@ export default class CommitTreeComponent extends React.Component {
         this.setState({
             versionTypeId: versionTypeId
         })
+    }
+
+    redirectToDashbaord(commitRequestId) {
+        console.log(")))) Call for async api");
+        this.setState({ loading: true });
+        console.log("method called", commitRequestId);
+        AuthenticationService.setupAxiosInterceptors();
+        const sendGetRequest = async () => {
+            try {
+                const resp = await ProgramService.sendNotificationAsync(commitRequestId);
+                console.log(")))) Supply plan rebuild completed");
+                var curUser = AuthenticationService.getLoggedInUserId();
+                console.log("Resposne.data+++", resp.data);
+                if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+                    this.setState({
+                        progressPer: 75
+                        , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+                    }, () => {
+                        // this.hideFirstComponent();
+                        this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+                    })
+                }
+            } catch (err) {
+                // Handle Error Here
+                console.error("Error+++", err);
+            }
+        };
+        sendGetRequest();
+    }
+
+    getLatestProgram(notificationDetails) {
+        var updatedJson = [];
+        console.log(")))) inside getting latest version")
+        this.setState({ loading: true });
+        var checkboxesChecked = [];
+        var programIdsToSyncArray = [];
+        var notificationArray = [];
+        notificationArray.push(notificationDetails)
+        var programIdsSuccessfullyCommitted = notificationArray;
+        for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
+            var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
+            if (index == -1) {
+                checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+            }
+        }
+        console.log(")))) Before calling get notification api")
+        DatasetService.getAllDatasetData(checkboxesChecked)
+            .then(response => {
+                console.log(")))) After calling get notification api")
+                console.log("Resposne+++", response);
+                var json = response.data[0];
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
+                    })
+                    // this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+
+                    var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                    programDataTransaction2.oncomplete = function (event) {
+
+                        var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
+                        var programSaveData = transactionForSavingData.objectStore('datasetData');
+                        for (var r = 0; r < json.length; r++) {
+                            json[r].actionList = [];
+                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                            var version = json[r].requestedProgramVersion;
+                            if (version == -1) {
+                                version = json[r].currentVersion.versionId
+                            }
+                            var item = {
+                                id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                programId: json[r].programId,
+                                version: version,
+                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                programData: updatedJson[r],
+                                userId: userId,
+                                programCode: json[r].programCode
+                            };
+                            programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                            var putRequest = programSaveData.put(item);
+
+                        }
+                        transactionForSavingData.oncomplete = function (event) {
+                            var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                            var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                            for (var r = 0; r < json.length; r++) {
+                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                var version = json[r].requestedProgramVersion;
+                                if (version == -1) {
+                                    version = json[r].currentVersion.versionId
+                                }
+                                var item = {
+                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                    programId: json[r].programId,
+                                    version: version,
+                                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                    programData: updatedJson[r],
+                                    userId: userId
+                                };
+                                var putRequest = downloadedProgramSaveData.put(item);
+
+                            }
+                            // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                            //     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                            //     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                            //     var programIds = []
+                            //     for (var r = 0; r < json.length; r++) {
+                            //         var programQPLDetailsJson = {
+                            //             id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                            //             programId: json[r].programId,
+                            //             version: json[r].currentVersion.versionId,
+                            //             userId: userId,
+                            //             programCode: json[r].programCode,
+                            //             openCount: 0,
+                            //             addressedCount: 0,
+                            //             programModified: 0,
+                            //             readonly: 0
+                            //         };
+                            //         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                            //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                            //     }
+                            //     programQPLDetailsTransaction.oncomplete = function (event) {
+                            //         console.log(")))) Data saved successfully")
+                            //         this.setState({
+                            //             progressPer: 100
+                            //         })
+                            //         this.goToMasterDataSync(programIdsToSyncArray);
+                            //     }.bind(this)
+                            // }.bind(this)
+                        }.bind(this);
+                    }.bind(this);
+                }.bind(this);
+            })
+
+    }
+
+
+    synchronize() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext')
+            })
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('datasetData');
+            var programRequest = programDataOs.get((this.state.programId));
+            programRequest.onerror = function (event) {
+                this.setState({
+                    supplyPlanError: i18n.t('static.program.errortext')
+                })
+            }.bind(this);
+            programRequest.onsuccess = function (e) {
+
+                var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJson = JSON.parse(datasetData);
+                var programJson = datasetJson;
+                programJson.versionType = { id: document.getElementById("versionTypeId").value };
+                programJson.versionStatus = { id: 2 };
+                programJson.notes = document.getElementById("notesId").value;
+                console.log("ProgramJson+++", programJson);
+
+                //create saveDatasetData in ProgramService
+                DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
+                    if (response.status == 200) {
+                        console.log(")))) Commit Request generated successfully");
+
+                        this.setState({
+                            progressPer: 50
+                            , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                        }, () => {
+                            // this.hideFirstComponent();
+                            // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
+                            this.redirectToDashbaord(response.data);
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode,
+                            color: "red",
+                            loading: false
+                        })
+                        // this.hideFirstComponent();
+                    }
+                })
+                    .catch(
+                        error => {
+                            console.log("@@@Error4", error);
+                            console.log("@@@Error4", error.message);
+                            console.log("@@@Error4", error.response ? error.response.status : "")
+                            if (error.message === "Network Error") {
+                                console.log("+++in catch 7")
+                                this.setState({
+                                    message: 'static.common.networkError',
+                                    color: "red",
+                                    loading: false
+                                }, () => {
+                                    // this.hideFirstComponent();
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 406:
+                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                                        }
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            color: "red",
+                                            loading: false
+                                        }, () => {
+                                            // this.hideFirstComponent()
+                                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                this.checkLastModifiedDateForProgram(this.state.programId);
+                                            }
+                                        });
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            // this.hideFirstComponent()
+                                        });
+                                        break;
+                                    default:
+                                        console.log("+++in catch 8")
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false,
+                                            color: "red"
+                                        }, () => {
+                                            // this.hideFirstComponent()
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            }.bind(this)
+        }.bind(this)
     }
 
     render() {
@@ -667,11 +935,11 @@ export default class CommitTreeComponent extends React.Component {
                         </ProgressBar>
                         <div className="d-sm-down-none  progressbar">
                             <ul>
-                                <li>Compare Data</li>
-                                <li>Resolve Conflicts</li>
-                                <li>Sending data to server</li>
-                                <li>Server processing</li>
-                                <li>Upgrade local to latest version</li>
+                                <li className="quantimedProgressbartext1">Compare Data</li>
+                                <li className="quantimedProgressbartext2">Resolve Conflicts</li>
+                                <li className="quantimedProgressbartext3">Sending data to server</li>
+                                <li className="quantimedProgressbartext4">Server processing</li>
+                                <li className="quantimedProgressbartext5">Upgrade local to latest version</li>
                             </ul>
                         </div>
                         <Form name='simpleForm'>
@@ -739,8 +1007,8 @@ export default class CommitTreeComponent extends React.Component {
                             </FormGroup>
 
                             <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i>Cancel</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>Commit</Button>
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button>
                             </div>
                         </div>
                     </CardBody>

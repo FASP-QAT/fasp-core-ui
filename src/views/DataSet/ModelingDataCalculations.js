@@ -185,7 +185,10 @@ export function calculateModelingData(dataset, props, page) {
                                 startValue: startValue,
                                 endValue: endValue,
                                 calculatedValue: calculatedValue,
-                                endValueWMC: endValueWMC
+                                endValueWMC: endValueWMC,
+                                difference: difference,
+                                seasonalityPerc: 0,
+                                manualChange: 0
                             })
                         }
                         console.log("Node MOM List###", nodeDataList);
