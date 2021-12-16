@@ -171,13 +171,24 @@ export default class CompareVersion extends Component {
             columns.push({ title: "Notes", width: 200 })
         }
         var scenarioList = [];
+        var treeScenarioList = [];
         for (var t = 0; t < datasetData.treeList.length; t++) {
             scenarioList = scenarioList.concat(datasetData.treeList[t].scenarioList);
+            var sl = datasetData.treeList[t].scenarioList;
+            for (var s = 0; s < sl.length; s++) {
+                treeScenarioList.push({ treeLabel: datasetData.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+            }
+
         }
 
         var scenarioList1 = [];
+        var treeScenarioList1 = [];
         for (var t = 0; t < datasetData1.treeList.length; t++) {
             scenarioList1 = scenarioList1.concat(datasetData1.treeList[t].scenarioList);
+            var sl = datasetData1.treeList[t].scenarioList;
+            for (var s = 0; s < sl.length; s++) {
+                treeScenarioList1.push({ treeLabel: datasetData1.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+            }
         }
 
         var consumptionExtrapolation = datasetData.consumptionExtrapolation;
@@ -201,17 +212,17 @@ export default class CompareVersion extends Component {
                 var regionalSelectedForecastData = selectedForecastData[regionList[r].regionId];
                 console.log("regionalSelectedForecastData+++", regionalSelectedForecastData)
 
-                data[count] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label.label_en : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label.label_en : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
                 data[count + 1] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast : "";
-                data[count + 2] = "";
+                data[count + 2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 count += 3;
             }
             for (var r = 0; r < regionList1.length; r++) {
                 var regionalSelectedForecastData1 = selectedForecastData1[regionList1[r].regionId];
                 console.log("regionalSelectedForecastData1+++", regionalSelectedForecastData1)
-                data[count] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label.label_en : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label.label_en : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
                 data[count + 1] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast : "";
-                data[count + 2] = "";
+                data[count + 2] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                 count += 3;
             }
 
