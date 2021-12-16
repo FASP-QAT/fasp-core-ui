@@ -805,23 +805,23 @@ export default class MapPlanningUnits extends Component {
                                                 if (obj.options.allowComments == true) {
                                                     items.push({ type: 'line' });
 
-                                                    var title = obj.records[y][x].getAttribute('title') || '';
+                                                    // var title = obj.records[y][x].getAttribute('title') || '';
 
-                                                    items.push({
-                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                        onclick: function () {
-                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                        }
-                                                    });
+                                                    // items.push({
+                                                    //     title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                    //     onclick: function () {
+                                                    //         obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                    //     }
+                                                    // });
 
-                                                    if (title) {
-                                                        items.push({
-                                                            title: obj.options.text.clearComments,
-                                                            onclick: function () {
-                                                                obj.setComments([x, y], '');
-                                                            }
-                                                        });
-                                                    }
+                                                    // if (title) {
+                                                    //     items.push({
+                                                    //         title: obj.options.text.clearComments,
+                                                    //         onclick: function () {
+                                                    //             obj.setComments([x, y], '');
+                                                    //         }
+                                                    //     });
+                                                    // }
                                                 }
                                             }
                                         }

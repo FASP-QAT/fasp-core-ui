@@ -130,12 +130,19 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
                                 var maxDate = invmax.isAfter(shipmax) && invmax.isAfter(conmax) ? invmax : shipmax.isAfter(invmax) && shipmax.isAfter(conmax) ? shipmax : conmax
                                 // Getting min data entry date
-                                var minDate = moment(minimumDate).subtract(programPlanningUnitList[ppL].monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
+                                var minDate;
+                                if(minimumDate!=null){
+                                    minDate = moment(minimumDate).subtract(programPlanningUnitList[ppL].monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
+                                }else{
+                                    minDate=undefined;
+                                }
                                 if (minDate == undefined) {
+                                    console.log("Min date is undefined###");
                                     let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))
                                     let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                     let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))
                                     minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
+                                    minDate = moment(minDate).subtract(programPlanningUnitList[ppL].monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
                                 }
                                 var FIRST_DATA_ENTRY_DATE = minDate;
                                 var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");

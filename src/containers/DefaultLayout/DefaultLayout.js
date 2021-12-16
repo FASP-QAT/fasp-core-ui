@@ -749,6 +749,7 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
+  
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -1166,7 +1167,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.datasync'),
                         icon: 'fa fa-refresh',
-                        url: '/masterDataSync',
+                        url: '/syncProgram',
                       },
                       {
                         name: i18n.t('static.translations.translations'),

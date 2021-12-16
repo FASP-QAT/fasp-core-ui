@@ -519,7 +519,7 @@ export default class PipelineProgramConsumption extends Component {
                                         ],
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         contextMenu: function (obj, x, y, e) {
-                                            return [];
+                                            return false;
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,

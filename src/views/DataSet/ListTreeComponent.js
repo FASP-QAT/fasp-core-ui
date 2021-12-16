@@ -153,7 +153,7 @@ export default class ListTreeComponent extends Component {
                     // data[1] = programList[j].programCode
                     data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
                     data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                    console.log("forecast method--->",treeList[k].forecastMethod.label)
+                    console.log("forecast method--->", treeList[k].forecastMethod.label)
                     data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
                     data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
                     data[6] = treeList[k].notes
@@ -163,6 +163,13 @@ export default class ListTreeComponent extends Component {
                     count++;
                 }
             }
+        }
+        if (treeArray.length > 0) {
+            treeArray.sort((a, b) => {
+                var itemLabelA = a[2].toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = b[2].toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();

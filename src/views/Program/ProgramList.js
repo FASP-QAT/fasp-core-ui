@@ -598,7 +598,7 @@ export default class ProgramList extends Component {
           }
           return items;
         } else {
-          return [];
+          return false;
         }
 
       }.bind(this)
