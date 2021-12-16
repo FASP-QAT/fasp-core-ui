@@ -178,11 +178,13 @@ class CompareAndSelectScenario extends Component {
                 }
             }
             var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId)[0].id : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
+            var forecastNotes = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes : "" : "";
             this.setState({
                 treeScenarioList,
                 actualConsumptionList: datasetJson.actualConsumptionList,
                 multiplier: multiplier,
-                selectedTreeScenarioId: selectedTreeScenarioId
+                selectedTreeScenarioId: selectedTreeScenarioId,
+                forecastNotes: forecastNotes
             }, () => {
                 this.scenarioOrderChanged(selectedTreeScenarioId)
                 this.buildJexcel()
@@ -247,7 +249,11 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = totalArray[tsl] + scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "";
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "")) : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                        var diff = ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : ""));
+                        if (diff < 0) {
+                            diff = 0 - diff;
+                        }
+                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
                         if (scenarioFilter.length > 0) {
                             countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
                         }
@@ -260,7 +266,12 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = totalArray[tsl] + scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "";
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "")) : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                        var diff = ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : ""));
+                        if (diff < 0) {
+                            diff = 0 - diff;
+                        }
+                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+
                         if (scenarioFilter.length > 0) {
                             countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
                         }
@@ -722,7 +733,7 @@ class CompareAndSelectScenario extends Component {
 
                 var pu = planningUnitList1[index];
                 console.log("pu.selectedForecastMap[this.state.regionId]$$$", pu.selectedForecastMap[this.state.regionId]);
-                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier };
+                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
 
@@ -740,6 +751,12 @@ class CompareAndSelectScenario extends Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+    }
+
+    setForecastNotes(e) {
+        this.setState({
+            forecastNotes: e.target.value
+        })
     }
 
     render() {
@@ -1118,42 +1135,44 @@ class CompareAndSelectScenario extends Component {
                                 </Form>
                                 <br></br>
                                 {this.state.actualConsumptionList.length > 0 &&
-                                    <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
-                                        <thead><tr>
-                                            <th>Display?</th>
-                                            <th>Type</th>
-                                            <th>Forecast</th>
-                                            <th>Select as forecast?</th>
-                                            <th>Total Forecast</th>
-                                            <th>Forecast Error</th>
-                                            <th>Forecast Error (# Months Used)</th>
-                                            <th>Compare to Consumption Forecast</th>
-                                        </tr></thead>
-                                        <tbody>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td style={{ color: "#808080" }}>Actuals (Adjusted)</td>
-                                                <td></td>
-                                                <td align="center"></td>
-                                                <td align="center"></td>
-                                                <td align="center"></td>
-                                                <td align="center"></td>
-                                            </tr>
-                                            {this.state.treeScenarioList.map((item, idx) => (
-                                                <tr id="addr0">
-                                                    <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} /></td>
-                                                    <td>{item.type}</td>
-                                                    <td style={{ color: item.color }}>{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}</td>
-                                                    <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
-                                                    <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx]} />}</td>
-                                                    <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx] > 0 ? this.state.actualDiff.length > 0 ? ((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(2) : "" : ""} />}</td>
-                                                    <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
+                                    <>
+                                        <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
+                                            <thead><tr>
+                                                <th>Display?</th>
+                                                <th>Type</th>
+                                                <th>Forecast</th>
+                                                <th>Select as forecast?</th>
+                                                <th>Total Forecast</th>
+                                                <th>Forecast Error</th>
+                                                <th>Forecast Error (# Months Used)</th>
+                                                <th>Compare to Consumption Forecast</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td style={{ color: "#808080" }}>Actuals (Adjusted)</td>
+                                                    <td></td>
+                                                    <td align="center"></td>
+                                                    <td align="center"></td>
+                                                    <td align="center"></td>
                                                     <td align="center"></td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
+                                                {this.state.treeScenarioList.map((item, idx) => (
+                                                    <tr id="addr0">
+                                                        <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} /></td>
+                                                        <td>{item.type}</td>
+                                                        <td style={{ color: item.color }}>{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}</td>
+                                                        <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
+                                                        <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx]} />}</td>
+                                                        <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx] > 0 ? this.state.actualDiff.length > 0 ? ((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(2) : "" : ""} />}</td>
+                                                        <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
+                                                        <td align="center"></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </>
                                 }
                                 <br></br>
                                 <br></br>
@@ -1196,6 +1215,22 @@ class CompareAndSelectScenario extends Component {
                                     {/* </div> */}
                                     {/* </div> */}
 
+                                    {this.state.planningUnitId > 0 && <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">Notes</Label>
+                                        <div className="controls">
+                                            <InputGroup>
+                                                <Input
+                                                    type="textarea"
+                                                    name="forecastNotes"
+                                                    id="forecastNotes"
+                                                    value={this.state.forecastNotes}
+                                                    onChange={(e) => { this.setForecastNotes(e); }}
+                                                    bsSize="sm"
+                                                >
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>}
                                 </Col>
 
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
