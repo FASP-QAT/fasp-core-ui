@@ -193,6 +193,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     buildJexcel() {
+        console.log("&&&")
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var columns = [];
@@ -282,6 +283,30 @@ class CompareAndSelectScenario extends Component {
             }
             dataArr.push(data)
         }
+        var higherThenConsumptionThreshold = 0;
+        var lowerThenConsumptionThreshold = 0;
+        var higherThenConsumptionThresholdPU = 0;
+        var lowerThenConsumptionThresholdPU = 0;
+        var arrayForTotal = [];
+        for (var t = 0; t < treeScenarioList.length; t++) {
+            if (treeScenarioList[t].type == 'C') {
+                arrayForTotal.push(totalArray[t])
+            }
+        }
+        var sortedArray = arrayForTotal.sort();
+        higherThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[sortedArray.length - 1] != "" && sortedArray[sortedArray.length - 1] != null && sortedArray[sortedArray.length - 1] != undefined ? sortedArray[sortedArray.length - 1] : 0;
+        lowerThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[0] != "" && sortedArray[0] != null && sortedArray[0] != undefined ? sortedArray[0] : 0;
+
+        // lowerThenConsumptionThreshold = 8496014.97
+        // higherThenConsumptionThreshold = 17829570.83
+
+        higherThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].higherThenConsumptionThreshold;
+        lowerThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].lowerThenConsumptionThreshold;
+
+        console.log("Highest consumption&&&", higherThenConsumptionThreshold)
+        console.log("lowest consumption&&&", lowerThenConsumptionThreshold)
+        console.log("Highest consumption&&&", higherThenConsumptionThresholdPU)
+        console.log("lowest consumption&&&", lowerThenConsumptionThresholdPU)
         var options = {
             data: dataArr,
             columnDrag: true,
@@ -325,7 +350,11 @@ class CompareAndSelectScenario extends Component {
             totalArray: totalArray,
             actualDiff: actualDiff,
             totalActual: totalActual,
-            countArray: countArray
+            countArray: countArray,
+            lowerThenConsumptionThreshold: lowerThenConsumptionThreshold,
+            lowerThenConsumptionThresholdPU: lowerThenConsumptionThresholdPU,
+            higherThenConsumptionThreshold: higherThenConsumptionThreshold,
+            higherThenConsumptionThresholdPU: higherThenConsumptionThresholdPU,
         })
     }
 
@@ -1162,12 +1191,12 @@ class CompareAndSelectScenario extends Component {
                                                     <tr id="addr0">
                                                         <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} /></td>
                                                         <td>{item.type}</td>
-                                                        <td style={{ color: item.color }}>{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}{item.readonly?" ** ":""}</td>
+                                                        <td style={{ color: item.color }}>{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}{item.readonly ? " ** " : ""}</td>
                                                         <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                         <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx]} />}</td>
                                                         <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx] > 0 ? this.state.actualDiff.length > 0 ? ((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(2) : "" : ""} />}</td>
                                                         <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
-                                                        <td align="center"></td>
+                                                        <td align="center" className={!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : "" : ""}>{!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) + "% below the lowest consumption forecast." : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) + "% above the highest consumption forecast." : "" : ""}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
