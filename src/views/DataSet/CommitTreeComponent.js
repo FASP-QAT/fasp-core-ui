@@ -491,9 +491,10 @@ export default class CommitTreeComponent extends React.Component {
         console.log(")))) Call for async api");
         this.setState({ loading: true });
         console.log("method called", commitRequestId);
-        AuthenticationService.setupAxiosInterceptors();
+
         const sendGetRequest = async () => {
             try {
+                AuthenticationService.setupAxiosInterceptors();
                 const resp = await ProgramService.sendNotificationAsync(commitRequestId);
                 console.log(")))) Supply plan rebuild completed");
                 var curUser = AuthenticationService.getLoggedInUserId();
@@ -535,7 +536,7 @@ export default class CommitTreeComponent extends React.Component {
             .then(response => {
                 console.log(")))) After calling get notification api")
                 console.log("Resposne+++", response);
-                var json = response.data[0];
+                var json = response.data;
 
                 var db1;
                 getDatabase();
@@ -550,85 +551,105 @@ export default class CommitTreeComponent extends React.Component {
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
 
-                    var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                    programDataTransaction2.oncomplete = function (event) {
+                    var datasetDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+                    var datasetDataOs = datasetDataTransaction.objectStore('datasetData');
+                    var datasetRequest = datasetDataOs.delete(this.state.programId);
 
-                        var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
-                        var programSaveData = transactionForSavingData.objectStore('datasetData');
-                        for (var r = 0; r < json.length; r++) {
-                            json[r].actionList = [];
-                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                            var version = json[r].requestedProgramVersion;
-                            if (version == -1) {
-                                version = json[r].currentVersion.versionId
-                            }
-                            var item = {
-                                id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                programId: json[r].programId,
-                                version: version,
-                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                programData: updatedJson[r],
-                                userId: userId,
-                                programCode: json[r].programCode
-                            };
-                            programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
-                            var putRequest = programSaveData.put(item);
+                    datasetDataTransaction.oncomplete = function (event) {
+                        var datasetDataTransaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                        var datasetDataOs1 = datasetDataTransaction1.objectStore('downloadedDatasetData');
+                        var datasetRequest1 = datasetDataOs1.delete(this.state.programId);
 
-                        }
-                        transactionForSavingData.oncomplete = function (event) {
-                            var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                            var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                            for (var r = 0; r < json.length; r++) {
-                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                var version = json[r].requestedProgramVersion;
-                                if (version == -1) {
-                                    version = json[r].currentVersion.versionId
+                        datasetDataTransaction1.oncomplete = function (event) {
+                            var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                            programDataTransaction2.oncomplete = function (event) {
+
+                                var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
+                                var programSaveData = transactionForSavingData.objectStore('datasetData');
+                                for (var r = 0; r < json.length; r++) {
+                                    json[r].actionList = [];
+                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                    // var version = json[r].requestedProgramVersion;
+                                    // if (version == -1) {
+                                    var version = json[r].currentVersion.versionId
+                                    // }
+                                    console.log("version ++", version);
+                                    var item = {
+                                        id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                        programId: json[r].programId,
+                                        version: version,
+                                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                        programData: updatedJson[r],
+                                        userId: userId,
+                                        programCode: json[r].programCode
+                                    };
+                                    programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                                    var putRequest = programSaveData.put(item);
+
                                 }
-                                var item = {
-                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                    programId: json[r].programId,
-                                    version: version,
-                                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                    programData: updatedJson[r],
-                                    userId: userId
-                                };
-                                var putRequest = downloadedProgramSaveData.put(item);
+                                transactionForSavingData.oncomplete = function (event) {
+                                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                    for (var r = 0; r < json.length; r++) {
+                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                        var version = json[r].requestedProgramVersion;
+                                        if (version == -1) {
+                                            version = json[r].currentVersion.versionId
+                                        }
+                                        var item = {
+                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                            programId: json[r].programId,
+                                            version: version,
+                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                            programData: updatedJson[r],
+                                            userId: userId
+                                        };
+                                        var putRequest = downloadedProgramSaveData.put(item);
 
-                            }
-                            // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                            //     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                            //     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                            //     var programIds = []
-                            //     for (var r = 0; r < json.length; r++) {
-                            //         var programQPLDetailsJson = {
-                            //             id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                            //             programId: json[r].programId,
-                            //             version: json[r].currentVersion.versionId,
-                            //             userId: userId,
-                            //             programCode: json[r].programCode,
-                            //             openCount: 0,
-                            //             addressedCount: 0,
-                            //             programModified: 0,
-                            //             readonly: 0
-                            //         };
-                            //         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                            //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                            //     }
-                            //     programQPLDetailsTransaction.oncomplete = function (event) {
-                            //         console.log(")))) Data saved successfully")
-                            //         this.setState({
-                            //             progressPer: 100
-                            //         })
-                            //         this.goToMasterDataSync(programIdsToSyncArray);
-                            //     }.bind(this)
-                            // }.bind(this)
+                                    }
+                                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                        //     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                        //     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                        //     var programIds = []
+                                        //     for (var r = 0; r < json.length; r++) {
+                                        //         var programQPLDetailsJson = {
+                                        //             id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                        //             programId: json[r].programId,
+                                        //             version: json[r].currentVersion.versionId,
+                                        //             userId: userId,
+                                        //             programCode: json[r].programCode,
+                                        //             openCount: 0,
+                                        //             addressedCount: 0,
+                                        //             programModified: 0,
+                                        //             readonly: 0
+                                        //         };
+                                        //         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                        //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                        //     }
+                                        //     programQPLDetailsTransaction.oncomplete = function (event) {
+                                        console.log(")))) Data saved successfully")
+                                        this.setState({
+                                            progressPer: 100
+                                        })
+                                        this.goToMasterDataSync(programIdsToSyncArray);
+                                        //     }.bind(this)
+                                    }.bind(this)
+                                }.bind(this);
+                            }.bind(this);
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
             })
 
+    }
+
+    goToMasterDataSync(programIds) {
+        console.log("ProgramIds++++", programIds);
+        console.log("this props++++", this)
+        console.log("this props++++", this.props)
+        this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
     }
 
 
