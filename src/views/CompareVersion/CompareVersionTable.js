@@ -4,7 +4,7 @@ import {
     Card, CardBody, Col
 } from 'reactstrap';
 import i18n from '../../i18n'
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR } from '../../Constants';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -15,8 +15,12 @@ export default class CompareVersion extends Component {
         super(props);
         this.state = {
             datasetData: {},
-            datasetData1: {}
+            datasetData1: {},
+            regionList: [],
+            regionList1: [],
+            regionList2: []
         }
+        this.loaded = this.loaded.bind(this)
     }
 
     componentDidMount() {
@@ -24,92 +28,7 @@ export default class CompareVersion extends Component {
         console.log("DatasetData1+++", this.props.datasetData1);
         var datasetData = this.props.datasetData;
         var datasetData1 = this.props.datasetData1;
-        // datasetData.selectedForecastData = [
-        //     {
-        //         planningUnit: { id: 4149, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 2592 Pieces" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "High Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 65000,
-        //         region: { regionId: 70, label: { label_en: "National" } },
-        //         notes: "Test"
-        //     },
-        //     {
-        //         planningUnit: { id: 4149, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 2592 Pieces" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "High Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 55000,
-        //         region: { regionId: 73, label: { label_en: "North" } },
-        //         notes: "Test"
-        //     },
-        //     {
-        //         planningUnit: { id: 4149, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 2592 Pieces" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "High Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 50000,
-        //         region: { regionId: 74, label: { label_en: "South" } },
-        //         notes: "Test"
-        //     },
-
-
-        //     {
-        //         planningUnit: { id: 2733, label: { label_en: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "Medium Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 55000,
-        //         region: { regionId: 70, label: { label_en: "National" } },
-        //         notes: "Test"
-        //     },
-        //     {
-        //         planningUnit: { id: 2733, label: { label_en: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets" } },
-        //         selectedForecastScenario: { id: 1, label: { label_en: "High Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 45000,
-        //         region: { regionId: 73, label: { label_en: "North" } },
-        //         notes: "Test"
-        //     },
-        // ];
-        // datasetData1.selectedForecastData = [
-        //     {
-        //         planningUnit: { id: 4148, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 1 Each" } },
-        //         selectedForecastScenario: { id: 1, label: { label_en: "Default Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 55000,
-        //         region: { regionId: 70, label: { label_en: "National" } },
-        //         notes: "Test 3"
-        //     },
-        //     {
-        //         planningUnit: { id: 4148, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 1 Each" } },
-        //         selectedForecastScenario: { id: 1, label: { label_en: "Default Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 35000,
-        //         region: { regionId: 73, label: { label_en: "North" } },
-        //         notes: "Test 3"
-        //     },
-        //     {
-        //         planningUnit: { id: 4148, label: { label_en: "Male Condom (Latex) Lubricated, Dume Classic, 53 mm, 1 Each" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "Medium Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 45000,
-        //         region: { regionId: 74, label: { label_en: "South" } },
-        //         notes: "Test 3"
-        //     },
-        //     {
-        //         planningUnit: { id: 2733, label: { label_en: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets" } },
-        //         selectedForecastScenario: { id: 2, label: { label_en: "Medium Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 65000,
-        //         region: { regionId: 70, label: { label_en: "National" } },
-        //         notes: "Test 4"
-        //     },
-        //     {
-        //         planningUnit: { id: 2733, label: { label_en: "Dolutegravir/Lamivudine/Tenofovir DF 50/300/300 mg Tablet, 30 Tablets" } },
-        //         selectedForecastScenario: { id: 3, label: { label_en: "High Scenario" } },
-        //         selectedForecastTree: { id: 1, label: { label_en: "Demographic comdoms template" } },
-        //         forecastQty: 65000,
-        //         region: { regionId: 74, label: { label_en: "South" } },
-        //         notes: "Test 4"
-        //     }
-        // ]
+        var datasetData2 = this.props.datasetData2;
 
         var planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList);
 
@@ -120,6 +39,10 @@ export default class CompareVersion extends Component {
         let nestedHeaders = [];
         var regionList = datasetData.regionList;
         var regionList1 = datasetData1.regionList;
+        var regionList2 = datasetData2.regionList;
+        this.setState({
+            regionList: regionList, regionList1: regionList1, regionList2: regionList2
+        })
         nestedHeaders.push(
             [
                 {
@@ -153,12 +76,17 @@ export default class CompareVersion extends Component {
                 colspan: 3
             })
         }
+        // for (var r = 0; r < regionList2.length; r++) {
+        //     regionJson.push({
+        //         title: regionList2[r].label.label_en,
+        //         colspan: 3,
+        //         type:'hidden'
+        //     })
+        // }
         var regionJsonStr = regionJson.map(item => {
             return { title: item.title, colspan: 3 }
         }).join(',')
-        console.log("regionJsonStr+++", regionJsonStr)
         nestedHeaders.push(regionJson);
-        console.log("nestedHeaders+++", nestedHeaders)
         columns.push({ title: "Planning Unit", width: 300 })
         for (var r = 0; r < regionList.length; r++) {
             columns.push({ title: "Selected Forecast", width: 200 })
@@ -169,6 +97,11 @@ export default class CompareVersion extends Component {
             columns.push({ title: "Selected Forecast", width: 200 })
             columns.push({ title: "Forecast Qty", width: 100 })
             columns.push({ title: "Notes", width: 200 })
+        }
+        for (var r = 0; r < regionList2.length; r++) {
+            columns.push({ title: "Selected Forecast", width: 200, type: 'hidden' })
+            columns.push({ title: "Forecast Qty", width: 100, type: 'hidden' })
+            columns.push({ title: "Notes", width: 200, type: 'hidden' })
         }
         var scenarioList = [];
         var treeScenarioList = [];
@@ -191,26 +124,34 @@ export default class CompareVersion extends Component {
             }
         }
 
+        var scenarioList2 = [];
+        var treeScenarioList2 = [];
+        for (var t = 0; t < datasetData2.treeList.length; t++) {
+            scenarioList2 = scenarioList2.concat(datasetData2.treeList[t].scenarioList);
+            var sl = datasetData2.treeList[t].scenarioList;
+            for (var s = 0; s < sl.length; s++) {
+                treeScenarioList2.push({ treeLabel: datasetData2.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+            }
+        }
+
         var consumptionExtrapolation = datasetData.consumptionExtrapolation;
-        console.log("consumptionExtrapolation+++", consumptionExtrapolation)
         var consumptionExtrapolation1 = datasetData1.consumptionExtrapolation;
+        var consumptionExtrapolation2 = datasetData2.consumptionExtrapolation;
 
         for (var j = 0; j < planningUnitSet.length; j++) {
             data = [];
             var pu = datasetData.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
             var pu1 = datasetData1.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
+            var pu2 = datasetData2.planningUnitList.filter(c => c.planningUnit.id == planningUnitSet[j]);
 
-            console.log("pu+++", pu)
-            console.log("pu1+++", pu1)
             var selectedForecastData = pu[0].selectedForecastMap;
             var selectedForecastData1 = pu1[0].selectedForecastMap;
-            console.log("selectedForecastData+++", selectedForecastData)
-            console.log("selectedForecastData1+++", selectedForecastData1)
+            var selectedForecastData2 = pu2[0].selectedForecastMap;
+
             data[0] = pu.length > 0 ? pu[0].planningUnit.label.label_en : pu1[0].planningUnit.label.label_en;
             var count = 1;
             for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionList[r].regionId];
-                console.log("regionalSelectedForecastData+++", regionalSelectedForecastData)
 
                 data[count] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label.label_en : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
                 data[count + 1] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast : "";
@@ -219,10 +160,16 @@ export default class CompareVersion extends Component {
             }
             for (var r = 0; r < regionList1.length; r++) {
                 var regionalSelectedForecastData1 = selectedForecastData1[regionList1[r].regionId];
-                console.log("regionalSelectedForecastData1+++", regionalSelectedForecastData1)
                 data[count] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label.label_en : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
                 data[count + 1] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast : "";
                 data[count + 2] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
+                count += 3;
+            }
+            for (var r = 0; r < regionList2.length; r++) {
+                var regionalSelectedForecastData2 = selectedForecastData2[regionList2[r].regionId];
+                data[count] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label.label_en : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count + 1] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
+                data[count + 2] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
                 count += 3;
             }
 
@@ -281,6 +228,34 @@ export default class CompareVersion extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        if (this.props.page == "commit") {
+            var elInstance = instance.jexcel;
+            var json = elInstance.getJson(null, false);
+            var startPt = 1;
+            var startPt1 = 1 + this.props.datasetData.regionList.length * 3;
+            var startPt2 = 1 + this.props.datasetData.regionList.length * 3 + this.props.datasetData1.regionList.length * 3;
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
+            for (var r = 0; r < json.length; r++) {
+                for (var i = 0; startPt < startPt1; i++) {
+                    var local = (json[r])[startPt]
+                    var server = (json[r])[startPt1 + i]
+                    var downloaded = (json[r])[startPt2 + i]
+                    if (local == server) {
+                    } else {
+                        if (local == downloaded) {
+                            var col = (colArr[startPt1 + i]).concat(parseInt(r) + 1);
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+                        } else if (server == downloaded) {
+                            var col = (colArr[startPt]).concat(parseInt(r) + 1);
+                            elInstance.setStyle(col, "background-color", "transparent");
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                        }
+                    }
+                    startPt += 1;
+                }
+            }
+        }
     }
 
     render() { return (<div></div>) }
