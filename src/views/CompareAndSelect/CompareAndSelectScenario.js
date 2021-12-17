@@ -247,7 +247,7 @@ class CompareAndSelectScenario extends Component {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "";
-                    totalArray[tsl] = totalArray[tsl] + scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "";
+                    totalArray[tsl] = totalArray[tsl] + (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "");
 
                     if (monthArrayForErrorFilter.length > 0) {
                         var diff = ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : ""));
@@ -263,8 +263,12 @@ class CompareAndSelectScenario extends Component {
                     consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : null });
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
+                    console.log("Scenario Filter+++",scenarioFilter);
+                    console.log("Scenario Filter+++",scenarioFilter.length>0);
+                    console.log("Scenario Filter+++",scenarioFilter.length>0?Number(scenarioFilter[0].amount).toFixed(2):"");
+
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "";
-                    totalArray[tsl] = totalArray[tsl] + scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "";
+                    totalArray[tsl] = totalArray[tsl] + (scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "");
 
                     if (monthArrayForErrorFilter.length > 0) {
                         var diff = ((actualFilter.length > 0 ? Number(actualFilter[0].amount.toFixed(2)) * this.state.multiplier : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : ""));
