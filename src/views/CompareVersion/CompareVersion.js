@@ -467,7 +467,7 @@ class CompareVersion extends Component {
                             </Form>
                             {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                 <>
-                                    <CompareVersionTable datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} />
+                                    <CompareVersionTable datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1}/>
                                     <div className="table-responsive">
                                         <div id="tableDiv" />
                                     </div>
