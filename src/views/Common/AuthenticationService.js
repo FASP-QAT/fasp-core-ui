@@ -1318,6 +1318,7 @@ class AuthenticationService {
                     case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
+                    case "/dataset/commitTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
