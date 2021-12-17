@@ -109,6 +109,7 @@
     "react-year-picker": "^0.3.7",
     "reactcss": "1.2.3",
     "reactstrap": "^8.0.0",
+    "regression": "^2.0.1",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.88.2",
     "simple-line-icons": "^2.4.1",
