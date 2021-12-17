@@ -268,6 +268,7 @@ export default class CompareVersion extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            editable:false,
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
