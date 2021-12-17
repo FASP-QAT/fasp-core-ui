@@ -294,7 +294,7 @@ class CompareAndSelectScenario extends Component {
         var lowerThenConsumptionThresholdPU = 0;
         var arrayForTotal = [];
         for (var t = 0; t < treeScenarioList.length; t++) {
-            if (treeScenarioList[t].type == 'C') {
+            if (treeScenarioList[t].type == 'C' && totalArray[t]>0) {
                 arrayForTotal.push(totalArray[t])
             }
         }
