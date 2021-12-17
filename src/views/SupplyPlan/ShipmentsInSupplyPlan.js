@@ -712,7 +712,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                         var existingShipmentQty = 0;
                                                         var shipmentsJson = (obj.getJson(null, false));
                                                         shipmentsJson.map((item, index) => {
-                                                            existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
+                                                            console.log("item[3]+++", item[3])
+                                                            if (item[0] != false && item[3] != CANCELLED_SHIPMENT_STATUS) {
+                                                                existingShipmentQty += Number(obj.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
+                                                            }
                                                         })
                                                         var suggestedQty = Number(expectedTotalShipmentQty) - Number(existingShipmentQty);
                                                         if (suggestedQty > 0) {
