@@ -70,6 +70,7 @@ class ForecastSummary extends Component {
             showTotalDifference: true,
             monthArrayList: [],
             planningUnitId: "",
+            hideCalculation: 2,
             scenarioList: [{ id: 1, name: "A. Consumption High", checked: true, color: "#4f81bd" },
             { id: 2, name: "B. Consumption Med", checked: true, color: "#f79646" },
             { id: 3, name: "C. Consumption Low", checked: true, color: "#000000" },
@@ -92,7 +93,8 @@ class ForecastSummary extends Component {
                 { forecastingUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue)' }, planningUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue), 1 Each' }, scenario: { id: 3 }, consumptionQty: '71032', startingStock: '7892.44444444444', existingShipmentQty: '64639.12', desiredMonthsOfStock: 5, priceType: 2, price: '5.9' }
 
             ],
-            errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"]
+            errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"],
+            summeryData: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -112,6 +114,15 @@ class ForecastSummary extends Component {
         this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
         this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
         this.storeProduct = this.storeProduct.bind(this)
+        this.hideCalculation = this.hideCalculation.bind(this);
+
+    }
+
+    hideCalculation(e) {
+        console.log("E++++++++", e.target.value);
+        this.setState({
+            hideCalculation: e.target.value
+        })
 
     }
 
@@ -211,13 +222,150 @@ class ForecastSummary extends Component {
 
     filterData() {
         let programId = document.getElementById("programId").value;
-        let viewById = document.getElementById("viewById").value;
         let versionId = document.getElementById("versionId").value;
-        let planningUnitId = document.getElementById("planningUnitId").value;
+        let planningUnitId = document.getElementById("displayId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log('values =>', planningUnitId, programId, versionId);
-        if (planningUnitId > 0 && programId > 0 && versionId != 0) {
+
+        if (versionId != 0 && programId > 0) {
+            if (versionId.includes('Local')) {
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var program = transaction.objectStore('datasetData');
+                    var getRequest = program.getAll();
+                    var datasetList = [];
+                    var datasetList1 = [];
+
+                    getRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        // console.log("DATASET----------->", myResult);
+                        // this.setState({
+                        //     datasetList: myResult
+                        // });
+
+
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson1 = JSON.parse(programData);
+                            console.log("programJson1-------->1", programJson1);
+                            // let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
+                            // const ids = dupForecastingUnitObj.map(o => o.id)
+                            // const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
+                            // console.log("programJson1-------->2", filtered);
+
+                            // let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
+                            // let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
+                            // const idsPU = dupPlanningUnitObj.map(o => o.id)
+                            // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
+
+                            datasetList.push({
+                                programCode: filteredGetRequestList[i].programCode,
+                                programVersion: filteredGetRequestList[i].version,
+                                programId: filteredGetRequestList[i].programId,
+                                versionId: filteredGetRequestList[i].version,
+                                id: filteredGetRequestList[i].id,
+                                loading: false,
+                                forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                                forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                                healthAreaList: programJson1.healthAreaList,
+                                actualConsumptionList: programJson1.actualConsumptionList,
+                                consumptionExtrapolation: programJson1.consumptionExtrapolation,
+                                treeList: programJson1.treeList,
+                                planningUnitList: programJson1.planningUnitList,
+                                // filteredForecastingUnit: filtered,
+                                // filteredPlanningUnit: filteredPU,
+                                regionList: programJson1.regionList,
+                                label: programJson1.label,
+                                realmCountry: programJson1.realmCountry,
+                            });
+                            datasetList1.push(filteredGetRequestList[i])
+                            // }
+                        }
+                        console.log("DATASET-------->", datasetList);
+                        this.setState({
+                            datasetList: datasetList,
+                            datasetList1: datasetList1
+                        }, () => {
+                            let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
+                            console.log("Test------------>1", filteredProgram);
+
+                            let planningUnitList = filteredProgram.planningUnitList;
+                            let summeryData = [];
+                            let tempData = [];
+
+                            let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
+                            let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
+                            console.log("Test------------>2", filteredTracercategoryId);
+
+                            for (var j = 0; j < planningUnitList.length; j++) {
+                                let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
+                                let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
+                                let planningUnit = planningUnitList[j].planningUnit;
+                                let totalForecastedQuantity = 0;
+                                let stock1 = planningUnitList[j].stock;
+                                let existingShipments = planningUnitList[j].existingShipments;
+                                let stock2 = 0;
+                                let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
+                                let desiredMonthOfStock2 = 0;
+                                let procurementGap = 0;
+                                let priceType = (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : '');
+                                let unitPrice = planningUnitList[j].price;
+                                let procurementNeeded = 0;
+                                let notes = '';
+
+                                let obj = { id: 1, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, priceType: priceType, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
+                                tempData.push(obj);
+
+                            }
+
+                            //sort based on tracerCategory
+                            for (var i = 0; i < filteredTracercategoryId.length; i++) {
+                                let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
+                                let obj = { id: 0, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
+                                summeryData.push(obj);
+                                summeryData = summeryData.concat(filteredTracerCategoryList);
+
+                            }
+                            console.log("Test------------>3", summeryData);
+                            this.setState({
+                                summeryData: summeryData
+                            });
+
+
+
+
+
+                        })
+
+
+                    }.bind(this);
+                }.bind(this);
+
+
+
+            } else {//api call
+
+
+
+            }
+        } else {//validation message
+
         }
     }
 
@@ -324,7 +472,6 @@ class ForecastSummary extends Component {
                         }
                     }
 
-
                 }
                 var lang = this.state.lang;
 
@@ -367,56 +514,15 @@ class ForecastSummary extends Component {
 
     setVersionId(event) {
 
-
-
         var versionId = event.target.value;
         var programId = this.state.programId;
 
-        if (programId != -1 && versionId != -1) {
-            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
-
-            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-            var month = [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-            ]
-
-            let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-            let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
-
-            // let startDateSplit = selectedForecastProgram.currentVersion.forecastStartDate.split('-');
-            // let stopDateSplit = selectedForecastProgram.currentVersion.forecastStopDate.split('-');
-
-            let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-            this.setState({
-                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                versionId: versionId,
-            }, () => {
-
-            })
-        } else {
-            this.setState({
-                versionId: event.target.value,
-            }, () => {
-                // localStorage.setItem("sesVersionIdReport", '');
-                // this.filterVersion();
-                if (versionId > 0 && this.state.programId > 0) {
-                    // this.buildJexcel();
-                }
-            })
-        }
+        this.setState({
+            versionId: event.target.value,
+        }, () => {
+            // localStorage.setItem("sesVersionIdReport", '');
+            this.filterData();
+        })
 
 
     }
@@ -824,6 +930,7 @@ class ForecastSummary extends Component {
                                                             name="displayId"
                                                             id="displayId"
                                                             bsSize="sm"
+                                                            onChange={this.filterData}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
                                                             <option value="1">National View</option>
@@ -842,7 +949,8 @@ class ForecastSummary extends Component {
                                                             name="calculationId"
                                                             id="calculationId"
                                                             bsSize="sm"
-                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                            value={this.state.hideCalculation}
+                                                            onChange={(e) => { this.hideCalculation(e); }}
                                                         >
                                                             <option value="1">Yes</option>
                                                             <option value="2">No</option>
@@ -867,31 +975,77 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </div> */}
                                             <div className="table-responsive">
-                                                <Table className="table-striped table-bordered text-center mt-2">
-                                                    {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+                                                {this.state.summeryData.length > 0 &&
+                                                    <Table className="table-striped table-bordered text-center mt-2">
+                                                        {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
-                                                    <thead>
-                                                        <tr>
-                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                            <th className="text-center" style={{}}> Forecasting Unit </th>
-                                                            <th className="text-center" style={{}}>Planning Unit</th>
-                                                            <th className="text-center" style={{}}>Total Forecasted Quantity</th>
-                                                            <th className="text-center" style={{}}>Stock (end of Dec 2020)</th>
-                                                            <th className="text-center" style={{}}>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Desired Months of Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Desired Stock (end of Dec 2023)</th>
-                                                            <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
-                                                            <th className="text-center" style={{}}>Price Type</th>
-                                                            <th className="text-center" style={{}}>Unit Price ($)</th>
-                                                            <th className="text-center" style={{}}>Procurements Needed ($)</th>
-                                                            <th className="text-center" style={{ width: '20%' }}>Notes</th>
+                                                        <thead>
+                                                            <tr>
+                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                <th className="text-center" style={{}}> Forecasting Unit </th>
+                                                                <th className="text-center" style={{}}>Planning Unit</th>
+                                                                <th className="text-center" style={{}}>Total Forecasted Quantity</th>
+                                                                <th className="text-center" style={{}}>Stock (end of Dec 2020)</th>
+                                                                <th className="text-center" style={{}}>Existing Shipments (Jan 2021 - Dec 2023)</th>
+                                                                <th className="text-center" style={{}}>Stock (end of Dec 2023)</th>
+                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of Dec 2023)</th>
+                                                                <th className="text-center" style={{}}>Desired Stock (end of Dec 2023)</th>
+                                                                <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
+                                                                <th className="text-center" style={{}}>Price Type</th>
+                                                                <th className="text-center" style={{}}>Unit Price ($)</th>
+                                                                <th className="text-center" style={{}}>Procurements Needed ($)</th>
+                                                                <th className="text-center" style={{ width: '20%' }}>Notes</th>
 
-                                                        </tr>
-                                                    </thead>
+                                                            </tr>
+                                                        </thead>
 
-                                                    <tbody>
-                                                        <tr>
+                                                        <tbody>
+                                                            {this.state.summeryData.map(item1 => (
+                                                                <tr>
+                                                                    {item1.id == 0 ?
+                                                                        <>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> {item1.tracerCategory.label.label_en}
+                                                                            </td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                        </>
+                                                                        :
+                                                                        <>
+                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                            <td>{item1.forecastingUnit.label.label_en}</td>
+                                                                            <td>{item1.planningUnit.label.label_en}</td>
+                                                                            <td>{item1.totalForecastedQuantity}</td>
+                                                                            <td>{item1.stock1}</td>
+                                                                            <td>{item1.existingShipments}</td>
+                                                                            <td>{item1.stock2}</td>
+                                                                            <td>{item1.desiredMonthOfStock1}</td>
+                                                                            <td>{item1.desiredMonthOfStock2}</td>
+                                                                            <td>{item1.procurementGap}</td>
+                                                                            <td>{item1.priceType}</td>
+                                                                            <td>{item1.unitPrice}</td>
+                                                                            <td>{item1.procurementNeeded}</td>
+                                                                            <td>{item1.notes}</td>
+                                                                        </>
+                                                                    }
+
+
+
+                                                                </tr>
+                                                            ))}
+
+                                                            {/* <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
                                                                 <i className="fa fa-minus-square-o supplyPlanIcon" ></i> ARVs
                                                             </td>
@@ -1010,9 +1164,10 @@ class ForecastSummary extends Component {
                                                             <td>$4.00</td>
                                                             <td></td>
                                                             <td></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </Table>
+                                                        </tr> */}
+                                                        </tbody>
+                                                    </Table>
+                                                }
                                             </div>
                                         </div>
                                     </div>
