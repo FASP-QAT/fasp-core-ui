@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from 'react-dom';
+import regression from 'regression';
 import {
     Card, CardBody,
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY } from "../../Constants";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -35,8 +36,14 @@ export default class ExtrapolateDataComponent extends React.Component {
             planningUnitList: [],
             regionId: -1,
             regionList: [],
+            monthArray: [],
+            actualConsumptionList: [],
+            inputDataFilter: [],
+            inputDataAverageFilter: [],
+            inputDataRegressionFilter: [],
             lang: localStorage.getItem("lang"),
             movingAvgId: true,
+            startMonthForExtrapolation: '',
             semiAvgId: true,
             linearRegressionId: true,
             smoothingId: true,
@@ -99,7 +106,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var forecastProgramJson = {
                         name: datasetJson.programCode,
                         id: myResult[i].id,
-                        regionList: datasetJson.regionList
+                        regionList: datasetJson.regionList,
+                        planningUnitList: datasetJson.planningUnitList
                     }
                     forecastProgramList.push(forecastProgramJson)
                 }
@@ -109,7 +117,59 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this)
         }.bind(this)
 
-        this.buildJxl();
+    }
+
+    getDatasetData(e) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+            var datasetOs = datasetTransaction.objectStore('datasetData');
+            var dsRequest = datasetOs.get(this.state.forecastProgramId);
+            dsRequest.onerror = function (event) {
+            }.bind(this);
+            dsRequest.onsuccess = function (event) {
+                var datasetData = dsRequest.result;
+                console.log("datasetData-----" + datasetData);
+                var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+
+                var datasetJson = JSON.parse(datasetData);
+                console.log("datasetJson&&&&&&&&&&&&&&&&&", datasetJson)
+                var actualConsumptionList = datasetJson.actualConsumptionList;
+                console.log(actualConsumptionList[0])
+                //            var pu = this.state.planningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
+                var regionList = datasetJson.regionList;
+                var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                var monthArray = [];
+                var curDate = startDate;
+                for (var m = 0; curDate < moment(stopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+                    curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                    monthArray.push(curDate)
+                }
+
+                console.log("actualConsumptionList" + actualConsumptionList);
+                this.setState({
+                    //consumptionList: consumptionList,
+                    actualConsumptionList: actualConsumptionList,
+                    regionList: regionList,
+                    startDate: startDate,
+                    stopDate: stopDate,
+                    // consumptionUnitList: consumptionUnitList,
+                    monthArray: monthArray,
+                    datasetJson: datasetJson,
+
+                    // planningUnitList: planningUnitList,
+                    // forecastingUnitList: forecastingUnitList
+                }, () => { this.buildJxl(); })
+            }.bind(this)
+        }.bind(this)
     }
 
     reset() {
@@ -125,24 +185,163 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     buildJxl() {
-        let dataList = this.state.dataList;
-        // console.log("langaugeList---->", langaugeList);
+        var actualConsumptionList = this.state.actualConsumptionList;
+        var monthArray = this.state.monthArray;
         let dataArray = [];
-        var data = [];
 
-        for (var j = 0; j < dataList.length; j++) {
+        let data = [];
+        let columns = [];
+        var inputData = [];
+        var inputDataAverage = [];
+        var inputDataRegression = [];
+        var startMonth = '';
+        for (var j = 0; j < monthArray.length; j++) {
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            if (consumptionData.length > 0) {
+                if (inputData.length == 0) {
+                    startMonth = monthArray[j];
+                }
+                if (inputDataAverage.length == 0) {
+                    startMonth = monthArray[j];
+                }
+                if (inputDataRegression.length == 0) {
+                    startMonth = monthArray[j];
+                }
+                inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+                inputDataAverage.push({ "month": inputDataAverage.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+                inputDataRegression.push({ "month": inputDataRegression.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+            }
+        }
+        const noOfMonthsForProjection = monthArray.length - inputData.length + 1;
+        if (inputData.length % 2 != 0) {
+            inputData.pop();
+        }
+        if (inputDataAverage.length % 2 != 0) {
+            inputDataAverage.pop();
+        }
+        if (inputDataRegression.length % 2 != 0) {
+            inputDataRegression.pop();
+        }
+        let actualMonths = inputData[inputData.length - 1].month;
+
+        //Semi Average 
+        if (inputData.length > 0) {
+            console.log(inputData);
+            let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+            let cnt = 0;
+            let m = 0;
+            let c = 0;
+            for (let x = 1; x <= actualMonths / 2; x++) {
+                x1 += inputData[x - 1].month;
+                y1 += inputData[x - 1].actual;
+                cnt++;
+            }
+            x1 = x1 / cnt;
+            y1 = y1 / cnt;
+            for (let x = actualMonths / 2 + 1; x <= actualMonths; x++) {
+                x2 += inputData[x - 1].month;
+                y2 += inputData[x - 1].actual;
+            }
+            x2 = x2 / cnt;
+            y2 = y2 / cnt;
+            m = (y2 - y1) / (x2 - x1);
+            c = m * (0 - x2) + y2;
+
+            for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
+                if (x <= actualMonths) {
+                    inputData[x - 1].forecast = m * x + c;
+                } else {
+                    inputData[x - 1] = { "month": x, "actual": null, "forecast": m * x + c };
+                }
+            }
+        }
+        // Moving Average
+
+        if (inputDataAverage.length > 0) {
+            // var actualMonths = inputDataAverage[inputDataAverage.length - 1].month;
+            var monthsForMovingAverage = document.getElementById("noOfMonthsId").value;
+
+            for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
+                console.log("x--->", x)
+                var forecast = '';
+                let startMonth = x - monthsForMovingAverage;
+                if (startMonth < 1) {
+                    startMonth = 1;
+                }
+                let endMonth = x - 1;
+                if (endMonth < 1) {
+                    forecast = null;
+                }
+                console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
+                let sum = 0;
+                let count = 0;
+                for (let x = startMonth; x <= endMonth; x++) {
+                    console.log("x%%%%%", x)
+                    if (x <= actualMonths) {
+                        sum += inputDataAverage[x - 1].actual;
+                        count++;
+                    } else {
+                        sum += inputDataAverage[x - 1].forecast;
+                        count++;
+                    }
+                }
+                console.log("sum=" + sum + ", count=" + count);
+                if (count == 0) {
+                    forecast = null;
+                } else {
+                    forecast = sum / count;
+                }
+
+                if (x <= actualMonths) {
+                    inputDataAverage[x - 1].forecast = forecast;
+                } else {
+                    inputDataAverage[x - 1] = { "month": x, "actual": null, "forecast": forecast };
+                }
+            }
+        }
+        //Regression        
+        let actualMonthsRegression = inputDataRegression[inputDataRegression.length - 1].month;
+        let tmpArray = new Array();
+        for (let x = 0; x < inputDataRegression.length; x++) {
+            tmpArray.push(new Array(inputDataRegression[x].month, inputDataRegression[x].actual));
+        }
+
+        const result = regression.linear(tmpArray);
+        const gradient = result.equation[0];
+        const yIntercept = result.equation[1];
+        for (let x = 1; x <= actualMonthsRegression + noOfMonthsForProjection; x++) {
+            console.log("x--", x)
+            if (x <= actualMonthsRegression) {
+                console.log("x-1", x - 1)
+                console.log("inputDataRegression%%%%%%%", inputDataRegression)
+                inputDataRegression[x - 1].forecast = gradient * x + yIntercept;
+            } else {
+                inputDataRegression[x - 1] = { "month": x, "actual": null, "forecast": gradient * x + yIntercept };
+            }
+        }
+        console.log("inputDataRegression", inputDataRegression);
+
+        for (var j = 0; j < monthArray.length; j++) {
             data = [];
-            data[0] = dataList[j].months
-            data[1] = dataList[j].actuals;
-            data[2] = dataList[j].movingAverages;
-            data[3] = dataList[j].semiAveragesForecast;
-            data[4] = dataList[j].linearRegression;
-            data[5] = dataList[j].tesLcb;
-            data[6] = dataList[j].tesM;
-            data[7] = dataList[j].tesUcb;
-            data[8] = dataList[j].arimaForecast
+            data[0] = monthArray[j];
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            if (consumptionData.length > 0) {
+                inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+            }
+            var inputDataFilter = inputData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var inputDataAverageFilter = inputDataAverage.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var inputDataRegressionFilter = inputDataRegression.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
 
-            dataArray.push(data);
+            //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
+            data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
+            data[2] = inputDataAverageFilter.length > 0 && inputDataAverageFilter[0].forecast != null ? inputDataAverageFilter[0].forecast.toFixed(2) : '';
+            data[3] = inputDataFilter.length > 0 && inputDataFilter[0].forecast != null ? inputDataFilter[0].forecast.toFixed(2) : '';
+            data[4] = inputDataRegressionFilter.length > 0 && inputDataRegressionFilter[0].forecast != null ? inputDataRegressionFilter[0].forecast.toFixed(2) : '';
+            data[5] = '';
+            data[6] = '';
+            data[7] = '';
+            data[8] = '';
+            dataArray.push(data)
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -150,11 +349,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         var options = {
             data: dataArray,
             columnDrag: true,
-            // colWidths: [0, 150, 150, 150, 100, 100, 100],
             columns: [
                 {
                     title: 'Month',
-                    type: 'text'
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
                 {
                     title: 'Adjusted Actuals',
@@ -218,6 +416,13 @@ export default class ExtrapolateDataComponent extends React.Component {
         };
         var dataEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataEl;
+        this.setState({
+            dataEl: dataEl, loading: false,
+            inputDataFilter: inputData,
+            inputDataAverageFilter: inputDataAverage,
+            inputDataRegressionFilter: inputDataRegression,
+            startMonthForExtrapolation: startMonth
+        })
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -271,9 +476,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         id: myResult[i].planningUnitId
                     }
                     planningUnitList.push(planningUnitDataJson)
-                }
+                } console.log("forecastProgramListFilter.planningUnitList===>" + forecastProgramListFilter);
                 this.setState({
-                    planningUnitList: planningUnitList,
+                    planningUnitList: forecastProgramListFilter.planningUnitList,
                     forecastProgramId: forecastProgramId,
                     regionList: regionList
                 })
@@ -281,6 +486,207 @@ export default class ExtrapolateDataComponent extends React.Component {
         }.bind(this)
     }
 
+
+
+    saveForecastConsumptionExtrapolation() {
+        this.setState({
+            loading: true
+        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var datasetTransaction = transaction.objectStore('datasetData');
+            var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+            datasetRequest.onerror = function (event) {
+            }.bind(this);
+            datasetRequest.onsuccess = function (event) {
+                var myResult = datasetRequest.result;
+                var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJson = JSON.parse(datasetData);
+                var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+                var consumptionExtrapolationData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)
+                var consumptionExtrapolationMovingData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)
+                var consumptionExtrapolationRegression = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)
+                var inputDataFilter = this.state.inputDataFilter;
+                var inputDataAverageFilter = this.state.inputDataAverageFilter;
+                var inputDataRegressionFilter = this.state.inputDataRegressionFilter;
+                console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+                console.log("inputDataFilter", inputDataFilter);
+                if (consumptionExtrapolationData == -1) {
+                    var data = [];
+                    for (var i = 0; i < inputDataFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 6,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34704,
+                                    "label_en": "Semi-Averages",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                } else {
+                    consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
+                    var data = [];
+                    for (var i = 0; i < inputDataFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
+                }
+                if (consumptionExtrapolationMovingData == -1) {
+                    var data = [];
+                    for (var i = 0; i < inputDataAverageFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 7,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34705,
+                                    "label_en": "Moving Averages",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                }
+                else {
+                    consumptionExtrapolationList[consumptionExtrapolationMovingData].jsonProperties = {};
+                    var data = [];
+                    for (var i = 0; i < inputDataAverageFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationMovingData].extrapolationDataList = data;
+                }
+
+                if (consumptionExtrapolationRegression == -1) {
+                    var data = [];
+                    for (var i = 0; i < inputDataRegressionFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 5,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34703,
+                                    "label_en": "Linear Regression",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                } else {
+                    consumptionExtrapolationList[consumptionExtrapolationRegression].jsonProperties = {};
+                    var data = [];
+                    for (var i = 0; i < inputDataRegressionFilter.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationRegression].extrapolationDataList = data;
+                }
+console.log('consumptionExtrapolationRegression',consumptionExtrapolationRegression);
+                datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+                datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                myResult.programData = datasetData;
+                var putRequest = datasetTransaction.put(myResult);
+
+                putRequest.onerror = function (event) {
+                }.bind(this);
+                putRequest.onsuccess = function (event) {
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
     setPlanningUnitId(e) {
         var planningUnitId = e.target.value;
         this.setState({
@@ -375,8 +781,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         const { planningUnitList } = this.state;
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
-                <option key={i} value={item.id}>
-                    {item.name}
+                <option key={i} value={item.planningUnit.id}>
+                    {item.planningUnit.label.label_en}
                 </option>
             )
         }, this);
@@ -663,14 +1069,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 id="regionId"
                                                 bsSize="sm"
                                                 value={this.state.regionId}
-                                                onChange={(e) => { this.setRegionId(e); }}
+                                                onChange={(e) => { this.setRegionId(e); this.getDatasetData(e); }}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {regions}
                                             </Input>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3 ">
+                                    {/* <FormGroup className="col-md-3 ">
                                         <Label htmlFor="appendedInputButton">Extrapolation Method</Label>
                                         <div className="controls ">
                                             <Input
@@ -687,7 +1093,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <option value="3">Extrapolate by Region</option>
                                             </Input>
                                         </div>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
@@ -760,6 +1166,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="noOfMonthsId"
                                                         name="noOfMonthsId"
+                                                        onChange={(e) => { this.getDatasetData(e); }}
                                                     />
                                                 </div>
                                             }
@@ -1043,6 +1450,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                         </div>
                         <div id="tableDiv" className="extrapolateTable"></div>
                     </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1"><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>Save</Button>
+                            &nbsp;
+                        </FormGroup>
+                    </CardFooter>
+
+
                 </Card>
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
@@ -1053,10 +1469,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <ModalBody>
                             <p>Methods are organized from simple to robust
 
-                            More sophisticated models are more sensitive to problems in the data
+                                More sophisticated models are more sensitive to problems in the data
 
-                            If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
-</p>
+                                If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
+                            </p>
                         </ModalBody>
                     </div>
                 </Modal>
