@@ -355,6 +355,7 @@ class CompareAndSelectScenario extends Component {
             lowerThenConsumptionThresholdPU: lowerThenConsumptionThresholdPU,
             higherThenConsumptionThreshold: higherThenConsumptionThreshold,
             higherThenConsumptionThresholdPU: higherThenConsumptionThresholdPU,
+            loading:false
         })
     }
 
@@ -370,6 +371,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     setPlanningUnitId(e) {
+        this.setState({loading:true})
         var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
         var planningUnitId = e.target.value;
         var equivalencyUnit = this.state.equivalencyUnitList.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id);
@@ -531,6 +533,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     setDatasetId(event) {
+        this.setState({loading:true})
         var datasetId = event.target.value;
         this.setState({
             datasetId: datasetId,
@@ -573,7 +576,8 @@ class CompareAndSelectScenario extends Component {
                     forecastingUnitList: forecastingUnitList,
                     monthList: monthList,
                     startDate: startDate,
-                    stopDate: stopDate
+                    stopDate: stopDate,
+                    loading:false
                 }, () => {
                 })
             } else {
@@ -586,6 +590,7 @@ class CompareAndSelectScenario extends Component {
                     forecastingUnitId: "",
                     equivalencyUnitId: "",
                     equivalencyUnitList: [],
+                    loading:false
                 })
             }
             // localStorage.setItem("sesVersionIdReport", '');
@@ -628,6 +633,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     getVersionIds() {
+        this.setState({loading:true})
         var versionListAll = this.state.versionListAll;
         var planningUnitListAll = this.state.planningUnitListAll;
         var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
@@ -722,6 +728,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     submitScenario() {
+        this.setState({loading:true})
         console.log("This.state.selectedScenarioId(((", this.state.selectedTreeScenarioId);
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         if (scenarioId == undefined) {
