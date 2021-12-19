@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -40,7 +40,7 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-
+const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
 
 class ForecastSummary extends Component {
     constructor(props) {
@@ -95,6 +95,11 @@ class ForecastSummary extends Component {
             ],
             errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"],
             summeryData: [],
+            forecastPeriod: '',
+            startDateDisplay: '',
+            endDateDisplay: '',
+            beforeEndDateDisplay: '',
+            totalProductCost: 0,
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -227,6 +232,11 @@ class ForecastSummary extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
+        let start_date = new Date(startDate);
+        let end_date = new Date(endDate);
+        let total_months = (end_date.getFullYear() - start_date.getFullYear()) * 12 + (end_date.getMonth() - start_date.getMonth()) + 1;
+
+
         if (versionId != 0 && programId > 0) {
             if (versionId.includes('Local')) {
 
@@ -309,42 +319,164 @@ class ForecastSummary extends Component {
                             let summeryData = [];
                             let tempData = [];
 
+
+                            let treeList = filteredProgram.treeList;
+                            let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
+
                             let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
                             let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
                             console.log("Test------------>2", filteredTracercategoryId);
+                            let totalProductCost = 0;
 
                             for (var j = 0; j < planningUnitList.length; j++) {
+
+                                //calculation part
+                                let nodeDataMomList = [];
+                                let consumptionData = [];
+                                let selectedForecastMap = planningUnitList[j].selectedForecastMap;
+                                console.log("Test------------>2", selectedForecastMap);
+                                console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
+                                console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
+
+                                let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+
+                                let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+
+                                if (scenarioId != null) {//scenarioId
+                                    for (let p = 0; p < treeList.length; p++) {
+                                        let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                        if (filteredScenario.length > 0) {
+                                            let flatlist = treeList[p].tree.flatList;
+                                            let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                                            console.log("Test------------>5", listContainNodeType5);
+                                            console.log("Test------------>6", listContainNodeType5[0].payload);
+                                            console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+
+                                            for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
+                                                console.log("Test------------>7.1", arrayOfNodeDataMap);
+
+                                                if (arrayOfNodeDataMap.length > 0) {
+                                                    console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                    nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                    let consumptionList = nodeDataMomList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: (m.calculatedValue).toFixed(2)
+                                                        }
+                                                    });
+                                                    let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    consumptionData.push(jsonTemp);
+
+                                                    break;
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                } else {//consumptionExtrapolationId
+
+                                    let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                    if (consumptionExtrapolationObj.length > 0) {
+                                        let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                            return {
+                                                consumptionDate: m.month,
+                                                consumptionQty: (m.amount).toFixed(2)
+                                            }
+                                        });
+                                        let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                        consumptionData.push(jsonTemp);
+
+                                    }
+
+                                }
+
+                                let totalForecastedQuantity0ri = 0;
+                                let tempList = [];
+                                let tempList1 = [];
+                                let resultTrue = [];
+                                if (consumptionData.length > 0) {
+                                    let cursorDate = startDate;
+                                    for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
+                                        var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                                        cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                                        tempList = tempList.concat(consumptionData[0].consumptionList.filter(c => moment(c.consumptionDate).isSame(dt)));
+                                    }
+
+                                    tempList1 = tempList.map(m => {
+                                        return {
+                                            consumptionDate: m.consumptionDate,
+                                            consumptionQty: m.consumptionQty,
+                                            id: 1
+                                        }
+                                    });
+
+                                    // logic for add same date data
+                                    resultTrue = Object.values(tempList1.reduce((a, { consumptionDate, consumptionQty, id }) => {
+                                        if (!a[id])
+                                            a[id] = Object.assign({}, { consumptionDate, consumptionQty, id });
+                                        else
+                                            // a[id].consumptionQty += consumptionQty;
+                                            a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
+                                        return a;
+                                    }, {}));
+
+                                    totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
+
+                                }
+                                // console.log("consumptionData----->1", consumptionData);
+                                // console.log("consumptionData----->2", tempList);
+                                // console.log("consumptionData----->3", resultTrue);
+
+
+
+
+
+
+                                //obj parameter decleration
                                 let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                 let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
                                 let planningUnit = planningUnitList[j].planningUnit;
-                                let totalForecastedQuantity = 0;
+                                let totalForecastedQuantity = totalForecastedQuantity0ri;
                                 let stock1 = planningUnitList[j].stock;
                                 let existingShipments = planningUnitList[j].existingShipments;
-                                let stock2 = 0;
+                                let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
                                 let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                let desiredMonthOfStock2 = 0;
-                                let procurementGap = 0;
-                                let priceType = (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : '');
+                                let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
+                                let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
+                                let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
+                                let isProcurementGapRed = (procurementGap < 0 ? true : false)
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : 'Custom'));
+                                let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                 let unitPrice = planningUnitList[j].price;
-                                let procurementNeeded = 0;
-                                let notes = '';
+                                let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
+                                let notes = planningUnitList[j].consumptionNotes;
 
-                                let obj = { id: 1, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, priceType: priceType, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
+                                let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
                                 tempData.push(obj);
 
+                                if (isProcurementGapRed == true) {
+                                    totalProductCost = totalProductCost + (tempProcurementGap * unitPrice);
+                                    totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                }
+
                             }
+                            // console.log("consumptionData----->", consumptionData);
 
                             //sort based on tracerCategory
                             for (var i = 0; i < filteredTracercategoryId.length; i++) {
                                 let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
-                                let obj = { id: 0, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
+                                let obj = { id: 0, tempTracerCategoryId: filteredTracerCategoryList[0].tracerCategory.id, display: false, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
                                 summeryData.push(obj);
                                 summeryData = summeryData.concat(filteredTracerCategoryList);
 
                             }
                             console.log("Test------------>3", summeryData);
                             this.setState({
-                                summeryData: summeryData
+                                summeryData: summeryData,
+                                totalProductCost: totalProductCost
                             });
 
 
@@ -367,6 +499,26 @@ class ForecastSummary extends Component {
         } else {//validation message
 
         }
+    }
+
+    checkedChanged(tempTracerCategoryId) {
+
+        var summeryData = this.state.summeryData;
+
+        for (var i = 0; i < summeryData.length; i++) {
+
+            if (tempTracerCategoryId == summeryData[i].tempTracerCategoryId) {
+                summeryData[i].display = !summeryData[i].display;
+            }
+
+        }
+
+        this.setState({
+            summeryData
+        }, () => {
+            console.log("tempTracerCategoryId---------->2", summeryData);
+            // this.calculateEquivalencyUnitTotal();
+        })
     }
 
 
@@ -514,8 +666,82 @@ class ForecastSummary extends Component {
 
     setVersionId(event) {
 
-        var versionId = event.target.value;
+        var versionId = (event.target.value.split('(')[0]).trim();
         var programId = this.state.programId;
+
+
+        if (programId != -1 && versionId != -1) {
+            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+            console.log("Test-----------------111", selectedForecastProgram);
+
+            let tempObj = {
+                forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+            }
+
+            selectedForecastProgram = {
+                ...selectedForecastProgram,
+                ...tempObj
+            }
+
+            let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+            let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+
+
+            let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+            let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+            d11.setMonth(d11.getMonth() - 1);
+
+            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+            var month = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ]
+
+            let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+            let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+            let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+            forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+            console.log("Test-----------------111", startDateSplit);
+            this.setState({
+                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
+                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+                endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+                beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+            }, () => {
+
+            })
+        } else {
+            var dt = new Date();
+            dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+            var dt1 = new Date();
+            dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+            this.setState({
+                forecastPeriod: '',
+                rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+                startDateDisplay: '',
+                endDateDisplay: '',
+                beforeEndDateDisplay: '',
+            }, () => {
+
+            })
+        }
+
 
         this.setState({
             versionId: event.target.value,
@@ -905,6 +1131,25 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="text"
+                                                            name="forecastPeriod"
+                                                            id="forecastPeriod"
+                                                            bsSize="sm"
+                                                            disabled={true}
+                                                            value={this.state.forecastPeriod}
+                                                        // onChange={this.filterData}
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3" style={{ display: 'none' }}>
                                                 <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
 
@@ -985,11 +1230,11 @@ class ForecastSummary extends Component {
                                                                 <th className="text-center" style={{}}> Forecasting Unit </th>
                                                                 <th className="text-center" style={{}}>Planning Unit</th>
                                                                 <th className="text-center" style={{}}>Total Forecasted Quantity</th>
-                                                                <th className="text-center" style={{}}>Stock (end of Dec 2020)</th>
-                                                                <th className="text-center" style={{}}>Existing Shipments (Jan 2021 - Dec 2023)</th>
-                                                                <th className="text-center" style={{}}>Stock (end of Dec 2023)</th>
-                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of Dec 2023)</th>
-                                                                <th className="text-center" style={{}}>Desired Stock (end of Dec 2023)</th>
+                                                                <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
                                                                 <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
                                                                 <th className="text-center" style={{}}>Price Type</th>
                                                                 <th className="text-center" style={{}}>Unit Price ($)</th>
@@ -1001,49 +1246,61 @@ class ForecastSummary extends Component {
 
                                                         <tbody>
                                                             {this.state.summeryData.map(item1 => (
-                                                                <tr>
-                                                                    {item1.id == 0 ?
-                                                                        <>
-                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> {item1.tracerCategory.label.label_en}
-                                                                            </td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                        </>
-                                                                        :
-                                                                        <>
-                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                            <td>{item1.forecastingUnit.label.label_en}</td>
-                                                                            <td>{item1.planningUnit.label.label_en}</td>
-                                                                            <td>{item1.totalForecastedQuantity}</td>
-                                                                            <td>{item1.stock1}</td>
-                                                                            <td>{item1.existingShipments}</td>
-                                                                            <td>{item1.stock2}</td>
-                                                                            <td>{item1.desiredMonthOfStock1}</td>
-                                                                            <td>{item1.desiredMonthOfStock2}</td>
-                                                                            <td>{item1.procurementGap}</td>
-                                                                            <td>{item1.priceType}</td>
-                                                                            <td>{item1.unitPrice}</td>
-                                                                            <td>{item1.procurementNeeded}</td>
-                                                                            <td>{item1.notes}</td>
-                                                                        </>
-                                                                    }
+                                                                <>
+                                                                    <tr>
+                                                                        {item1.id == 0 ?
+                                                                            <>
+                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                    {
+                                                                                        item1.display == false ?
+                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            :
+                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                    }
 
+                                                                                </td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                            </>
+                                                                            :
+                                                                            <>
+                                                                                {item1.display == true &&
+                                                                                    <>
+                                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                        <td>{item1.forecastingUnit.label.label_en}</td>
+                                                                                        <td>{item1.planningUnit.label.label_en}</td>
+                                                                                        <td>{item1.totalForecastedQuantity}</td>
+                                                                                        <td>{item1.stock1}</td>
+                                                                                        <td>{item1.existingShipments}</td>
+                                                                                        <td>{item1.stock2}</td>
+                                                                                        <td>{item1.desiredMonthOfStock1}</td>
+                                                                                        <td>{item1.desiredMonthOfStock2}</td>
+                                                                                        {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
+                                                                                        {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                        <td>{item1.unitPrice}</td>
+                                                                                        <td>{item1.procurementNeeded}</td>
+                                                                                        <td>{item1.notes}</td>
+                                                                                    </>
+                                                                                }
+                                                                            </>
+                                                                        }
 
+                                                                    </tr>
 
-                                                                </tr>
+                                                                </>
                                                             ))}
+
 
                                                             {/* <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
@@ -1166,6 +1423,56 @@ class ForecastSummary extends Component {
                                                             <td></td>
                                                         </tr> */}
                                                         </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Product Cost</b></td>
+                                                                <td><b>{this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Freight (7%)</b></td>
+                                                                <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Total Cost</b></td>
+                                                                <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tfoot>
                                                     </Table>
                                                 }
                                             </div>
