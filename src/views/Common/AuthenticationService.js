@@ -1359,6 +1359,12 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/forecastReport/consumptionForecastError":
+                    case "/forecastReport/compareScenario":
+                    case "/forecastReport/forecastSummary":
+                    case "/forecastReport/forecastOutput":
+                        return true;
+
                     default:
                         console.log("default case");
                         return false;

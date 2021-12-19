@@ -1851,7 +1851,7 @@ class ForecastOutput extends Component {
 
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.yaxisEquUnit')}</Label>
+                                                <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
