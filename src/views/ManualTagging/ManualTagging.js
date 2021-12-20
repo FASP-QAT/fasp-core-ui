@@ -25,7 +25,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import conversionFormula from '../../assets/img/conversionFormula.png';
 import conversionFormulaExample from '../../assets/img/conversionFormulaExample.png';
 
@@ -99,7 +99,7 @@ export default class ManualTagging extends Component {
             hasSelectAll: true,
             artmisHistoryModal: false,
             batchDetails: [],
-            table1Loader: false
+            table1Loader: true
 
         }
 
@@ -2453,6 +2453,7 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     buildJexcelRequired,
                     roNoOrderNo: json,
+                    table1Loader : outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
@@ -3015,8 +3016,8 @@ export default class ManualTagging extends Component {
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className={this.props.match.params.color} id="div1" style={{color:'#BA0C2F'}}>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className={this.state.color} id="div2" style={{color:'#BA0C2F'}}>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1" style={{ color: '#BA0C2F' }}>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2" style={{ color: '#BA0C2F' }}>{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <div className="Card-header-reporticon">
