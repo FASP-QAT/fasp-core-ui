@@ -2469,7 +2469,20 @@ export default class BuildTree extends Component {
             } else {
                 if (type == 1) {
                     console.log("get payload 5");
-                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                    if (itemConfig.payload.nodeType.id == 4) {
+                        if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.label.label_en;
+                        } else {
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                        }
+
+                    } else if (itemConfig.payload.nodeType.id == 5) {
+                        console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
+                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                    } else {
+                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                    }
+
                 } else if (type == 3) {
                     console.log("get payload 6");
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -3071,8 +3084,9 @@ export default class BuildTree extends Component {
         this.setState({
             planningUnitList
         }, () => {
-            console.log("filtered planning unit list---", planningUnitList);
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+            console.log("filtered planning unit list---", this.state.planningUnitList);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode != null) {
+                console.log("test---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
                 var conversionFactor = this.state.planningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
                 this.setState({
                     conversionFactor
@@ -5784,7 +5798,7 @@ export default class BuildTree extends Component {
                                                         {this.state.planningUnitList.length > 0
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
-                                                                    <option key={i} value={item.planningUnitId}>
+                                                                    <option key={i} value={item.id}>
                                                                         {getLabelText(item.label, this.state.lang)}
                                                                     </option>
                                                                 )
