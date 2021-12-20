@@ -1832,6 +1832,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
 
+        //IS Change
+        if (x != 12) {
+            this.el.setValueFromCoords(12, y, 1, true);
+        }
+
     }.bind(this);
     // -----end of changed function
 
@@ -2132,7 +2137,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-    </FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

@@ -15,10 +15,6 @@ import {
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import eventBus from './eventBus.js'
-import ProgramService from "../../api/ProgramService"
-import { Alert, Col, Nav, NavItem, Row } from 'reactstrap';
-
 
 
 // routes config
@@ -225,7 +221,6 @@ const PlanningUnitCountryList = React.lazy(() => import('../../views/RealmCountr
 const PlanningUnitCapacityList = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('../../views/RealmCountry/RealmCountryRegion'));
 const syncPage = React.lazy(() => import('../../views/Synchronisation/syncPage'));
-const commitRequest = React.lazy(() => import('../../views/Synchronisation/CommitRequest'));
 
 const ProductCatalog = React.lazy(() => import('../../views/Report/ProductCatalog'));
 const ConsumptionReport = React.lazy(() => import('../../views/Report/Consumption'));
@@ -443,7 +438,6 @@ const routes = [
   { path: '/dashboard/:color/:message', component: Dashboard },
   { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
-  { path: '/program/commitRequest', name: "static.dashboard.commitRequest", component: commitRequest },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
   { path: '/program/importProgram', name: 'static.dashboard.importprogram', component: ImportProgram },
@@ -662,40 +656,19 @@ class DefaultLayout extends Component {
       isTimedOut: false,
       changeIcon: false,
       programDataLastModifiedDate: '',
-      downloadedProgramDataLastModifiedDate: '',
-      notificationArray: [{
-        visible: false,
-        notificationDetails: {
-          program: {
-            code: "",
-            id: 0
-          }, committedRequestId: 0, status: 0
-        }
-      }],
-      loading: false
+      downloadedProgramDataLastModifiedDate: ''
     }
-
     this.idleTimer = null
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
     this.getProgramData = this.getProgramData.bind(this);
     this.getNotificationCount = this.getNotificationCount.bind(this);
-    this.goToMasterDataSync = this.goToMasterDataSync.bind(this);
-    this.onDismiss = this.onDismiss.bind(this);
 
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
-
-  onDismiss(e, count) {
-    e.stopPropagation();
-    var notificationArray = this.state.notificationArray;
-    notificationArray[count].visible = false;
-    this.setState({ notificationArray: notificationArray });
-  }
-
-
+  
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -759,241 +732,7 @@ class DefaultLayout extends Component {
       this.setState({ businessFunctions: bfunction });
     }
     // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
-    eventBus.on("testDataAccess", (data) => {
-      console.log("data.notificationDetails+++", data.notificationDetails);
-      console.log("this.state.notificationDetails+++", this.state.notificationArray);
-      var notificationArray = this.state.notificationArray;
-      if (notificationArray[0].notificationDetails.program.id == 0) {
-        notificationArray = [];
-      }
-      // var programIdsSuccessfullyCommitted=this.state.programIdsSuccessfullyCommitted;
-      // if(data.notificationDetails.status==2){
-      //   programIdsSuccessfullyCommitted.push(data.notificationDetails);
-      // }
-      notificationArray.push({ visible: data.message, notificationDetails: data.notificationDetails })
-      this.setState({
-        notificationArray: notificationArray
-      })
-    }
-    );
 
-  }
-
-  componentWillUnmount() {
-    eventBus.remove("testDataAccess");
-  }
-
-  alertClicked() {
-    this.setState({ loading: true });
-    var notificationArray=this.state.notificationArray;
-    for(var i=0;i<notificationArray.length;i++){
-      notificationArray[i].visible=false;
-    }
-    this.setState({
-      notificationArray:notificationArray
-    })
-    var checkboxesChecked = [];
-    var programIdsToSyncArray = [];
-    var programIdsSuccessfullyCommitted = this.state.notificationArray;
-    for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
-      var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
-      if (index == -1) {
-        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
-      }
-    }
-    // checkboxesChecked.push({ programId: programId, versionId: -1 })
-    ProgramService.getAllProgramData(checkboxesChecked)
-      .then(response => {
-        console.log("Resposne+++", response);
-        var json=response.data;
-        var updatedJson = [];
-        for (var r = 0; r < json.length; r++) {
-          var planningUnitList = json[r].planningUnitList;
-          var consumptionList=json[r].consumptionList;
-          var inventoryList=json[r].inventoryList;
-          var shipmentList=json[r].shipmentList;
-          var batchInfoList=json[r].batchInfoList;
-          var problemReportList=json[r].problemReportList;
-          var supplyPlan=json[r].supplyPlan;
-          var generalData = json[r];
-          delete generalData.consumptionList;
-          delete generalData.inventoryList;
-          delete generalData.shipmentList;
-          delete generalData.batchInfoList;
-          delete generalData.supplyPlan;
-          delete generalData.planningUnitList;
-          generalData.actionList=[];
-          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
-          var planningUnitDataList = [];
-          for (var pu = 0; pu < planningUnitList.length; pu++) {
-              // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
-              // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
-              var planningUnitDataJson = {
-                  consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
-                  batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
-                  supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
-              }
-              var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
-              planningUnitDataList.push({planningUnitId:planningUnitList[pu].id,planningUnitData:encryptedPlanningUnitDataText})
-          }
-          var programDataJson = {
-              generalData:generalEncryptedData,
-              planningUnitDataList:planningUnitDataList
-          };
-          updatedJson.push(programDataJson);
-      }
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-          this.setState({
-            message: i18n.t('static.program.errortext'),
-            color: 'red'
-          })
-          this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-          var program = transaction.objectStore('programQPLDetails');
-          var getRequest = program.getAll();
-          getRequest.onerror = function (event) {
-            this.setState({
-              message: i18n.t('static.program.errortext'),
-              color: 'red'
-            })
-            this.hideFirstComponent()
-          }.bind(this);
-          getRequest.onsuccess = function (event) {
-            var myResult = [];
-            myResult = getRequest.result;
-            var userId = AuthenticationService.getLoggedInUserId();
-            console.log("Myresult+++", myResult);
-
-            var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-            var programDataOs1 = programDataTransaction1.objectStore('programData');
-            for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
-              var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-              console.log("checkIfProgramExists+++", checkIfProgramExists);
-              var programIdToDelete = 0;
-              if (checkIfProgramExists.length > 0) {
-                programIdToDelete = checkIfProgramExists[0].id;
-              }
-              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
-            }
-            programDataTransaction1.oncomplete = function (event) {
-              var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-              var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-
-              for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
-                var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-                console.log("checkIfProgramExists+++", checkIfProgramExists);
-                var programIdToDelete = 0;
-                if (checkIfProgramExists.length > 0) {
-                  programIdToDelete = checkIfProgramExists[0].id;
-                }
-                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
-              }
-              programDataTransaction3.oncomplete = function (event) {
-                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-
-                for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
-                  var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
-                  console.log("checkIfProgramExists+++", checkIfProgramExists);
-                  var programIdToDelete = 0;
-                  if (checkIfProgramExists.length > 0) {
-                    programIdToDelete = checkIfProgramExists[0].id;
-                  }
-                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
-                }
-                programDataTransaction2.oncomplete = function (event) {
-
-                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                  var programSaveData = transactionForSavingData.objectStore('programData');
-                  for (var r = 0; r < json.length; r++) {
-                    json[r].actionList = [];
-                    // json[r].openCount = 0;
-                    // json[r].addressedCount = 0;
-                    // json[r].programCode = json[r].programCode;
-                    // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
-                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                    var version = json[r].requestedProgramVersion;
-                    if (version == -1) {
-                      version = json[r].currentVersion.versionId
-                    }
-                    var item = {
-                      id: json[r].programId + "_v" + version + "_uId_" + userId,
-                      programId: json[r].programId,
-                      version: version,
-                      programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                      programData: updatedJson[r],
-                      userId: userId,
-                      programCode: json[r].programCode,
-                      // openCount: 0,
-                      // addressedCount: 0
-                    };
-                    programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
-                    // console.log("Item------------>", item);
-                    var putRequest = programSaveData.put(item);
-
-                  }
-                  transactionForSavingData.oncomplete = function (event) {
-                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
-                    for (var r = 0; r < json.length; r++) {
-                      // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
-                      var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                      var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                      var version = json[r].requestedProgramVersion;
-                      if (version == -1) {
-                        version = json[r].currentVersion.versionId
-                      }
-                      var item = {
-                        id: json[r].programId + "_v" + version + "_uId_" + userId,
-                        programId: json[r].programId,
-                        version: version,
-                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                        programData: updatedJson[r],
-                        userId: userId
-                      };
-                      // console.log("Item------------>", item);
-                      var putRequest = downloadedProgramSaveData.put(item);
-
-                    }
-                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                      var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                      var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                      var programIds = []
-                      for (var r = 0; r < json.length; r++) {
-                        var programQPLDetailsJson = {
-                          id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                          programId: json[r].programId,
-                          version: json[r].currentVersion.versionId,
-                          userId: userId,
-                          programCode: json[r].programCode,
-                          openCount: 0,
-                          addressedCount: 0,
-                          programModified: 0,
-                          readonly: 0
-                        };
-                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                      }
-                      programQPLDetailsTransaction.oncomplete = function (event) {
-                        this.goToMasterDataSync(programIdsToSyncArray);
-                      }.bind(this)
-                    }.bind(this)
-                  }.bind(this);
-                }.bind(this);
-              }.bind(this);
-            }.bind(this);
-          }.bind(this);
-        }.bind(this);
-            })
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
@@ -1040,14 +779,6 @@ class DefaultLayout extends Component {
     }
 
   }
-
-  goToMasterDataSync(programIds) {
-    console.log("ProgramIds++++", programIds);
-    console.log("this props++++", this)
-    console.log("this props++++", this.props)
-    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } });
-  }
-
   showShipmentLinkingAlerts(e) {
     e.preventDefault();
     this.props.history.push(`/shipmentLinkingNotification`)
@@ -1265,32 +996,10 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} masterDataSync={this.goToMasterDataSync} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} />
           </Suspense>
-          {this.state.notificationArray.map((c, count) => {
-            return (<div className="col-md-6  offset-md-6">
-              <Col className="col-12 col-md-12">
-                {c.notificationDetails.status == 2 && <Alert className="notification-success" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)} onClick={() => this.alertClicked()}>
-                  {i18n.t('static.notification.commitSuccess', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
-                </Alert>}
-                {c.notificationDetails.status == 3 && <Alert className="notification-failed" isOpen={c.visible} toggle={(e) => this.onDismiss(e, count)}>
-                  {i18n.t('static.notification.commitFailed', { programCode: c.notificationDetails.program.code, programVersion: c.notificationDetails.committedVersionId })}
-                </Alert>}
-              </Col>
-            </div>)
-          })}
-          {/* <div className="col-md-12">
-        <Col className="col-12 col-md-6 offset-md-6">
-          {this.state.notificationDetails.status == 2 && <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss} onClick={this.alertClicked(this.state.notificationDetails.program.id, this.state.notificationDetails.committedVersionId)}>
-            {i18n.t('static.notification.commitSuccess', { programCode: this.state.notificationDetails.program.code, programVersion: this.state.notificationDetails.committedVersionId })}
-          </Alert>}
-          {this.state.notificationDetails.status == 3 && <Alert color="info" isOpen={this.state.visible} toggle={this.onDismiss}>
-            {i18n.t('static.notification.commitFailed', { programCode: this.state.notificationDetails.program.code, programVersion: this.state.notificationDetails.committedVersionId })}
-          </Alert>}
-        </Col>
-        </div> */}
         </AppHeader>
-        <div className="app-body" style={{ display: this.state.loading ? "none" : "block" }}>
+        <div className="app-body">
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
@@ -1324,7 +1033,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.datasync'),
                         icon: 'fa fa-refresh',
-                        url: '/masterDataSync',
+                        url: '/syncProgram',
                       },
                       {
                         name: i18n.t('static.translations.translations'),
@@ -1706,12 +1415,6 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
-                            icon: 'fa fa-upload',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.commitRequest'),
-                            url: '/program/commitRequest',
                             icon: 'fa fa-upload',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') ? false : true) }
                           },
@@ -3014,18 +2717,7 @@ class DefaultLayout extends Component {
             </Suspense>
           </AppAside>
         </div>
-        <div style={{ display: this.state.loading ? "block" : "none" }}>
-          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-            <div class="align-items-center">
-              <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
-              <div class="spinner-border blue ml-4" role="status">
-
-              </div>
-            </div>
-          </div>
-        </div>
-        <AppFooter  style={{ display: this.state.loading ? "none" : "block" }}>
+        <AppFooter>
           <Suspense fallback={this.loading()}>
             <DefaultFooter />
           </Suspense>

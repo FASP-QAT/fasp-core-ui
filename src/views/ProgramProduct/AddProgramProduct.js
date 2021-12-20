@@ -294,7 +294,11 @@ class AddprogramPlanningUnit extends Component {
                                                 .then(response => {
                                                     if (response.status == 200) {
                                                         // alert("hi");
-                                                        let myReasponse = response.data;
+                                                        let myReasponse = response.data.sort((a, b) => {
+                                                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                            return itemLabelA > itemLabelB ? 1 : -1;
+                                                        });
                                                         var productDataArr = []
                                                         // if (myReasponse.length > 0) {
                                                         this.setState({ rows: myReasponse });
@@ -418,7 +422,8 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: 'Id',
-                                                                    type: 'hidden'
+                                                                    type: 'hidden',
+                                                                    readOnly: true
                                                                 },
                                                                 {
                                                                     title: 'Active',
@@ -1661,7 +1666,7 @@ class AddprogramPlanningUnit extends Component {
                                 &nbsp;
                                 {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
-                                </FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
 

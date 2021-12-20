@@ -430,12 +430,15 @@ export default class ConsumptionDetails extends React.Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    })
-                    this.getPlanningUnitList(programSelect);
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        })
+                        this.getPlanningUnitList(programSelect);
+                    }
                 }
             }.bind(this);
         }.bind(this)
@@ -926,7 +929,7 @@ export default class ConsumptionDetails extends React.Component {
                                     </Form>
                                 )} />
                         {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
-                        <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="consumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
                             <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} />
                             <div className="table-responsive consumptionDataEntryTable" id="consumptionTableDiv">
                                 <div id="consumptionTable" />

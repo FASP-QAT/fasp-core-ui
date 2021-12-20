@@ -73,7 +73,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     onload: this.loaded,
                     filters: true,
                     contextMenu: function (obj, x, y, e) {
-                        return [];
+                        return false;
                     }.bind(this),
 
                     license: JEXCEL_PRO_KEY,

@@ -146,6 +146,7 @@ export default class ExportProgram extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
+                    console.log("MyResult+++",myResult);
                     var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedProgramData');
                     var dGetRequest = dProgram.getAll();

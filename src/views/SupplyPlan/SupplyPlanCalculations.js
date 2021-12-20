@@ -137,6 +137,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     minDate=undefined;
                                 }
                                 if (minDate == undefined) {
+                                    console.log("Min date is undefined###");
                                     let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))
                                     let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                     let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))

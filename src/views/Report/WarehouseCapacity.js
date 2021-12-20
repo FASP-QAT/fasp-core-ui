@@ -883,7 +883,7 @@ class warehouseCapacity extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
 
         };
@@ -1010,6 +1010,7 @@ class warehouseCapacity extends Component {
                                                         value={this.state.programValues}
                                                         onChange={(e) => { this.handleChangeProgram(e) }}
                                                         options={programList && programList.length > 0 ? programList : []}
+                                                        disabled={this.state.loading}
 
                                                     />
                                                     {!!this.props.error &&

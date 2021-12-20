@@ -497,7 +497,7 @@ class SupplierListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var supplierEl = jexcel(document.getElementById("tableDiv"), options);

@@ -275,7 +275,7 @@ class DeleteLocalProgramComponent extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId && !myResult[i].readonly) {
+          if (myResult[i].userId == userId) {
             // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
             // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
