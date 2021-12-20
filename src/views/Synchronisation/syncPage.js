@@ -1227,7 +1227,7 @@ export default class syncPage extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
+          if (myResult[i].userId == userId && !myResult[i].readonly) {
             // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson1 = JSON.parse(programData);
@@ -2796,13 +2796,13 @@ export default class syncPage extends Component {
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
-        if(transList.length==0){
-            console.log("this problem report id do not have trans+++",row.problemReportId);
-            return ""
-        }else{
-        var listLength = transList.length;
-        return transList[listLength - 1].notes;
-        }
+    if (transList.length == 0) {
+      console.log("this problem report id do not have trans+++", row.problemReportId);
+      return ""
+    } else {
+      var listLength = transList.length;
+      return transList[listLength - 1].notes;
+    }
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
@@ -3484,33 +3484,6 @@ export default class syncPage extends Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
-            var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
-            var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
-            var generalJson = JSON.parse(generalData);
-            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-            var consumptionList = [];
-            var inventoryList = [];
-            var shipmentList = [];
-            var batchInfoList = [];
-            var supplyPlan = [];
-
-            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-              var planningUnitData = planningUnitDataList[pu];
-              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              var planningUnitDataJson = JSON.parse(programData);
-              consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
-              inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
-              shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
-              batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
-              supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
-            }
-            var programJson = generalJson;
-            programJson.consumptionList = consumptionList;
-            programJson.inventoryList = inventoryList;
-            programJson.shipmentList = shipmentList;
-            programJson.batchInfoList = batchInfoList;
-            programJson.supplyPlan = supplyPlan;
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
