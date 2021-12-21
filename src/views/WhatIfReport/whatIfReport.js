@@ -416,9 +416,29 @@ export default class WhatIfReportComponent extends React.Component {
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                var generalProgramJson = JSON.parse(programData);
+
+                var programDataJson = programRequest.result.programData;
+                var planningUnitDataList = programDataJson.planningUnitDataList;
+
+                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == this.state.planningUnitId);
+                var programJson = {};
+                if (planningUnitDataFilter.length > 0) {
+                    var planningUnitData = planningUnitDataFilter[0]
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: []
+                    }
+                }
 
                 var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
                 var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
@@ -441,7 +461,9 @@ export default class WhatIfReportComponent extends React.Component {
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
                     this.setState({
+                        generalProgramJson: generalProgramJson,
                         programJson: programJson
+
                     })
                     this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     this.setState({
@@ -2191,7 +2213,7 @@ export default class WhatIfReportComponent extends React.Component {
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
                     loading: false,
-                    programQPLDetails:getRequest.result
+                    programQPLDetails: getRequest.result
                 })
 
                 var programIdd = '';
@@ -3358,7 +3380,7 @@ export default class WhatIfReportComponent extends React.Component {
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
+                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     this.setState({
                         shipments: !this.state.shipments
@@ -5401,7 +5423,7 @@ export default class WhatIfReportComponent extends React.Component {
                     <CardFooter className="pb-3">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <Button style={{ display: this.state.display }} type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                        {this.state.programModified == 1 && !this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                        {this.state.programModified == 1 && !this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                     </CardFooter>
                 </Card>
 
@@ -5498,7 +5520,7 @@ export default class WhatIfReportComponent extends React.Component {
         }
 
         var roleList = AuthenticationService.getLoggedInUserRole();
-        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
+        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
             if (document.getElementById("addRowId") != null) {
                 document.getElementById("addRowId").style.display = "none"
             }
