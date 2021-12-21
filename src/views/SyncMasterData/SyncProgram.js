@@ -95,7 +95,8 @@ export default class SyncProgram extends Component {
                     if (programList.length > 0) {
                         this.syncPrograms(programList);
                     } else {
-                        this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
+                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.props.location.state != undefined ? this.props.location.state.programIds : [] } })
+                        // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                     }
                 })
             }.bind(this)
@@ -401,7 +402,8 @@ export default class SyncProgram extends Component {
                                                         syncedMasters: syncedMasters + 1,
                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                     })
-                                                    this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
+                                                    this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.props.location.state != undefined ? this.props.location.state.programIds : [] } })
+                                                    // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                                                 }.bind(this)
                                             }.bind(this)
                                         }.bind(this)
@@ -479,7 +481,8 @@ export default class SyncProgram extends Component {
                                 var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             }
                             programDataTransaction2.oncomplete = function (event) {
-                                this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
+                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.props.location.state != undefined ? this.props.location.state.programIds : [] } })
+                                // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
