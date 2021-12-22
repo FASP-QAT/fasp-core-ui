@@ -1609,7 +1609,8 @@ class ForecastOutput extends Component {
                             pointStyle: 'line',
                             pointRadius: 0,
                             showInLegend: true,
-                            data: consumptionValue
+                            // data: consumptionValue
+                            data: (consumptionValue.filter(c => c != "").length > 0 ? consumptionValue : [])
                         }
                     )
 
@@ -2013,7 +2014,7 @@ class ForecastOutput extends Component {
                                                                     <tr>
                                                                         <th>Display?</th>
                                                                         <th>{this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit'}</th>
-                                                                        <th>Tree Name + Scenario / Consumption Extrapolation</th>
+                                                                        <th>Forecast</th>
                                                                         {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
                                                                             <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
                                                                         ))}
@@ -2026,7 +2027,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.xaxis == 2 && this.state.consumptionData.map(item => (
                                                                         <tr>
                                                                             <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
-                                                                            <td>{item.objUnit.label.label_en}</td>
+                                                                            <td style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
                                                                             <td>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
@@ -2036,7 +2037,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit == 1 && this.state.xaxis == 2 &&
                                                                         <tr>
                                                                             <td></td>
-                                                                            <td><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
                                                                             <td></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td><b>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</b></td>
@@ -2048,7 +2049,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.xaxis == 1 && this.state.consumptionData.map(item => (
                                                                         <tr>
                                                                             <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
-                                                                            <td>{item.objUnit.label.label_en}</td>
+                                                                            <td style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
                                                                             <td>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
@@ -2058,7 +2059,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit == 1 && this.state.xaxis == 1 &&
                                                                         <tr>
                                                                             <td></td>
-                                                                            <td><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
                                                                             <td></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
