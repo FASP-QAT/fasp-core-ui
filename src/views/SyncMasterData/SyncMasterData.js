@@ -24,6 +24,7 @@ import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncMasterData extends Component {
@@ -120,7 +121,7 @@ export default class SyncMasterData extends Component {
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 {/* <ChangeInLocalProgramVersion ref="programChangeChild" ></ChangeInLocalProgramVersion> */}
                 <h6 className="mt-success" style={{ color: this.props.match.params.color }} id="div1">{i18n.t(this.props.match.params.message)}</h6>
-                <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
+                <h5 className="pl-md-5" style={{ color: "#BA0C2F" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5>
                 <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col xs="12" sm="12">
                         <Card>
@@ -148,7 +149,7 @@ export default class SyncMasterData extends Component {
                                 <FormGroup>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
                                     &nbsp;
-                            </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -171,236 +172,299 @@ export default class SyncMasterData extends Component {
 
     }
 
-    syncProgramData(date, programList, programQPLDetailsList) {
+    syncProgramData(date, programList, programQPLDetailsList, readonlyProgramIds,programPlanningUnitList) {
         // console.log("Date", date);
         // console.log('Program List', programList);
         var valid = true;
-        for (var i = 0; i < programList.length; i++) {
-            AuthenticationService.setupAxiosInterceptors();
-            // this.refs.problemListChild.qatProblemActions(programList[i].id);
-            if (isSiteOnline) {
-                //Code to Sync Country list
-                MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
-                    .then(response => {
-                        // console.log("Response", response);
-                        if (response.status == 200) {
-                            // console.log("Response=========================>", response.data);
-                            // console.log("i", i);
-                            var curUser = AuthenticationService.getLoggedInUserId();
-                            var prog = programList.filter(c => parseInt(c.programId) == parseInt(response.data.programId) && parseInt(c.version) == parseInt(response.data.versionId) && parseInt(c.userId) == parseInt(response.data.userId))[0];
-                            var prgQPLDetails = programQPLDetailsList.filter(c => c.id == prog.id)[0];
-                            // console.log("Prog=====================>", prog)
-                            var programDataBytes = CryptoJS.AES.decrypt((prog).programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-                            var shipmentDataList = (programJson.shipmentList);
-                            var batchInfoList = (programJson.batchInfoList);
-                            var actionList = programJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var problemReportList = programJson.problemReportList;
-                            // console.log("Shipment data list", shipmentDataList);
-                            // console.log("Batch Info list", batchInfoList);
-                            var shipArray = response.data.shipmentList;
-                            var rebuild = false;
-                            if (response.data.shipmentList.length > 0) {
-                                rebuild = true;
-                            }
-                            var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
-                            // console.log("Min Date shiparray", shipArray);
-                            var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
-                            var minDate1 = moment.min(shipArray1.map(d => moment(d.receivedDate)));
-                            if (moment(minDate1).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                minDate = minDate1;
-                            }
-                            // console.log("Min Date in sync", minDate);
-                            var batchArray = response.data.batchInfoList;
-                            var planningUnitList = [];
-                            for (var j = 0; j < shipArray.length; j++) {
-                                // console.log("In planning unit list", shipArray[j].planningUnit.id);
-                                if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
-                                    planningUnitList.push(shipArray[j].planningUnit.id);
-                                }
-                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArray[j].shipmentId)
-                                if (index == -1) {
-                                    shipmentDataList.push(shipArray[j]);
-                                } else {
-                                    if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                        minDate = shipmentDataList[index].expectedDeliveryDate;
-                                    }
-                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
-                                        minDate = shipmentDataList[index].receivedDate;
-                                    }
-                                    shipmentDataList[index] = shipArray[j];
-                                }
-                            }
-                            // console.log("Shipment data updated", shipmentDataList);
 
-                            for (var j = 0; j < batchArray.length; j++) {
-                                var index = batchInfoList.findIndex(c => c.batchNo == batchArray[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArray[j].expiryDate).format("YYYY-MM"));
-                                if (index == -1) {
-                                    batchInfoList.push(batchArray[j]);
-                                } else {
-                                    batchInfoList[index] = batchArray[j];
-                                }
-                            }
-                            // console.log("Batch Info updated", batchInfoList);
+        let startDate = '2021-01-01';
+        let stopDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD");
+        var programIds = readonlyProgramIds;
+        var json = {
+            startDate: startDate,
+            stopDate: stopDate,
+            programIds: programIds
+        }
+        ProgramService.getCommitRequests(json, 3)
+            .then(commitRequestResponse => {
+                if (commitRequestResponse.status == 200) {
+                    var commitRequestResponseData = commitRequestResponse.data;
+                    for (var i = 0; i < programList.length; i++) {
+                        AuthenticationService.setupAxiosInterceptors();
+                        // this.refs.problemListChild.qatProblemActions(programList[i].id);
+                        if (isSiteOnline) {
+                            //Code to Sync Country list
+                            MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
+                                .then(response => {
+                                    // console.log("Response", response);
+                                    if (response.status == 200) {
+                                        // console.log("Response=========================>", response.data);
+                                        // console.log("i", i);
+                                        var curUser = AuthenticationService.getLoggedInUserId();
+                                        var prog = programList.filter(c => parseInt(c.programId) == parseInt(response.data.programId) && parseInt(c.version) == parseInt(response.data.versionId) && parseInt(c.userId) == parseInt(response.data.userId))[0];
+                                        var prgQPLDetails = programQPLDetailsList.filter(c => c.id == prog.id)[0];
+                                        // console.log("Prog=====================>", prog)
+                                        // Iss prgQPLDetails ke liye mujhe check karna hai ki commit request me uska id hai kya agar hai to usko unreadonly karo
+                                        var checkIfReadonly = commitRequestResponseData.filter(c => c.program.id == prgQPLDetails.programId && c.committedVersionId == prgQPLDetails.version);
+                                        var readonly = checkIfReadonly.length > 0 ? 0 : prgQPLDetails.readonly;
+                                        var generalDataBytes = CryptoJS.AES.decrypt((prog).programData.generalData, SECRET_KEY);
+                                        var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+                                        var generalJson = JSON.parse(generalData);
 
-                            var problemReportArray = response.data.problemReportList;
-                            // console.log("Problem report array", problemReportArray);
-                            for (var pr = 0; pr < problemReportArray.length; pr++) {
-                                // console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
-                                var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
-                                // console.log("D------------->Index----------->", index, "D------------>", problemReportArray[pr].problemStatus.id);
-                                if (index == -1) {
-                                    problemReportList.push(problemReportArray[pr]);
-                                } else {
-                                    // console.log("In else");
-                                    problemReportList[index].reviewed = problemReportArray[pr].reviewed;
-                                    problemReportList[index].problemStatus = problemReportArray[pr].problemStatus;
-                                    problemReportList[index].reviewNotes = problemReportArray[pr].reviewNotes;
-                                    problemReportList[index].reviewedDate = (problemReportArray[pr].reviewedDate);
-
-                                    // console.log("problemReportList[index]", problemReportList[index]);
-                                    var problemReportTransList = problemReportList[index].problemTransList;
-                                    // console.log("Problem report trans list", problemReportTransList)
-                                    var curProblemReportTransList = problemReportArray[pr].problemTransList;
-                                    // console.log("Cur problem report trans list", curProblemReportTransList)
-                                    for (var cpr = 0; cpr < curProblemReportTransList.length; cpr++) {
-                                        var index1 = problemReportTransList.findIndex(c => c.problemReportTransId == curProblemReportTransList[cpr].problemReportTransId);
-                                        // console.log("index1", index1)
-                                        if (index1 == -1) {
-                                            problemReportTransList.push(curProblemReportTransList[cpr]);
-                                        } else {
-                                            problemReportTransList[index1] = curProblemReportTransList[cpr];
+                                        var planningUnitDataList = (prog).programData.planningUnitDataList;
+                                        // var shipmentDataList = (programJson.shipmentList);
+                                        // var batchInfoList = (programJson.batchInfoList);
+                                        var actionList = generalJson.actionList;
+                                        if (actionList == undefined) {
+                                            actionList = []
                                         }
-                                    }
-                                    problemReportList[index].problemReportTransList = problemReportTransList;
-                                }
-                            }
-                            for (var p = 0; p < planningUnitList.length; p++) {
-                                actionList.push({
-                                    planningUnitId: planningUnitList[p],
-                                    type: SHIPMENT_MODIFIED,
-                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-
-                                })
-                            }
-                            programJson.shipmentList = shipmentDataList;
-                            programJson.actionList = actionList;
-                            programJson.batchInfoList = batchInfoList;
-                            programJson.problemReportList = problemReportList;
-                            prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false )).length;
-                            prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false )).length;
-                            prog.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                            var db1;
-                            var storeOS;
-                            getDatabase();
-                            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                            openRequest.onerror = function (event) {
-                                // console.log("D--------------------------->in 1")
-                                if (document.getElementById('div1') != null) {
-                                    document.getElementById('div1').style.display = 'none';
-                                }
-                                this.setState({
-                                    message: i18n.t('static.program.errortext')
-                                },
-                                    () => {
-                                        this.hideSecondComponent();
-                                    })
-                            }.bind(this);
-                            openRequest.onsuccess = function (e) {
-                                db1 = e.target.result;
-                                var transaction = db1.transaction(['programData'], 'readwrite');
-                                var programTransaction = transaction.objectStore('programData');
-                                var putRequest = programTransaction.put(prog);
-
-                                putRequest.onerror = function (event) {
-                                    this.setState({
-                                        supplyPlanError: i18n.t('static.program.errortext')
-                                    })
-                                }.bind(this);
-                                putRequest.onsuccess = function (event) {
-                                    var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                    var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                    var programQPLDetailsRequest = programQPLDetailsOs.put(prgQPLDetails);
-                                    // console.log("Planning unit list", planningUnitList);
-                                    programQPLDetailsRequest.onsuccess = function (event) {
-                                        // var dt = date;
-                                        // if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
-                                        //     dt = "2020-01-01 00:00:00";
-                                        // }
-                                        // console.log("M------------------------>", dt);
-                                        // console.log("program id in master data sync***", prog.id);
-                                        var rebuildQPL = false;
-                                        if (this.props.location.state != undefined) {
-                                            if (this.props.location.state.programIds.includes(prog.id)) {
-                                                rebuildQPL = true;
+                                        var problemReportList = generalJson.problemReportList;
+                                        // console.log("Shipment data list", shipmentDataList);
+                                        // console.log("Batch Info list", batchInfoList);
+                                        var shipArray = response.data.shipmentList;
+                                        var pplModified=programPlanningUnitList.filter(c=>moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss")>=moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id==response.data.programId);
+                                        var rebuild = false;
+                                        if (response.data.shipmentList.length > 0 || pplModified.length > 0) {
+                                            rebuild = true;
+                                        }
+                                        var shipArray1 = response.data.shipmentList.filter(c => c.receivedDate != null && c.receivedDate != "" && c.receivedDate != "Invalid date" && c.receivedDate != undefined);
+                                        // console.log("Min Date shiparray", shipArray);
+                                        var minDate = moment.min(shipArray.map(d => moment(d.expectedDeliveryDate)));
+                                        var minDate1 = moment.min(shipArray1.map(d => moment(d.receivedDate)));
+                                        if (moment(minDate1).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                            minDate = minDate1;
+                                        }
+                                        // console.log("Min Date in sync", minDate);
+                                        var batchArray = response.data.batchInfoList;
+                                        var planningUnitList = [];
+                                        for (var j = 0; j < shipArray.length; j++) {
+                                            if (!planningUnitList.includes(shipArray[j].planningUnit.id)) {
+                                                planningUnitList.push(shipArray[j].planningUnit.id);
                                             }
                                         }
-                                        calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, rebuild, rebuildQPL);
-                                    }.bind(this)
-                                }.bind(this)
-                            }.bind(this)
+                                        for(var ppl=0;ppl<pplModified.length;ppl++){
+                                            if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
+                                                planningUnitList.push(pplModified[ppl].planningUnit.id);
+                                            }
+                                        }
+
+                                        for (var pu = 0; pu < planningUnitList.length; pu++) {
+
+                                            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
+                                            var programJson = {}
+                                            if (planningUnitDataIndex != -1) {
+                                                var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitList[pu]))[0];
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
+                                            } else {
+                                                programJson = {
+                                                    consumptionList: [],
+                                                    inventoryList: [],
+                                                    shipmentList: [],
+                                                    batchInfoList: [],
+                                                    supplyPlan: []
+                                                }
+                                            }
+
+                                            var shipmentDataList = programJson.shipmentList;
+                                            var batchInfoList = programJson.batchInfoList;
+                                            var shipArrayForPlanningUnit = shipArray.filter(c => c.planningUnit.id == planningUnitList[pu]);
+                                            for (var j = 0; j < shipArrayForPlanningUnit.length; j++) {
+                                                // console.log("In planning unit list", shipArray[j].planningUnit.id);
+                                                var index = shipmentDataList.findIndex(c => c.shipmentId == shipArrayForPlanningUnit[j].shipmentId)
+                                                if (index == -1) {
+                                                    shipmentDataList.push(shipArrayForPlanningUnit[j]);
+                                                } else {
+                                                    if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                                        minDate = shipmentDataList[index].expectedDeliveryDate;
+                                                    }
+                                                    if (shipmentDataList[index].receivedDate != null && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != "" && shipmentDataList[index].receivedDate != undefined && moment(shipmentDataList[index].receivedDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
+                                                        minDate = shipmentDataList[index].receivedDate;
+                                                    }
+                                                    shipmentDataList[index] = shipArrayForPlanningUnit[j];
+                                                }
+                                            }
+                                            // console.log("Shipment data updated", shipmentDataList);
+                                            var batchArrayForPlanningUnit = batchArray.filter(c => c.planningUnitId && planningUnitList[pu]);
+                                            for (var j = 0; j < batchArrayForPlanningUnit.length; j++) {
+                                                var index = batchInfoList.findIndex(c => c.batchNo == batchArrayForPlanningUnit[j].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchArrayForPlanningUnit[j].expiryDate).format("YYYY-MM"));
+                                                if (index == -1) {
+                                                    batchInfoList.push(batchArrayForPlanningUnit[j]);
+                                                } else {
+                                                    batchInfoList[index] = batchArrayForPlanningUnit[j];
+                                                }
+                                            }
+                                            if (planningUnitDataIndex != -1) {
+                                                planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                            } else {
+                                                planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                            }
+
+                                        }
+                                        if(pplModified.length>0){
+                                            minDate=null;
+                                        }
+                                        // console.log("Batch Info updated", batchInfoList);
+
+                                        var problemReportArray = response.data.problemReportList;
+                                        // console.log("Problem report array", problemReportArray);
+                                        for (var pr = 0; pr < problemReportArray.length; pr++) {
+                                            // console.log("problemReportArray[pr].problemReportId---------->", problemReportArray[pr].problemReportId);
+                                            var index = problemReportList.findIndex(c => c.problemReportId == problemReportArray[pr].problemReportId)
+                                            // console.log("D------------->Index----------->", index, "D------------>", problemReportArray[pr].problemStatus.id);
+                                            if (index == -1) {
+                                                problemReportList.push(problemReportArray[pr]);
+                                            } else {
+                                                // console.log("In else");
+                                                problemReportList[index].reviewed = problemReportArray[pr].reviewed;
+                                                problemReportList[index].problemStatus = problemReportArray[pr].problemStatus;
+                                                problemReportList[index].reviewNotes = problemReportArray[pr].reviewNotes;
+                                                problemReportList[index].reviewedDate = (problemReportArray[pr].reviewedDate);
+
+                                                // console.log("problemReportList[index]", problemReportList[index]);
+                                                var problemReportTransList = problemReportList[index].problemTransList;
+                                                // console.log("Problem report trans list", problemReportTransList)
+                                                var curProblemReportTransList = problemReportArray[pr].problemTransList;
+                                                // console.log("Cur problem report trans list", curProblemReportTransList)
+                                                for (var cpr = 0; cpr < curProblemReportTransList.length; cpr++) {
+                                                    var index1 = problemReportTransList.findIndex(c => c.problemReportTransId == curProblemReportTransList[cpr].problemReportTransId);
+                                                    // console.log("index1", index1)
+                                                    if (index1 == -1) {
+                                                        problemReportTransList.push(curProblemReportTransList[cpr]);
+                                                    } else {
+                                                        problemReportTransList[index1] = curProblemReportTransList[cpr];
+                                                    }
+                                                }
+                                                problemReportList[index].problemReportTransList = problemReportTransList;
+                                            }
+                                        }
+                                        for (var p = 0; p < planningUnitList.length; p++) {
+                                            actionList.push({
+                                                planningUnitId: planningUnitList[p],
+                                                type: SHIPMENT_MODIFIED,
+                                                date: minDate!=null?moment(minDate).startOf('month').format("YYYY-MM-DD"):moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+
+                                            })
+                                        }
+                                        // programJson.shipmentList = shipmentDataList;
+                                        // programJson.batchInfoList = batchInfoList;
+                                        generalJson.actionList = actionList;
+                                        generalJson.problemReportList = problemReportList;
+                                        prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                        prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+                                        prgQPLDetails.readonly = readonly;
+                                        prog.programData.planningUnitDataList = planningUnitDataList;
+                                        prog.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalJson), SECRET_KEY)).toString();
+                                        var db1;
+                                        var storeOS;
+                                        getDatabase();
+                                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                                        openRequest.onerror = function (event) {
+                                            // console.log("D--------------------------->in 1")
+                                            if (document.getElementById('div1') != null) {
+                                                document.getElementById('div1').style.display = 'none';
+                                            }
+                                            this.setState({
+                                                message: i18n.t('static.program.errortext')
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
+                                        }.bind(this);
+                                        openRequest.onsuccess = function (e) {
+                                            db1 = e.target.result;
+                                            var transaction = db1.transaction(['programData'], 'readwrite');
+                                            var programTransaction = transaction.objectStore('programData');
+                                            var putRequest = programTransaction.put(prog);
+
+                                            putRequest.onerror = function (event) {
+                                                this.setState({
+                                                    supplyPlanError: i18n.t('static.program.errortext')
+                                                })
+                                            }.bind(this);
+                                            putRequest.onsuccess = function (event) {
+                                                var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(prgQPLDetails);
+                                                // console.log("Planning unit list", planningUnitList);
+                                                programQPLDetailsRequest.onsuccess = function (event) {
+                                                    // var dt = date;
+                                                    // if (this.props.match.params.message != "" && this.props.match.params.message != undefined && this.props.match.params.message != null) {
+                                                    //     dt = "2020-01-01 00:00:00";
+                                                    // }
+                                                    // console.log("M------------------------>", dt);
+                                                    // console.log("program id in master data sync***", prog.id);
+                                                    var rebuildQPL = false;
+                                                    if (this.props.location.state != undefined) {
+                                                        if (this.props.location.state.programIds.includes(prog.id)) {
+                                                            rebuildQPL = true;
+                                                        }
+                                                    }
+                                                    calculateSupplyPlan(prog.id, 0, 'programData', 'masterDataSync', this, planningUnitList, minDate, this.refs.problemListChild, rebuild, rebuildQPL);
+                                                }.bind(this)
+                                            }.bind(this)
+                                        }.bind(this)
+                                    } else {
+                                        // console.log("D--------------------------->in 2")
+                                        // this.setState({
+                                        //     message: response.data.messageCode
+                                        // },
+                                        //     () => {
+                                        //         this.hideSecondComponent();
+                                        //     })
+                                        // document.getElementById("retryButtonDiv").style.display = "block";
+                                        valid = false;
+                                        this.fetchData(1, programList[i].id);
+                                    }
+                                }).catch(error => {
+                                    this.fetchData(1, 1);
+                                    // console.log("D------------------------> 3 error", error);
+                                    if (error.message === "Network Error") {
+                                        // console.log("D--------------------------->in 3")
+                                        // this.setState({ message: error.message },
+                                        //     () => {
+                                        //         this.hideSecondComponent();
+                                        //     });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 500:
+                                            case 401:
+                                            case 404:
+                                            case 406:
+                                            case 412:
+                                                // console.log("D--------------------------->in 4")
+                                                // this.setState({ message: error.response.data.messageCode },
+                                                //     () => {
+                                                //         this.hideSecondComponent();
+                                                //     });
+                                                break;
+                                            default:
+                                                // console.log("D--------------------------->in 5")
+                                                // this.setState({ message: 'static.unkownError' },
+                                                //     () => {
+                                                //         this.hideSecondComponent();
+                                                //     });
+                                                break;
+                                        }
+                                    }
+                                    // document.getElementById("retryButtonDiv").style.display = "block";
+                                    // valid = false;
+                                });
                         } else {
-                            // console.log("D--------------------------->in 2")
+                            // console.log("D--------------------------->in 6")
+                            // document.getElementById("retryButtonDiv").style.display = "block";
                             // this.setState({
-                            //     message: response.data.messageCode
+                            //     message: 'static.common.onlinealerttext'
                             // },
                             //     () => {
                             //         this.hideSecondComponent();
                             //     })
-                            // document.getElementById("retryButtonDiv").style.display = "block";
                             valid = false;
-                            this.fetchData(1, programList[i].id);
                         }
-                    }).catch(error => {
-                        this.fetchData(1, 1);
-                        // console.log("D------------------------> 3 error", error);
-                        if (error.message === "Network Error") {
-                            // console.log("D--------------------------->in 3")
-                            // this.setState({ message: error.message },
-                            //     () => {
-                            //         this.hideSecondComponent();
-                            //     });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    // console.log("D--------------------------->in 4")
-                                    // this.setState({ message: error.response.data.messageCode },
-                                    //     () => {
-                                    //         this.hideSecondComponent();
-                                    //     });
-                                    break;
-                                default:
-                                    // console.log("D--------------------------->in 5")
-                                    // this.setState({ message: 'static.unkownError' },
-                                    //     () => {
-                                    //         this.hideSecondComponent();
-                                    //     });
-                                    break;
-                            }
-                        }
-                        // document.getElementById("retryButtonDiv").style.display = "block";
-                        // valid = false;
-                    });
-            } else {
-                // console.log("D--------------------------->in 6")
-                // document.getElementById("retryButtonDiv").style.display = "block";
-                // this.setState({
-                //     message: 'static.common.onlinealerttext'
-                // },
-                //     () => {
-                //         this.hideSecondComponent();
-                //     })
-                valid = false;
-            }
-        }
+                    }
+                }
+            })
 
         // this.refs.programListChild.checkNewerVersions();
         // this.refs.programChangeChild.checkIfLocalProgramVersionChanged();
@@ -557,8 +621,11 @@ export default class SyncMasterData extends Component {
                         var programQPLDetailsJsonRequest = programQPLDetailsOs.getAll();
                         programQPLDetailsJsonRequest.onsuccess = function (e) {
                             var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
-
-
+                            var readonlyProgramJson = programQPLDetailsJson.filter(c => c.readonly);
+                            var readonlyProgramIds = [];
+                            for (var rp = 0; rp < readonlyProgramJson.length; rp++) {
+                                readonlyProgramIds.push(readonlyProgramJson[rp].programId);
+                            }
                             // console.log("Validation", validation);
                             if (validation) {
                                 AuthenticationService.setupAxiosInterceptors();
@@ -816,7 +883,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                 syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                 syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                             }, () => {
-                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson);
+                                                                                                                                                                                                this.syncProgramData(lastSyncDate, myResult, programQPLDetailsJson, readonlyProgramIds,response.programPlanningUnitList);
                                                                                                                                                                                                 // currency
                                                                                                                                                                                                 var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                                                                                                                                                                                                 // console.log("M sync currency transaction start")

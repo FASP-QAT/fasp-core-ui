@@ -755,7 +755,7 @@ class ForecastMetrics extends Component {
       filters: true,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -784,7 +784,7 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-          let textColor = 'red'//contrast('#f48282');
+          let textColor = '#BA0C2F'//contrast('#f48282');
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
         }
       } else {
@@ -1602,10 +1602,11 @@ class ForecastMetrics extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
 
@@ -1624,10 +1625,11 @@ class ForecastMetrics extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>
@@ -1643,6 +1645,7 @@ class ForecastMetrics extends Component {
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
@@ -1667,6 +1670,7 @@ class ForecastMetrics extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          disabled={this.state.loading}
                         />
 
                       </div>

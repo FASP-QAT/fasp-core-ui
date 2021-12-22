@@ -49,6 +49,7 @@ export default class AddInventory extends Component {
             regionList: [],
             dataSourceList: [],
             realmCountryPlanningUnitList: [],
+            programQPLDetails:[]
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -403,7 +404,7 @@ export default class AddInventory extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -416,7 +417,7 @@ export default class AddInventory extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -444,7 +445,8 @@ export default class AddInventory extends Component {
                         a = a.label.toLowerCase();
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
-                    }), loading: false
+                    }), loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -459,12 +461,15 @@ export default class AddInventory extends Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    })
-                    this.getPlanningUnitList(programSelect);
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        })
+                        this.getPlanningUnitList(programSelect);
+                    }
                 }
             }.bind(this);
         }.bind(this)
@@ -509,7 +514,7 @@ export default class AddInventory extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -521,12 +526,12 @@ export default class AddInventory extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         for (var i = 0; i < programJson.regionList.length; i++) {
@@ -546,7 +551,7 @@ export default class AddInventory extends Component {
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
-                                color: 'red'
+                                color: '#BA0C2F'
                             })
                             this.hideFirstComponent()
                         }.bind(this);
@@ -571,6 +576,7 @@ export default class AddInventory extends Component {
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
                                 planningUnitListAll: myResult,
+                                generalProgramJson: programJson,
                                 regionList: regionList.sort(function (a, b) {
                                     a = a.name.toLowerCase();
                                     b = b.name.toLowerCase();
@@ -634,7 +640,7 @@ export default class AddInventory extends Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -644,7 +650,7 @@ export default class AddInventory extends Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -656,14 +662,28 @@ export default class AddInventory extends Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                        var programJson = {};
+                        if (planningUnitDataFilter.length > 0) {
+                            var planningUnitData = planningUnitDataFilter[0]
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
                         var batchList = []
                         var batchInfoList = programJson.batchInfoList;
 
@@ -865,7 +885,7 @@ export default class AddInventory extends Component {
                                         </div>
                                     </Form>
                                 )} />
-
+                        {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
                             <div className="table-responsive inventoryDataEntryTable" id="adjustmentsTableDiv">
@@ -891,7 +911,7 @@ export default class AddInventory extends Component {
                                 {this.state.inventoryChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.refs.inventoryChild.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
                                 {this.refs.inventoryChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
-                        </FormGroup>
+                            </FormGroup>
                         </FormGroup>
                     </CardFooter>
                 </Card>
@@ -960,7 +980,7 @@ export default class AddInventory extends Component {
         if (cont == true) {
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: "red",
+                color: "#BA0C2F",
                 inventoryBatchInfoChangedFlag: 0
             }, () => {
                 this.hideFirstComponent();

@@ -912,6 +912,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/program/syncPage":
+                    case "/program/commitRequest":
                         if (bfunction.includes("ROLE_BF_COMMIT_VERSION")) {
                             return true;
                         }

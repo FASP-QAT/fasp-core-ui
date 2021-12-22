@@ -745,7 +745,7 @@ class warehouseCapacity extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         // this.setState({ loading: true })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var regionList = (programJson.regionList);
@@ -883,7 +883,7 @@ class warehouseCapacity extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
 
         };
@@ -970,7 +970,7 @@ class warehouseCapacity extends Component {
                                                         />
                                                         {!!this.props.error &&
                                                             this.props.touched && (
-                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                                <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                             )}
                                                     </div>
 
@@ -1010,11 +1010,12 @@ class warehouseCapacity extends Component {
                                                         value={this.state.programValues}
                                                         onChange={(e) => { this.handleChangeProgram(e) }}
                                                         options={programList && programList.length > 0 ? programList : []}
+                                                        disabled={this.state.loading}
 
                                                     />
                                                     {!!this.props.error &&
                                                         this.props.touched && (
-                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                         )}
 
                                                 </FormGroup>

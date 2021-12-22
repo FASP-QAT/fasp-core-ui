@@ -668,6 +668,7 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
+  
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -815,7 +816,7 @@ class DefaultLayout extends Component {
     openRequest.onerror = function (event) {
       this.setState({
         message: i18n.t('static.program.errortext'),
-        color: 'red'
+        color: '#BA0C2F'
       })
     }.bind(this);
     openRequest.onsuccess = function (e) {
@@ -826,7 +827,7 @@ class DefaultLayout extends Component {
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
-          color: 'red',
+          color: '#BA0C2F',
           loading: false
         })
       }.bind(this);
@@ -1032,7 +1033,7 @@ class DefaultLayout extends Component {
                       {
                         name: i18n.t('static.dashboard.datasync'),
                         icon: 'fa fa-refresh',
-                        url: '/masterDataSync',
+                        url: '/syncProgram',
                       },
                       {
                         name: i18n.t('static.translations.translations'),

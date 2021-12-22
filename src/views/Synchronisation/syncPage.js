@@ -27,6 +27,10 @@ import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions'
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
+import LanguageService from '../../api/LanguageService';
+import eventBus from '../../containers/DefaultLayout/eventBus';
+import { ProgressBar, Step } from "react-step-progress-bar";
+import "../../../node_modules/react-step-progress-bar/styles.css"
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -77,6 +81,7 @@ export default class syncPage extends Component {
       loading: true,
       versionType: 1,
       openCount: 0,
+      progressPer: 0,
       notes: ''
     }
     this.toggle = this.toggle.bind(this);
@@ -254,7 +259,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       columnSorting: false,
       tableOverflow: false,
@@ -441,7 +446,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsInventory
     };
@@ -634,7 +639,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsShipment
     };
@@ -749,7 +754,7 @@ export default class syncPage extends Component {
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
       onload: this.loadedResolveConflictsProblem
     };
@@ -939,6 +944,10 @@ export default class syncPage extends Component {
       openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
+        this.setState({ progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green' }, () => {
+          this.hideFirstComponent();
+        })
+
         // this.generateDataAfterResolveConflictsForQPL();
       }
     })
@@ -986,6 +995,9 @@ export default class syncPage extends Component {
       openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
+        this.setState({ progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green' }, () => {
+          this.hideFirstComponent();
+        })
         // this.generateDataAfterResolveConflictsForQPL();
       }
     })
@@ -1126,8 +1138,45 @@ export default class syncPage extends Component {
       programJson.consumptionList = consumptionData;
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
+      programJson.actionList = actionList;
+
+      var planningUnitDataListFromState = this.state.planningUnitDataList;
+      var updatedJson = [];
+      var consumptionList = programJson.consumptionList;
+      var inventoryList = programJson.inventoryList;
+      var shipmentList = programJson.shipmentList;
+      var batchInfoList = programJson.batchInfoList;
+      var problemReportList = programJson.problemReportList;
+      var supplyPlan = programJson.supplyPlan;
+      console.log("Supply Plan full+++", supplyPlan);
+      var generalData = programJson;
+      delete generalData.consumptionList;
+      delete generalData.inventoryList;
+      delete generalData.shipmentList;
+      delete generalData.batchInfoList;
+      delete generalData.supplyPlan;
+      delete generalData.planningUnitList;
+      var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+      var planningUnitDataList = [];
+      for (var pu = 0; pu < planningUnitDataListFromState.length; pu++) {
+        var planningUnitDataJson = {
+          consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitDataListFromState[pu].planningUnitId),
+          batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId),
+          supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId)
+        }
+        console.log("Supply Plan filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitDataListFromState[pu].planningUnitId));
+        var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+        planningUnitDataList.push({ planningUnitId: planningUnitDataListFromState[pu].planningUnitId, planningUnitData: encryptedPlanningUnitDataText })
+      }
+      var programDataJson = {
+        generalData: generalEncryptedData,
+        planningUnitDataList: planningUnitDataList
+      };
+
       var proRequestResult = this.state.programRequestResult;
-      proRequestResult.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+      proRequestResult.programData = programDataJson;
 
       var programTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
       var programOs = programTransaction.objectStore('whatIfProgramData');
@@ -1178,7 +1227,7 @@ export default class syncPage extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
+          if (myResult[i].userId == userId && !myResult[i].readonly) {
             // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson1 = JSON.parse(programData);
@@ -1200,30 +1249,45 @@ export default class syncPage extends Component {
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
-          if (proList.length == 1) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: proList[0].value
-            }, () => {
-              // this.getDataForCompare(proList[0]);
-              this.checkLastModifiedDateForProgram(proList[0]);
-            })
-          } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
-            this.setState({
-              versionTypeList: response.data,
-              programList: proList,
-              // loading: false,
-              programId: localStorage.getItem("sesProgramId")
-            }, () => {
-              // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-              this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
-            })
+          if (proList.length > 0) {
+            if (proList.length == 1) {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                // loading: false,
+                programId: proList[0].value
+              }, () => {
+                // this.getDataForCompare(proList[0]);
+                this.checkLastModifiedDateForProgram(proList[0]);
+              })
+            } else if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
+              var programFilter = proList.filter(c => c.value == localStorage.getItem("sesProgramId"));
+              if (programFilter.length > 0) {
+                this.setState({
+                  versionTypeList: response.data,
+                  programList: proList,
+                  // loading: false,
+                  programId: localStorage.getItem("sesProgramId")
+                }, () => {
+                  // this.getDataForCompare(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+                  this.checkLastModifiedDateForProgram(proList.filter(c => c.value == localStorage.getItem("sesProgramId"))[0]);
+                })
+              } else {
+                this.setState({
+                  versionTypeList: response.data,
+                  programList: proList,
+                  loading: false
+                })
+              }
+            } else {
+              this.setState({
+                versionTypeList: response.data,
+                programList: proList,
+                loading: false
+              })
+            }
           } else {
             this.setState({
-              versionTypeList: response.data,
-              programList: proList,
               loading: false
             })
           }
@@ -1317,6 +1381,7 @@ export default class syncPage extends Component {
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
         if (response1.status == 200) {
           var lastModifiedDate = response1.data;
+          console.log("LastModifiedDate+++", lastModifiedDate);
           var db1;
           var storeOS;
           getDatabase();
@@ -1339,9 +1404,9 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
-              if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
+              if (lastModifiedDate != undefined && lastModifiedDate != null && lastModifiedDate != "" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
-                this.props.history.push(`/masterDataSync`)
+                this.props.history.push(`/syncProgram`)
               } else {
                 this.getDataForCompare(value);
               }
@@ -1460,12 +1525,38 @@ export default class syncPage extends Component {
                     this.hideSecondComponent()
                   }.bind(this);
                   programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                    var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalJson = JSON.parse(generalData);
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                    var consumptionList = [];
+                    var inventoryList = [];
+                    var shipmentList = [];
+                    var batchInfoList = [];
+                    var supplyPlan = [];
+
+                    for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                      var planningUnitData = planningUnitDataList[pu];
+                      var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                      var planningUnitDataJson = JSON.parse(programData);
+                      consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                      inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                      shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                      batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                      supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+                    }
+                    var programJson = generalJson;
+                    programJson.consumptionList = consumptionList;
+                    programJson.inventoryList = inventoryList;
+                    programJson.shipmentList = shipmentList;
+                    programJson.batchInfoList = batchInfoList;
+                    programJson.supplyPlan = supplyPlan;
+
                     this.setState({
                       programRequestResult: programRequest.result,
-                      programRequestProgramJson: programJson
+                      programRequestProgramJson: programJson,
+                      planningUnitDataList: planningUnitDataList
                     })
                     console.log("+++Response of local version", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                     // var dProgramDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
@@ -1607,13 +1698,11 @@ export default class syncPage extends Component {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
                                 for (var k = 0; k < fsResult.length; k++) {
-                                  if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId && fsResult[k].active == true) {
-                                    var fsJson = {
-                                      name: fsResult[k].fundingSourceCode,
-                                      id: fsResult[k].fundingSourceId
-                                    }
-                                    fundingSourceList.push(fsJson);
+                                  var fsJson = {
+                                    name: fsResult[k].fundingSourceCode,
+                                    id: fsResult[k].fundingSourceId
                                   }
+                                  fundingSourceList.push(fsJson);
                                 }
 
                                 var bTransaction = db1.transaction(['budget'], 'readwrite');
@@ -1845,6 +1934,8 @@ export default class syncPage extends Component {
                                               this.toggleLarge(rowData[15], rowData[16], y, 'consumption');
                                             }.bind(this)
                                           })
+                                        } else {
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -2029,6 +2120,8 @@ export default class syncPage extends Component {
                                               this.toggleLargeInventory(rowData[16], rowData[17], y, 'inventory');
                                             }.bind(this)
                                           })
+                                        } else {
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -2210,6 +2303,8 @@ export default class syncPage extends Component {
                                               this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
                                             }.bind(this)
                                           })
+                                        } else {
+                                          return false;
                                         }
 
                                         // if (rowData[0].toString() > 0) {
@@ -2701,13 +2796,13 @@ export default class syncPage extends Component {
 
   getNote(row, lang) {
     var transList = row.problemTransList.filter(c => c.reviewed == false);
-        if(transList.length==0){
-            console.log("this problem report id do not have trans+++",row.problemReportId);
-            return ""
-        }else{
-        var listLength = transList.length;
-        return transList[listLength - 1].notes;
-        }
+    if (transList.length == 0) {
+      console.log("this problem report id do not have trans+++", row.problemReportId);
+      return ""
+    } else {
+      var listLength = transList.length;
+      return transList[listLength - 1].notes;
+    }
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
@@ -2880,6 +2975,13 @@ export default class syncPage extends Component {
     }
     elInstance.orderBy(20, 0);
     elInstance.options.editable = false;
+    if (this.state.conflictsCount == 0) {
+      this.setState({
+        progressPer: 25, message: i18n.t('static.commitVersion.resolvedConflictsSuccess'), color: 'green'
+      }, () => {
+        this.hideFirstComponent();
+      })
+    }
   }
 
   tabPane() {
@@ -2965,6 +3067,7 @@ export default class syncPage extends Component {
                             name="programSelect"
                             id="programSelect"
                             bsSize="sm"
+                            disabled={this.state.loading}
                             options={this.state.programList}
                             value={this.state.programId}
                             onChange={(e) => { this.checkLastModifiedDateForProgram(e); }}
@@ -2984,6 +3087,82 @@ export default class syncPage extends Component {
 
                   </Col>
                 </Form>
+                <ProgressBar
+                  percent={this.state.progressPer}
+                  filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                  style={{ width: '75%' }}
+                >
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        // src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
+                        src="../../../../public/assets/img/numbers/number1.png"
+                      />
+
+
+                    )}
+
+                  </Step>
+
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number2.png"
+                      // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
+                      />
+                      // <h2>2</h2>
+                    )}
+
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number3.png"
+                      // src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
+                      />
+                      // <h2>3</h2>
+                    )}
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number4.png"
+                      // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                      />
+                      // <h2>4</h2>
+                    )}
+                  </Step>
+                  <Step transition="scale">
+                    {({ accomplished }) => (
+                      <img
+                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                        width="30"
+                        src="../../../../public/assets/img/numbers/number5.png"
+                      // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                      />
+                      // <h2>4</h2>
+                    )}
+                  </Step>
+                </ProgressBar>
+                <div className="d-sm-down-none  progressbar">
+                  <ul>
+                    <li className="quantimedProgressbartext1">{i18n.t('static.commitVersion.compareData')}</li>
+                    <li className="quantimedProgressbartext2">{i18n.t('static.commitVersion.resolveConflicts')}</li>
+                    <li className="quantimedProgressbartext3">{i18n.t('static.commitVersion.sendingDataToServer')}</li>
+                    <li className="quantimedProgressbartext4">{i18n.t('static.commitVersion.serverProcessing')}</li>
+                    <li className="quantimedProgressbartext5">{i18n.t('static.commitVersion.upgradeLocalToLatest')}</li>
+                  </ul>
+                </div>
+                <br></br>
                 <div id="detailsDiv">
                   <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
@@ -3008,51 +3187,51 @@ export default class syncPage extends Component {
                           setFieldTouched,
                           setFieldError
                         }) => (
-                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
-                              <Col md="12 pl-0 pt-3">
-                                <div className="d-md-flex">
-                                  <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="select"
-                                          bsSize="sm"
-                                          name="versionType" id="versionType" onChange={this.versionTypeChanged}>
-                                          {versionTypes}
-                                        </Input>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                    <div className="controls ">
-                                      <InputGroup>
-                                        <Input type="textarea"
-                                          name="notes"
+                          <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                            <Col md="12 pl-0 pt-3">
+                              <div className="d-md-flex">
+                                <FormGroup className="col-md-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="select"
+                                        bsSize="sm"
+                                        name="versionType" id="versionType" onChange={this.versionTypeChanged}>
+                                        {versionTypes}
+                                      </Input>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input type="textarea"
+                                        name="notes"
                                         // maxLength={600} 
-                                          // maxLength={600} 
-                                        // maxLength={600} 
-                                          id="notes"
-                                          valid={!errors.notes && this.state.notes != ''}
-                                          invalid={touched.notes && !!errors.notes}
-                                          onChange={(e) => { handleChange(e); this.notesChange(e); }}
-                                          onBlur={handleBlur}
-                                          value={this.state.notes}
-                                        >
-                                        </Input>
-                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                      </InputGroup>
-                                    </div>
-                                  </FormGroup>
-                                  <FormGroup className="tab-ml-1 mt-4">
-                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
-                                    &nbsp;
-                </FormGroup>
-                                </div>
-                              </Col>
-                            </Form>
-                          )} />
+                                        id="notes"
+                                        valid={!errors.notes && this.state.notes != ''}
+                                        invalid={touched.notes && !!errors.notes}
+                                        onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                        onBlur={handleBlur}
+                                        value={this.state.notes}
+                                      >
+                                      </Input>
+                                      <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-4">
+                                  <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                  {/* {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleIdArr().includes("ROLE_APPLICATION_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>} */}
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  &nbsp;
+                                </FormGroup>
+                              </div>
+                            </Col>
+                          </Form>
+                        )} />
+                    <h5 style={{ color: 'red' }}>{i18n.t('static.commitVersion.commitNote')}</h5>
                     <Row>
                       <Col xs="12" md="12" className="mb-4">
                         <Nav tabs>
@@ -3101,14 +3280,11 @@ export default class syncPage extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                       <div class="align-items-center">
                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                         <div class="spinner-border blue ml-4" role="status">
-
                         </div>
                       </div>
                     </div>
                   </div>
-
                 </div>
               </CardBody>
               {/* <CardFooter> */}
@@ -3308,286 +3484,552 @@ export default class syncPage extends Component {
             })
           }.bind(this);
           programRequest.onsuccess = function (e) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            // var planningUnitList = [];
-            // var consumptionData = [];
-            // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
-            // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
-            // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
-            // for (var c = 0; c < consumptionJson.length; c++) {
-            //   if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
-            //     consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
-            //   }
-            // }
-            // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
+            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson = JSON.parse(programData);
 
-            // var inventoryData = [];
-            // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
-            // var oldProgramDataInventory = this.state.oldProgramDataInventory;
-            // var latestProgramDataInventory = this.state.latestProgramDataInventory;
-            // for (var c = 0; c < inventoryJson.length; c++) {
-            //   if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
-            //     inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
-            //   }
-            // }
-            // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
+            var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+            var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+            var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId).value);
+            programQPLDetailsGetRequest.onsuccess = function (event) {
+              var programQPLDetails = programQPLDetailsGetRequest.result;
+              var programIdForNotification = programQPLDetails.programId;
+              var versionIdForNotification = programQPLDetails.version;
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-            // var shipmentData = [];
-            // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
-            // var oldProgramDataShipment = this.state.oldProgramDataShipment;
-            // var latestProgramDataShipment = this.state.latestProgramDataShipment;
-            // for (var c = 0; c < shipmentJson.length; c++) {
-            //   if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
-            //     shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
-            //   }
-            // }
-            // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-            var problemReportList = [];
-            var problemJson = (this.state.mergedProblemListJexcel).getJson();
-            var oldProgramDataProblem = this.state.oldProgramDataProblemList;
-            var latestProgramDataProblem = this.state.latestProgramDataProblemList;
-            for (var c = 0; c < problemJson.length; c++) {
-              if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
-                problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
-              } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
-                problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
+
+              // var problemReportList = [];
+              // var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              // var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              // var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              // for (var c = 0; c < problemJson.length; c++) {
+              // if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+              // problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+              // problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // }
+              var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+              var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+              var generalJson = JSON.parse(generalData);
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var consumptionList = [];
+              var inventoryList = [];
+              var shipmentList = [];
+              var batchInfoList = [];
+              var supplyPlan = [];
+
+              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
-            }
-            problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
-            problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
-            // programJson.consumptionList = consumptionData;
-            // programJson.inventoryList = inventoryData;
-            // programJson.shipmentList = shipmentData;
-            programJson.problemReportList = problemReportList;
-            console.log("ProgramJson.consumption+++", programJson.consumptionList);
-            // programJson.problemReportList = [];
-            programJson.versionType = { id: document.getElementById("versionType").value };
-            programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
-            programJson.notes = document.getElementById("notes").value;
-            ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
-              if (response.status == 200) {
-                if (response.data == this.state.comparedLatestVersion) {
-                  ProgramService.saveProgramData(programJson).then(response => {
-                    if (response.status == 200) {
-                      var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
-                      var programDataOs1 = programDataTransaction1.objectStore('programData');
-                      var programRequest1 = programDataOs1.delete((this.state.programId).value);
+              var programJson = generalJson;
+              programJson.consumptionList = consumptionList;
+              programJson.inventoryList = inventoryList;
+              programJson.shipmentList = shipmentList;
+              programJson.batchInfoList = batchInfoList;
+              programJson.supplyPlan = supplyPlan;
+              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              // var programJson = JSON.parse(programData);
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-                      var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
-                      var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
-                      var programRequest3 = programDataOs3.delete((this.state.programId).value);
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-                      var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                      var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
-                      var programRequest2 = programDataOs2.delete((this.state.programId).value);
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
-                      programRequest1.onerror = function (event) {
-                        this.setState({
-                          supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                      }.bind(this);
-                      programRequest2.onsuccess = function (e) {
+              // var problemReportList = [];
+              // var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              // var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              // var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              // for (var c = 0; c < problemJson.length; c++) {
+              // if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+              // problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+              // problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+              // }
+              var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+              var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
+              var generalJson = JSON.parse(generalData);
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var consumptionList = [];
+              var inventoryList = [];
+              var shipmentList = [];
+              var batchInfoList = [];
+              var supplyPlan = [];
 
-                        var json = response.data;
-                        json.actionList = [];
-                        var version = json.requestedProgramVersion;
-                        if (version == -1) {
-                          version = json.currentVersion.versionId
-                        }
+              for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+                var planningUnitData = planningUnitDataList[pu];
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var planningUnitDataJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(planningUnitDataJson.consumptionList);
+                inventoryList = inventoryList.concat(planningUnitDataJson.inventoryList);
+                shipmentList = shipmentList.concat(planningUnitDataJson.shipmentList);
+                batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
+                supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
+              }
+              var programJson = generalJson;
+              programJson.consumptionList = consumptionList;
+              programJson.inventoryList = inventoryList;
+              programJson.shipmentList = shipmentList;
+              programJson.batchInfoList = batchInfoList;
+              programJson.supplyPlan = supplyPlan;
+              // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+              // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              // var programJson = JSON.parse(programData);
+              // var planningUnitList = [];
+              // var consumptionData = [];
+              // var consumptionJson = (this.state.mergedConsumptionJexcel).getJson();
+              // var oldProgramDataConsumption = this.state.oldProgramDataConsumption;
+              // var latestProgramDataConsumption = this.state.latestProgramDataConsumption;
+              // for (var c = 0; c < consumptionJson.length; c++) {
+              // if (((consumptionJson[c])[18] == 2 || (consumptionJson[c])[18] == 4) && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(oldProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // } else if ((consumptionJson[c])[18] == 3 && (consumptionJson[c])[0] != 0) {
+              // consumptionData.push(latestProgramDataConsumption.filter(a => a.consumptionId == (consumptionJson[c])[0])[0]);
+              // }
+              // }
+              // consumptionData = consumptionData.concat(oldProgramDataConsumption.filter(c => c.consumptionId == 0));
 
-                        var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
-                        var programSaveData = transactionForSavingData.objectStore('programData');
+              // var inventoryData = [];
+              // var inventoryJson = (this.state.mergedInventoryJexcel).getJson();
+              // var oldProgramDataInventory = this.state.oldProgramDataInventory;
+              // var latestProgramDataInventory = this.state.latestProgramDataInventory;
+              // for (var c = 0; c < inventoryJson.length; c++) {
+              // if (((inventoryJson[c])[19] == 2 || (inventoryJson[c])[19] == 4) && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(oldProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // } else if ((inventoryJson[c])[19] == 3 && (inventoryJson[c])[0] != 0) {
+              // inventoryData.push(latestProgramDataInventory.filter(a => a.inventoryId == (inventoryJson[c])[0])[0]);
+              // }
+              // }
+              // inventoryData = inventoryData.concat(oldProgramDataInventory.filter(c => c.inventoryId == 0));
 
-                        var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
-                        var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+              // var shipmentData = [];
+              // var shipmentJson = (this.state.mergedShipmentJexcel).getJson();
+              // var oldProgramDataShipment = this.state.oldProgramDataShipment;
+              // var latestProgramDataShipment = this.state.latestProgramDataShipment;
+              // for (var c = 0; c < shipmentJson.length; c++) {
+              // if (((shipmentJson[c])[33] == 2 || (shipmentJson[c])[33] == 4) && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(oldProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // } else if ((shipmentJson[c])[33] == 3 && (shipmentJson[c])[0] != 0) {
+              // shipmentData.push(latestProgramDataShipment.filter(a => a.shipmentId == (shipmentJson[c])[0])[0]);
+              // }
+              // }
+              // shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => c.shipmentId == 0 && c.active.toString() == "true"));
 
-                        var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
-                        var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
-                        // for (var i = 0; i < json.length; i++) {
-                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
-                        var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+              var problemReportList = [];
+              var problemJson = (this.state.mergedProblemListJexcel).getJson();
+              var oldProgramDataProblem = this.state.oldProgramDataProblemList;
+              var latestProgramDataProblem = this.state.latestProgramDataProblemList;
+              for (var c = 0; c < problemJson.length; c++) {
+                if (((problemJson[c])[20] == 2 || (problemJson[c])[20] == 4) && (problemJson[c])[0] != 0) {
+                  problemReportList.push(oldProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                } else if ((problemJson[c])[20] == 3 && (problemJson[c])[0] != 0) {
+                  problemReportList.push(latestProgramDataProblem.filter(a => a.problemReportId == (problemJson[c])[0])[0]);
+                }
+              }
+              problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
+              problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
+              // programJson.consumptionList = consumptionData;
+              // programJson.inventoryList = inventoryData;
+              // programJson.shipmentList = shipmentData;
+              programJson.problemReportList = problemReportList;
+              console.log("ProgramJson.consumption+++", programJson.consumptionList);
+              // programJson.problemReportList = [];
+              programJson.versionType = { id: document.getElementById("versionType").value };
+              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+              programJson.notes = document.getElementById("notes").value;
+              console.log("ProgramJson+++", programJson);
+              // ProgramService.getLatestVersionForProgram((this.state.singleProgramId)).then(response => {
+              //   if (response.status == 200) {
+              //     if (response.data == this.state.comparedLatestVersion) {
+              // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
+              // if (response1.status == 200) {
+              // if (response1.data == false) {
+              ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
+                if (response.status == 200) {
+                  console.log(")))) Commit Request generated successfully");
+                  // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+                  // var programDataOs1 = programDataTransaction1.objectStore('programData');
+                  // var programRequest1 = programDataOs1.delete((this.state.programId).value);
 
-                        var item = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
-                          programData: encryptedText.toString(),
-                          userId: userId
-                        };
-                        var programQPLDetails = {
-                          id: json.programId + "_v" + version + "_uId_" + userId,
-                          programId: json.programId,
-                          version: version,
-                          userId: userId,
-                          programCode: json.programCode,
-                          openCount: openCount,
-                          addressedCount: addressedCount,
-                          programModified: 0
-                        }
-                        var putRequest = programSaveData.put(item);
-                        var putRequest1 = downloadedProgramSaveData.put(item);
-                        var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                  // var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+                  // var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+                  // var programRequest3 = programDataOs3.delete((this.state.programId).value);
 
-                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
-                        // this.redirectToDashbaord();
-                      }.bind(this)
-                    } else {
+                  // var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+                  // var programRequest2 = programDataOs2.delete((this.state.programId).value);
+
+                  // programRequest1.onerror = function (event) {
+                  // this.setState({
+                  // supplyPlanError: i18n.t('static.program.errortext')
+                  // })
+                  // }.bind(this);
+                  // programRequest2.onsuccess = function (e) {
+
+                  // var json = response.data;
+                  // json.actionList = [];
+                  // var version = json.requestedProgramVersion;
+                  // if (version == -1) {
+                  // version = json.currentVersion.versionId
+                  // }
+
+                  // var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  // var programSaveData = transactionForSavingData.objectStore('programData');
+
+                  // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                  // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+
+                  var transactionForProgramQPLDetails = db1.transaction(['programQPLDetails'], 'readwrite');
+                  var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('programQPLDetails');
+                  // // for (var i = 0; i < json.length; i++) {
+                  // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json), SECRET_KEY);
+                  // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                  // var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                  // var openCount = (json.problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
+                  // var addressedCount = (json.problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
+
+                  // var item = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // programName: (CryptoJS.AES.encrypt(JSON.stringify((json.label)), SECRET_KEY)).toString(),
+                  // programData: encryptedText.toString(),
+                  // userId: userId
+                  // };
+                  // var programQPLDetails = {
+                  // id: json.programId + "_v" + version + "_uId_" + userId,
+                  // programId: json.programId,
+                  // version: version,
+                  // userId: userId,
+                  // programCode: json.programCode,
+                  // openCount: openCount,
+                  // addressedCount: addressedCount,
+                  // programModified: 0
+                  // }
+                  programQPLDetails.readonly = 1;
+                  // var putRequest = programSaveData.put(programRequest.result);
+                  // var putRequest1 = downloadedProgramSaveData.put(item);
+                  var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                  localStorage.setItem("sesProgramId", "");
+                  console.log(")))) Made program readonly");
+                  // this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": json.programId + "_v" + version + "_uId_" + userId } })
+                  this.setState({
+                    progressPer: 50
+                    , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                  }, () => {
+                    this.hideFirstComponent();
+                    this.redirectToDashbaord(response.data);
+                  })
+                  // }.bind(this)
+                } else {
+                  this.setState({
+                    message: response.data.messageCode,
+                    color: "red",
+                    loading: false
+                  })
+                  this.hideFirstComponent();
+                }
+              })
+                .catch(
+                  error => {
+                    console.log("@@@Error4", error);
+                    console.log("@@@Error4", error.message);
+                    console.log("@@@Error4", error.response ? error.response.status : "")
+                    if (error.message === "Network Error") {
+                      console.log("+++in catch 7")
                       this.setState({
-                        message: response.data.messageCode,
+                        message: 'static.common.networkError',
                         color: "red",
                         loading: false
-                      })
-                      this.hideFirstComponent();
-                    }
-                  })
-                    .catch(
-                      error => {
-                        console.log("@@@Error4", error);
-                        console.log("@@@Error4", error.message);
-                        console.log("@@@Error4", error.response ? error.response.status : "")
-                        if (error.message === "Network Error") {
-                          console.log("+++in catch 7")
+                      }, () => {
+                        this.hideFirstComponent();
+                      });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                          this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 403:
+                          this.props.history.push(`/accessDenied`)
+                          break;
+                        case 406:
+                          if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                          }
                           this.setState({
-                            message: 'static.common.networkError',
+                            message: error.response.data.messageCode,
                             color: "red",
                             loading: false
                           }, () => {
-                            this.hideFirstComponent();
+                            this.hideFirstComponent()
+                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                              this.checkLastModifiedDateForProgram(this.state.programId);
+                            }
                           });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                              this.props.history.push(`/login/static.message.sessionExpired`)
-                              break;
-                            case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                            case 500:
-                            case 404:
-                            case 406:
-                              this.setState({
-                                message: error.response.data.messageCode,
-                                color: "red",
-                                loading: false
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                            case 412:
-                              this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false,
-                                color: "red"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                            default:
-                              console.log("+++in catch 8")
-                              this.setState({
-                                message: 'static.unkownError',
-                                loading: false,
-                                color: "red"
-                              }, () => {
-                                this.hideFirstComponent()
-                              });
-                              break;
-                          }
-                        }
+                          break;
+                        case 500:
+                        case 404:
+                        case 412:
+                          this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
+                        default:
+                          console.log("+++in catch 8")
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false,
+                            color: "red"
+                          }, () => {
+                            this.hideFirstComponent()
+                          });
+                          break;
                       }
-                    );
-                } else {
-                  alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                  this.setState({
-                    message: i18n.t("static.commitVersion.versionIsOutDated"),
-                    loading: false,
-                    color: "red"
-                  }, () => {
-                    this.hideFirstComponent()
-                    this.checkLastModifiedDateForProgram(this.state.programId);
-                  });
-
-                }
-              } else {
-                this.setState({
-                  message: response.data.messageCode,
-                  color: "red",
-                  loading: false
-                })
-                this.hideFirstComponent();
-              }
-            })
-              .catch(
-                error => {
-                  console.log("@@@Error5", error);
-                  console.log("@@@Error5", error.message);
-                  console.log("@@@Error5", error.response ? error.response.status : "")
-                  if (error.message === "Network Error") {
-                    console.log("+++in catch 9")
-                    this.setState({
-                      message: 'static.common.networkError',
-                      color: "red",
-                      loading: false
-                    }, () => {
-                      this.hideFirstComponent();
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          color: "red",
-                          loading: false
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
-                      default:
-                        console.log("+++in catch 10")
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false,
-                          color: "red"
-                        }, () => {
-                          this.hideFirstComponent()
-                        });
-                        break;
                     }
                   }
-                }
-              );
+                );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.requestAlreadyExists"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.requestAlreadyExists"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         // this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
+
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
+
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+              //     } else {
+              //       alert(i18n.t("static.commitVersion.versionIsOutDated"));
+              //       this.setState({
+              //         message: i18n.t("static.commitVersion.versionIsOutDated"),
+              //         loading: false,
+              //         color: "red"
+              //       }, () => {
+              //         this.hideFirstComponent()
+              //         this.checkLastModifiedDateForProgram(this.state.programId);
+              //       });
+
+              //     }
+              //   } else {
+              //     this.setState({
+              //       message: response.data.messageCode,
+              //       color: "red",
+              //       loading: false
+              //     })
+              //     this.hideFirstComponent();
+              //   }
+              // })
+              //   .catch(
+              //     error => {
+              //       console.log("@@@Error5", error);
+              //       console.log("@@@Error5", error.message);
+              //       console.log("@@@Error5", error.response ? error.response.status : "")
+              //       if (error.message === "Network Error") {
+              //         console.log("+++in catch 9")
+              //         this.setState({
+              //           message: 'static.common.networkError',
+              //           color: "red",
+              //           loading: false
+              //         }, () => {
+              //           this.hideFirstComponent();
+              //         });
+              //       } else {
+              //         switch (error.response ? error.response.status : "") {
+
+              //           case 401:
+              //             this.props.history.push(`/login/static.message.sessionExpired`)
+              //             break;
+              //           case 403:
+              //             this.props.history.push(`/accessDenied`)
+              //             break;
+              //           case 500:
+              //           case 404:
+              //           case 406:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               color: "red",
+              //               loading: false
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           case 412:
+              //             this.setState({
+              //               message: error.response.data.messageCode,
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //           default:
+              //             console.log("+++in catch 10")
+              //             this.setState({
+              //               message: 'static.unkownError',
+              //               loading: false,
+              //               color: "red"
+              //             }, () => {
+              //               this.hideFirstComponent()
+              //             });
+              //             break;
+              //         }
+              //       }
+              //     }
+              //   );
+            }.bind(this)
           }.bind(this)
         }.bind(this)
       }
@@ -3602,10 +4044,308 @@ export default class syncPage extends Component {
     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
   }
 
-  redirectToDashbaord() {
-    this.setState({ loading: false })
-    let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+  redirectToDashbaord(commitRequestId) {
+    console.log(")))) Call for async api");
+    this.setState({ loading: true });
+    console.log("method called", commitRequestId);
+    AuthenticationService.setupAxiosInterceptors();
+    const sendGetRequest = async () => {
+      try {
+        const resp = await ProgramService.sendNotificationAsync(commitRequestId);
+        console.log(")))) Supply plan rebuild completed");
+        // var msg=resp.data.messageCode;
+        // console.log("Response +++", msg);
+        // this.setState({openModal:true,
+        // responseMessage:msg});
+        var curUser = AuthenticationService.getLoggedInUserId();
+        console.log("Resposne.data+++", resp.data);
+        if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+          this.setState({
+            progressPer: 75
+            , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+          }, () => {
+            this.hideFirstComponent();
+            this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+          })
+          // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
+        } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+          var db1;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red'
+            })
+            this.hideFirstComponent()
+          }.bind(this);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+            var program = transaction.objectStore('programQPLDetails');
+            var getRequest = program.get((this.state.programId).value);
+            getRequest.onerror = function (event) {
+              this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+              })
+              this.hideFirstComponent()
+            }.bind(this);
+            getRequest.onsuccess = function (event) {
+              var myResult = [];
+              myResult = getRequest.result;
+              myResult.readonly = 0;
+              var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+              var program1 = transaction1.objectStore('programQPLDetails');
+              var getRequest1 = program1.put(myResult);
+              getRequest1.onsuccess = function (e) {
+                this.setState({
+                  message: i18n.t('static.commitVersion.commitFailed'),
+                  color: 'red',
+                  loading: false
+                })
+                this.hideFirstComponent()
+              }.bind(this)
+            }.bind(this)
+          }.bind(this)
+        }
+
+        // window.visible=true;
+
+      } catch (err) {
+        // Handle Error Here
+        console.error("Error+++", err);
+      }
+    };
+    sendGetRequest();
+  }
+
+  getLatestProgram(notificationDetails) {
+    console.log(")))) inside getting latest version")
+    this.setState({ loading: true });
+    var checkboxesChecked = [];
+    var programIdsToSyncArray = [];
+    var notificationArray = [];
+    notificationArray.push(notificationDetails)
+    var programIdsSuccessfullyCommitted = notificationArray;
+    for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
+      var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
+      if (index == -1) {
+        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+      }
+    }
+    // checkboxesChecked.push({ programId: programId, versionId: -1 })
+    console.log(")))) Before calling get notification api")
+    ProgramService.getAllProgramData(checkboxesChecked)
+      .then(response => {
+        console.log(")))) After calling get notification api")
+        console.log("Resposne+++", response);
+        var json = response.data;
+        var updatedJson = [];
+        for (var r = 0; r < json.length; r++) {
+          var planningUnitList = json[r].planningUnitList;
+          var consumptionList = json[r].consumptionList;
+          var inventoryList = json[r].inventoryList;
+          var shipmentList = json[r].shipmentList;
+          var batchInfoList = json[r].batchInfoList;
+          var problemReportList = json[r].problemReportList;
+          var supplyPlan = json[r].supplyPlan;
+          console.log("Supply plan+++", supplyPlan)
+          var generalData = json[r];
+          delete generalData.consumptionList;
+          delete generalData.inventoryList;
+          delete generalData.shipmentList;
+          delete generalData.batchInfoList;
+          delete generalData.supplyPlan;
+          delete generalData.planningUnitList;
+          generalData.actionList = [];
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+          var planningUnitDataList = [];
+          for (var pu = 0; pu < planningUnitList.length; pu++) {
+            // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+            // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+            var planningUnitDataJson = {
+              consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+              batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+              supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+            }
+            console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
+            var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+            planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
+          }
+          var programDataJson = {
+            generalData: generalEncryptedData,
+            planningUnitDataList: planningUnitDataList
+          };
+          updatedJson.push(programDataJson);
+        }
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: 'red'
+          })
+          this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+          var program = transaction.objectStore('programQPLDetails');
+          var getRequest = program.getAll();
+          getRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: 'red'
+            })
+            this.hideFirstComponent()
+          }.bind(this);
+          getRequest.onsuccess = function (event) {
+            var myResult = [];
+            myResult = getRequest.result;
+            var userId = AuthenticationService.getLoggedInUserId();
+            console.log("Myresult+++", myResult);
+
+            var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
+            var programDataOs1 = programDataTransaction1.objectStore('programData');
+            for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+              var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+              console.log("checkIfProgramExists+++", checkIfProgramExists);
+              var programIdToDelete = 0;
+              if (checkIfProgramExists.length > 0) {
+                programIdToDelete = checkIfProgramExists[0].id;
+              }
+              var programRequest1 = programDataOs1.delete(checkIfProgramExists[0].id);
+            }
+            programDataTransaction1.oncomplete = function (event) {
+              var programDataTransaction3 = db1.transaction(['programQPLDetails'], 'readwrite');
+              var programDataOs3 = programDataTransaction3.objectStore('programQPLDetails');
+
+              for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                console.log("checkIfProgramExists+++", checkIfProgramExists);
+                var programIdToDelete = 0;
+                if (checkIfProgramExists.length > 0) {
+                  programIdToDelete = checkIfProgramExists[0].id;
+                }
+                var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
+              }
+              programDataTransaction3.oncomplete = function (event) {
+                var programDataTransaction2 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs2 = programDataTransaction2.objectStore('downloadedProgramData');
+
+                for (var dpd = 0; dpd < programIdsSuccessfullyCommitted.length; dpd++) {
+                  var checkIfProgramExists = myResult.filter(c => c.programId == programIdsSuccessfullyCommitted[dpd].notificationDetails.program.id && c.version == programIdsSuccessfullyCommitted[dpd].notificationDetails.committedVersionId && c.readonly == 1 && c.userId == userId);
+                  console.log("checkIfProgramExists+++", checkIfProgramExists);
+                  var programIdToDelete = 0;
+                  if (checkIfProgramExists.length > 0) {
+                    programIdToDelete = checkIfProgramExists[0].id;
+                  }
+                  var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                }
+                programDataTransaction2.oncomplete = function (event) {
+
+                  var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                  var programSaveData = transactionForSavingData.objectStore('programData');
+                  for (var r = 0; r < json.length; r++) {
+                    json[r].actionList = [];
+                    // json[r].openCount = 0;
+                    // json[r].addressedCount = 0;
+                    // json[r].programCode = json[r].programCode;
+                    // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    var version = json[r].requestedProgramVersion;
+                    if (version == -1) {
+                      version = json[r].currentVersion.versionId
+                    }
+                    var item = {
+                      id: json[r].programId + "_v" + version + "_uId_" + userId,
+                      programId: json[r].programId,
+                      version: version,
+                      programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                      programData: updatedJson[r],
+                      userId: userId,
+                      programCode: json[r].programCode,
+                      // openCount: 0,
+                      // addressedCount: 0
+                    };
+                    programIdsToSyncArray.push(json[r].programId + "_v" + version + "_uId_" + userId)
+                    // console.log("Item------------>", item);
+                    var putRequest = programSaveData.put(item);
+
+                  }
+                  transactionForSavingData.oncomplete = function (event) {
+                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
+                    for (var r = 0; r < json.length; r++) {
+                      // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                      var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                      var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                      var version = json[r].requestedProgramVersion;
+                      if (version == -1) {
+                        version = json[r].currentVersion.versionId
+                      }
+                      var item = {
+                        id: json[r].programId + "_v" + version + "_uId_" + userId,
+                        programId: json[r].programId,
+                        version: version,
+                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                        programData: updatedJson[r],
+                        userId: userId
+                      };
+                      // console.log("Item------------>", item);
+                      var putRequest = downloadedProgramSaveData.put(item);
+
+                    }
+                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                      var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                      var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                      var programIds = []
+                      for (var r = 0; r < json.length; r++) {
+                        var programQPLDetailsJson = {
+                          id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                          programId: json[r].programId,
+                          version: json[r].currentVersion.versionId,
+                          userId: userId,
+                          programCode: json[r].programCode,
+                          openCount: 0,
+                          addressedCount: 0,
+                          programModified: 0,
+                          readonly: 0
+                        };
+                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                        var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                      }
+                      programQPLDetailsTransaction.oncomplete = function (event) {
+                        console.log(")))) Data saved successfully")
+                        this.setState({
+                          progressPer: 100
+                        })
+                        this.goToMasterDataSync(programIdsToSyncArray);
+                      }.bind(this)
+                    }.bind(this)
+                  }.bind(this);
+                }.bind(this);
+              }.bind(this);
+            }.bind(this);
+          }.bind(this);
+        }.bind(this);
+      })
+
+    // this.setState({ loading: false })
+    // let id = AuthenticationService.displayDashboardBasedOnRole();
+    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.message.commitSuccess'))
+  }
+
+  goToMasterDataSync(programIds) {
+    console.log("ProgramIds++++", programIds);
+    console.log("this props++++", this)
+    console.log("this props++++", this.props)
+    this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
   }
 
   updateState(parameterName, value) {
@@ -3640,7 +4380,7 @@ export default class syncPage extends Component {
         this.hideSecondComponent()
       }.bind(this);
       programRequest.onsuccess = function (e) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
         var oldProgramData = programJson;
@@ -3660,7 +4400,7 @@ export default class syncPage extends Component {
               index = latestProgramDataProblemList.findIndex(
                 f =>
                   // moment(f.dt).format("YYYY-MM") == moment(oldProgramDataProblemList[c].dt).format("YYYY-MM") && 
-                  f.region != null && f.region.id !=0 &&
+                  f.region != null && f.region.id != 0 &&
                   f.region.id == oldProgramDataProblemList[c].region.id
                   && f.planningUnit.id == oldProgramDataProblemList[c].planningUnit.id
                   && f.realmProblem.problem.problemId == oldProgramDataProblemList[c].realmProblem.problem.problemId &&
@@ -3736,7 +4476,7 @@ export default class syncPage extends Component {
           var oldDataList = oldProgramDataProblemList.filter(c => c.problemReportId == mergedProblemListData[cd].problemReportId);
           var oldData = ""
           if (oldDataList.length > 0) {
-            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0 ) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
+            oldData = [oldDataList[0].problemReportId, 1, oldDataList[0].program.code, 1, (oldDataList[0].region != null && oldDataList[0].region.id != 0) ? (getLabelText(oldDataList[0].region.label, this.state.lang)) : '', getLabelText(oldDataList[0].planningUnit.label, this.state.lang), (oldDataList[0].dt != null) ? (moment(oldDataList[0].dt).format('MMM-YY')) : '', moment(oldDataList[0].createdDate).format('MMM-YY'), getProblemDesc(oldDataList[0], this.state.lang), getSuggestion(oldDataList[0], this.state.lang), getLabelText(oldDataList[0].problemStatus.label, this.state.lang), this.getNote(oldDataList[0], this.state.lang), oldDataList[0].problemStatus.id, oldDataList[0].planningUnit.id, oldDataList[0].realmProblem.problem.problemId, oldDataList[0].realmProblem.problem.actionUrl, oldDataList[0].realmProblem.criticality.id, "", "", "", 4];
           }
           data[17] = oldData;//Old data //R
           var latestDataList = latestProgramDataProblemList.filter(c => mergedProblemListData[cd].problemReportId != 0 && c.problemReportId == mergedProblemListData[cd].problemReportId);
@@ -3863,6 +4603,8 @@ export default class syncPage extends Component {
                   this.toggleLargeProblem(rowData[17], rowData[18], y, 'problemList');
                 }.bind(this)
               })
+            } else {
+              return false;
             }
 
             // if (rowData[0].toString() > 0) {

@@ -99,7 +99,7 @@ export default class ManualTagging extends Component {
             hasSelectAll: true,
             artmisHistoryModal: false,
             batchDetails: [],
-            table1Loader: false
+            table1Loader: true
 
         }
 
@@ -336,7 +336,7 @@ export default class ManualTagging extends Component {
         this.setState({
             originalQty: 0,
             message: i18n.t('static.actionCancelled'),
-            color: "red",
+            color: "#BA0C2F",
             planningUnitIdUpdated: '',
             table1Loader: false
         }, () => {
@@ -1153,7 +1153,7 @@ export default class ManualTagging extends Component {
                                     if (error.message === "Network Error") {
                                         this.setState({
                                             message: 'static.unkownError',
-                                            color: 'red',
+                                            color: '#BA0C2F',
                                             loading: false,
                                             loading1: false
                                         });
@@ -1174,7 +1174,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 },
                                                     () => {
 
@@ -1190,7 +1190,7 @@ export default class ManualTagging extends Component {
                                                     message: error.response.data.messageCode,
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 },
                                                     () => {
 
@@ -1206,7 +1206,7 @@ export default class ManualTagging extends Component {
                                                     message: 'static.unkownError',
                                                     loading: false,
                                                     loading1: false,
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                 });
                                                 break;
                                         }
@@ -1773,7 +1773,7 @@ export default class ManualTagging extends Component {
 
                     this.setState({
                         message: response.data.messageCode,
-                        color: 'red',
+                        color: '#BA0C2F',
                         loading: false
                     },
                         () => {
@@ -2013,7 +2013,7 @@ export default class ManualTagging extends Component {
 
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
-                        return [];
+                        return false;
                     }.bind(this),
 
                 };
@@ -2152,7 +2152,7 @@ export default class ManualTagging extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    return [];
+                    return false;
                 }.bind(this),
             };
         }
@@ -2406,7 +2406,7 @@ export default class ManualTagging extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    return [];
+                    return false;
                 }.bind(this),
             };
         }
@@ -2451,6 +2451,7 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     buildJexcelRequired,
                     roNoOrderNo: json,
+                    table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
@@ -2536,7 +2537,7 @@ export default class ManualTagging extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
-                            color: 'red'
+                            color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -3013,8 +3014,8 @@ export default class ManualTagging extends Component {
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1" style={{ color: '#BA0C2F' }}>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2" style={{ color: '#BA0C2F' }}>{i18n.t(this.state.message, { entityname })}</h5>
                 {/* <Card style={{ display: this.state.loading ? "none" : "block" }}> */}
                 <Card>
                     <div className="Card-header-reporticon">

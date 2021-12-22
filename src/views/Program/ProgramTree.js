@@ -82,7 +82,7 @@ class Program extends Component {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     }, () => {
                         this.hideFirstComponent()
                     })
@@ -93,7 +93,7 @@ class Program extends Component {
                         this.setState({
                             message: 'static.common.networkError',
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -112,7 +112,7 @@ class Program extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -121,7 +121,7 @@ class Program extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -130,7 +130,7 @@ class Program extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -187,7 +187,7 @@ class Program extends Component {
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: "red"
+                            message: response.data.messageCode, loading: false, color: "#BA0C2F"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -198,7 +198,7 @@ class Program extends Component {
                             this.setState({
                                 message: 'static.common.networkError',
                                 loading: false,
-                                color: "red"
+                                color: "#BA0C2F"
                             }, () => {
                                 this.hideFirstComponent()
                             })
@@ -217,7 +217,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -226,7 +226,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -235,7 +235,7 @@ class Program extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -262,7 +262,7 @@ class Program extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -351,7 +351,7 @@ class Program extends Component {
                                     this.setState({
                                         message: response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -362,7 +362,7 @@ class Program extends Component {
                                         this.setState({
                                             message: 'static.common.networkError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -381,7 +381,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -390,7 +390,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -399,7 +399,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: 'static.unkownError',
                                                     loading: false,
-                                                    color: "red"
+                                                    color: "#BA0C2F"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -443,7 +443,7 @@ class Program extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            loading: false, color: "red"
+                            loading: false, color: "#BA0C2F"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -454,7 +454,7 @@ class Program extends Component {
                             this.setState({
                                 message: 'static.common.networkError',
                                 loading: false,
-                                color: "red"
+                                color: "#BA0C2F"
                             }, () => {
                                 this.hideFirstComponent()
                             })
@@ -473,7 +473,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -482,7 +482,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -491,7 +491,7 @@ class Program extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "red"
+                                        color: "#BA0C2F"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -505,7 +505,7 @@ class Program extends Component {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
                 message: i18n.t('static.common.realmtext'),
-                color: "red"
+                color: "#BA0C2F"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -540,7 +540,7 @@ class Program extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             }, () => {
                 this.hideFirstComponent()
             })
@@ -557,7 +557,7 @@ class Program extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red',
+                    color: '#BA0C2F',
                     loading: false
                 }, () => {
                     this.hideFirstComponent()
@@ -863,7 +863,7 @@ class Program extends Component {
         if (programCheckedCount == 0) {
             this.setState({
                 message: i18n.t('static.program.errorSelectAtleastOneProgram'),
-                loading: false, color: "red"
+                loading: false, color: "#BA0C2F"
             },
                 () => {
                     this.hideFirstComponent();
@@ -886,6 +886,44 @@ class Program extends Component {
                         // console.log("ProgramThenCount", programThenCount)
                         // console.log("Response data", response.data)
                         var json = response.data;
+                        var updatedJson = [];
+                        for (var r = 0; r < json.length; r++) {
+                            var planningUnitList = json[r].planningUnitList;
+                            var consumptionList=json[r].consumptionList;
+                            var inventoryList=json[r].inventoryList;
+                            var shipmentList=json[r].shipmentList;
+                            var batchInfoList=json[r].batchInfoList;
+                            var problemReportList=json[r].problemReportList;
+                            var supplyPlan=json[r].supplyPlan;
+                            var generalData = json[r];
+                            delete generalData.consumptionList;
+                            delete generalData.inventoryList;
+                            delete generalData.shipmentList;
+                            delete generalData.batchInfoList;
+                            delete generalData.supplyPlan;
+                            delete generalData.planningUnitList;
+                            generalData.actionList=[];
+                            var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
+                            var planningUnitDataList = [];
+                            for (var pu = 0; pu < planningUnitList.length; pu++) {
+                                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson);
+                                // console.log("json[r].consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id)+++",programDataJson.consumptionList);
+                                var planningUnitDataJson = {
+                                    consumptionList: consumptionList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                                    inventoryList: inventoryList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                                    shipmentList: shipmentList.filter(c => c.planningUnit.id == planningUnitList[pu].id),
+                                    batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
+                                    supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
+                                }
+                                var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
+                                planningUnitDataList.push({planningUnitId:planningUnitList[pu].id,planningUnitData:encryptedPlanningUnitDataText})
+                            }
+                            var programDataJson = {
+                                generalData:generalEncryptedData,
+                                planningUnitDataList:planningUnitDataList
+                            };
+                            updatedJson.push(programDataJson);
+                        }
                         var programAndVersionList = [];
                         for (var r = 0; r < json.length; r++) {
                             var version = json[r].requestedProgramVersion;
@@ -952,7 +990,7 @@ class Program extends Component {
                                                         // json[r].openCount = 0;
                                                         // json[r].addressedCount = 0;
                                                         // json[r].programCode = json[r].programCode;
-                                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                        // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                         var version = json[r].requestedProgramVersion;
@@ -964,7 +1002,7 @@ class Program extends Component {
                                                             programId: json[r].programId,
                                                             version: version,
                                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                            programData: encryptedText.toString(),
+                                                            programData: updatedJson[r],
                                                             userId: userId,
                                                             programCode: json[r].programCode,
                                                             // openCount: 0,
@@ -978,7 +1016,7 @@ class Program extends Component {
                                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                                                         var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                                         for (var r = 0; r < json.length; r++) {
-                                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                            // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                             var version = json[r].requestedProgramVersion;
@@ -990,7 +1028,7 @@ class Program extends Component {
                                                                 programId: json[r].programId,
                                                                 version: version,
                                                                 programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                                programData: encryptedText.toString(),
+                                                                programData: updatedJson[r],
                                                                 userId: userId
                                                             };
                                                             // console.log("Item------------>", item);
@@ -1010,7 +1048,8 @@ class Program extends Component {
                                                                     programCode: json[r].programCode,
                                                                     openCount: 0,
                                                                     addressedCount: 0,
-                                                                    programModified: 0
+                                                                    programModified: 0,
+                                                                    readonly:0
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1028,7 +1067,7 @@ class Program extends Component {
                                                                 // this.refs.programListChild.checkNewerVersions();
                                                                 this.getPrograms();
                                                                 this.getLocalPrograms();
-                                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                                this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                                             }.bind(this)
                                                         }.bind(this)
                                                     }.bind(this)
@@ -1037,9 +1076,9 @@ class Program extends Component {
                                                 label: i18n.t('static.program.no'),
                                                 onClick: () => {
                                                     this.setState({
-                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
+                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "#BA0C2F"
                                                     })
-                                                    this.setState({ loading: false, color: "red" }, () => {
+                                                    this.setState({ loading: false, color: "#BA0C2F" }, () => {
                                                         this.hideFirstComponent()
                                                     })
                                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
@@ -1059,7 +1098,7 @@ class Program extends Component {
                                         // json[r].openCount = 0;
                                         // json[r].addressedCount = 0;
                                         // json[r].programCode = json[r].programCode;
-                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                        // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                         var version = json[r].requestedProgramVersion;
@@ -1071,7 +1110,7 @@ class Program extends Component {
                                             programId: json[r].programId,
                                             version: version,
                                             programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                            programData: encryptedText.toString(),
+                                            programData: updatedJson[r],
                                             userId: userId,
                                             programCode: json[r].programCode,
                                             // openCount: 0,
@@ -1085,7 +1124,7 @@ class Program extends Component {
                                         var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
                                         var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                         for (var r = 0; r < json.length; r++) {
-                                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                            // var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
                                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                             var version = json[r].requestedProgramVersion;
@@ -1097,7 +1136,7 @@ class Program extends Component {
                                                 programId: json[r].programId,
                                                 version: version,
                                                 programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                programData: encryptedText.toString(),
+                                                programData: updatedJson[r],
                                                 userId: userId
                                             };
                                             // console.log("Item------------>", item);
@@ -1117,7 +1156,8 @@ class Program extends Component {
                                                     programCode: json[r].programCode,
                                                     openCount: 0,
                                                     addressedCount: 0,
-                                                    programModified: 0
+                                                    programModified: 0,
+                                                    readonly:0
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1134,7 +1174,7 @@ class Program extends Component {
                                                 // this.refs.programListChild.checkNewerVersions();
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
-                                                this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
+                                                this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                             }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
@@ -1148,7 +1188,7 @@ class Program extends Component {
                                 this.setState({
                                     message: 'static.common.networkError',
                                     loading: false,
-                                    color: "red"
+                                    color: "#BA0C2F"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -1167,7 +1207,7 @@ class Program extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1176,7 +1216,7 @@ class Program extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1185,7 +1225,7 @@ class Program extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1196,7 +1236,7 @@ class Program extends Component {
                     );
 
             } else {
-                this.setState({ loading: false, color: "red" }, () => {
+                this.setState({ loading: false, color: "#BA0C2F" }, () => {
                     this.hideFirstComponent()
                 })
                 alert(i18n.t('static.common.online'))

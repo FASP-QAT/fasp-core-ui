@@ -105,7 +105,7 @@ export default class DatabaseTranslations extends React.Component {
                             filters: true,
                             license: JEXCEL_PRO_KEY,
                             contextMenu: function (obj, x, y, e) {
-                                return [];
+                                return false;
                             }.bind(this),
                             // tableHeight: '500px',
                         };
@@ -117,7 +117,7 @@ export default class DatabaseTranslations extends React.Component {
                         this.setState({
                             message: response.data.messageCode,
                             loading: false,
-                            color: 'red'
+                            color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -130,7 +130,7 @@ export default class DatabaseTranslations extends React.Component {
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -147,21 +147,21 @@ export default class DatabaseTranslations extends React.Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: 'red'
+                                        color: '#BA0C2F'
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: 'red'
+                                        color: '#BA0C2F'
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: 'red'
+                                        color: '#BA0C2F'
                                     });
                                     break;
                             }
@@ -172,7 +172,7 @@ export default class DatabaseTranslations extends React.Component {
                 this.setState({
                     message: languageResponse.data.messageCode,
                     loading: false,
-                    color: 'red'
+                    color: '#BA0C2F'
                 },
                     () => {
                         this.hideSecondComponent();
@@ -185,7 +185,7 @@ export default class DatabaseTranslations extends React.Component {
                     this.setState({
                         message: 'static.unkownError',
                         loading: false,
-                        color: 'red'
+                        color: '#BA0C2F'
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
@@ -202,21 +202,21 @@ export default class DatabaseTranslations extends React.Component {
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                         case 412:
                             this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                         default:
                             this.setState({
                                 message: 'static.unkownError',
                                 loading: false,
-                                color: 'red'
+                                color: '#BA0C2F'
                             });
                             break;
                     }
@@ -276,7 +276,7 @@ export default class DatabaseTranslations extends React.Component {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false,
-                        color: 'red'
+                        color: '#BA0C2F'
                     },
                         () => {
                             this.hideSecondComponent();
@@ -288,7 +288,7 @@ export default class DatabaseTranslations extends React.Component {
                         this.setState({
                             message: 'static.unkownError',
                             loading: false,
-                            color: 'red'
+                            color: '#BA0C2F'
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -305,21 +305,21 @@ export default class DatabaseTranslations extends React.Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 });
                                 break;
                         }

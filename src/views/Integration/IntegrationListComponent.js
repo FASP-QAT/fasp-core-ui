@@ -101,7 +101,7 @@ export default class IntegrationListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var IntegrationListEl = jexcel(document.getElementById("tableDiv"), options);
@@ -245,7 +245,7 @@ export default class IntegrationListComponent extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}

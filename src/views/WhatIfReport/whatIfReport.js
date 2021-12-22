@@ -14,7 +14,7 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, NONE_SELECTED_DATA_SOURCE_ID, PERCENTAGE_REGEX, DATE_FORMAT_CAP_WITHOUT_DATE, INTEGER_NO_REGEX, USD_CURRENCY_ID, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, SHIPMENT_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { getDatabase, getEnLabel } from "../../CommonComponent/IndexedDbFunctions";
 import { Link } from "react-router-dom";
 import NumberFormat from 'react-number-format';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -365,7 +365,24 @@ export default class WhatIfReportComponent extends React.Component {
     }
 
     updateFieldData(value) {
-        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, rows: [] });
+        var planningUnitDataList = this.state.planningUnitDataList;
+        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == value.value);
+        var programJson = {};
+        if (planningUnitDataFilter.length > 0) {
+            var planningUnitData = planningUnitDataFilter[0]
+            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            programJson = JSON.parse(programData);
+        } else {
+            programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+            }
+        }
+        this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, rows: [], programJson: programJson });
 
     }
 
@@ -381,7 +398,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -394,14 +411,34 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (e) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                var generalProgramJson = JSON.parse(programData);
+
+                var programDataJson = programRequest.result.programData;
+                var planningUnitDataList = programDataJson.planningUnitDataList;
+
+                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == this.state.planningUnitId);
+                var programJson = {};
+                if (planningUnitDataFilter.length > 0) {
+                    var planningUnitData = planningUnitDataFilter[0]
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: []
+                    }
+                }
 
                 var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
                 var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
@@ -418,13 +455,15 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
                 whatIfRequest.onsuccess = function (e) {
                     this.setState({
-                        programJson:programJson
+                        generalProgramJson: generalProgramJson,
+                        programJson: programJson
+
                     })
                     this.formSubmit(this.state.planningUnit, this.state.monthCount);
                     this.setState({
@@ -452,7 +491,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -472,7 +511,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -492,7 +531,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -576,7 +615,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -589,14 +628,32 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                var programDataJson = programRequest.result.programData;
+                var planningUnitDataList = programDataJson.planningUnitDataList;
+                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                var programJson = {}
+                if (planningUnitDataIndex != -1) {
+                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: []
+                    }
+                }
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
                 // var consumptionList=programJson.consumptionList;
                 // var inventoryList=programJson.inventoryList;
                 // var shipmentList=programJson.shipmentList;
@@ -609,7 +666,7 @@ export default class WhatIfReportComponent extends React.Component {
                             let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
                             var shipmentList = programJson.shipmentList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -638,13 +695,13 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         } else if (rows[r].scenarioId == 1) {
                             let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
 
                             var consumptionList = programJson.consumptionList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -683,13 +740,13 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.consumptionList = consumptionList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         } else if (rows[r].scenarioId == 2) {
                             // var rangeValue = this.state.rangeValue;
                             let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                             let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
                             var consumptionList = programJson.consumptionList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -728,10 +785,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.consumptionList = consumptionList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         } else if (rows[r].scenarioId == 4) {
                             var shipmentList = programJson.shipmentList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -761,26 +818,26 @@ export default class WhatIfReportComponent extends React.Component {
                                     var ppUnit = papuResult;
                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                        submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                     }
                                     var approvedToShippedLeadTime = "";
                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                        approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                     }
 
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                                     } else {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
 
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 }
                                 if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     var index = 0;
@@ -802,10 +859,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         } else if (rows[r].scenarioId == 5) {
                             var shipmentList = programJson.shipmentList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -835,26 +892,26 @@ export default class WhatIfReportComponent extends React.Component {
                                     var ppUnit = papuResult;
                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                        submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                     }
                                     var approvedToShippedLeadTime = "";
                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                        approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                     }
 
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                                     } else {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
 
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 }
                                 if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     var index = 0;
@@ -876,10 +933,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         } else if (rows[r].scenarioId == 6) {
                             var shipmentList = programJson.shipmentList;
-                            var actionList = programJson.actionList;
+                            var actionList = generalProgramJson.actionList;
                             if (actionList == undefined) {
                                 actionList = []
                             }
@@ -910,26 +967,26 @@ export default class WhatIfReportComponent extends React.Component {
                                     var ppUnit = papuResult;
                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                        submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                        submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                     }
                                     var approvedToShippedLeadTime = "";
                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                        approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                        approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                     }
 
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                                     } else {
-                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
 
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 }
                                 if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     var index = 0;
@@ -947,34 +1004,41 @@ export default class WhatIfReportComponent extends React.Component {
                                 date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentList;
-                            programJson.actionList = actionList;
+                            generalProgramJson.actionList = actionList;
                         }
                     }
                 }
                 var transaction1 = db1.transaction(['whatIfProgramData'], 'readwrite');
                 var programTransaction1 = transaction1.objectStore('whatIfProgramData');
-                var programRequest1 = programTransaction1.get(programId);
-                programRequest1.onsuccess = function (event) {
-                    programRequest1.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest1 = programTransaction1.put(programRequest1.result);
-                    putRequest1.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "red"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest1.onsuccess = function (event) {
-                        document.getElementById("saveScenarioDiv").style.display = 'none';
-                        this.setState({
-                            programModified: 1
-                        })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
-                    }.bind(this)
+                // var programRequest1 = programTransaction1.get(programId);
+                // programRequest1.onsuccess = function (event) {
+                if (planningUnitDataIndex != -1) {
+                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                } else {
+                    planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                }
+                programDataJson.planningUnitDataList = planningUnitDataList;
+                programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                programRequest.result.programData = programDataJson;
+                var putRequest1 = programTransaction1.put(programRequest.result);
+                putRequest1.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "#BA0C2F"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                putRequest1.onsuccess = function (event) {
+                    document.getElementById("saveScenarioDiv").style.display = 'none';
+                    this.setState({
+                        programModified: 1
+                    })
+                    calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"));
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+        // }.bind(this)
     }
 
     addRow() {
@@ -989,7 +1053,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -1002,20 +1066,38 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
             programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
+                var programDataJson = programRequest.result.programData;
+                var planningUnitDataList = programDataJson.planningUnitDataList;
+                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                var programJson = {}
+                if (planningUnitDataIndex != -1) {
+                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: []
+                    }
+                }
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
                 if (this.state.scenarioId == 3) {
                     var rangeValue = this.state.rangeValue;
                     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var shipmentList = programJson.shipmentList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1040,14 +1122,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1074,7 +1163,7 @@ export default class WhatIfReportComponent extends React.Component {
                     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var consumptionList = programJson.consumptionList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1110,14 +1199,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.consumptionList = consumptionList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1146,7 +1242,7 @@ export default class WhatIfReportComponent extends React.Component {
                     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                     var consumptionList = programJson.consumptionList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1182,14 +1278,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.consumptionList = consumptionList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1213,7 +1316,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 4) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1240,26 +1343,26 @@ export default class WhatIfReportComponent extends React.Component {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                             }
                             var approvedToShippedLeadTime = "";
                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                             }
 
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                             } else {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             var index = 0;
@@ -1281,14 +1384,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1311,7 +1421,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 5) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1338,26 +1448,26 @@ export default class WhatIfReportComponent extends React.Component {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                             }
                             var approvedToShippedLeadTime = "";
                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                             }
 
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                             } else {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             var index = 0;
@@ -1379,14 +1489,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -1409,7 +1526,7 @@ export default class WhatIfReportComponent extends React.Component {
                     }.bind(this)
                 } else if (this.state.scenarioId == 6) {
                     var shipmentList = programJson.shipmentList;
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1437,26 +1554,26 @@ export default class WhatIfReportComponent extends React.Component {
                             var ppUnit = papuResult;
                             var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                             }
                             var approvedToShippedLeadTime = "";
                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
+                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                             }
 
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
                             } else {
-                                shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
 
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(programJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                         }
                         if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                             var index = 0;
@@ -1474,14 +1591,21 @@ export default class WhatIfReportComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.shipmentList = shipmentList;
-                    programJson.actionList = actionList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
                     putRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -2044,7 +2168,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red",
+                color: "#BA0C2F",
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -2058,7 +2182,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red",
+                    color: "#BA0C2F",
                 })
                 this.hideFirstComponent()
             };
@@ -2088,7 +2212,8 @@ export default class WhatIfReportComponent extends React.Component {
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
-                    loading: false
+                    loading: false,
+                    programQPLDetails: getRequest.result
                 })
 
                 var programIdd = '';
@@ -2099,13 +2224,16 @@ export default class WhatIfReportComponent extends React.Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    }, () => {
-                        this.getPlanningUnitList(programSelect);
-                    })
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        }, () => {
+                            this.getPlanningUnitList(programSelect);
+                        })
+                    }
                 }
 
             }.bind(this);
@@ -2138,7 +2266,7 @@ export default class WhatIfReportComponent extends React.Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red",
+                    color: "#BA0C2F",
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -2151,31 +2279,23 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
                 programRequest.onsuccess = function (e) {
-                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-
+                    var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                     var whatIfProgramDataTransaction = db1.transaction(['whatIfProgramData'], 'readwrite');
                     var whatIfProgramDataOs = whatIfProgramDataTransaction.objectStore('whatIfProgramData');
-                    var item = {
-                        id: programRequest.result.id,
-                        programId: programRequest.result.programId,
-                        version: programRequest.result.version,
-                        programName: (CryptoJS.AES.encrypt(JSON.stringify((programRequest.result.label)), SECRET_KEY)).toString(),
-                        programData: programRequest.result.programData,
-                        userId: programRequest.result.userId
-                    }
-                    var whatIfRequest = whatIfProgramDataOs.put(item);
+                    var whatIfRequest = whatIfProgramDataOs.put(programRequest.result);
                     whatIfRequest.onerror = function (event) {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -2197,7 +2317,7 @@ export default class WhatIfReportComponent extends React.Component {
                             this.setState({
                                 supplyPlanError: i18n.t('static.program.errortext'),
                                 loading: false,
-                                color: "red",
+                                color: "#BA0C2F",
                             })
                             this.hideFirstComponent()
                         }.bind(this);
@@ -2225,7 +2345,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 this.setState({
                                     supplyPlanError: i18n.t('static.program.errortext'),
                                     loading: false,
-                                    color: "red",
+                                    color: "#BA0C2F",
                                 })
                                 this.hideFirstComponent()
                             }.bind(this);
@@ -2242,7 +2362,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false,
-                                        color: "red",
+                                        color: "#BA0C2F",
                                     })
                                     this.hideFirstComponent()
                                 }.bind(this);
@@ -2270,29 +2390,48 @@ export default class WhatIfReportComponent extends React.Component {
                                             b = b.name.toLowerCase();
                                             return a < b ? -1 : a > b ? 1 : 0;
                                         }),
-                                        programJson: programJson,
+                                        generalProgramJson: programJson,
+                                        planningUnitDataList: planningUnitDataList,
                                         dataSourceListAll: dataSourceListAll,
                                         planningUnitListForConsumption: planningUnitListForConsumption,
                                         loading: false
+                                    }, () => {
+                                        let planningUnitIdProp = '';
+
+                                        if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
+                                            planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                        } else if (proList.length == 1) {
+                                            planningUnitIdProp = proList[0].value;
+                                        }
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                            var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
+                                            // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                            var programJson = {};
+                                            if (planningUnitDataFilter.length > 0) {
+                                                var planningUnitData = planningUnitDataFilter[0]
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
+                                            } else {
+                                                programJson = {
+                                                    consumptionList: [],
+                                                    inventoryList: [],
+                                                    shipmentList: [],
+                                                    batchInfoList: [],
+                                                    supplyPlan: []
+                                                }
+                                            }
+                                            this.setState({
+                                                planningUnit: planningUnit,
+                                                planningUnitId: planningUnitIdProp,
+                                                programJson: programJson
+                                            }, () => {
+                                                this.formSubmit(planningUnit, this.state.monthCount);
+                                            })
+
+                                        }
                                     })
-
-                                    let planningUnitIdProp = '';
-
-                                    if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                    } else if (proList.length == 1) {
-                                        planningUnitIdProp = proList[0].value;
-                                    }
-                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                        var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                        this.setState({
-                                            planningUnit: planningUnit,
-                                            planningUnitId: planningUnitIdProp
-                                        }, () => {
-                                            this.formSubmit(planningUnit, this.state.monthCount);
-                                        })
-
-                                    }
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
@@ -2393,7 +2532,7 @@ export default class WhatIfReportComponent extends React.Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red",
+                color: "#BA0C2F",
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -2414,6 +2553,7 @@ export default class WhatIfReportComponent extends React.Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
+            var generalProgramJson = this.state.generalProgramJson;
             var invList = (programJson.inventoryList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.inventoryDate) >= moment(m[0].startDate) && moment(c.inventoryDate) <= moment(m[17].endDate)) && c.active == 1)
             var conList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && (moment(c.consumptionDate) >= moment(m[0].startDate) && moment(c.consumptionDate) <= moment(m[17].endDate)) && c.active == 1)
             var shiList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[0].startDate && c.receivedDate <= m[17].endDate) : (c.expectedDeliveryDate >= m[0].startDate && c.expectedDeliveryDate <= m[17].endDate)))
@@ -2422,12 +2562,12 @@ export default class WhatIfReportComponent extends React.Component {
             })
             var realmTransaction = db1.transaction(['realm'], 'readwrite');
             var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(programJson.realmCountry.realm.realmId);
+            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
             realmRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -2457,7 +2597,7 @@ export default class WhatIfReportComponent extends React.Component {
                 }
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
-                    versionId: programJson.currentVersion.versionId,
+                    versionId: generalProgramJson.currentVersion.versionId,
                     monthsInPastForAMC: programPlanningUnit.monthsInPastForAmc,
                     monthsInFutureForAMC: programPlanningUnit.monthsInFutureForAmc,
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
@@ -2476,7 +2616,7 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red",
+                        color: "#BA0C2F",
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -2490,7 +2630,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red",
+                            color: "#BA0C2F",
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -2972,9 +3112,9 @@ export default class WhatIfReportComponent extends React.Component {
                                 } else {
                                     suggestShipment = false;
                                 }
-                                var addLeadTimes = parseFloat(programJson.plannedToSubmittedLeadTime) + parseFloat(programJson.submittedToApprovedLeadTime) +
-                                    parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.shippedToArrivedBySeaLeadTime) +
-                                    parseFloat(programJson.arrivedToDeliveredLeadTime);
+                                var addLeadTimes = parseFloat(generalProgramJson.plannedToSubmittedLeadTime) + parseFloat(generalProgramJson.submittedToApprovedLeadTime) +
+                                    parseFloat(generalProgramJson.approvedToShippedLeadTime) + parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime) +
+                                    parseFloat(generalProgramJson.arrivedToDeliveredLeadTime);
                                 var expectedDeliveryDate = moment(m[n].startDate).subtract(Number(addLeadTimes * 30), 'days').format("YYYY-MM-DD");
                                 var isEmergencyOrder = 0;
                                 if (expectedDeliveryDate >= currentMonth) {
@@ -3240,7 +3380,7 @@ export default class WhatIfReportComponent extends React.Component {
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     this.setState({
                         shipments: !this.state.shipments
@@ -3289,7 +3429,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
         })
         this.hideFirstComponent();
     }
@@ -3313,7 +3453,7 @@ export default class WhatIfReportComponent extends React.Component {
             }
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: 'red',
+                color: '#BA0C2F',
                 consumptionError: '',
                 inventoryError: '',
                 shipmentError: '',
@@ -3850,7 +3990,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.planned'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#a7c6ed',
+                        backgroundColor: '#A7C6ED',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -3862,7 +4002,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.submitted'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#205493',
+                        backgroundColor: '#0067B9',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -3874,7 +4014,7 @@ export default class WhatIfReportComponent extends React.Component {
                         label: i18n.t('static.supplyPlan.shipped'),
                         stack: 1,
                         yAxisID: 'A',
-                        backgroundColor: '#006789',
+                        backgroundColor: '#49A4A1',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -4149,8 +4289,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <tr id="addr0" key={idx}>
                                                     <td><input type="checkbox" id={"scenarioCheckbox" + idx} checked={this.state.rows[idx].scenarioChecked} onChange={() => this.scenarioCheckedChanged(idx)} /></td>
                                                     <td>{this.state.rows[idx].scenarioName}</td>
-                                                    <td>{this.state.rows[idx].startDate!=""?moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE):""}</td>
-                                                    <td>{this.state.rows[idx].stopDate!=""?moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE):""}</td>
+                                                    <td>{this.state.rows[idx].startDate != "" ? moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
+                                                    <td>{this.state.rows[idx].stopDate != "" ? moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
                                                     <td>{this.state.rows[idx].percentage}</td>
 
                                                 </tr>
@@ -4455,7 +4595,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                    return (<td align="right" bgcolor={item1.balance == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                 })
                                             }
                                         </tr>
@@ -4464,7 +4604,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "red" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
                                         </tr>
@@ -5235,7 +5375,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                        <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
@@ -5280,10 +5420,10 @@ export default class WhatIfReportComponent extends React.Component {
                         </div>
 
                     </CardBody>
-                    <CardFooter className="pb-5">
+                    <CardFooter className="pb-3">
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         <Button style={{ display: this.state.display }} type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                        {this.state.programModified==1 && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                        {this.state.programModified == 1 && !this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                     </CardFooter>
                 </Card>
 
@@ -5380,7 +5520,7 @@ export default class WhatIfReportComponent extends React.Component {
         }
 
         var roleList = AuthenticationService.getLoggedInUserRole();
-        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
             if (document.getElementById("addRowId") != null) {
                 document.getElementById("addRowId").style.display = "none"
             }

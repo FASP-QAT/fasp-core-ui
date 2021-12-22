@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -45,7 +45,9 @@ class StockAdjustmentComponent extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             regionList: [],
             message: '',
@@ -58,7 +60,8 @@ class StockAdjustmentComponent extends Component {
             planningUnitLabels: [],
             data: [],
             lang: localStorage.getItem('lang'),
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
@@ -188,7 +191,7 @@ class StockAdjustmentComponent extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         // console.log(programNameLabel)
 
@@ -304,7 +307,7 @@ class StockAdjustmentComponent extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -780,7 +783,7 @@ class StockAdjustmentComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -864,14 +867,31 @@ class StockAdjustmentComponent extends Component {
                                 var puResult = [];
                                 puResult = puRequest.result;
 
-                                console.log("2----", programRequest)
-                                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                var programJson = JSON.parse(programData);
-                                console.log(programJson)
+                                console.log("2----", programRequest);
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
+                                
+                                var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                                 console.log(startDate, endDate)
                                 var data = []
                                 planningUnitIds.map(planningUnitId => {
+                                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                                    var programJson = {}
+                                    if (planningUnitDataIndex != -1) {
+                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
+                                    } else {
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
+                                        }
+                                    }
                                     var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
                                     console.log(inventoryList)
 
@@ -884,8 +904,8 @@ class StockAdjustmentComponent extends Component {
                                             inventoryDate: ele.inventoryDate,
                                             planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
                                             stockAdjustemntQty: ele.adjustmentQty,
-                                            lastModifiedBy: programJson.currentVersion.lastModifiedBy,
-                                            lastModifiedDate: programJson.currentVersion.lastModifiedDate,
+                                            lastModifiedBy: generalProgramJson.currentVersion.lastModifiedBy,
+                                            lastModifiedDate: generalProgramJson.currentVersion.lastModifiedDate,
                                             notes: ele.notes,
                                             dataSource: dataSource.length > 0 ? dataSource[0] : ele.dataSource
                                         }
@@ -1322,6 +1342,7 @@ class StockAdjustmentComponent extends Component {
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                                            disabled={this.state.loading}
                                         />
 
                                     </div>

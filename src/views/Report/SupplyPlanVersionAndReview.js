@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -74,7 +74,9 @@ class SupplyPlanVersionAndReview extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - 10);
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
             loading: true,
             matricsList: [],
@@ -86,7 +88,8 @@ class SupplyPlanVersionAndReview extends Component {
             countries: [],
             message: '',
             programLst: [],
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: -1
@@ -211,7 +214,7 @@ class SupplyPlanVersionAndReview extends Component {
                     readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
-                    options: { isTime: 1, format: "DD-Mon-YY HH24:MM PM" },
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
                     readOnly: true,
                     type: 'calendar'
                 }, {
@@ -258,7 +261,7 @@ class SupplyPlanVersionAndReview extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -830,7 +833,7 @@ class SupplyPlanVersionAndReview extends Component {
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`).replaceAll(' ', '%20') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`).replaceAll(' ', '%20') : '') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
         ])));
 
 
@@ -928,7 +931,7 @@ class SupplyPlanVersionAndReview extends Component {
         columns.map((item, idx) => { headers[idx] = item.text });
         const header = [headers];
         console.log(header);
-        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '', elt.notes]);
+        const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`) : '') : '', elt.notes]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1174,7 +1177,7 @@ class SupplyPlanVersionAndReview extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon">
@@ -1227,7 +1230,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
                                                     this.props.touched && (
-                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                        <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                     )}</InputGroup></FormGroup>
 
                                         <FormGroup className="col-md-3">

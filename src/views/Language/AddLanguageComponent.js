@@ -14,6 +14,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
 import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import eventBus from '../../containers/DefaultLayout/eventBus';
 
 const initialValues = {
     label: "",
@@ -75,7 +76,9 @@ class AddLanguageComponent extends Component {
                 countryCode: ''
             },
             message: '',
-            loading: true
+            loading: true,
+            openModal:false,
+            responseMessage:''
         }
 
         // this.Capitalize = this.Capitalize.bind(this);
@@ -84,6 +87,8 @@ class AddLanguageComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.testAsync = this.testAsync.bind(this);
+        this.toggleLarge=this.toggleLarge.bind(this);
     }
 
     dataChange(event) {
@@ -103,6 +108,22 @@ class AddLanguageComponent extends Component {
         },
             () => { });
     };
+
+    // testAsync(){
+    //     AuthenticationService.setupAxiosInterceptors();
+    //     LanguageService.testAsync().then(response => {
+    //         console.log("response+++",response)
+
+    //     }).catch(
+    //         error => {
+    //             console.log("error+++",error)
+
+    //         })
+    // }
+
+    toggleLarge(){
+        this.setState({openModal:false});
+    }
 
     Capitalize(str) {
         // if (str != null && str != "") {
@@ -160,7 +181,7 @@ class AddLanguageComponent extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
 
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -299,22 +320,22 @@ class AddLanguageComponent extends Component {
 
                                                                 <div class="spinner-border blue ml-4" role="status">
 
-                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <CardFooter>
-                                                        <FormGroup>
-                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
+                                                </div>
+                                                <CardFooter>
+                                                    <FormGroup>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.testAsync} ><i className="fa fa-check"></i>Test Async</Button>
                                                             &nbsp;
                                                     </FormGroup>
-                                                    </CardFooter>
-                                                </Form>
-                                            </div>
-                                        )} />
+                                                </CardFooter>
+                                            </Form>
+                                        </div>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>

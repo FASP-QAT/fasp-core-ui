@@ -497,7 +497,7 @@ class SupplierListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var supplierEl = jexcel(document.getElementById("tableDiv"), options);
@@ -645,7 +645,7 @@ class SupplierListComponent extends Component {
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
 

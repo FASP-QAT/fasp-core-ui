@@ -1,23 +1,20 @@
+import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Nav, NavItem, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import PropTypes from 'prop-types';
-
-import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
-import DefaultHeaderDropdown from './DefaultHeaderDropdown'
-import logo from '../../assets/img/QAT-logo.png'
-import QAT from '../../assets/img/brand/QAT-minimize.png'
-import i18n from '../../i18n'
-import { Online, Offline } from 'react-detect-offline';
-import AuthenticationService from '../../views/Common/AuthenticationService';
-import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { Alert, Col, Nav, NavItem ,Row} from 'reactstrap';
+import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
-import iconsUparrowBlue from '../../assets/img/icons-uparrow-blue-.png';
-import iconsUparrowRed from '../../assets/img/icons-uparrow-red.png';
-import iconsDownarrowBlue from '../../assets/img/icons-downarrow-blue.png';
-import iconsDownarrowRed from '../../assets/img/icons-downarrow-red.png';
-import { API_URL, polling } from '../../Constants';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import logo from '../../assets/img/QAT-logo.png';
+import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
+import i18n from '../../i18n';
+import AuthenticationService from '../../views/Common/AuthenticationService';
+import DefaultHeaderDropdown from './DefaultHeaderDropdown';
+import eventBus from './eventBus.js'
+import CryptoJS from 'crypto-js'
+import ProgramService from "../../api/ProgramService"
 
 const propTypes = {
   children: PropTypes.node,
@@ -30,15 +27,18 @@ class DefaultHeader extends Component {
     super(props);
     this.changeLanguage = this.changeLanguage.bind(this)
   }
+
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
 
+  componentDidMount() {
+    
+  }
 
   render() {
-
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
     const checkOnline = localStorage.getItem('sessionType');
@@ -51,6 +51,7 @@ class DefaultHeader extends Component {
             full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
             minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
           />
+
         </NavLink>
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         {/* <Nav className="d-md-down-none" navbar>
@@ -96,8 +97,8 @@ class DefaultHeader extends Component {
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                  {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
-                  <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px',marginTop: '-1px' }} />
+                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
+                <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px', marginTop: '-1px' }} />
               </NavLink>
             </NavItem>}
           <DefaultHeaderDropdown mssgs />
@@ -113,7 +114,7 @@ class DefaultHeader extends Component {
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
                   // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: 'red' }} ></i>
+                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F' }} ></i>
                 }
                 {/* {localStorage.getItem("sesLatestProgram") == "false" &&
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
@@ -129,7 +130,7 @@ class DefaultHeader extends Component {
 
                 {this.props.changeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: 'red' }}></i>
+                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F' }}></i>
 
                 }
                 {!this.props.changeIcon &&
@@ -168,10 +169,7 @@ class DefaultHeader extends Component {
               </span>
             </NavLink>
           </NavItem>
-
         </Nav>
-
-
       </React.Fragment>
     );
   }

@@ -45,7 +45,7 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "red", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
@@ -481,7 +481,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -597,7 +597,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
 
@@ -703,7 +703,7 @@ class StockStatusAcrossPlanningUnits extends Component {
     }
     style = (cell, row) => {
         if (cell < row.minMOS) {
-            return { align: 'center', color: 'red' }
+            return { align: 'center', color: '#BA0C2F' }
         }
     }
 
@@ -941,7 +941,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -1113,9 +1113,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
+                        var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
 
                         var realmTransaction = db1.transaction(['realm'], 'readwrite');
                         var realmOs = realmTransaction.objectStore('realm');
@@ -1131,6 +1132,22 @@ class StockStatusAcrossPlanningUnits extends Component {
                             var realm = realmRequest.result;
 
                             this.state.planningUnitList.map(planningUnit => {
+                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnit.planningUnitId);
+                        var programJson = {}
+                        if (planningUnitDataIndex != -1) {
+                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnit.planningUnitId))[0];
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
                                 console.log(planningUnit)
                                 this.state.tracerCategoryValues.map(tc => {
                                     if (tc.value == planningUnit.forecastingUnit.tracerCategory.id) {
@@ -1644,6 +1661,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         bsSize="sm"
                                                         value={this.state.tracerCategoryValues}
                                                         onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                                                        disabled={this.state.loading}
                                                         options=
                                                         {tracerCategories.length > 0 ?
                                                             tracerCategories.map((item, i) => {

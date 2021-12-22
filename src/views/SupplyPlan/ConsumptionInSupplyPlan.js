@@ -127,6 +127,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
         var programJson = this.props.items.programJson;
+        var generalProgramJson = this.props.items.generalProgramJson;
         var db1;
         var dataSourceList = [];
         var realmCountryPlanningUnitList = [];
@@ -135,7 +136,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-            this.props.updateState("color", "red");
+            this.props.updateState("color", "#BA0C2F");
             this.props.hideFirstComponent();
         }.bind(this);
         openRequest.onsuccess = function (e) {
@@ -145,14 +146,14 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var rcpuRequest = rcpuOs.getAll();
             rcpuRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             rcpuRequest.onsuccess = function (event) {
                 var rcpuResult = [];
                 rcpuResult = rcpuRequest.result;
                 for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
+                    if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
                         var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
@@ -177,15 +178,15 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var dataSourceRequest = dataSourceOs.getAll();
                 dataSourceRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 dataSourceRequest.onsuccess = function (event) {
                     var dataSourceResult = [];
                     dataSourceResult = dataSourceRequest.result;
                     for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
-                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId && (dataSourceResult[k].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || dataSourceResult[k].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)) {
+                        if (dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
+                            if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && (dataSourceResult[k].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || dataSourceResult[k].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)) {
                                 var dataSourceJson = {
                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
                                     id: dataSourceResult[k].dataSourceId,
@@ -219,7 +220,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     }
 
                     var roleList = AuthenticationService.getLoggedInUserRole();
-                    if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                         consumptionEditable = false;
                     }
                     if (document.getElementById("addConsumptionRowSupplyPlan") != null) {
@@ -345,6 +346,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         license: JEXCEL_PRO_KEY,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
+                        onchangepage: this.onchangepage,
                         text: {
                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -355,63 +357,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         editable: consumptionEditable,
                         onchange: this.consumptionChanged,
                         updateTable: function (el, cell, x, y, source, value, id) {
-                            var elInstance = el.jexcel;
-                            var lastY = -1;
-                            if (y != null && lastY != y) {
-                                var rowData = elInstance.getRowData(y);
-                                if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
-                                    var lastEditableDate = "";
-                                    if (rowData[2] == 1) {
-                                        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                    } else {
-                                        lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
-                                    }
-                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
-                                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
-                                        for (var c = 0; c < colArr.length; c++) {
-                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                            cell.classList.add('readonly');
-                                        }
-                                    } else {
-                                        // for (var c = 0; c < colArr.length; c++) {
-                                        //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                        //     cell.classList.remove('readonly');
-                                        // }
-                                        if (rowData[2] == 2) {
-                                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                            cell.classList.add('readonly');
-                                        } else {
-                                            var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                            cell.classList.remove('readonly');
-                                        }
-
-                                        if (rowData[15] > 0) {
-                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                            cell.classList.add('readonly');
-                                        } else {
-                                            var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                            cell.classList.remove('readonly');
-                                        }
-                                    }
-                                    lastY = y;
-                                } else {
-                                    if (rowData[2] == 2) {
-                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                        cell.classList.add('readonly');
-                                    } else {
-                                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                                        cell.classList.remove('readonly');
-                                    }
-
-                                    if (rowData[15] > 0) {
-                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                        cell.classList.add('readonly');
-                                    } else {
-                                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                                        cell.classList.remove('readonly');
-                                    }
-                                }
-                            }
                         }.bind(this),
                         onsearch: function (el) {
                             el.jexcel.updateTable();
@@ -715,6 +660,137 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if (this.props.consumptionPage == "consumptionDataEntry") {
+            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            }
+        } else {
+            jsonLength = json.length;
+        }
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var y = 0; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                var lastEditableDate = "";
+                if (rowData[2] == 1) {
+                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                } else {
+                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                }
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                } else {
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
+            } else {
+                if (rowData[2] == 2) {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+
+                if (rowData[15] > 0) {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
+
+    }
+
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el.jexcel;
+        var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                var lastEditableDate = "";
+                if (rowData[2] == 1) {
+                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                } else {
+                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                }
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                } else {
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
+            } else {
+                if (rowData[2] == 2) {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+
+                if (rowData[15] > 0) {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
     }
 
     filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source) {
@@ -746,6 +822,56 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
         this.props.updateState("consumptionChangedFlag", 1);
+        if (x == 12 || x == 0 || x == 2 || x == 15) {
+            var rowData = elInstance.getRowData(y);
+            if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
+                var lastEditableDate = "";
+                if (rowData[2] == 1) {
+                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                } else {
+                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                }
+                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                } else {
+                    if (rowData[2] == 2) {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+
+                    if (rowData[15] > 0) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                    }
+                }
+            } else {
+                if (rowData[2] == 2) {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+
+                if (rowData[15] > 0) {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.add('readonly');
+                } else {
+                    var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                    cell.classList.remove('readonly');
+                }
+            }
+        }
         if (x != 13 && rowData[13] != 1) {
             elInstance.setValueFromCoords(13, y, 1, true);
         }
@@ -1293,6 +1419,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     // Save consumptions
     saveConsumption() {
+        console.log("###Started with save", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         // this.showOnlyErrors();
         this.props.updateState("consumptionError", "");
         this.props.updateState("loading", true);
@@ -1311,7 +1438,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
+                this.props.updateState("color", "#BA0C2F");
                 this.props.hideFirstComponent();
             }.bind(this);
             openRequest.onsuccess = function (e) {
@@ -1331,15 +1458,33 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                    this.props.updateState("color", "red");
+                    this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
                 programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var programDataJson = programRequest.result.programData;
+                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
                     var consumptionDataList = (programJson.consumptionList);
-                    var actionList = programJson.actionList;
+                    var actionList = generalProgramJson.actionList;
                     if (actionList == undefined) {
                         actionList = []
                     }
@@ -1485,16 +1630,24 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         })
                     }
                     programJson.consumptionList = consumptionDataList;
-                    programJson.actionList = actionList;
+                    generalProgramJson.actionList = actionList;
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
                     this.setState({
-                        programJson: programJson
+                        programJson: programJson,
+                        planningUnitDataList: planningUnitDataList
                     })
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
 
                     putRequest.onerror = function (event) {
                         this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                        this.props.updateState("color", "red");
+                        this.props.updateState("color", "#BA0C2F");
                         this.props.hideFirstComponent();
                     }.bind(this);
                     putRequest.onsuccess = function (event) {

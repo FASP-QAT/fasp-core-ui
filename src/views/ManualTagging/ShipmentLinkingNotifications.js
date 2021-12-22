@@ -190,7 +190,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: 'red',
+                                color: '#BA0C2F',
                                 loading: false,
                                 loading1: false
                             }, () => {
@@ -212,7 +212,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false,
                                         loading1: false,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                     }, () => {
                                         this.hideSecondComponent();
                                     });
@@ -222,7 +222,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         message: error.response.data.messageCode,
                                         loading: false,
                                         loading1: false,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                     }, () => {
                                         this.hideSecondComponent();
                                     });
@@ -232,7 +232,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         message: 'static.unkownError',
                                         loading: false,
                                         loading1: false,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                     }, () => {
                                         this.hideSecondComponent();
                                     });
@@ -447,7 +447,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -466,7 +466,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: 'red',
+                                            color: '#BA0C2F',
                                             loading: false
                                         }, () => {
                                             this.hideSecondComponent();
@@ -475,7 +475,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     case 412:
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: 'red',
+                                            color: '#BA0C2F',
                                             loading: false
                                         }, () => {
                                             this.hideSecondComponent();
@@ -484,7 +484,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
-                                            color: 'red',
+                                            color: '#BA0C2F',
                                             loading: false
                                         }, () => {
                                             this.hideSecondComponent();
@@ -570,7 +570,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                     this.setState({
                         message: response.data.messageCode,
-                        color: 'red',
+                        color: '#BA0C2F',
                         loading: false
                     },
                         () => {
@@ -582,7 +582,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            color: 'red',
+                            color: '#BA0C2F',
                             loading: false
                         }, () => {
                             this.hideSecondComponent();
@@ -601,7 +601,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -610,7 +610,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -619,7 +619,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -993,7 +993,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: 'static.unkownError',
-                                                    color: 'red',
+                                                    color: '#BA0C2F',
                                                     loading: false
                                                 }, () => {
                                                     this.hideSecondComponent();
@@ -1012,7 +1012,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            color: 'red',
+                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
                                                             this.hideSecondComponent();
@@ -1021,7 +1021,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     case 412:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
-                                                            color: 'red',
+                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
                                                             this.hideSecondComponent();
@@ -1030,7 +1030,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                                     default:
                                                         this.setState({
                                                             message: 'static.unkownError',
-                                                            color: 'red',
+                                                            color: '#BA0C2F',
                                                             loading: false
                                                         }, () => {
                                                             this.hideSecondComponent();
@@ -1125,7 +1125,7 @@ export default class ShipmentLinkingNotifications extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
 
@@ -1229,7 +1229,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                     this.setState({
                         message: response.data.messageCode,
-                        color: 'red',
+                        color: '#BA0C2F',
                         loading: false
                     },
                         () => {
@@ -1241,7 +1241,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            color: 'red',
+                            color: '#BA0C2F',
                             loading: false
                         }, () => {
                             this.hideSecondComponent();
@@ -1260,7 +1260,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -1269,7 +1269,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -1278,7 +1278,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    color: 'red',
+                                    color: '#BA0C2F',
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent();
@@ -1319,7 +1319,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
                         this.setState({
                             message: response.data.messageCode,
-                            color: 'red'
+                            color: '#BA0C2F'
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1330,7 +1330,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: 'static.unkownError',
-                                color: 'red',
+                                color: '#BA0C2F',
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent();
@@ -1349,7 +1349,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 case 406:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                         loading: false
                                     }, () => {
                                         this.hideSecondComponent();
@@ -1358,7 +1358,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                         loading: false
                                     }, () => {
                                         this.hideSecondComponent();
@@ -1367,7 +1367,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        color: 'red',
+                                        color: '#BA0C2F',
                                         loading: false
                                     }, () => {
                                         this.hideSecondComponent();

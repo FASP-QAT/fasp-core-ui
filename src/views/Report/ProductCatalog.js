@@ -541,7 +541,7 @@ class ProductCatalog extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
                         console.log(programNameLabel)
 
@@ -842,7 +842,7 @@ class ProductCatalog extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             contextMenu: function (obj, x, y, e) {
-                return [];
+                return false;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);

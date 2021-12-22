@@ -74,7 +74,7 @@ const pickerLang = {
 }
 let dendoLabels = [{ label: "Today", pointStyle: "triangle" }]
 
-const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "red", value: 0 },
+const legendcolor = [{ text: i18n.t('static.report.stockout'), color: "#BA0C2F", value: 0 },
 { text: i18n.t('static.report.lowstock'), color: "#f48521", value: 1 },
 { text: i18n.t('static.report.okaystock'), color: "#118b70", value: 2 },
 { text: i18n.t('static.report.overstock'), color: "#edb944", value: 3 },
@@ -1235,10 +1235,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          disabled={this.state.loading}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
-                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
                       </div>
                     </FormGroup>
@@ -1255,10 +1256,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        disabled={this.state.loading}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
-                          <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
 
                     </FormGroup>
@@ -1275,6 +1277,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
+                          disabled={this.state.loading}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {

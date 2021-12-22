@@ -477,7 +477,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -490,7 +490,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -557,6 +557,7 @@ class EditSupplyPlanStatus extends Component {
                             consumptionListUnFiltered: consumptionListUnFiltered,
                             batchInfoList: batchList,
                             programJson: programJson,
+                            generalProgramJson:programJson,
                             consumptionList: consumptionList,
                             showConsumption: 1,
                             consumptionMonth: month,
@@ -592,7 +593,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -605,7 +606,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -675,6 +676,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             batchInfoList: batchList,
                             programJson: programJson,
+                            generalProgramJson:programJson,
                             inventoryListUnFiltered: inventoryListUnFiltered,
                             inventoryList: inventoryList,
                             showInventory: 1,
@@ -711,7 +713,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -724,7 +726,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -853,7 +855,8 @@ class EditSupplyPlanStatus extends Component {
                                             showShipments: 1,
                                             shipmentList: shipmentList,
                                             shipmentListUnFiltered: shipmentListUnFiltered,
-                                            programJson: programJson
+                                            programJson: programJson,
+                                            generalProgramJson:programJson,
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
@@ -939,7 +942,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             expiredStockModal: !this.state.expiredStockModal,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
         })
         this.hideFirstComponent()
     }
@@ -952,7 +955,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             loading: false,
             message: i18n.t('static.actionCancelled'),
-            color: 'red',
+            color: '#BA0C2F',
             consumptionError: '',
             inventoryError: '',
             shipmentError: '',
@@ -1133,7 +1136,7 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "red"
+                color: "#BA0C2F"
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -1147,7 +1150,7 @@ class EditSupplyPlanStatus extends Component {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext'),
                     loading: false,
-                    color: "red"
+                    color: "#BA0C2F"
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -1198,7 +1201,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         supplyPlanError: i18n.t('static.program.errortext'),
                         loading: false,
-                        color: "red"
+                        color: "#BA0C2F"
                     })
                 }.bind(this);
                 shipmentStatusRequest.onsuccess = function (event) {
@@ -1211,7 +1214,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             supplyPlanError: i18n.t('static.program.errortext'),
                             loading: false,
-                            color: "red"
+                            color: "#BA0C2F"
                         })
                     }.bind(this);
                     papuRequest.onsuccess = function (event) {
@@ -2699,7 +2702,7 @@ class EditSupplyPlanStatus extends Component {
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
-                                            <li><span className="legendcolor" style={{ backgroundColor: "red" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                                            <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
                                             <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
                                             <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
                                             <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
@@ -2989,7 +2992,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={item1.balance == 0 ? 'red' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                                    return (<td align="right" bgcolor={item1.balance == 0 ? '#BA0C2F' : ''} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
@@ -2998,7 +3001,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "red" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>

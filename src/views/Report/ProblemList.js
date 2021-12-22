@@ -185,12 +185,13 @@ export default class ConsumptionDetails extends React.Component {
                     }
                     proListProblemStatus.sort((a, b) => {
                         var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         problemListForUpdate: myResult,
-                        problemStatusList: proListProblemStatus
+                        problemStatusList: proListProblemStatus,
+                        programQPLDetails:getRequest.result
                     }, () => {
                         if (localStorage.getItem("sesProblemStatus") != '' && localStorage.getItem("sesProblemStatus") != undefined) {
                             let sessionProblemList = JSON.parse(localStorage.getItem("sesProblemStatus"));
@@ -241,7 +242,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         procList.sort((a, b) => {
                             var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase                  
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -458,7 +459,7 @@ export default class ConsumptionDetails extends React.Component {
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.get(programId.toString());
                         programQPLDetailsGetRequest.onsuccess = function (event) {
                             var programObj = getRequest.result;
-                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+                            var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData.generalData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             var programQPLDetails = programQPLDetailsGetRequest.result;
@@ -526,14 +527,14 @@ export default class ConsumptionDetails extends React.Component {
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
                             programQPLDetails.addressedCount = addressedCount;
-                            programObj.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                            programObj.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
                             var putRequest = problemOs.put(programObj);
                             putRequest.onerror = function (event) {
                                 this.setState({
                                     message: i18n.t('static.program.errortext'),
-                                    color: 'red'
+                                    color: '#BA0C2F'
                                 })
                             }.bind(this);
                             putRequest.onsuccess = function (event) {
@@ -634,6 +635,7 @@ export default class ConsumptionDetails extends React.Component {
         this.el.destroy();
         var json = [];
         var data = problemArray;
+        var qplEditable=this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly;
 
         var options = {
             data: data,
@@ -749,7 +751,7 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'hidden',
                 },
             ],
-            editable: true,
+            editable: !qplEditable,
             text: {
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 show: '',
@@ -1216,7 +1218,7 @@ export default class ConsumptionDetails extends React.Component {
                             () => {
                                 console.log("callback")
                             })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
 

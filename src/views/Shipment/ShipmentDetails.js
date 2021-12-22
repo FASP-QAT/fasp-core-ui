@@ -62,7 +62,8 @@ export default class ShipmentDetails extends React.Component {
             procurementAgentList: [],
             budgetList: [],
             shipmentStatusList: [],
-            showBatchSaveButton: false
+            showBatchSaveButton: false,
+            programQPLDetails:[]
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -557,7 +558,7 @@ export default class ShipmentDetails extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             this.hideFirstComponent()
         }.bind(this);
@@ -570,7 +571,7 @@ export default class ShipmentDetails extends React.Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 this.hideFirstComponent()
             }.bind(this);
@@ -599,7 +600,8 @@ export default class ShipmentDetails extends React.Component {
                         b = b.label.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
-                    loading: false
+                    loading: false,
+                    programQPLDetails:getRequest.result
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -614,12 +616,15 @@ export default class ShipmentDetails extends React.Component {
                     programIdd = localStorage.getItem("sesProgramId");
                 }
                 if (programIdd != '' && programIdd != undefined) {
-                    var programSelect = { value: programIdd, label: proList.filter(c => c.value == programIdd)[0].label };
-                    this.setState({
-                        programSelect: programSelect,
-                        programId: programIdd
-                    })
-                    this.getPlanningUnitList(programSelect);
+                    var proListFiltered = proList.filter(c => c.value == programIdd);
+                    if (proListFiltered.length > 0) {
+                        var programSelect = { value: programIdd, label: proListFiltered[0].label };
+                        this.setState({
+                            programSelect: programSelect,
+                            programId: programIdd
+                        })
+                        this.getPlanningUnitList(programSelect);
+                    }
                 }
             }.bind(this);
         }.bind(this)
@@ -662,7 +667,7 @@ export default class ShipmentDetails extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -675,7 +680,7 @@ export default class ShipmentDetails extends React.Component {
                     planningunitRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
@@ -757,7 +762,7 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentTypeIds).includes(1)) {
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') {
+                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
@@ -770,7 +775,7 @@ export default class ShipmentDetails extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     this.hideFirstComponent()
                 }.bind(this);
@@ -782,14 +787,32 @@ export default class ShipmentDetails extends React.Component {
                     programRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
-                            color: 'red'
+                            color: '#BA0C2F'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                        var programJson = {};
+                        if (planningUnitDataFilter.length > 0) {
+                            var planningUnitData = planningUnitDataFilter[0]
+                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            programJson = JSON.parse(programData);
+                        } else {
+                            programJson = {
+                                consumptionList: [],
+                                inventoryList: [],
+                                shipmentList: [],
+                                batchInfoList: [],
+                                supplyPlan: []
+                            }
+                        }
+
+                        var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
+                        var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                        var generalProgramJson = JSON.parse(generalProgramData);
 
                         var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == planningUnitId))[0];
                         var shipmentListUnFiltered = programJson.shipmentList;
@@ -807,6 +830,7 @@ export default class ShipmentDetails extends React.Component {
                             shelfLife: programPlanningUnit.shelfLife,
                             catalogPrice: programPlanningUnit.catalogPrice,
                             programJson: programJson,
+                            generalProgramJson: generalProgramJson,
                             shipmentListUnFiltered: shipmentListUnFiltered,
                             shipmentList: shipmentList,
                             showShipments: 1,
@@ -900,7 +924,7 @@ export default class ShipmentDetails extends React.Component {
         if (cont == true) {
             this.setState({
                 message: i18n.t('static.actionCancelled'),
-                color: 'red',
+                color: '#BA0C2F',
                 shipmentQtyChangedFlag: 0,
                 shipmentBatchInfoChangedFlag: 0,
                 shipmentDatesChangedFlag: 0
@@ -1031,6 +1055,7 @@ export default class ShipmentDetails extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
+                                {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>

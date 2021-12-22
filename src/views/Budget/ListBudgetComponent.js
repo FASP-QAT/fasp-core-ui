@@ -919,7 +919,7 @@ class ListBudgetComponent extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       contextMenu: function (obj, x, y, e) {
-        return [];
+        return false;
       }.bind(this),
     };
     var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -1370,7 +1370,7 @@ class ListBudgetComponent extends Component {
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+        <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
@@ -1480,7 +1480,7 @@ class ListBudgetComponent extends Component {
                 </div>
               </div>
             </div>
-            <h5 style={{ color: 'red' }}>{i18n.t('static.budget.redRow')}</h5>
+            <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.budget.redRow')}</h5>
 
 
           </CardBody>
