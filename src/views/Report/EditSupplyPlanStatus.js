@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -99,6 +99,7 @@ class EditSupplyPlanStatus extends Component {
             data: [],
             problemStatusList: [],
             problemEl: '',
+            problemTransEl: '',
             problemList: [],
             monthsArray: [],
             programList: [],
@@ -231,6 +232,8 @@ class EditSupplyPlanStatus extends Component {
         this.updateState = this.updateState.bind(this);
         this.handleProblemStatusChange = this.handleProblemStatusChange.bind(this);
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
+        this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
+        this.loaded1 = this.loaded1.bind(this);
     }
 
     updateState(parameterName, value) {
@@ -408,7 +411,18 @@ class EditSupplyPlanStatus extends Component {
 
     toggleTransView(problemTransList) {
         console.log("====>", problemTransList);
-        this.setState({ transView: !this.state.transView, problemTransList: problemTransList })
+        this.setState({ transView: !this.state.transView, problemTransList: problemTransList }, () => {
+            this.test();
+        })
+    }
+
+    test() {
+        console.log("In test+++");
+        this.setState({
+            test: 1
+        }, () => {
+            this.buildProblemTransJexcel();
+        })
     }
     toggleTransModal() {
         this.setState({ transView: !this.state.transView })
@@ -557,7 +571,7 @@ class EditSupplyPlanStatus extends Component {
                             consumptionListUnFiltered: consumptionListUnFiltered,
                             batchInfoList: batchList,
                             programJson: programJson,
-                            generalProgramJson:programJson,
+                            generalProgramJson: programJson,
                             consumptionList: consumptionList,
                             showConsumption: 1,
                             consumptionMonth: month,
@@ -676,7 +690,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             batchInfoList: batchList,
                             programJson: programJson,
-                            generalProgramJson:programJson,
+                            generalProgramJson: programJson,
                             inventoryListUnFiltered: inventoryListUnFiltered,
                             inventoryList: inventoryList,
                             showInventory: 1,
@@ -856,7 +870,7 @@ class EditSupplyPlanStatus extends Component {
                                             shipmentList: shipmentList,
                                             shipmentListUnFiltered: shipmentListUnFiltered,
                                             programJson: programJson,
-                                            generalProgramJson:programJson,
+                                            generalProgramJson: programJson,
                                         }, () => {
                                             if (this.refs.shipmentChild != undefined) {
                                                 this.refs.shipmentChild.showShipmentData();
@@ -3251,12 +3265,12 @@ class EditSupplyPlanStatus extends Component {
 
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
-        if(transList.length==0){
-            console.log("this problem report id do not have trans+++",row.problemReportId);
+        if (transList.length == 0) {
+            console.log("this problem report id do not have trans+++", row.problemReportId);
             return ""
-        }else{
-        var listLength = transList.length;
-        return transList[listLength - 1].notes;
+        } else {
+            var listLength = transList.length;
+            return transList[listLength - 1].notes;
         }
     }
 
@@ -3393,6 +3407,89 @@ class EditSupplyPlanStatus extends Component {
         mylist = mylist.filter(c => c.userManaged == true);
         return mylist;
     }.bind(this)
+
+    buildProblemTransJexcel() {
+        console.log("In jexcel+++", this.state.problemTransList);
+        var currentTrans = this.state.problemTransList.sort((function (a, b) {
+            a = a.createdDate
+            b = b.createdDate
+            return a > b ? -1 : a < b ? 1 : 0;
+        }));
+
+        let dataArray = [];
+        let count = 0;
+        for (var j = 0; j < currentTrans.length; j++) {
+            data = [];
+            data[0] = currentTrans[j].problemStatus.label.label_en;
+            data[1] = currentTrans[j].notes;
+            data[2] = currentTrans[j].createdBy.username;
+            data[3] = currentTrans[j].createdDate;
+            dataArray[count] = data;
+            count++;
+        }
+        this.el = jexcel(document.getElementById("problemTransDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = dataArray;
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            columns: [
+                {
+                    title: i18n.t('static.report.problemStatus'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.lastmodifiedby'),
+                    type: 'text',
+
+                },
+                {
+                    title: i18n.t('static.report.lastmodifieddate'),
+                    type: 'calendar',
+                    format: JEXCEL_DATE_FORMAT_SM
+
+                },
+
+            ],
+            onload: this.loaded1,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            parseFormulas: true,
+            license: JEXCEL_PRO_KEY,
+            text: {
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
+                show: '',
+                entries: '',
+            },
+        };
+        var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
+        this.el = problemTransEl;
+        this.setState({
+            problemTransEl: problemTransEl
+        })
+    }
+    loaded1 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance, 1);
+    }
 
     buildJExcel() {
         var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
@@ -3760,6 +3857,7 @@ class EditSupplyPlanStatus extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
+
 
         const columns = [
             {
@@ -4393,8 +4491,15 @@ class EditSupplyPlanStatus extends Component {
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>
+                            
                             <ModalBody>
-                                <ToolkitProvider
+                                <br></br>
+                                <br></br>
+                                <div className="table-responsive RemoveStriped qat-problemListSearch">
+                                    <div id="problemTransDiv" className="" />
+                                </div>
+
+                                {/* <ToolkitProvider
                                     keyField="problemReportId"
                                     data={this.state.problemTransList}
                                     columns={columns}
@@ -4406,7 +4511,7 @@ class EditSupplyPlanStatus extends Component {
                                         props => (
                                             <div className="col-md-12 bg-white pb-1 mb-2">
                                                 <ul class="navbar-nav"><li class="nav-item pl-0"><a aria-current="page" class="nav-link active" >
-                                                    {/* <b>{i18n.t('static.report.problemTransDetails')}</b> */}
+                                                  
                                                 </a></li></ul>
                                                 <div className="TableCust">
                                                     <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
@@ -4429,7 +4534,8 @@ class EditSupplyPlanStatus extends Component {
                                             </div>
                                         )
                                     }
-                                </ToolkitProvider>
+                                </ToolkitProvider> */}
+
                             </ModalBody>
                             {/* <ModalFooter>
                             </ModalFooter> */}
