@@ -6,6 +6,7 @@ import { Bar } from 'react-chartjs-2';
 import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
+// import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP,JEXCEL_PAGINATION_OPTION } from '../../Constants.js'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -14,7 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION,SECRET_KEY,APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -25,7 +26,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+// import { JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -39,6 +40,7 @@ import ShipmentStatusService from '../../api/ShipmentStatusService';
 import CurrencyService from '../../api/CurrencyService';
 import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
+import CryptoJS from 'crypto-js'
 
 const entityname = i18n.t('static.program.program');
 
@@ -512,6 +514,20 @@ class EditSupplyPlanStatus extends Component {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = this.state.program;
+                var programQPLDetails = [];
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                programQPLDetails.push({
+                    id: programJson.programId,
+                    programId: programJson.programId,
+                    version: programJson.currentVersion.versionId,
+                    userId: userId,
+                    programCode: programJson.programCode,
+                    openCount: 0,
+                    addressedCount: 0,
+                    programModified: 0,
+                    readonly: 0
+                })
                 var batchInfoList = programJson.batchInfoList;
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
@@ -525,7 +541,9 @@ class EditSupplyPlanStatus extends Component {
                         })
                     })
                     this.setState({
-                        dataSourceList: dataSourceList
+                        dataSourceList: dataSourceList,
+                        programQPLDetails:programQPLDetails,
+                        programId:programJson.programId
                     })
 
                     RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
@@ -3057,6 +3075,7 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
                                                     </tbody>
                                                 </Table>
+                                                </div>
 
                                                 {
                                                     this.state.jsonArrForGraph.length > 0
@@ -3072,12 +3091,8 @@ class EditSupplyPlanStatus extends Component {
                                                         </div>
                                                         <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                     </div>}
-                                            </div>
                                         </div>
                                     </div>
-
-
-
                                     {/* {
                         this.state.jsonArrForGraph.length > 0
                         &&
@@ -4491,7 +4506,7 @@ class EditSupplyPlanStatus extends Component {
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>
-                            
+
                             <ModalBody>
                                 <br></br>
                                 <br></br>
