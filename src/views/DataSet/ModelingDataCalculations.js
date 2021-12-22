@@ -11,14 +11,12 @@ export function calculateModelingData(dataset, props, page) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;
-        console.log("In calculate function###", dataset);
         var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
         var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
         var datasetJson = JSON.parse(datasetData);
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var treeList = datasetJson.treeList;
-        console.log("Tree List###", treeList);
         for (var tl = 0; tl < treeList.length; tl++) {
             var tree = treeList[tl];
             var flatListUnsorted = tree.tree.flatList;
@@ -33,12 +31,9 @@ export function calculateModelingData(dataset, props, page) {
                 var payload = flatList[fl].payload;
                 if (payload.nodeType.id != 1) {
                     var nodeDataMap = payload.nodeDataMap;
-                    console.log("NodeDataMap###", nodeDataMap);
                     var scenarioList = tree.scenarioList;
                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                        console.log("NodeDataMap1###", nodeDataMap[scenarioList[ndm].id]);
                         var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                        console.log("NodeDataMapForScenario###", nodeDataMapForScenario);
                         var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                         var hasTransferNodeIdList = nodeDataModelingListUnFiltered.filter(c => c.transferNodeDataId != null);
 
@@ -63,28 +58,23 @@ export function calculateModelingData(dataset, props, page) {
 
 
             }
-            console.log("Flat List###", flatList);
             for (var fl = 0; fl < flatList.length; fl++) {
+                console.log("FlatList$$$",flatList[fl]);
                 var payload = flatList[fl].payload;
                 if (payload.nodeType.id != 1) {
                     var nodeDataMap = payload.nodeDataMap;
                     var scenarioList = tree.scenarioList;
                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                         var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                        console.log("NodeDataMapForScenario###", nodeDataMapForScenario);
                         var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                         var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                         var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                         var curDate = startDate;
                         var nodeDataList = [];
                         for (var i = 0; curDate < stopDate; i++) {
-                            console.log("CurDate###", curDate, "i+++", i);
                             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
-                            // console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
-                            console.log("((nodeDataMap[scenarioList[ndm].id])[0]>>>", ((nodeDataMap[scenarioList[ndm].id])[0]));
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
-                            console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
                             var startValue = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                                 if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
@@ -98,11 +88,9 @@ export function calculateModelingData(dataset, props, page) {
                                 var nodeDataListPrevMonth = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0];
                                 startValue = nodeDataMapForScenario.manualChangesEffectFuture ? nodeDataListPrevMonth.endValue : nodeDataListPrevMonth.endValueWMC;
                             }
-                            console.log("Start value###", startValue);
                             var difference = 0;
                             var differenceWMC = 0;
                             var transferNodeValue = 0;
-                            console.log("nodeDataModelingList###", nodeDataModelingList);
                             for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                                 var nodeDataModeling = nodeDataModelingList[ndml];
                                 //Linear number
@@ -149,7 +137,6 @@ export function calculateModelingData(dataset, props, page) {
                                 }
 
                             }
-                            console.log("Difference###", difference);
                             var endValue = 0;
                             var endValueWMC = 0;
                             endValue = Number(startValue) + Number(difference) + Number(transferNodeValue);
@@ -163,8 +150,6 @@ export function calculateModelingData(dataset, props, page) {
 
                             endValue = endValue + totalManualChange;
 
-                            console.log("End Value###", endValue);
-                            console.log("End Value WMC###", endValueWMC);
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
@@ -177,7 +162,6 @@ export function calculateModelingData(dataset, props, page) {
                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
                             }
 
-                            console.log("Calculated Value###", calculatedValue);
 
                             //Month For loop
                             nodeDataList.push({
@@ -185,10 +169,13 @@ export function calculateModelingData(dataset, props, page) {
                                 startValue: startValue,
                                 endValue: endValue,
                                 calculatedValue: calculatedValue,
-                                endValueWMC: endValueWMC
+                                endValueWMC: endValueWMC,
+                                difference: difference,
+                                seasonalityPerc: 0,
+                                manualChange: 0
                             })
                         }
-                        console.log("Node MOM List###", nodeDataList);
+                        console.log("Node MOM List$$$", nodeDataList);
                         nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                         nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     }
@@ -201,7 +188,6 @@ export function calculateModelingData(dataset, props, page) {
         }
         treeList = treeList;
         datasetJson.treeList = treeList;
-        console.log("DatasetJson###", datasetJson);
         var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
         dataset.programData = encryptedDatasetJson;
         var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');

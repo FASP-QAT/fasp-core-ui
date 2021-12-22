@@ -1318,6 +1318,7 @@ class AuthenticationService {
                     case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
+                    case "/dataset/commitTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
@@ -1357,6 +1358,12 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+
+                    case "/forecastReport/consumptionForecastError":
+                    case "/forecastReport/compareScenario":
+                    case "/forecastReport/forecastSummary":
+                    case "/forecastReport/forecastOutput":
+                        return true;
 
                     default:
                         console.log("default case");

@@ -62,7 +62,7 @@ class ModelingValidation extends Component {
             nodeIdArr: [],
             nodeDataModelingList: [],
             loading: false,
-            monthList:[],
+            monthList: [],
             show: false
         };
         this.setDatasetId = this.setDatasetId.bind(this);
@@ -135,7 +135,7 @@ class ModelingValidation extends Component {
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        console.log("In get dataset data+++",versionId);
+        console.log("In get dataset data+++", versionId);
         if (versionId != "") {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -280,12 +280,12 @@ class ModelingValidation extends Component {
                 show: true
             })
             var datasetData = this.state.datasetData;
-            var treeList=datasetData.treeList;
-            console.log("TreeList+++",treeList)
-            var tree=treeList.filter(c=>c.treeId==this.state.treeId)[0];
-            console.log("Tree+++",tree)
-            var flatList=tree.tree.flatList;
-            console.log("TreeList+++",flatList);
+            var treeList = datasetData.treeList;
+            console.log("TreeList+++", treeList)
+            var tree = treeList.filter(c => c.treeId == this.state.treeId)[0];
+            console.log("Tree+++", tree)
+            var flatList = tree.tree.flatList;
+            console.log("TreeList+++", flatList);
             // var nodeDataModelingList = datasetData.nodeDataModelingList;
             var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
@@ -295,9 +295,9 @@ class ModelingValidation extends Component {
             // var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
             // console.log("NodeDataModelingList+++", nodeDataModelingListFilter);
             // var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
-            var monthList=[];
-            var curDate=startDate;
-            for(var i=0;curDate<stopDate;i++){
+            var monthList = [];
+            var curDate = startDate;
+            for (var i = 0; curDate < stopDate; i++) {
                 curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                 monthList.push(curDate)
             }
@@ -322,17 +322,17 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    console.log("flatList.filter(c=>c.nodeId==nodeVal[k].value)[0]+++",flatList.filter(c=>c.id==nodeVal[k].value)[0]);
-                    var flatListFiltered=flatList.filter(c=>c.id==nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue;
-                    data[k + 1] = Number(calculatedValue).toFixed(2);
+                    console.log("flatList.filter(c=>c.nodeId==nodeVal[k].value)[0]+++", flatList.filter(c => c.id == nodeVal[k].value)[0]);
+                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
+                    data[k + 1] = flatListFiltered.length > 0 ? Number(calculatedValue).toFixed(2) : "";
                     total += Number(calculatedValue);
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered=flatList.filter(c=>c.id==nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue;
+                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
                     var val = (Number(calculatedValue) / Number(total)) * 100;
                     data[nodeVal.length + 1 + k + 1] = calculatedValue != 0 ? Number(val).toFixed(2) : 0;
                     totalPer += calculatedValue != 0 ? val : 0;
@@ -379,7 +379,7 @@ class ModelingValidation extends Component {
 
             this.setState({
                 nodeDataModelingList: [{}],
-                monthList:monthList,
+                monthList: monthList,
                 dataEl: dataEl,
             })
             this.setState({
