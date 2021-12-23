@@ -2453,7 +2453,7 @@ export default class ManualTagging extends Component {
                     outputListAfterSearch,
                     buildJexcelRequired,
                     roNoOrderNo: json,
-                    table1Loader : outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
+                    table1Loader: outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? false : true,
                     searchedValue: (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "" ? outputListAfterSearch[0].orderNo : ""),
                     selectedRowPlanningUnit: outputListAfterSearch[0].planningUnit.id
                     // planningUnitIdUpdated: outputListAfterSearch[0].planningUnit.id
