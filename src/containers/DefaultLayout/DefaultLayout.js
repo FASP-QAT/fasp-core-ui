@@ -317,7 +317,7 @@ const routes = [
   { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
   { path: '/report/compareVersion', exact: true, name: 'Compare Version', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'Product Validation', component: ProductValidation },
-  { path: '/report/compareAndSelectScenario', exact: true, name: 'Compare and Select Scenario', component: CompareAndSelectScenario },
+  { path: '/report/compareAndSelectScenario', exact: true, name: 'Compare and Select Forecast', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
