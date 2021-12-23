@@ -1704,6 +1704,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             editable: tableEditable,
             onchange: this.batchInfoChangedShipment,
             allowExport: false,
+            parseFormulas: true,
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1}`,
@@ -2533,7 +2534,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
@@ -2606,7 +2607,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         positiveValidation("B", y, elInstance);
                     }
                 }
-                var validation = checkValidtion("number", "C", y, rowData[2], elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+                var validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
