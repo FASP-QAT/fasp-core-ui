@@ -250,6 +250,7 @@ export default class CompareVersion extends Component {
             filters: true,
             editable: false,
             license: JEXCEL_PRO_KEY,
+            editable:false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Resolve conflicts

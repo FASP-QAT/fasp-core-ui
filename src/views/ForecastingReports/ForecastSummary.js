@@ -1,0 +1,1682 @@
+import React, { Component, lazy } from 'react';
+import { Bar } from 'react-chartjs-2';
+import MultiSelect from "react-multi-select-component";
+import {
+    Card,
+    CardBody,
+    Col,
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
+} from 'reactstrap';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import i18n from '../../i18n'
+import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmService from '../../api/RealmService';
+import getLabelText from '../../CommonComponent/getLabelText';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import ProductService from '../../api/ProductService';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+import ProgramService from '../../api/ProgramService';
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, } from '../../Constants.js'
+import moment from "moment";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import pdfIcon from '../../assets/img/pdf.png';
+import csvicon from '../../assets/img/csv.png'
+import { LOGO } from '../../CommonComponent/Logo.js'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+
+
+const ref = React.createRef();
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
+const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+
+class ForecastSummary extends Component {
+    constructor(props) {
+        super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
+        this.state = {
+            programs: [],
+            planningUnits: [],
+            versions: [],
+            show: false,
+            message: '',
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            loading: false,
+            programId: '',
+            versionId: '',
+            planningUnitLabel: '',
+            viewById: 1,
+            regionList: [],
+            regionVal: [],
+            regionListFiltered: [],
+            versionListAll: [{ versionId: 1, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 1, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }, { versionId: 1, program: { label: "Benin Malaria Forecast Dataset", programId: 3 } }, { versionId: 2, program: { label: "Benin PRH,Condoms Forecast Dataset", programId: 1 } }, { versionId: 2, program: { label: "Benin ARV Forecast Dataset", programId: 2 } }],
+            showTotalForecast: true,
+            showTotalActual: true,
+            showTotalDifference: true,
+            monthArrayList: [],
+            planningUnitId: "",
+            hideCalculation: 2,
+            scenarioList: [{ id: 1, name: "A. Consumption High", checked: true, color: "#4f81bd" },
+            { id: 2, name: "B. Consumption Med", checked: true, color: "#f79646" },
+            { id: 3, name: "C. Consumption Low", checked: true, color: "#000000" },
+            { id: 4, name: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" },
+            { id: 5, name: "E. Demographic", checked: true, color: "#604a7b" }],
+            consumptionData: [
+                { forecastingUnit: { id: 1, label: "Abacavir 300 mg Tablet" }, planningUnit: { id: 1, label: "Abacavir 300 mg Tablet, 60 Tablets" }, scenario: { id: 3 }, consumptionQty: 44556, startingStock: 6188, existingShipmentQty: 48120, desiredMonthsOfStock: 5, priceType: 1, price: 0.81 },
+                { forecastingUnit: { id: 2, label: "Benzylpenicillin 5 MU Vial" }, planningUnit: { id: 2, label: "Benzylpenicillin 5 MU Vial, 10 Vials" }, scenario: { id: 1 }, consumptionQty: 51721, startingStock: 7183, existingShipmentQty: 50687, desiredMonthsOfStock: 5, priceType: 2, price: 1.04 },
+                { forecastingUnit: { id: 3, label: "Lamivudine 150 mg Tablet" }, planningUnit: { id: 3, label: "Lamivudine 150 mg Tablet, 30 Tablets" }, scenario: { id: 3 }, consumptionQty: 36412, startingStock: 6069, existingShipmentQty: 33863, desiredMonthsOfStock: 5, priceType: 2, price: 43 },
+                { forecastingUnit: { id: 4, label: "Lamivudine 10 mg/mL Solution" }, planningUnit: { id: 4, label: "Lamivudine 10 mg/mL Solution, 100 mL" }, scenario: { id: 4 }, consumptionQty: 24421, startingStock: 5427, existingShipmentQty: 23933, desiredMonthsOfStock: 5, priceType: 2, price: 3 },
+                { forecastingUnit: { id: 5, label: "Paracetamol 500 mg Tablet" }, planningUnit: { id: 5, label: "Paracetamol 500 mg Tablet, 1000 Tablets" }, scenario: { id: 5 }, consumptionQty: 50152, startingStock: 5572, existingShipmentQty: 49650, desiredMonthsOfStock: 5, priceType: 2, price: 542 },
+                { forecastingUnit: { id: 6, label: "Malaria Rapid Diagnostic Test (RDT) HRP2 (Pf) Cassette" }, planningUnit: { id: 6, label: "Malaria Rapid Diagnostic Test (RDT) HRP2 (Pf) Cassette, 25 Single Test Kits" }, scenario: { id: 1 }, consumptionQty: 45904, startingStock: 5100, existingShipmentQty: 44527, desiredMonthsOfStock: 5, priceType: 2, price: 3 },
+
+                { forecastingUnit: { id: 6, label: 'Examination Gloves (Latex) Large, Powder-Free, Non-Sterile' }, planningUnit: { id: 6, label: 'Examination Gloves (Latex) Large, Powder-Free, Non-Sterile, 100 Each' }, scenario: { id: 3 }, consumptionQty: '95366', startingStock: '21192.4444444444', existingShipmentQty: '86783.06', desiredMonthsOfStock: 5, priceType: 2, price: '4' },
+                { forecastingUnit: { id: 6, label: 'Gauze, Sterile, 12 Ply, 4 x 4 in (10 x 10 cm)' }, planningUnit: { id: 6, label: 'Gauze, Sterile, 12 Ply, 4 x 4 in (10 x 10 cm), 100 Pieces' }, scenario: { id: 3 }, consumptionQty: '62785', startingStock: '10464.1666666667', existingShipmentQty: '60901.45', desiredMonthsOfStock: 5, priceType: 2, price: '4.1' },
+                { forecastingUnit: { id: 6, label: 'MC Kit, Sterile, Single Use, Forceps Guided Procedure, 2017' }, planningUnit: { id: 6, label: 'MC Kit, Sterile, Single Use, Forceps Guided Procedure, 2017, 1 Kit' }, scenario: { id: 3 }, consumptionQty: '54177', startingStock: '12039.3333333333', existingShipmentQty: '56344.08', desiredMonthsOfStock: 5, priceType: 2, price: '51' },
+                { forecastingUnit: { id: 6, label: 'Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom' }, planningUnit: { id: 6, label: 'Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each' }, scenario: { id: 3 }, consumptionQty: '70748', startingStock: '9826.11111111111', existingShipmentQty: '71455.48', desiredMonthsOfStock: 5, priceType: 2, price: '4.1' },
+                { forecastingUnit: { id: 6, label: 'Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm Male Condom' }, planningUnit: { id: 6, label: 'Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces' }, scenario: { id: 3 }, consumptionQty: '77219', startingStock: '15014.8055555556', existingShipmentQty: '74130.24', desiredMonthsOfStock: 5, priceType: 2, price: '5.1' },
+                { forecastingUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue)' }, planningUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue), 1 Each' }, scenario: { id: 3 }, consumptionQty: '88216', startingStock: '14702.6666666667', existingShipmentQty: '90862.48', desiredMonthsOfStock: 5, priceType: 2, price: '55' },
+                { forecastingUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue)' }, planningUnit: { id: 6, label: 'Long Lasting Insecticide Treated Net (LLIN) 190x160x180 cm (LxWxH) Rectangular (Light Blue), 1 Each' }, scenario: { id: 3 }, consumptionQty: '71032', startingStock: '7892.44444444444', existingShipmentQty: '64639.12', desiredMonthsOfStock: 5, priceType: 2, price: '5.9' }
+
+            ],
+            errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"],
+            summeryData: [],
+            forecastPeriod: '',
+            startDateDisplay: '',
+            endDateDisplay: '',
+            beforeEndDateDisplay: '',
+            totalProductCost: 0,
+            regPlanningUnitList: []
+
+        };
+        this.getPrograms = this.getPrograms.bind(this);
+        this.filterData = this.filterData.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.setViewById = this.setViewById.bind(this);
+        // this.getProductCategories = this.getProductCategories.bind(this);
+        //this.pickRange = React.createRef()
+        this.setProgramId = this.setProgramId.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
+        // this.setVersionId = this.setVersionId.bind(this);
+        this.setForecastingUnit = this.setForecastingUnit.bind(this);
+        this.setRegionVal = this.setRegionVal.bind(this);
+        this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
+        this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
+        this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
+        this.storeProduct = this.storeProduct.bind(this)
+        this.hideCalculation = this.hideCalculation.bind(this);
+        this.filterTsList = this.filterTsList.bind(this);
+        this.saveSelectedForecast = this.saveSelectedForecast.bind(this);
+        this.forecastChanged = this.forecastChanged.bind(this)
+
+    }
+
+    hideCalculation(e) {
+        console.log("E++++++++", e.target.value);
+        this.setState({
+            hideCalculation: e.target.value
+        })
+
+    }
+
+    storeProduct(e) {
+        console.log("E++++++++", e.target)
+        var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
+        this.setState({
+            planningUnitId: e.target.value,
+            planningUnitLabel: name[0].label,
+        })
+    }
+
+    toggleAccordionTotalActual() {
+        this.setState({
+            showTotalActual: !this.state.showTotalActual
+        })
+        var fields = document.getElementsByClassName("totalActual");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalActual == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+
+    toggleAccordionTotalForecast() {
+        this.setState({
+            showTotalForecast: !this.state.showTotalForecast
+        })
+        var fields = document.getElementsByClassName("totalForecast");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalForecast == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+
+    toggleAccordionTotalDiffernce() {
+        this.setState({
+            showTotalDifference: !this.state.showTotalDifference
+        })
+        var fields = document.getElementsByClassName("totalDifference");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalDifference == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+
+    setRegionVal(e) {
+        console.log("e+++", e);
+        var regionIdArr = [];
+        for (var i = 0; i < e.length; i++) {
+            regionIdArr.push(e[i].value);
+        }
+        var regionListFiltered = this.state.regionList.filter(c => regionIdArr.includes(c.value));
+        this.setState({
+            regionVal: e,
+            regionListFiltered
+        })
+    }
+
+    setForecastingUnit(e) {
+        this.setState({
+            forecastingUnitId: e.target.value
+        }, () => {
+            this.filterPlanningUnit()
+        })
+    }
+
+    filterPlanningUnit() {
+        var planningUnitListAll = this.state.planningUnitListAll;
+        var planningUnits = planningUnitListAll.filter(c => c.program.programId == this.state.programId && c.forecastingUnit.forecastingUnitId == this.state.forecastingUnitId);
+        this.setState({
+            planningUnits
+        })
+    }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
+    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+
+    exportCSV() {
+    }
+
+
+    exportPDF = () => {
+    }
+
+    filterData() {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        let displayId = document.getElementById("displayId").value;
+        this.setState({
+            displayId: displayId
+        })
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+
+        let start_date = new Date(startDate);
+        let end_date = new Date(endDate);
+        let total_months = (end_date.getFullYear() - start_date.getFullYear()) * 12 + (end_date.getMonth() - start_date.getMonth()) + 1;
+
+
+        if (versionId != 0 && programId > 0) {
+            if (versionId.includes('Local')) {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    var program = transaction.objectStore('datasetData');
+                    var getRequest = program.getAll();
+                    var datasetList = [];
+                    var datasetList1 = [];
+
+                    getRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        // console.log("DATASET----------->", myResult);
+                        // this.setState({
+                        //     datasetList: myResult
+                        // });
+
+
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson1 = JSON.parse(programData);
+                            console.log("programJson1-------->1", programJson1);
+                            // let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
+                            // const ids = dupForecastingUnitObj.map(o => o.id)
+                            // const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
+                            // console.log("programJson1-------->2", filtered);
+
+                            // let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
+                            // let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
+                            // const idsPU = dupPlanningUnitObj.map(o => o.id)
+                            // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
+
+                            datasetList.push({
+                                programCode: filteredGetRequestList[i].programCode,
+                                programVersion: filteredGetRequestList[i].version,
+                                programId: filteredGetRequestList[i].programId,
+                                versionId: filteredGetRequestList[i].version,
+                                id: filteredGetRequestList[i].id,
+                                loading: false,
+                                forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                                forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                                healthAreaList: programJson1.healthAreaList,
+                                actualConsumptionList: programJson1.actualConsumptionList,
+                                consumptionExtrapolation: programJson1.consumptionExtrapolation,
+                                treeList: programJson1.treeList,
+                                planningUnitList: programJson1.planningUnitList,
+                                // filteredForecastingUnit: filtered,
+                                // filteredPlanningUnit: filteredPU,
+                                regionList: programJson1.regionList,
+                                label: programJson1.label,
+                                realmCountry: programJson1.realmCountry,
+                            });
+                            datasetList1.push(filteredGetRequestList[i])
+                            // }
+                        }
+                        console.log("DATASET-------->", datasetList);
+                        this.setState({
+                            datasetList: datasetList,
+                            datasetList1: datasetList1
+                        }, () => {
+                            let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
+                            console.log("Test------------>1", filteredProgram);
+
+                            let planningUnitList = filteredProgram.planningUnitList;
+                            let summeryData = [];
+                            let tempData = [];
+
+
+                            let treeList = filteredProgram.treeList;
+                            let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
+
+                            let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
+                            let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
+                            console.log("Test------------>2", filteredTracercategoryId);
+                            let totalProductCost = 0;
+
+                            for (var j = 0; j < planningUnitList.length; j++) {
+
+                                //calculation part
+                                let nodeDataMomList = [];
+                                let consumptionData = [];
+                                let selectedForecastMap = planningUnitList[j].selectedForecastMap;
+                                console.log("Test------------>2", selectedForecastMap);
+                                console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
+                                console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
+
+                                let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+
+                                let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+
+                                if (scenarioId != null) {//scenarioId
+                                    for (let p = 0; p < treeList.length; p++) {
+                                        let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                        if (filteredScenario.length > 0) {
+                                            let flatlist = treeList[p].tree.flatList;
+                                            let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                                            console.log("Test------------>5", listContainNodeType5);
+                                            console.log("Test------------>6", listContainNodeType5[0].payload);
+                                            console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+
+                                            for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
+                                                console.log("Test------------>7.1", arrayOfNodeDataMap);
+
+                                                if (arrayOfNodeDataMap.length > 0) {
+                                                    console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                    nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                    let consumptionList = nodeDataMomList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: (m.calculatedValue).toFixed(2)
+                                                        }
+                                                    });
+                                                    let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    consumptionData.push(jsonTemp);
+
+                                                    break;
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                } else {//consumptionExtrapolationId
+
+                                    let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                    if (consumptionExtrapolationObj.length > 0) {
+                                        let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                            return {
+                                                consumptionDate: m.month,
+                                                consumptionQty: (m.amount).toFixed(2)
+                                            }
+                                        });
+                                        let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                        consumptionData.push(jsonTemp);
+
+                                    }
+
+                                }
+
+                                let totalForecastedQuantity0ri = 0;
+                                let tempList = [];
+                                let tempList1 = [];
+                                let resultTrue = [];
+                                if (consumptionData.length > 0) {
+                                    let cursorDate = startDate;
+                                    for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
+                                        var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                                        cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                                        tempList = tempList.concat(consumptionData[0].consumptionList.filter(c => moment(c.consumptionDate).isSame(dt)));
+                                    }
+
+                                    tempList1 = tempList.map(m => {
+                                        return {
+                                            consumptionDate: m.consumptionDate,
+                                            consumptionQty: m.consumptionQty,
+                                            id: 1
+                                        }
+                                    });
+
+                                    // logic for add same date data
+                                    resultTrue = Object.values(tempList1.reduce((a, { consumptionDate, consumptionQty, id }) => {
+                                        if (!a[id])
+                                            a[id] = Object.assign({}, { consumptionDate, consumptionQty, id });
+                                        else
+                                            // a[id].consumptionQty += consumptionQty;
+                                            a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
+                                        return a;
+                                    }, {}));
+
+                                    totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
+
+                                }
+                                // console.log("consumptionData----->1", consumptionData);
+                                // console.log("consumptionData----->2", tempList);
+                                // console.log("consumptionData----->3", resultTrue);
+
+
+
+
+
+
+                                //obj parameter decleration
+                                let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
+                                let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
+                                let planningUnit = planningUnitList[j].planningUnit;
+                                let totalForecastedQuantity = totalForecastedQuantity0ri;
+                                let stock1 = planningUnitList[j].stock;
+                                let existingShipments = planningUnitList[j].existingShipments;
+                                let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
+                                let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
+                                let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
+                                let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
+                                let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
+                                let isProcurementGapRed = (procurementGap < 0 ? true : false)
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : 'Custom'));
+                                let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
+                                let unitPrice = planningUnitList[j].price;
+                                let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
+                                let notes = planningUnitList[j].consumptionNotes;
+
+                                let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
+                                tempData.push(obj);
+
+                                if (isProcurementGapRed == true) {
+                                    totalProductCost = totalProductCost + (tempProcurementGap * unitPrice);
+                                    totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                }
+
+                            }
+                            // console.log("consumptionData----->", consumptionData);
+
+                            //sort based on tracerCategory
+                            for (var i = 0; i < filteredTracercategoryId.length; i++) {
+                                let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
+                                let obj = { id: 0, tempTracerCategoryId: filteredTracerCategoryList[0].tracerCategory.id, display: false, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
+                                summeryData.push(obj);
+                                summeryData = summeryData.concat(filteredTracerCategoryList);
+
+                            }
+                            console.log("Test------------>3", summeryData);
+                            this.setState({
+                                summeryData: summeryData,
+                                totalProductCost: totalProductCost,
+                                regDatasetJson: filteredProgram,
+                                regPlanningUnitList: planningUnitList,
+                                regRegionList: filteredProgram.regionList,
+                                tracerCategoryList: [...new Set(planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id)))]
+                            }, () => {
+                                if (displayId == 2) {
+                                    // console.log("langaugeList---->", langaugeList);
+                                    let dataArray = [];
+                                    var treeList = this.state.regDatasetJson.treeList;
+                                    console.log("TreeList+++", treeList)
+                                    var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
+                                    var tsList = [];
+                                    let startDate = this.state.regDatasetJson.forecastStartDate;
+                                    let endDate = this.state.regDatasetJson.forecastStopDate;
+                                    for (var tl = 0; tl < treeList.length; tl++) {
+                                        var scenarioList = treeList[tl].scenarioList;
+                                        for (var sl = 0; sl < scenarioList.length; sl++) {
+                                            tsList.push({ id: "T" + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, totalForecast: 0 });
+                                        }
+                                    }
+                                    for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
+                                        var total = 0;
+                                        console.log("consumptionExtrapolation[ce].extrapolationDataList+++", consumptionExtrapolation[ce].extrapolationDataList)
+                                        consumptionExtrapolation[ce].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(endDate).format("YYYY-MM-DD")).map(ele => {
+                                            total += ele.amount;
+                                        });
+                                        console.log("total+++", total);
+                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total });
+                                    }
+                                    this.setState({
+                                        tsList: tsList
+                                    })
+                                    var data = []
+                                    var tcList = this.state.tracerCategoryList;
+                                    console.log("tcList+++", tcList);
+                                    var puList = this.state.regPlanningUnitList;
+                                    console.log("PuList+++", puList);
+                                    var regRegionList = this.state.regRegionList;
+                                    for (var tc = 0; tc < tcList.length; tc++) {
+                                        data = [];
+                                        data[0] = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en;
+                                        data[1] = "";
+                                        data[2] = "";
+                                        for (var k = 0; k < this.state.regRegionList.length; k++) {
+                                            data[k + 3] = "";
+                                            data[k + 4] = "";
+                                            data[k + 5] = "";
+                                        }
+                                        data[(regRegionList.length * 3) + 3] = 1
+                                        data[(regRegionList.length * 3) + 4] = ""
+
+                                        dataArray.push(data);
+                                        var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                                        for (var j = 0; j < puListFiltered.length; j++) {
+                                            data = [];
+                                            data[0] = puListFiltered[j].planningUnit.forecastingUnit.label.label_en;
+                                            data[1] = puListFiltered[j].planningUnit;
+                                            data[2] = puListFiltered[j].planningUnit.label.label_en;
+                                            var total = 0;
+                                            for (var k = 0; k < regRegionList.length; k++) {
+                                                var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                                                console.log("filterForecastSelected+++", filterForecastSelected);
+                                                console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
+                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? filterForecastSelected.totalForecast : "";
+                                                total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+                                                data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
+                                            }
+                                            data[(regRegionList.length * 3) + 3] = 2
+                                            data[(regRegionList.length * 3) + 4] = total;
+                                            dataArray.push(data);
+                                        }
+                                    }
+                                    var columns = [];
+                                    columns.push({ title: "Forecasting Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
+                                    for (var k = 0; k < regRegionList.length; k++) {
+                                        columns.push({ title: "Selected Forecast", type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });
+                                        columns.push({ title: "Forecast Quantity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                        columns.push({ title: "Notes", type: 'text', width: 100 });
+                                    }
+                                    columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                    let nestedHeaders = [];
+                                    nestedHeaders.push(
+                                        {
+                                            title: '',
+                                            colspan: '1'
+                                        },
+
+                                    );
+                                    nestedHeaders.push(
+                                        {
+                                            title: '',
+                                            colspan: '1'
+                                        },
+                                    );
+                                    for (var k = 0; k < regRegionList.length; k++) {
+                                        nestedHeaders.push(
+                                            {
+                                                title: regRegionList[k].label.label_en,
+                                                colspan: '3'
+                                            },
+
+                                        );
+
+                                    }
+                                    nestedHeaders.push(
+                                        {
+                                            title: 'All Regions',
+                                            colspan: '1'
+                                        },
+                                    );
+                                    // if (langaugeList.length == 0) {
+                                    //     data = [];
+                                    //     languageArray[0] = data;
+                                    // }
+                                    // console.log("languageArray---->", languageArray);
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
+                                    console.log("DataArray+++", dataArray)
+                                    var options = {
+                                        data: dataArray,
+                                        columnDrag: true,
+                                        columns: columns,
+                                        nestedHeaders: [nestedHeaders],
+                                        text: {
+                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                            show: '',
+                                            entries: '',
+                                        },
+                                        pagination: false,
+                                        search: false,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onselection: this.selected,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        allowExport: false,
+                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                        position: 'top',
+                                        filters: true,
+                                        onchange: this.forecastChanged,
+                                        onload: function (instance, cell, x, y, value) {
+                                            jExcelLoadedFunctionOnlyHideRow(instance);
+                                            var elInstance = instance.jexcel;
+                                            var json = elInstance.getJson(null, false);
+                                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+                                            for (var y = 0; y < json.length; y++) {
+                                                var rowData = elInstance.getRowData(y);
+                                                if (rowData[12] == 1) {
+                                                    for (var r = 0; r < rowData.length; r++) {
+                                                        var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
+                                                        cell.classList.add('readonly');
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        license: JEXCEL_PRO_KEY,
+                                        contextMenu: function (obj, x, y, e) {
+                                            return false;
+                                        }.bind(this),
+                                    };
+                                    var dataEl = jexcel(document.getElementById("tableDiv"), options);
+                                    this.el = dataEl;
+                                    this.setState({
+                                        dataEl: dataEl
+                                    })
+                                }
+                            });
+                        })
+
+
+                    }.bind(this);
+                }.bind(this);
+
+
+            } else {//api call
+
+
+
+            }
+        } else {//validation message
+
+        }
+    }
+
+    forecastChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.dataEl;
+        var rowData = elInstance.getRowData(y);
+        var possiblex = [];
+        for (var r = 0; r < this.state.regRegionList.length; r++) {
+            possiblex.push((r + 1) * 3);
+        }
+        var index = possiblex.findIndex(c => c == x);
+        if (index != -1) {
+            if (value != "") {
+                var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
+                var totalForecast = 0;
+                if (tsListFilter.type == "C") {
+                    totalForecast = tsListFilter.totalForecast;
+                } else {
+                    var flatList = tsListFilter.flatList;
+                    var flatListFilter = flatList.filter(c => c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+
+                    var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
+                    nodeDataMomList.map(ele => {
+                        totalForecast += Number(ele.calculatedValue);
+                    });
+                }
+                elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+            }
+        }
+    }
+
+    filterTsList(instance, cell, c, r, source) {
+        var tsList = this.state.tsList;
+        var mylist = [];
+        var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
+        return mylist;
+    }
+
+    checkedChanged(tempTracerCategoryId) {
+
+        var summeryData = this.state.summeryData;
+
+        for (var i = 0; i < summeryData.length; i++) {
+
+            if (tempTracerCategoryId == summeryData[i].tempTracerCategoryId) {
+                summeryData[i].display = !summeryData[i].display;
+            }
+
+        }
+
+        this.setState({
+            summeryData
+        }, () => {
+            console.log("tempTracerCategoryId---------->2", summeryData);
+            // this.calculateEquivalencyUnitTotal();
+        })
+    }
+
+
+    getPrograms() {
+        // this.setState({ programs: [{ label: "Benin PRH,Condoms Forecast Dataset", programId: 1 }, { label: "Benin ARV Forecast Dataset", programId: 2 }, { label: "Benin Malaria Forecast Dataset", programId: 3 }], loading: false });
+        if (isSiteOnline()) {
+            // AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getDataSetListAll()
+                .then(response => {
+                    this.setState({
+                        programs: response.data
+                    }, () => { this.consolidatedProgramList() })
+                }).catch(
+                    error => {
+                        this.setState({
+                            programs: [], loading: false
+                        }, () => { this.consolidatedProgramList() })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+        } else {
+            console.log('offline')
+            this.consolidatedProgramList()
+            this.setState({ loading: false })
+        }
+    }
+
+    consolidatedProgramList = () => {
+        const lan = 'en';
+        const { programs } = this.state
+        var proList = programs;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        console.log(programNameLabel)
+
+                        var f = 0
+                        for (var k = 0; k < this.state.programs.length; k++) {
+                            if (this.state.programs[k].programId == programData.programId) {
+                                f = 1;
+                                console.log('already exist')
+                            }
+                        }
+                        if (f == 0) {
+                            proList.push(programData)
+                        }
+                    }
+
+                }
+                var lang = this.state.lang;
+
+                this.setState({
+                    programs: proList.sort(function (a, b) {
+                        a = getLabelText(a.label, lang).toLowerCase();
+                        b = getLabelText(b.label, lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
+                }, () => {
+                    console.log("programs------------------>", this.state.programs);
+                })
+
+
+            }.bind(this);
+
+        }.bind(this);
+
+
+    }
+
+    componentDidMount() {
+        this.getPrograms();
+        this.setState({
+            regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
+            regionList: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
+            regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
+        })
+    }
+
+    setProgramId(event) {
+        this.setState({
+            programId: event.target.value,
+            versionId: ''
+        }, () => {
+            // localStorage.setItem("sesVersionIdReport", '');
+            this.getVersionIds();
+        })
+    }
+
+    setVersionId(event) {
+
+        var versionId = (event.target.value.split('(')[0]).trim();
+        var programId = this.state.programId;
+
+
+        if (programId != -1 && versionId != -1) {
+            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+            console.log("Test-----------------111", selectedForecastProgram);
+
+            let tempObj = {
+                forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+            }
+
+            selectedForecastProgram = {
+                ...selectedForecastProgram,
+                ...tempObj
+            }
+
+            let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+            let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+
+
+            let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+            let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+            d11.setMonth(d11.getMonth() - 1);
+
+            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+            var month = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ]
+
+            let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+            let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+            let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+            forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+            console.log("Test-----------------111", startDateSplit);
+            this.setState({
+                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
+                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+                endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+                beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+            }, () => {
+
+            })
+        } else {
+            var dt = new Date();
+            dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+            var dt1 = new Date();
+            dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+            this.setState({
+                forecastPeriod: '',
+                rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+                startDateDisplay: '',
+                endDateDisplay: '',
+                beforeEndDateDisplay: '',
+            }, () => {
+
+            })
+        }
+
+
+        this.setState({
+            versionId: event.target.value,
+        }, () => {
+            // localStorage.setItem("sesVersionIdReport", '');
+            this.filterData();
+        })
+
+
+    }
+
+    buildJexcel() {
+        var dataArr = [];
+        var data = [];
+        var consumptionData = this.state.consumptionData;
+        console.log("ConsumptionData+++", consumptionData[0].forecastingUnit);
+        for (var j = 0; j < consumptionData.length; j++) {
+            console.log("ConsumptionData+++", consumptionData[j].forecastingUnit);
+            data = [];
+            data[0] = consumptionData[j].forecastingUnit.label; //A
+            data[1] = consumptionData[j].planningUnit.label; //B
+            data[2] = consumptionData[j].scenario.id; //C
+            data[3] = consumptionData[j].consumptionQty;//D
+            data[4] = consumptionData[j].startingStock;//E
+            data[5] = consumptionData[j].existingShipmentQty;//F
+            data[6] = `=E${parseInt(j) + 1}+F${parseInt(j) + 1}-D${parseInt(j) + 1}`;//G
+            data[7] = consumptionData[j].desiredMonthsOfStock;//H
+            data[8] = `=ROUND(H${parseInt(j) + 1}*D${parseInt(j) + 1}/36,0)`;//I
+            data[9] = `=ROUND(G${parseInt(j) + 1}-I${parseInt(j) + 1},0)`; //J
+            data[10] = consumptionData[j].priceType;//K
+            data[11] = consumptionData[j].price;//L
+            data[12] = `=IF(IFERROR(-J${parseInt(j) + 1}*L${parseInt(j) + 1},"")>0,IFERROR(-J${parseInt(j) + 1}*L${parseInt(j) + 1},""),"")`;
+            dataArr[j] = data;
+        }
+        var options = {
+            data: dataArr,
+            columnDrag: true,
+            columns: [
+                { title: i18n.t('static.product.unit1'), type: 'text', width: 200, readOnly: true },
+                { title: i18n.t('static.product.product'), type: 'text', width: 200, readOnly: true },
+                { type: 'dropdown', title: "Scenario", source: this.state.scenarioList, width: 200 },
+                { title: "Forecast (PU)", type: 'numeric', width: 100, type: 'numeric', mask: '#,##', decimal: '.', readOnly: true },
+                { title: "Starting Stock (PU) - end of Dec 2020", type: 'numeric', mask: '#,##', readOnly: true, width: 100 },
+                { title: 'Existing Shipments in period (PU)', type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100, },
+                { title: "Ending Stock - end of Dec 2023", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
+                { title: "Desired End of Period Stock (in months)", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
+                { title: "Desired End of Period Stock (in PU)", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
+                { title: "Shipment gap", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
+                { title: "Price type", type: 'dropdown', width: 100, source: [{ id: 1, name: "Dataset" }, { id: 2, name: "GHSC-PSM*" }, { id: 3, name: "Global Fund*" }] },
+                { title: "PU (unit $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
+                { title: "Procurements Needed PU (total $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
+
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        }
+        var myVar = jexcel(document.getElementById("consumptionTable"), options);
+        this.el = myVar;
+        this.setState({
+            consumptionEl: myVar,
+            loading: false
+        })
+    }
+
+    loaded(instance) {
+        jExcelLoadedFunction(instance);
+    }
+
+    getVersionIds() {
+        // var versionListAll = this.state.versionListAll;
+        // var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
+        // var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
+        // var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
+        // var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
+        // this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, rangeValue });
+
+        let programId = this.state.programId;
+        if (programId != 0) {
+
+            const program = this.state.programs.filter(c => c.programId == programId)
+            console.log(program)
+            if (program.length == 1) {
+                if (isSiteOnline()) {
+                    this.setState({
+                        versions: [],
+                    }, () => {
+                        this.setState({
+                            versions: program[0].versionList.filter(function (x, i, a) {
+                                return a.indexOf(x) === i;
+                            })
+                        }, () => { this.consolidatedVersionList(programId) });
+                    });
+
+
+                } else {
+                    this.setState({
+                        versions: [],
+
+                    }, () => {
+                        this.consolidatedVersionList(programId)
+                    })
+                }
+            } else {
+
+                this.setState({
+                    versions: [],
+
+                }, () => { })
+
+            }
+        } else {
+            this.setState({
+                versions: [],
+
+            }, () => { })
+        }
+    }
+
+    consolidatedVersionList = (programId) => {
+        const lan = 'en';
+        const { versions } = this.state
+        var verList = versions;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+
+                    }
+
+
+                }
+
+                console.log(verList)
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
+                versionList.reverse();
+                this.setState({
+                    versions: versionList,
+                    // versionId: versionList[0].versionId
+                }, () => {
+                    // this.getPlanningUnit();
+                })
+
+
+            }.bind(this);
+
+
+
+        }.bind(this)
+
+
+    }
+
+    show() {
+        this.getVersionIds()
+    }
+    handleRangeChange(value, text, listIndex) {
+
+    }
+    handleRangeDissmis(value) {
+        let startDate = value.from.year + '-' + value.from.month + '-01';
+        let stopDate = value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate();
+        var monthArrayList = [];
+        let cursorDate = value.from.year + '-' + value.from.month + '-01';
+        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+            monthArrayList.push(dt);
+        }
+        this.setState({ rangeValue: value, monthArrayList: monthArrayList }, () => {
+            // this.filterData();
+        })
+
+    }
+
+    _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+    }
+    loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+
+    dateFormatterLanguage = value => {
+        if (moment(value).format('MM') === '01') {
+            return (i18n.t('static.month.jan') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '02') {
+            return (i18n.t('static.month.feb') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '03') {
+            return (i18n.t('static.month.mar') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '04') {
+            return (i18n.t('static.month.apr') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '05') {
+            return (i18n.t('static.month.may') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '06') {
+            return (i18n.t('static.month.jun') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '07') {
+            return (i18n.t('static.month.jul') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '08') {
+            return (i18n.t('static.month.aug') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '09') {
+            return (i18n.t('static.month.sep') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '10') {
+            return (i18n.t('static.month.oct') + ' ' + moment(value).format('YY'))
+        } else if (moment(value).format('MM') === '11') {
+            return (i18n.t('static.month.nov') + ' ' + moment(value).format('YY'))
+        } else {
+            return (i18n.t('static.month.dec') + ' ' + moment(value).format('YY'))
+        }
+    }
+
+    setViewById(e) {
+        console.log("e.targetvakue+++", e.target.value)
+        var viewById = e.target.value;
+        this.setState({
+            viewById: viewById,
+            planningUnitId: ""
+        }, () => {
+            if (viewById == 2) {
+                document.getElementById("planningUnitDiv").style.display = "none";
+            } else {
+                document.getElementById("planningUnitDiv").style.display = "block";
+            }
+        })
+    }
+
+    saveSelectedForecast() {
+        var id = this.state.regDatasetJson.id;
+        var json = this.state.dataEl.getJson(null, false).filter(c => c[12] == 2);
+        console.log("Json+++", json);
+        var dataList = [];
+        for (var j = 0; j < json.length; j++) {
+            for (var k = 0; k < this.state.regRegionList.length; k++) {
+                console.log("(k + 1) * 3+++", (k + 1) * 3);
+                console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
+                if (json[j][(k + 1) * 3] != "") {
+                    var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
+                    dataList.push({
+                        planningUnit: json[j][1],
+                        scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
+                        consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
+                        totalForecast: json[j][((k + 1) * 3) + 1],
+                        notes: json[j][((k + 1) * 3) + 2],
+                        region: this.state.regRegionList[k]
+                    })
+                }
+            }
+
+        }
+        console.log("DataList+++", dataList)
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+
+            var programRequest = programTransaction.get(id);
+            programRequest.onerror = function (event) {
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+                var dataset = programRequest.result;
+                var programDataJson = programRequest.result.programData;
+                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJson = JSON.parse(datasetData);
+                var datasetForEncryption = datasetJson;
+                var planningUnitList = datasetJson.planningUnitList;
+                var planningUnitList1 = planningUnitList;
+                for (var dl = 0; dl < dataList.length; dl++) {
+                    console.log("dataList[dl].planningUnit.id+++", dataList[dl].planningUnit.id);
+                    var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id);
+                    console.log("Index+++", index)
+                    console.log("Reg+++", dataList[dl].region.regionId)
+                    var pu = planningUnitList1[index];
+                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes };
+                    planningUnitList1[index] = pu;
+                }
+                console.log("PlanningUnitList1+++", planningUnitList1);
+                datasetForEncryption.planningUnitList = planningUnitList1;
+
+                var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                dataset.programData = encryptedDatasetJson;
+
+                var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+                var datasetOs = datasetTransaction.objectStore('datasetData');
+                var putRequest = datasetOs.put(dataset);
+                putRequest.onerror = function (event) {
+                }.bind(this);
+                putRequest.onsuccess = function (event) {
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + "Data saved successfully");
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
+    render() {
+        const { programs } = this.state;
+        let programList = programs.length > 0
+            && programs.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
+
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
+                return (
+                    <option key={i} value={item.versionId}>
+                        {/* {item.versionId} */}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                    </option>
+                )
+            }, this);
+
+        const pickerLang = {
+            months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+        const checkOnline = localStorage.getItem('sessionType');
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
+
+        return (
+            <div className="animated fadeIn" >
+                <AuthenticationServiceComponent history={this.props.history} />
+                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+                <h5 className="red">{i18n.t(this.state.message)}</h5>
+
+                <Card>
+                    <div className="Card-header-reporticon pb-2">
+                        {checkOnline === 'Online' &&
+                            this.state.consumptionData.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+
+
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }
+                        {checkOnline === 'Offline' &&
+                            this.state.offlineConsumptionList.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                        <div>
+                            <div ref={ref}>
+                                <Form >
+                                    <div className="pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="programId"
+                                                            id="programId"
+                                                            bsSize="sm"
+                                                            // onChange={this.filterVersion}
+                                                            onChange={(e) => { this.setProgramId(e); }}
+                                                            value={this.state.programId}
+
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {programList}
+                                                            {/* <option value="4">FASPonia MOH 1</option> */}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="versionId"
+                                                            id="versionId"
+                                                            bsSize="sm"
+                                                            // onChange={this.filterVersion}
+                                                            onChange={(e) => { this.setVersionId(e); }}
+                                                            value={this.state.versionId}
+
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                            {versionList}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="text"
+                                                            name="forecastPeriod"
+                                                            id="forecastPeriod"
+                                                            bsSize="sm"
+                                                            disabled={true}
+                                                            value={this.state.forecastPeriod}
+                                                        // onChange={this.filterData}
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3" style={{ display: 'none' }}>
+                                                <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Display</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="displayId"
+                                                            id="displayId"
+                                                            bsSize="sm"
+                                                            onChange={this.filterData}
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                            <option value="1">National View</option>
+                                                            <option value="2">Regional View</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Hide Calculations</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="calculationId"
+                                                            id="calculationId"
+                                                            bsSize="sm"
+                                                            value={this.state.hideCalculation}
+                                                            onChange={(e) => { this.hideCalculation(e); }}
+                                                        >
+                                                            <option value="1">Yes</option>
+                                                            <option value="2">No</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
+
+
+                                        </div>
+                                    </div>
+                                </Form>
+
+                                <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div className="row">
+                                        <div className="col-md-12 pl-0 pr-0">
+                                            {/* <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <div className="table-responsive" id="consumptionTableDiv">
+                                                    <div id="consumptionTable" />
+                                                </div>
+                                            </div> */}
+                                            <div className="table-responsive">
+                                                {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
+                                                    <Table className="table-striped table-bordered text-center mt-2">
+                                                        {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                <th className="text-center" style={{}}> Forecasting Unit </th>
+                                                                <th className="text-center" style={{}}>Planning Unit</th>
+                                                                <th className="text-center" style={{}}>Total Forecasted Quantity</th>
+                                                                <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
+                                                                <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
+                                                                <th className="text-center" style={{}}>Price Type</th>
+                                                                <th className="text-center" style={{}}>Unit Price ($)</th>
+                                                                <th className="text-center" style={{}}>Procurements Needed ($)</th>
+                                                                <th className="text-center" style={{ width: '20%' }}>Notes</th>
+
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            {this.state.summeryData.map(item1 => (
+                                                                <>
+                                                                    <tr>
+                                                                        {item1.id == 0 ?
+                                                                            <>
+                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                    {
+                                                                                        item1.display == false ?
+                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            :
+                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                    }
+
+                                                                                </td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                            </>
+                                                                            :
+                                                                            <>
+                                                                                {item1.display == true &&
+                                                                                    <>
+                                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                        <td>{item1.forecastingUnit.label.label_en}</td>
+                                                                                        <td>{item1.planningUnit.label.label_en}</td>
+                                                                                        <td>{item1.totalForecastedQuantity}</td>
+                                                                                        <td>{item1.stock1}</td>
+                                                                                        <td>{item1.existingShipments}</td>
+                                                                                        <td>{item1.stock2}</td>
+                                                                                        <td>{item1.desiredMonthOfStock1}</td>
+                                                                                        <td>{item1.desiredMonthOfStock2}</td>
+                                                                                        {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
+                                                                                        {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                        <td>{item1.unitPrice}</td>
+                                                                                        <td>{item1.procurementNeeded}</td>
+                                                                                        <td>{item1.notes}</td>
+                                                                                    </>
+                                                                                }
+                                                                            </>
+                                                                        }
+
+                                                                    </tr>
+
+                                                                </>
+                                                            ))}
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Product Cost</b></td>
+                                                                <td><b>{this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Freight (7%)</b></td>
+                                                                <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td><b>Total Cost</b></td>
+                                                                <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </Table>
+                                                }
+                                                {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
+                                                    <div id="tableDiv">
+                                                    </div>
+
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </Col>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </CardBody>
+                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && <CardFooter>
+                        <FormGroup>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                            </FormGroup>
+                        </FormGroup>
+                    </CardFooter>}
+                </Card>
+            </div >
+        );
+    }
+}
+
+export default ForecastSummary;
